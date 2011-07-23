@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:orientation="vertical" android:id="@+id/linearLayout1">
+	<TextSwitcher android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:id="@+id/rollresult" />
+	<LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/linearLayout2">
+		<TextView style="@style/text" android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="@string/dieroll" android:id="@+id/textView1" android:layout_gravity="center"></TextView>
+		<EditText android:layout_weight="1" android:layout_height="wrap_content" android:inputType="number" android:id="@+id/rollnum" android:layout_width="fill_parent" android:layout_gravity="center"></EditText>
+	</LinearLayout>
+	<Button android:layout_height="wrap_content"
+		android:id="@+id/rollButton"
+		android:text="@string/roll" android:layout_width="fill_parent"/>
+</LinearLayout>

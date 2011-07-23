@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">MTG Familiar</string>
+
+	<string name="and">And</string>
+	<string name="or">Or</string>
+
+	<string-array name="logic_array">
+		<item>And</item>
+		<item>Or</item>
+	</string-array>
+
+	<string-array name="logic_spinner">
+		<item>></item>
+		<item>&lt;</item>
+		<item>=</item>
+	</string-array>
+	
+	<string-array name="format_names">
+		<item>Block</item>
+		<item>Standard</item>
+		<item>Extended</item>
+		<item>Legacy</item>
+		<item>Vintage</item>
+	</string-array>
+	
+	<string-array name="rarities">
+		<item>Common</item>
+		<item>Uncommon</item>
+		<item>Rare</item>
+		<item>Mythic</item>
+	</string-array>
+
+	<string-array name="pt_spinner">
+		<item />
+		<item>*</item>
+		<item>1+*</item>
+		<item>-1</item>
+		<item>0</item>
+		<item>1</item>
+		<item>2</item>
+		<item>3</item>
+		<item>4</item>
+		<item>5</item>
+		<item>6</item>
+		<item>7</item>
+		<item>8</item>
+		<item>9</item>
+		<item>10</item>
+		<item>11</item>
+		<item>12</item>
+		<item>13</item>
+		<item>14</item>
+		<item>15</item>
+		<item>99</item>
+	</string-array>
+
+	<string-array name="cmc_spinner">
+		<item />
+		<item>0</item>
+		<item>1</item>
+		<item>2</item>
+		<item>3</item>
+		<item>4</item>
+		<item>5</item>
+		<item>6</item>
+		<item>7</item>
+		<item>8</item>
+		<item>9</item>
+		<item>10</item>
+		<item>11</item>
+		<item>12</item>
+		<item>13</item>
+		<item>14</item>
+		<item>15</item>
+		<item>16</item>
+		<item>1000000</item>
+	</string-array>
+
+	<string name="pow">Power</string>
+	<string name="tou">Toughness</string>
+	<string name="formatsearch">Format</string>
+	<string name="setsearch">Set</string>
+	<string name="cmc">CMC</string>
+	<string name="image">Card Image</string>
+	<string name="price">Card Price</string>
+	<string name="cardsearch">Card Search</string>
+	<string name="lifecounter">Life Counter</string>
+	<string name="random">Random Number Generator</string>
+	<string name="roll">Roll!</string>
+	<string name="dieroll">Roll a D</string>
+	<string name="plus">+</string>
+	<string name="minus">-</string>
+	<string name="searchrarity">Rarity</string>
+	<string name="refreshDB">Refresh Database</string>
+
+</resources>

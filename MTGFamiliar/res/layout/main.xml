@@ -1,0 +1,6 @@
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_height="fill_parent" android:id="@+id/linearLayout1" android:layout_width="fill_parent" android:orientation="vertical">
+        <Button android:layout_height="wrap_content" android:layout_width="fill_parent" android:text="@string/cardsearch" android:id="@+id/cardsearch"></Button>
+        <Button android:layout_height="wrap_content" android:layout_width="fill_parent" android:text="@string/lifecounter" android:id="@+id/lifecounter"></Button>
+        <Button android:layout_height="wrap_content" android:layout_width="fill_parent" android:text="@string/random" android:id="@+id/rng"></Button>
+    </LinearLayout>

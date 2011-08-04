@@ -93,5 +93,8 @@
 	<string name="minus">-</string>
 	<string name="searchrarity">Rarity</string>
 	<string name="refreshDB">Refresh Database</string>
+	<string name="dbdownloadmsg">Before you can search through a database of cards, you must download it. Do you want to download it now? You can always download the database by pressing the menu button on this screen and choosing &quot;Refresh Database&quot;.</string>
+	<string name="dlnow">Download Now</string>
+	<string name="dllater">Download Later</string>
 
 </resources>

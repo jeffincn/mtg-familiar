@@ -49,12 +49,18 @@ public class MtgXMLHandler extends DefaultHandler {
 	private String[]			artists;
 	private String[]			colors;
 	private String[]	types;
+	
+	private main mMain;
 
 	// ===========================================================
 	// Methods
 	// ===========================================================
 	public void setDb(CardDbAdapter cda) {
 		mDbHelper = cda;
+	}
+
+	public void setMain(main m) {
+		mMain = m;
 	}
 
 	@Override
@@ -91,6 +97,10 @@ public class MtgXMLHandler extends DefaultHandler {
 
 		value = buf.toString();
 
+		if(localName.equals("numCards")){
+			mMain.setNumCards(Integer.parseInt(value));
+		}
+		
 		// for sets
 		if (parsing_sets) {
 			if (localName.equals("code_magiccards")) {
@@ -261,6 +271,8 @@ public class MtgXMLHandler extends DefaultHandler {
 					number = 0;
 					artist = null;
 					color = null;
+					
+					mMain.cardAdded();
 				}
 			}
 		}

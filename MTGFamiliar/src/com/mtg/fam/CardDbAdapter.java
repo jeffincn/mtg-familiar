@@ -297,22 +297,16 @@ public class CardDbAdapter {
 		Cursor mCursor = null;
 
 		String statement = null;
-		boolean started = false;
 
 		if (cardname != null) {
-			if (!started) {
+			{
 				statement = KEY_NAME + " LIKE '%" + cardname + "%'";
-				started = true;
-			}
-			else {
-				statement += " AND " + KEY_NAME + " LIKE '%" + cardname + "%'";
 			}
 		}
 
 		if (cardtext != null) {
-			if (!started) {
+			if (statement == null) {
 				statement = KEY_ABILITY + " LIKE '%" + cardtext + "%'";
-				started = true;
 			}
 			else {
 				statement += " AND " + KEY_ABILITY + " LIKE '%" + cardtext + "%'";
@@ -320,19 +314,27 @@ public class CardDbAdapter {
 		}
 
 		if (cardtype != null) {
-			if (!started) {
-				statement = KEY_TYPE + " LIKE '%" + cardtype + "%'";
-				started = true;
+			String[] types = cardtype.split(" ");
+			if(statement == null){
+				statement = "(";
 			}
-			else {
-				statement += " AND " + KEY_TYPE + " LIKE '%" + cardtype + "%'";
+			
+			boolean firstType = false;
+			for(String s : types){
+				if(firstType){
+					statement += " AND ";
+				}
+				statement += KEY_TYPE + " LIKE '%" + s + "%'";
+				firstType = true;
 			}
+			
+			statement += ")";
 		}
 
 		if (!(color.equals("wubrgl") || (color.equals("WUBRGL") && colorlogic == false))) {
 			boolean firstprint = true;
 
-			if (!started) {
+			if (statement == null) {
 				statement = "((";
 			}
 			else {
@@ -340,16 +342,22 @@ public class CardDbAdapter {
 			}
 
 			// Can't contain these colors
-			for (int i = 0; i < color.length(); i++) {
-				if (color.charAt(i) > 'a') {
-					if (firstprint == true) {
-						firstprint = false;
-					}
-					else {
+			for (byte b : color.getBytes()) {
+				char c = (char)b;
+				
+				if (c > 'a') {
+					if(firstprint == false){
 						statement += " AND ";
 					}
-					statement += KEY_COLOR + " NOT LIKE '%"
-							+ Character.toUpperCase(color.charAt(i)) + "%'";
+					firstprint = false;
+					
+					if(c == 'l' || c == 'L'){
+						statement += KEY_COLOR + " NOT GLOB '[CLA]'";
+					}
+					else{
+						statement += KEY_COLOR + " NOT LIKE '%"
+						+ Character.toUpperCase(c) + "%'";						
+					}
 				}
 			}
 
@@ -357,20 +365,24 @@ public class CardDbAdapter {
 			firstprint = true;
 
 			// Might contain these colors
-			for (int i = 0; i < color.length(); i++) {
-				if (color.charAt(i) < 'a') {
-					if (firstprint == true) {
-						firstprint = false;
+			for (byte b : color.getBytes()) {
+				char c = (char)b;
+				if (c < 'a') {
+					if (firstprint == false && colorlogic == true) {
+						statement += " AND ";
 					}
-					else {
-						if (colorlogic == true) {
-							statement += " AND ";
-						}
-						else {
-							statement += " OR ";
-						}
+					else if(firstprint == false){
+						statement += " OR ";
 					}
-					statement += KEY_COLOR + " LIKE '%" + color.charAt(i) + "%'";
+					firstprint = false;
+
+					if(c == 'l' || c == 'L'){
+						statement += KEY_COLOR + " GLOB '[CLA]'";
+					}
+					else{
+						statement += KEY_COLOR + " LIKE '%" + c + "%'";
+					}
+					
 				}
 			}
 			statement += "))";
@@ -439,7 +451,8 @@ public class CardDbAdapter {
 						KEY_SET + " LIKE '%SOM%' OR " + 
 						KEY_SET + " LIKE '%MBS%' OR " + 
 						KEY_SET + " LIKE '%NPH%' OR " + 
-						KEY_SET + " LIKE '%M11%')";
+						KEY_SET + " LIKE '%M11%' OR " +
+						KEY_SET + " LIKE '%M12%')";
 			}
 			if(formats.contains(formatNames[2])){
 				if (first) {
@@ -463,7 +476,8 @@ public class CardDbAdapter {
 						KEY_SET + " LIKE '%MBS%' OR " + 
 						KEY_SET + " LIKE '%NPH%' OR " + 
 						KEY_SET + " LIKE '%M10%' OR " +
-						KEY_SET + " LIKE '%M11%')";
+						KEY_SET + " LIKE '%M11%' OR " +
+						KEY_SET + " LIKE '%M12%')";
 			}
 			if(formats.contains(formatNames[3])){
 				// Legacy, banlist?
@@ -476,7 +490,7 @@ public class CardDbAdapter {
 
 		if (pow_logic.equals("<") || pow_logic.equals(">")) {
 			boolean cont = true;
-			started = false;
+			boolean firstprint = false;
 			String powersNeg = "-[";
 			String powers1 = "[";
 			String powers2 = "1[";
@@ -533,11 +547,11 @@ public class CardDbAdapter {
 
 				if (!powersNeg.equals("-[]")) {
 					statement += KEY_POWER + " GLOB '" + powersNeg + "'";
-					started = true;
+					firstprint = true;
 				}
 				if (!powers1.equals("[]")) {
-					if (!started) {
-						started = true;
+					if (!firstprint) {
+						firstprint = true;
 					}
 					else {
 						statement += " OR ";
@@ -545,7 +559,7 @@ public class CardDbAdapter {
 					statement += KEY_POWER + " GLOB '" + powers1 + "'";
 				}
 				if (!powers2.equals("1[]")) {
-					if (started) {
+					if (firstprint) {
 						statement += " OR ";
 					}
 					statement += KEY_POWER + " GLOB '" + powers2 + "'";
@@ -564,7 +578,7 @@ public class CardDbAdapter {
 
 		if (tou_logic.equals("<") || tou_logic.equals(">")) {
 			boolean cont = true;
-			started = false;
+			boolean firstprint = false;
 			String toughnessNeg = "-[";
 			String toughness1 = "[";
 			String toughness2 = "1[";
@@ -621,11 +635,11 @@ public class CardDbAdapter {
 
 				if (!toughnessNeg.equals("-[]")) {
 					statement += KEY_TOUGHNESS + " GLOB '" + toughnessNeg + "'";
-					started = true;
+					firstprint = true;
 				}
 				if (!toughness1.equals("[]")) {
-					if (!started) {
-						started = true;
+					if (!firstprint) {
+						firstprint = true;
 					}
 					else {
 						statement += " OR ";
@@ -633,7 +647,7 @@ public class CardDbAdapter {
 					statement += KEY_TOUGHNESS + " GLOB '" + toughness1 + "'";
 				}
 				if (!toughness2.equals("1[]")) {
-					if (started) {
+					if (firstprint) {
 						statement += " OR ";
 					}
 					statement += KEY_TOUGHNESS + " GLOB '" + toughness2 + "'";
@@ -669,11 +683,11 @@ public class CardDbAdapter {
 				statement += " AND (";
 			}
 			
-			started = false;
+			boolean firstprint = false;
 			for (int i=0; i < rarity.length(); i++){
-				if(!started){
+				if(!firstprint){
 					statement += KEY_RARITY + " = " + (int)rarity.toUpperCase().charAt(i) + "";
-					started = true;
+					firstprint = true;
 				}
 				else{
 					statement += " OR " + KEY_RARITY + " = " + (int)rarity.toUpperCase().charAt(i) + "";					

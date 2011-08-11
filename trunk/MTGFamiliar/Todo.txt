@@ -31,8 +31,6 @@ beautify UI, non-default theme?
 
 Small Fixes
 -----------
-split the words on type search (the zombie goblin problem)
 figure out shared prefs
 loading pics block UI thread?
 spinner for color choice (must contain all / may contain any)
-reset button for card search (clear fields)

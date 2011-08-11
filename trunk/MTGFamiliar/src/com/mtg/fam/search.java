@@ -9,6 +9,9 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -66,6 +69,9 @@ public class search extends Activity{
 	private Button	rarityButton;
 	private String[]	rarityNames;
 	private boolean[]	rarityChecked;
+	private Dialog	setDialog;
+	private Dialog	formatDialog;
+	private Dialog	rarityDialog;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -283,38 +289,38 @@ public class search extends Activity{
 		
 		Resources res = getResources();
 		formatNames = res.getStringArray(R.array.format_names);
-		formatChecked = new boolean[5];
+		formatChecked = new boolean[formatNames.length];
 		
 		rarityNames = res.getStringArray(R.array.rarities);
-		rarityChecked = new boolean[4];
+		rarityChecked = new boolean[rarityNames.length];
 	}
 
 	@Override
 	protected Dialog onCreateDialog( int id ) 
 	{
 		if(id == SETLIST){
-			return 
-			new AlertDialog.Builder( this )
+			setDialog = new AlertDialog.Builder( this )
 	        	.setTitle( "Sets" )
 	        	.setMultiChoiceItems( setNames, setChecked, new DialogSelectionClickHandler() )
 	        	.setPositiveButton( "OK", new DialogButtonClickHandler() )
 	        	.create();
+			return setDialog;
 		}
 		else if(id==FORMATLIST){
-			return 
-			new AlertDialog.Builder( this )
+			formatDialog = new AlertDialog.Builder( this )
 	        	.setTitle( "Formats" )
 	        	.setMultiChoiceItems( formatNames, formatChecked, new DialogSelectionClickHandler() )
 	        	.setPositiveButton( "OK", new DialogButtonClickHandler() )
 	        	.create();
+			return formatDialog;
 		}
 		else if(id==RARITYLIST){
-			return 
-			new AlertDialog.Builder( this )
+			rarityDialog = new AlertDialog.Builder( this )
 	        	.setTitle( "Rarities" )
 	        	.setMultiChoiceItems( rarityNames, rarityChecked, new DialogSelectionClickHandler() )
 	        	.setPositiveButton( "OK", new DialogButtonClickHandler() )
 	        	.create();
+			return rarityDialog;
 		}
 		return null;
 	}
@@ -338,6 +344,59 @@ public class search extends Activity{
 				case DialogInterface.BUTTON_POSITIVE:
 					break;
 			}
+		}
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.search_menu, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+			case R.id.clear:
+				namefield.setText("");
+				typefield.setText("");
+				textfield.setText("");
+				
+				checkboxW.setChecked(false);
+				checkboxU.setChecked(false);
+				checkboxB.setChecked(false);
+				checkboxR.setChecked(false);
+				checkboxG.setChecked(false);
+				checkboxL.setChecked(false);
+				logicbutton.setChecked(false);
+				
+				powLogic.setSelection(0);
+				powChoice.setSelection(0);
+				touLogic.setSelection(0);
+				touChoice.setSelection(0);
+				cmcLogic.setSelection(0);
+				cmcChoice.setSelection(0);
+				
+				for(int i=0; i < setChecked.length; i++){
+					setChecked[i] = false;
+				}
+				for(int i=0; i < formatChecked.length; i++){
+					formatChecked[i] = false;
+				}
+				for(int i=0; i < rarityChecked.length; i++){
+					rarityChecked[i] = false;
+				}
+				this.removeDialog(SETLIST);
+				this.removeDialog(FORMATLIST);
+				this.removeDialog(RARITYLIST);
+/*
+				onCreateDialog(SETLIST);
+				onCreateDialog(FORMATLIST);
+				onCreateDialog(RARITYLIST);
+*/				return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 }

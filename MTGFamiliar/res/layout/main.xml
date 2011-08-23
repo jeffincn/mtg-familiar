@@ -1,6 +1,17 @@
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_height="fill_parent" android:id="@+id/linearLayout1" android:layout_width="fill_parent" android:orientation="vertical">
-        <Button android:layout_height="wrap_content" android:layout_width="fill_parent" android:text="@string/cardsearch" android:id="@+id/cardsearch"></Button>
-        <Button android:layout_height="wrap_content" android:layout_width="fill_parent" android:text="@string/lifecounter" android:id="@+id/lifecounter"></Button>
-        <Button android:layout_height="wrap_content" android:layout_width="fill_parent" android:text="@string/random" android:id="@+id/rng"></Button>
-    </LinearLayout>
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="fill_parent" android:id="@+id/linearLayout1"
+	android:layout_width="fill_parent" android:orientation="vertical">
+	<Button android:layout_height="wrap_content"
+		android:layout_width="fill_parent" android:text="@string/cardsearch"
+		android:id="@+id/cardsearch" />
+	<Button android:layout_height="wrap_content"
+		android:layout_width="fill_parent" android:text="@string/lifecounter"
+		android:id="@+id/lifecounter" />
+	<Button android:layout_height="wrap_content"
+		android:layout_width="fill_parent" android:text="@string/random"
+		android:id="@+id/rng" />
+	<TextView android:text="TextView" android:id="@+id/timertext"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		style="@style/text" />
+</LinearLayout>

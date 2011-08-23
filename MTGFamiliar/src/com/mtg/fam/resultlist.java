@@ -13,9 +13,10 @@ import android.widget.SimpleCursorAdapter;
 
 public class resultlist extends ListActivity {
 
-	private CardDbAdapter mDbHelper;
-	private ListView lv;
-	private Context mCtx;
+	private CardDbAdapter	mDbHelper;
+	private ListView			lv;
+	private Context				mCtx;
+	private Cursor				c;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -25,25 +26,15 @@ public class resultlist extends ListActivity {
 
 		mDbHelper = new CardDbAdapter(this);
 		mDbHelper.open();
-		
+
 		mCtx = this;
 
 		Bundle extras = getIntent().getExtras();
-		Cursor c = mDbHelper.Search(
-				this.getApplicationContext(),
-				extras.getString(CardDbAdapter.KEY_NAME),
-				extras.getString(search.TEXT),
-				extras.getString(search.TYPE),
-				extras.getString(search.COLOR),
-				extras.getBoolean(search.COLORLOGIC),
-				extras.getString(search.SET),
-				extras.getString(search.POW_CHOICE),
-				extras.getString(search.POW_LOGIC),
-				extras.getString(search.TOU_CHOICE),
-				extras.getString(search.TOU_LOGIC),
-				extras.getInt(search.CMC),
-				extras.getString(search.CMC_LOGIC),
-				extras.getString(search.FORMAT),
+		c = mDbHelper.Search(this.getApplicationContext(), extras.getString(CardDbAdapter.KEY_NAME),
+				extras.getString(search.TEXT), extras.getString(search.TYPE), extras.getString(search.COLOR),
+				extras.getInt(search.COLORLOGIC), extras.getString(search.SET), extras.getString(search.POW_CHOICE),
+				extras.getString(search.POW_LOGIC), extras.getString(search.TOU_CHOICE), extras.getString(search.TOU_LOGIC),
+				extras.getInt(search.CMC), extras.getString(search.CMC_LOGIC), extras.getString(search.FORMAT),
 				extras.getString(search.RARITY));
 		startManagingCursor(c);
 		fillData(c);
@@ -53,30 +44,47 @@ public class resultlist extends ListActivity {
 		lv = getListView();
 
 		lv.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> parent, View view, int position,
-					long id) {
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Intent i = new Intent(mCtx, cardview.class);
 				i.putExtra("id", id);
 				startActivity(i);
 			}
 		});
+	}
 
+	@Override
+	public void onPause() {
+		super.onPause();
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		if (c != null) {
+			c.close();
+		}
+		if (mDbHelper != null) {
+			mDbHelper.close();
+		}
 	}
 
 	private void fillData(Cursor c) {
 
 		// Create an array to specify the fields we want to display in the list
 		// (only TITLE)
-		String[] from = new String[] { CardDbAdapter.KEY_NAME,
-				CardDbAdapter.KEY_SET };
+		String[] from = new String[] { CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_SET };
 
 		// and an array of the fields we want to bind those fields to (in this case
 		// just text1)
 		int[] to = new int[] { R.id.cardname, R.id.cardset };
 
 		// Now create a simple cursor adapter and set it to display
-		SimpleCursorAdapter notes = new SimpleCursorAdapter(this,
-				R.layout.card_row, c, from, to);
+		SimpleCursorAdapter notes = new SimpleCursorAdapter(this, R.layout.card_row, c, from, to);
 		setListAdapter(notes);
 	}
 }

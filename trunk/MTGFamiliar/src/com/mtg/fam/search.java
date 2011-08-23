@@ -18,7 +18,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Spinner;
-import android.widget.ToggleButton;
 
 public class search extends Activity{
 	protected static final String NAME = "name";
@@ -51,7 +50,7 @@ public class search extends Activity{
 	private CheckBox checkboxR;
 	private CheckBox checkboxG;
 	private CheckBox checkboxL;
-	private ToggleButton logicbutton;
+	private Spinner colorspinner;
 	private Button setButton;
 	private String[] setNames;
 	private boolean[] setChecked;
@@ -94,7 +93,7 @@ public class search extends Activity{
 		checkboxG = (CheckBox)findViewById(R.id.checkBoxG);
 		checkboxL = (CheckBox)findViewById(R.id.checkBoxL);
 	
-    logicbutton = (ToggleButton) findViewById(R.id.logicToggle);
+    colorspinner = (Spinner) findViewById(R.id.colorlogic);
     
     setButton = (Button)findViewById(R.id.setsearch);
     formatButton = (Button)findViewById(R.id.formatsearch);
@@ -130,6 +129,10 @@ public class search extends Activity{
     ArrayAdapter<CharSequence> adapter5 = ArrayAdapter.createFromResource( this, R.array.cmc_spinner, android.R.layout.simple_spinner_item);
     adapter5.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     cmcChoice.setAdapter(adapter5);
+    
+    ArrayAdapter<CharSequence> adapter6 = ArrayAdapter.createFromResource( this, R.array.color_spinner, android.R.layout.simple_spinner_item);
+    adapter6.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    colorspinner.setAdapter(adapter6);
 
 		setButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -259,7 +262,7 @@ public class search extends Activity{
 				i.putExtra(TEXT, text);
 				i.putExtra(TYPE, type);
 				i.putExtra(COLOR, color);
-				i.putExtra(COLORLOGIC, logicbutton.isChecked());
+				i.putExtra(COLORLOGIC, colorspinner.getSelectedItemPosition());//logicbutton.isChecked());
 				i.putExtra(SET, sets);
 				i.putExtra(FORMAT, fmt);
 				i.putExtra(POW_CHOICE, ptChoices[powChoice.getSelectedItemPosition()]);
@@ -286,6 +289,8 @@ public class search extends Activity{
 			setChecked[i] = false;
 			setCursor.moveToNext();
 		}
+		
+		setCursor.close();
 		
 		Resources res = getResources();
 		formatNames = res.getStringArray(R.array.format_names);
@@ -369,7 +374,7 @@ public class search extends Activity{
 				checkboxR.setChecked(false);
 				checkboxG.setChecked(false);
 				checkboxL.setChecked(false);
-				logicbutton.setChecked(false);
+				colorspinner.setSelection(0);
 				
 				powLogic.setSelection(0);
 				powChoice.setSelection(0);

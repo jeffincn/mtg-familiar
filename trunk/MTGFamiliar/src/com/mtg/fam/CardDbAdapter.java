@@ -191,6 +191,28 @@ public class CardDbAdapter {
 
 		return mDb.insert(DATABASE_TABLE_CARDS, null, initialValues);
 	}
+	
+	public long createCard(MtgCard c) {
+		ContentValues initialValues = new ContentValues();
+
+		initialValues.put(KEY_NAME, c.name);
+		initialValues.put(KEY_SET, c.set);
+		initialValues.put(KEY_TYPE, c.type);
+		initialValues.put(KEY_RARITY, (int)c.rarity);
+		initialValues.put(KEY_MANACOST, c.manacost);
+		initialValues.put(KEY_CMC, c.cmc);
+		initialValues.put(KEY_POWER, c.power+"");
+		initialValues.put(KEY_TOUGHNESS, c.toughness+"");
+		initialValues.put(KEY_LOYALTY, c.loyalty);
+		initialValues.put(KEY_ABILITY, c.ability);
+		initialValues.put(KEY_FLAVOR, c.flavor);
+		initialValues.put(KEY_ARTIST, c.artist);
+		initialValues.put(KEY_NUMBER, c.number);
+		initialValues.put(KEY_COLOR, c.color);
+
+		return mDb.insert(DATABASE_TABLE_CARDS, null, initialValues);
+	}
+
 
 	public long createSet(String name, String code, String code_mtgi) {
 		ContentValues initialValues = new ContentValues();
@@ -199,6 +221,16 @@ public class CardDbAdapter {
 		initialValues.put(KEY_CODE, code);
 		initialValues.put(KEY_NAME, name);
 		initialValues.put(KEY_CODE_MTGI, code_mtgi);
+
+		return mDb.insert(DATABASE_TABLE_SETS, null, initialValues);
+	}
+
+	public long createSet(MtgSet set) {
+		ContentValues initialValues = new ContentValues();
+
+		initialValues.put(KEY_CODE, set.code);
+		initialValues.put(KEY_NAME, set.name);
+		initialValues.put(KEY_CODE_MTGI, set.code_magiccards);
 
 		return mDb.insert(DATABASE_TABLE_SETS, null, initialValues);
 	}
@@ -292,24 +324,22 @@ public class CardDbAdapter {
 	}
 
 	public Cursor Search(Context mCtx, String cardname, String cardtext, String cardtype,
-			String color, boolean colorlogic, String sets, String pow_choice,
+			String color, int colorlogic, String sets, String pow_choice,
 			String pow_logic, String tou_choice, String tou_logic, int cmc, String cmcLogic, String formats, String rarity) {
 		Cursor mCursor = null;
 
 		String statement = null;
 
 		if (cardname != null) {
-			{
-				statement = KEY_NAME + " LIKE '%" + cardname + "%'";
-			}
+			statement = "(" + KEY_NAME + " LIKE '%" + cardname + "%')";
 		}
 
 		if (cardtext != null) {
 			if (statement == null) {
-				statement = KEY_ABILITY + " LIKE '%" + cardtext + "%'";
+				statement = "(" + KEY_ABILITY + " LIKE '%" + cardtext + "%')";
 			}
 			else {
-				statement += " AND " + KEY_ABILITY + " LIKE '%" + cardtext + "%'";
+				statement += " AND (" + KEY_ABILITY + " LIKE '%" + cardtext + "%')";
 			}
 		}
 
@@ -317,6 +347,9 @@ public class CardDbAdapter {
 			String[] types = cardtype.split(" ");
 			if(statement == null){
 				statement = "(";
+			}
+			else{
+				statement += " AND (";
 			}
 			
 			boolean firstType = false;
@@ -331,7 +364,7 @@ public class CardDbAdapter {
 			statement += ")";
 		}
 
-		if (!(color.equals("wubrgl") || (color.equals("WUBRGL") && colorlogic == false))) {
+		if (!(color.equals("wubrgl") || (color.equals("WUBRGL") && colorlogic == 0))) {
 			boolean firstprint = true;
 
 			if (statement == null) {
@@ -368,7 +401,7 @@ public class CardDbAdapter {
 			for (byte b : color.getBytes()) {
 				char c = (char)b;
 				if (c < 'a') {
-					if (firstprint == false && colorlogic == true) {
+					if (firstprint == false && colorlogic == 1) {
 						statement += " AND ";
 					}
 					else if(firstprint == false){

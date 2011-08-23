@@ -77,6 +77,11 @@
 		<item>1000000</item>
 	</string-array>
 
+	<string-array name="color_spinner">
+		<item>May Include Any Colors</item>
+		<item>Must Include All Colors</item>
+	</string-array>
+
 	<string name="pow">Power</string>
 	<string name="tou">Toughness</string>
 	<string name="formatsearch">Format</string>
@@ -92,10 +97,12 @@
 	<string name="plus">+</string>
 	<string name="minus">-</string>
 	<string name="searchrarity">Rarity</string>
-	<string name="refreshDB">Refresh Database</string>
 	<string name="dbdownloadmsg">Before you can search through a database of cards, you must download it. Do you want to download it now? You can always download the database by pressing the menu button on this screen and choosing &quot;Refresh Database&quot;.</string>
 	<string name="dlnow">Download Now</string>
 	<string name="dllater">Download Later</string>
 	<string name="clear">Clear Fields</string>
+
+	<string name="refreshDB">XML</string>
+	<string name="JSON">JSON</string>
 
 </resources>

@@ -1,5 +1,9 @@
 package com.mtg.fam;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -11,6 +15,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.text.SpannableStringBuilder;
@@ -24,7 +30,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class cardview extends Activity {
+public class cardview extends Activity implements Runnable{
 
 	private CardDbAdapter mDbHelper;
 	private TextView name;
@@ -38,12 +44,12 @@ public class cardview extends Activity {
 
 	private String cardname;
 	private String url;
-	
 
-    private ImageGetter imgGetter = new ImageGetter() {
+
+	private ImageGetter imgGetter = new ImageGetter() {
 		public Drawable getDrawable(String source) {
 			Drawable d = null;
-			
+
 			int[] drawableNums = { R.drawable.zero, R.drawable.one,
 					R.drawable.two, R.drawable.three, R.drawable.four,
 					R.drawable.five, R.drawable.six, R.drawable.seven,
@@ -52,7 +58,7 @@ public class cardview extends Activity {
 					R.drawable.fourteen, R.drawable.fifteen,
 					R.drawable.sixteen, R.drawable.seventeen,
 					R.drawable.eighteen, R.drawable.ninteen, R.drawable.twenty };
-			
+
 			if(source.equalsIgnoreCase("w")){
 				d = getResources().getDrawable(R.drawable.w);
 			}
@@ -164,17 +170,21 @@ public class cardview extends Activity {
 			else if(source.equalsIgnoreCase("x")){
 				d = getResources().getDrawable(R.drawable.x);
 			}			
-			
+
 			for(int i=0; i < drawableNums.length; i++){
 				if(source.equals(new Integer(i).toString())){
 					d = getResources().getDrawable(drawableNums[i]);
 				}
 			}
-			
+
 			d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
 			return d;
 		}
 	};
+	private Cursor	c;
+	private ImageView	image;
+	private BitmapDrawable	d;
+	private Bitmap bmp;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -187,15 +197,15 @@ public class cardview extends Activity {
 		mDbHelper = new CardDbAdapter(this);
 		mDbHelper.open();
 
-		Cursor c = mDbHelper.fetchCard(id);
+		c = mDbHelper.fetchCard(id);
 		c.moveToFirst();
 
 		//http://magiccards.info/scans/en/mt/55.jpg
-		
+
 		String mtgi_code = mDbHelper.getCodeMtgi(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)));
 		url = "http://magiccards.info/scans/en/" + mtgi_code + "/" +c.getString(c.getColumnIndex(CardDbAdapter.KEY_NUMBER)) + ".jpg";
 		url = url.toLowerCase();
-			
+
 		name = (TextView) findViewById(R.id.name);
 		cost = (TextView) findViewById(R.id.cost);
 		type = (TextView) findViewById(R.id.type);
@@ -204,65 +214,83 @@ public class cardview extends Activity {
 		flavor = (TextView) findViewById(R.id.flavor);
 		artist = (TextView) findViewById(R.id.artist);
 		pt = (TextView) findViewById(R.id.pt);
-		
+
 		switch((char)c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY))){
-		case 'C':
-			set.setTextColor(this.getResources().getColor(R.color.common));
-			break;
-		case 'U':
-			set.setTextColor(this.getResources().getColor(R.color.uncommon));
-			break;
-		case 'R':
-			set.setTextColor(this.getResources().getColor(R.color.rare));
-			break;
-		case 'M':
-			set.setTextColor(this.getResources().getColor(R.color.mythic));
-			break;
+			case 'C':
+				set.setTextColor(this.getResources().getColor(R.color.common));
+				break;
+			case 'U':
+				set.setTextColor(this.getResources().getColor(R.color.uncommon));
+				break;
+			case 'R':
+				set.setTextColor(this.getResources().getColor(R.color.rare));
+				break;
+			case 'M':
+				set.setTextColor(this.getResources().getColor(R.color.mythic));
+				break;
 		}
 
 		String sCost = c.getString(c.getColumnIndex(CardDbAdapter.KEY_MANACOST));
 		sCost = sCost.replace("{", "<img src=\"");
 		sCost = sCost.replace("}", "\"/>");
-		
+
 		CharSequence csCost= Html.fromHtml(sCost, imgGetter, null);
-				
+
 		cardname = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
-		
+
 		name.setText(c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME)));
 		cost.setText(csCost);
 		type.setText(c.getString(c.getColumnIndex(CardDbAdapter.KEY_TYPE)));
 		set.setText(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)));
-		
+
 		String sAbility = c.getString(c.getColumnIndex(CardDbAdapter.KEY_ABILITY)).replace("£", "<br>")/*.replace("#_", "<i>").replace("_#", "</i>")*/.replace("{", "<img src=\"").replace("}", "\"/>");
 		CharSequence csAbility = Html.fromHtml(sAbility, imgGetter, null);
 		csAbility = italicizeBetweenTokens(csAbility, "##");
 		ability.setText(csAbility);
-		
+
 		String sFlavor = c.getString(c.getColumnIndex(CardDbAdapter.KEY_FLAVOR)).replace("£", "<br>")/*.replace("#_", "<i>").replace("_#", "</i>")*/;
 		CharSequence csFlavor = Html.fromHtml(sFlavor, imgGetter, null);
 		csFlavor = italicizeBetweenTokens(csFlavor, "##");
 		flavor.setText(csFlavor);
 
 		artist.setText(c.getString(c.getColumnIndex(CardDbAdapter.KEY_ARTIST)));
-		
+
 		int loyalty = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_LOYALTY));
-		if(loyalty != 0){
+		String t = (String) type.getText();
+		if(t.contains("Planeswalker")){
 			pt.setText(new Integer(loyalty).toString());
 		}
-		else{
+		else if(t.contains("Creature")){
 			String spt = c.getString(c.getColumnIndex(CardDbAdapter.KEY_POWER)) + "/"
-				+ c.getString(c.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS));
-			if (spt.length() == 1) {
-				pt.setText("");
-			}
-			else {
-				pt.setText(spt);
-			}
+			+ c.getString(c.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS));
+			pt.setText(spt);
+		}
+		else{
+			pt.setText("");
+		}
+	}
+
+	@Override
+	protected	void onPause(){
+		super.onPause();
+	}
+	@Override
+	protected	void onStop(){
+		super.onStop();
+	}
+	@Override
+	protected	void onDestroy(){
+		super.onDestroy();
+		if(c!=null){
+			c.close();
+		}
+		if(mDbHelper != null){
+			mDbHelper.close();			
 		}
 	}
 
 	Drawable drawable_from_url(String url, String src_name)
-			throws java.net.MalformedURLException, java.io.IOException {
+	throws java.net.MalformedURLException, java.io.IOException {
 		return Drawable.createFromStream(((java.io.InputStream) new java.net.URL(
 				url).getContent()), src_name);
 	}
@@ -278,45 +306,33 @@ public class cardview extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-		case R.id.image:
-			showDialog(0);
-			return true;
-		case R.id.price:
-			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://magictraders.com/cgi-bin/query.cgi?list=magic&target=" + cardname.replace(' ', '+') + "&field=0")));
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
+			case R.id.image:
+				showDialog(0);
+				return true;
+			case R.id.price:
+				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://magictraders.com/cgi-bin/query.cgi?list=magic&target=" + cardname.replace(' ', '+') + "&field=0")));
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
 	@Override
 	protected Dialog onCreateDialog( int id ) 
 	{
 		Dialog dialog = new Dialog(this);
 		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		
+
 		dialog.setContentView(R.layout.image_dialog);
 
-		ImageView image = (ImageView) dialog.findViewById(R.id.cardimage);		
+		image = (ImageView) dialog.findViewById(R.id.cardimage);		
 
-		try {
-			Drawable d = drawable_from_url(url, "img.jpg");
-			Bitmap bmp = ((BitmapDrawable)d).getBitmap();
-			
-			Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-			int width = display.getWidth()-20; 
-			int height = (int) ((bmp.getHeight()/(float)bmp.getWidth())*width);
+		Thread thread = new Thread(this);
+		thread.start();
 
-			Bitmap bmS = Bitmap.createScaledBitmap(bmp, width, height, false);
-
-			image.setImageBitmap(bmS);
-		}
-		catch (Exception ex) {
-		}
-		
 		return dialog;
 	}
-	
+
 	/**
 	 * Given either a Spannable String or a regular String and a token, apply
 	 * the given CharacterStyle to the span between the tokens, and also
@@ -337,27 +353,60 @@ public class cardview extends Activity {
 	 * @see http://developer.android.com/reference/android/text/style/CharacterStyle.html
 	 */
 	public static CharSequence italicizeBetweenTokens(CharSequence text,
-	    String token)
+			String token)
 	{
 		while(text.toString().contains(token)){
-		    // Start and end refer to the points where the span will apply
-		    int tokenLen = token.length();
-		    int start = text.toString().indexOf(token) + tokenLen;
-		    int end = text.toString().indexOf(token, start);
-	
-		    if (start > -1 && end > -1)
-		    {
-			// Copy the spannable string to a mutable spannable string
-			SpannableStringBuilder ssb = new SpannableStringBuilder(text);
-		    ssb.setSpan(new StyleSpan(Typeface.ITALIC) , start, end, 0);
-	
-			// Delete the tokens before and after the span
-			ssb.delete(end, end + tokenLen);
-			ssb.delete(start - tokenLen, start);
-	
-			text = ssb;
-		    }
+			// Start and end refer to the points where the span will apply
+			int tokenLen = token.length();
+			int start = text.toString().indexOf(token) + tokenLen;
+			int end = text.toString().indexOf(token, start);
+
+			if (start > -1 && end > -1)
+			{
+				// Copy the spannable string to a mutable spannable string
+				SpannableStringBuilder ssb = new SpannableStringBuilder(text);
+				ssb.setSpan(new StyleSpan(Typeface.ITALIC) , start, end, 0);
+
+				// Delete the tokens before and after the span
+				ssb.delete(end, end + tokenLen);
+				ssb.delete(start - tokenLen, start);
+
+				text = ssb;
+			}
 		}
-	    return text;
+		return text;
 	}
+
+	public void run() {
+		try {
+			URL u = new URL(url);
+			Object content = u.getContent();
+			InputStream is = (InputStream)content;
+			
+			d = new BitmapDrawable(getResources(), is);
+			bmp = d.getBitmap();
+			
+			Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+			float scale = (display.getWidth()-20) / (float)d.getIntrinsicWidth();
+			int newWidth = Math.round(bmp.getWidth()*scale);
+			int newHeight = Math.round(bmp.getHeight()*scale);
+
+			bmp = Bitmap.createScaledBitmap(d.getBitmap(), newWidth, newHeight, true);
+			d = new BitmapDrawable(bmp);
+ 		}
+		catch (IOException e) {
+			d = (BitmapDrawable) getResources().getDrawable(R.drawable.nonet);
+		}
+		catch (Exception e) {
+			d = (BitmapDrawable) getResources().getDrawable(R.drawable.nonet);
+		}
+    handler.sendEmptyMessage(0);
+	}
+	
+	private Handler	handler	= new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			image.setImageDrawable(d);
+		}
+	};
 }

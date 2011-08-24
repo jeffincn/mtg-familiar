@@ -6,11 +6,11 @@ import java.io.InputStreamReader;
 import android.util.Log;
 
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
 
 public class JSONparser {
 	private main					mMain;
 	private CardDbAdapter	mDbHelper;
+	private String	ptstr;
 
 	public JSONparser(main m, CardDbAdapter cda) {
 		mMain = m;
@@ -27,8 +27,6 @@ public class JSONparser {
 
 		reader.beginObject();
 		while (reader.hasNext()) {
-			JsonToken jt = reader.peek();
-			Log.d("jt", jt.toString());
 
 			s = reader.nextName();
 			if (s.equalsIgnoreCase("v")) { // bdd_date
@@ -114,7 +112,27 @@ public class JSONparser {
 								}
 								if (s2.equalsIgnoreCase("g")) { // power
 									try {
-										c.power = reader.nextInt();
+										ptstr = reader.nextString();
+										try{
+											c.power = Integer.parseInt(ptstr);
+										}
+										catch(NumberFormatException e){
+											if(ptstr.equals("*")){
+												c.power = CardDbAdapter.STAR;
+											}
+											else if(ptstr.equals("1+*")){
+												c.power = CardDbAdapter.ONEPLUSSTAR;
+											}
+											else if(ptstr.equals("2+*")){
+												c.power = CardDbAdapter.TWOPLUSSTAR;
+											}
+											else if(ptstr.equals("7-*")){
+												c.power = CardDbAdapter.SEVENMINUSSTAR;
+											}
+											else if(ptstr.length() > 0){
+												Log.d("power", ptstr);
+											}
+										}
 									}
 									catch (Exception e) {
 										reader.skipValue();
@@ -122,7 +140,27 @@ public class JSONparser {
 								}
 								if (s2.equalsIgnoreCase("h")) { // toughness
 									try {
-										c.toughness = reader.nextInt();
+										ptstr = reader.nextString();
+										try{
+											c.toughness = Integer.parseInt(ptstr);
+										}
+										catch(NumberFormatException e){
+											if(ptstr.equals("*")){
+												c.toughness = CardDbAdapter.STAR;
+											}
+											else if(ptstr.equals("1+*")){
+												c.toughness = CardDbAdapter.ONEPLUSSTAR;
+											}
+											else if(ptstr.equals("2+*")){
+												c.toughness = CardDbAdapter.TWOPLUSSTAR;
+											}
+											else if(ptstr.equals("7-*")){
+												c.toughness = CardDbAdapter.SEVENMINUSSTAR;
+											}
+											else if(ptstr.length() > 0){
+												Log.d("toughness", ptstr);
+											}
+										}
 									}
 									catch (Exception e) {
 										reader.skipValue();

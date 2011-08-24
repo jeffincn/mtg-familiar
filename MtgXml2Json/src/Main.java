@@ -51,7 +51,8 @@ public class Main implements ActionListener {
 		{"\"num_cards\"",						"\"w\""},
 
 		{"Ã\\u2020",								"Ae"},
-		{"â\\u20ac\\u201d",					"-"}};
+		{"â\\u20ac\\u201d",					"-"},
+		{"Â£",											"<br>"}};
 
 	private static JFrame			UIFrame;
 	private static JPanel			UIPanel;

@@ -247,8 +247,48 @@ public class search extends Activity{
 					}
 				}
 				
-				String[] ptChoices = getResources().getStringArray(R.array.pt_spinner);
 				String[] logicChoices = getResources().getStringArray(R.array.logic_spinner);
+				String power = getResources().getStringArray(R.array.pt_spinner)[powChoice.getSelectedItemPosition()];
+				String toughness =  getResources().getStringArray(R.array.pt_spinner)[touChoice.getSelectedItemPosition()];
+				
+				int pow = CardDbAdapter.NOONECARES;
+				try{
+					pow = Integer.parseInt(power);
+				}
+				catch(NumberFormatException e){
+					if(power.equals("*")){
+						pow = CardDbAdapter.STAR;
+					}
+					else if(power.equals("1+*")){
+						pow = CardDbAdapter.ONEPLUSSTAR;
+					}
+					else if(power.equals("2+*")){
+						pow = CardDbAdapter.TWOPLUSSTAR;
+					}
+					else if(power.equals("7-*")){
+						pow = CardDbAdapter.SEVENMINUSSTAR;
+					}
+				}
+				
+				int tou = CardDbAdapter.NOONECARES;
+				try{
+					tou = Integer.parseInt(toughness);
+				}
+				catch(NumberFormatException e){
+					if(toughness.equals("*")){
+						tou = CardDbAdapter.STAR;
+					}
+					else if(toughness.equals("1+*")){
+						tou = CardDbAdapter.ONEPLUSSTAR;
+					}
+					else if(toughness.equals("2+*")){
+						tou = CardDbAdapter.TWOPLUSSTAR;
+					}
+					else if(toughness.equals("7-*")){
+						tou = CardDbAdapter.SEVENMINUSSTAR;
+					}
+				}
+				
 				String[] cmcChoices = getResources().getStringArray(R.array.cmc_spinner);
 				int cmc;
 				try{
@@ -265,9 +305,9 @@ public class search extends Activity{
 				i.putExtra(COLORLOGIC, colorspinner.getSelectedItemPosition());//logicbutton.isChecked());
 				i.putExtra(SET, sets);
 				i.putExtra(FORMAT, fmt);
-				i.putExtra(POW_CHOICE, ptChoices[powChoice.getSelectedItemPosition()]);
+				i.putExtra(POW_CHOICE, pow);
 				i.putExtra(POW_LOGIC, logicChoices[powLogic.getSelectedItemPosition()]);
-				i.putExtra(TOU_CHOICE, ptChoices[touChoice.getSelectedItemPosition()]);
+				i.putExtra(TOU_CHOICE, tou);
 				i.putExtra(TOU_LOGIC, logicChoices[touLogic.getSelectedItemPosition()]);
 				i.putExtra(CMC, cmc);
 				i.putExtra(CMC_LOGIC, logicChoices[cmcLogic.getSelectedItemPosition()]);

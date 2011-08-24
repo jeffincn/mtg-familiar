@@ -63,8 +63,7 @@ public class main extends Activity implements Runnable {
 		life = (Button) findViewById(R.id.lifecounter);
 		rng = (Button) findViewById(R.id.rng);
 
-		timer = (TextView)findViewById(R.id.timertext);
-		timer.setText("How fast will it be?");
+		timer = (TextView)findViewById(R.id.title);
 		
 		search.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {

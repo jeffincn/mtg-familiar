@@ -33,8 +33,6 @@
 
 	<string-array name="pt_spinner">
 		<item />
-		<item>*</item>
-		<item>1+*</item>
 		<item>-1</item>
 		<item>0</item>
 		<item>1</item>
@@ -53,6 +51,11 @@
 		<item>14</item>
 		<item>15</item>
 		<item>99</item>
+		<item>*</item>
+		<item>1+*</item>
+		<item>2+*</item>
+		<item>7-*</item>
+		<item>*^2</item>
 	</string-array>
 
 	<string-array name="cmc_spinner">

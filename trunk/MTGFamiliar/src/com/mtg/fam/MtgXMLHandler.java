@@ -6,6 +6,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import android.util.Log;
+
 public class MtgXMLHandler extends DefaultHandler {
 
 	// ===========================================================
@@ -21,8 +23,8 @@ public class MtgXMLHandler extends DefaultHandler {
 	String								name;
 
 	// Card Variables, also name
-	private String				power;
-	private String				toughness;
+	private int						power;
+	private int						toughness;
 	private String				ability;
 	private String				type;
 	private String				color;
@@ -171,10 +173,48 @@ public class MtgXMLHandler extends DefaultHandler {
 				}
 			}
 			else if (localName.equals("power")) {
-				power = value;
+				try{
+					power = Integer.parseInt(value);
+				}
+				catch(NumberFormatException e){
+					if(value.equals("*")){
+						power = CardDbAdapter.STAR;
+					}
+					else if(value.equals("1+*")){
+						power = CardDbAdapter.ONEPLUSSTAR;
+					}
+					else if(value.equals("2+*")){
+						power = CardDbAdapter.TWOPLUSSTAR;
+					}
+					else if(value.equals("7-*")){
+						power = CardDbAdapter.SEVENMINUSSTAR;
+					}
+					else{
+						Log.d("powerXML", value);
+					}
+				}
 			}
 			else if (localName.equals("toughness")) {
-				toughness = value;
+				try{
+					toughness = Integer.parseInt(value);
+				}
+				catch(NumberFormatException e){
+					if(value.equals("*")){
+						toughness = CardDbAdapter.STAR;
+					}
+					else if(value.equals("1+*")){
+						toughness = CardDbAdapter.ONEPLUSSTAR;
+					}
+					else if(value.equals("2+*")){
+						toughness = CardDbAdapter.TWOPLUSSTAR;
+					}
+					else if(value.equals("7-*")){
+						toughness = CardDbAdapter.SEVENMINUSSTAR;
+					}
+					else{
+						Log.d("toughnessXML", value);
+					}
+				}
 			}
 			else if (localName.equals("loyalty")) {
 				try {
@@ -242,8 +282,8 @@ public class MtgXMLHandler extends DefaultHandler {
 					rarities = null;
 					manacosts = null;
 					cmcs = null;
-					power = null;
-					toughness = null;
+					power = 0;
+					toughness = 0;
 					loyalty = 0;
 					abilities = null;
 					flavor = null;
@@ -263,8 +303,8 @@ public class MtgXMLHandler extends DefaultHandler {
 					rarity = '\0';
 					manacost = null;
 					cmc = 0;
-					power = null;
-					toughness = null;
+					power = 0;
+					toughness = 0;
 					loyalty = 0;
 					ability = null;
 					flavor = null;

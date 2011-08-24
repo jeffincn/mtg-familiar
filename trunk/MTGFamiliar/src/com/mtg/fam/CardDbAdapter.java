@@ -39,13 +39,19 @@ import android.util.Log;
  */
 public class CardDbAdapter {
 
+	public static final int STAR = -1000;
+	public static final int ONEPLUSSTAR = -1001;
+	public static final int TWOPLUSSTAR = -1002;
+	public static final int SEVENMINUSSTAR = -1003;
+	public static final int NOONECARES = -1004;
+	
 	public static final int AND = 0;
 	public static final int OR = 1;
 
 	private static final String DATABASE_NAME = "data";
 	private static final String DATABASE_TABLE_CARDS = "cards";
 	private static final String DATABASE_TABLE_SETS = "sets";
-	private static final int DATABASE_VERSION = 8;
+	private static final int DATABASE_VERSION = 9;
 
 	public static final String KEY_ID = "_id";
 	public static final String KEY_NAME = "name";
@@ -80,8 +86,8 @@ public class CardDbAdapter {
 			KEY_RARITY + " integer, " +
 			KEY_MANACOST + " text, " +
 			KEY_CMC + " integer not null, " +
-			KEY_POWER + " text, " +
-			KEY_TOUGHNESS + " text, " +
+			KEY_POWER + " integer, " +
+			KEY_TOUGHNESS + " integer, " +
 			KEY_LOYALTY + " integer, " +
 			KEY_ABILITY	+ " text, " +
 			KEY_FLAVOR	+ " text, " +
@@ -106,7 +112,6 @@ public class CardDbAdapter {
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
-
 			db.execSQL(DATABASE_CREATE_CARDS);
 			db.execSQL(DATABASE_CREATE_SETS);
 		}
@@ -170,7 +175,7 @@ public class CardDbAdapter {
 	 * @return rowId or -1 if failed
 	 */
 	public long createCard(String name, String set, String type, char rarity, String manacost,
-			int cmc, String power, String toughness, int loyalty, String ability, String flavor,
+			int cmc, int power, int toughness, int loyalty, String ability, String flavor,
 			String artist, int number, String color) {
 		ContentValues initialValues = new ContentValues();
 
@@ -201,8 +206,8 @@ public class CardDbAdapter {
 		initialValues.put(KEY_RARITY, (int)c.rarity);
 		initialValues.put(KEY_MANACOST, c.manacost);
 		initialValues.put(KEY_CMC, c.cmc);
-		initialValues.put(KEY_POWER, c.power+"");
-		initialValues.put(KEY_TOUGHNESS, c.toughness+"");
+		initialValues.put(KEY_POWER, c.power);
+		initialValues.put(KEY_TOUGHNESS, c.toughness);
 		initialValues.put(KEY_LOYALTY, c.loyalty);
 		initialValues.put(KEY_ABILITY, c.ability);
 		initialValues.put(KEY_FLAVOR, c.flavor);
@@ -301,7 +306,7 @@ public class CardDbAdapter {
 	 * @return true if the Card was successfully updated, false otherwise
 	 */
 	public boolean updateCard(long id, String name, String set, String type, char rarity, String manacost,
-			int cmc, String power, String toughness, int loyalty, String ability, String flavor,
+			int cmc, int power, int toughness, int loyalty, String ability, String flavor,
 			String artist, int number, String color) {
 		ContentValues args = new ContentValues();
 
@@ -324,8 +329,8 @@ public class CardDbAdapter {
 	}
 
 	public Cursor Search(Context mCtx, String cardname, String cardtext, String cardtype,
-			String color, int colorlogic, String sets, String pow_choice,
-			String pow_logic, String tou_choice, String tou_logic, int cmc, String cmcLogic, String formats, String rarity) {
+			String color, int colorlogic, String sets, int pow_choice,
+			String pow_logic, int tou_choice, String tou_logic, int cmc, String cmcLogic, String formats, String rarity) {
 		Cursor mCursor = null;
 
 		String statement = null;
@@ -520,181 +525,45 @@ public class CardDbAdapter {
 			}
 			statement += ")";
 		}
-
-		if (pow_logic.equals("<") || pow_logic.equals(">")) {
-			boolean cont = true;
-			boolean firstprint = false;
-			String powersNeg = "-[";
-			String powers1 = "[";
-			String powers2 = "1[";
-
-			try {
-				if (pow_logic.equals("<")) {
-					for (int i = -1; i < 0 && i < Integer.parseInt(pow_choice) && i < 10; i++) {
-						powersNeg += -i;
-					}
-					powersNeg += "]";
-
-					for (int i = 0; i < Integer.parseInt(pow_choice) && i < 10; i++) {
-						powers1 += i;
-					}
-					powers1 += "]";
-
-					powers2 = "1[";
-					for (int i = 0; i < (Integer.parseInt(pow_choice) - 10); i++) {
-						powers2 += i;
-					}
-					powers2 += "]";
-				}
-				else if (pow_logic.equals(">")) {
-					for (int i = Integer.parseInt(pow_choice); i < 0; i++) {
-						powersNeg += -i;
-					}
-					powersNeg += "]";
-
-					for (int i = Integer.parseInt(pow_choice) + 1; i < 10; i++) {
-						powers1 += i;
-					}
-					powers1 += "]";
-
-					powers2 = "1[";
-					for (int i = Integer.parseInt(pow_choice) + 1; i < 16; i++) {
-						if (i > 9) {
-							powers2 += (i - 10);
-						}
-					}
-					powers2 += "]";
+		
+		if(pow_choice != NOONECARES){
+			if(statement == null){
+				statement ="(";
+			}
+			else{
+				statement += " AND (";
+			}
+			
+			if(pow_choice > STAR){
+				statement += KEY_POWER + " " + pow_logic + " " + pow_choice;
+				if(pow_logic.equals("<")){
+					statement += " AND " + KEY_POWER + " > " + STAR;
 				}
 			}
-			catch (NumberFormatException e) {
-				cont = false;
+			else if(pow_logic.equals("=")){
+				statement += KEY_POWER + " " + pow_logic + " " + pow_choice;
 			}
-
-			if (cont) {
-				if (statement == null) {
-					statement = "(";
-				}
-				else {
-					statement += " AND (";
-				}
-
-				if (!powersNeg.equals("-[]")) {
-					statement += KEY_POWER + " GLOB '" + powersNeg + "'";
-					firstprint = true;
-				}
-				if (!powers1.equals("[]")) {
-					if (!firstprint) {
-						firstprint = true;
-					}
-					else {
-						statement += " OR ";
-					}
-					statement += KEY_POWER + " GLOB '" + powers1 + "'";
-				}
-				if (!powers2.equals("1[]")) {
-					if (firstprint) {
-						statement += " OR ";
-					}
-					statement += KEY_POWER + " GLOB '" + powers2 + "'";
-				}
-				statement += ")";
-			}
+			statement += ")";
 		}
-		else if (pow_logic.equals("=")) {
-			if (statement == null) {
-				statement = "(" + KEY_POWER + " GLOB '" + pow_choice + "')";
+		
+		if(tou_choice != NOONECARES){
+			if(statement == null){
+				statement ="(";
 			}
-			else {
-				statement += " AND (" + KEY_POWER + " GLOB '" + pow_choice + "')";
+			else{
+				statement += " AND (";
 			}
-		}
-
-		if (tou_logic.equals("<") || tou_logic.equals(">")) {
-			boolean cont = true;
-			boolean firstprint = false;
-			String toughnessNeg = "-[";
-			String toughness1 = "[";
-			String toughness2 = "1[";
-
-			try {
-				if (tou_logic.equals("<")) {
-					for (int i = -1; i < 0 && i < Integer.parseInt(tou_choice) && i < 10; i++) {
-						toughnessNeg += -i;
-					}
-					toughnessNeg += "]";
-
-					for (int i = 0; i < Integer.parseInt(tou_choice) && i < 10; i++) {
-						toughness1 += i;
-					}
-					toughness1 += "]";
-
-					toughness2 = "1[";
-					for (int i = 0; i < (Integer.parseInt(tou_choice) - 10); i++) {
-						toughness2 += i;
-					}
-					toughness2 += "]";
-				}
-				else if (tou_logic.equals(">")) {
-					for (int i = Integer.parseInt(tou_choice); i < 0; i++) {
-						toughnessNeg += -i;
-					}
-					toughnessNeg += "]";
-
-					for (int i = Integer.parseInt(tou_choice) + 1; i < 10; i++) {
-						toughness1 += i;
-					}
-					toughness1 += "]";
-
-					toughness2 = "1[";
-					for (int i = Integer.parseInt(tou_choice) + 1; i < 16; i++) {
-						if (i > 9) {
-							toughness2 += (i - 10);
-						}
-					}
-					toughness2 += "]";
+			
+			if(tou_choice > STAR){
+				statement += KEY_TOUGHNESS + " " + tou_logic + " " + tou_choice;
+				if(tou_logic.equals("<")){
+					statement += " AND " + KEY_TOUGHNESS + " > " + STAR;
 				}
 			}
-			catch (NumberFormatException e) {
-				cont = false;
+			else if(tou_logic.equals("=")){
+				statement += KEY_TOUGHNESS + " " + tou_logic + " " + tou_choice;
 			}
-
-			if (cont) {
-				if (statement == null) {
-					statement = "(";
-				}
-				else {
-					statement += " AND (";
-				}
-
-				if (!toughnessNeg.equals("-[]")) {
-					statement += KEY_TOUGHNESS + " GLOB '" + toughnessNeg + "'";
-					firstprint = true;
-				}
-				if (!toughness1.equals("[]")) {
-					if (!firstprint) {
-						firstprint = true;
-					}
-					else {
-						statement += " OR ";
-					}
-					statement += KEY_TOUGHNESS + " GLOB '" + toughness1 + "'";
-				}
-				if (!toughness2.equals("1[]")) {
-					if (firstprint) {
-						statement += " OR ";
-					}
-					statement += KEY_TOUGHNESS + " GLOB '" + toughness2 + "'";
-				}
-				statement += ")";
-			}
-		}
-		else if (tou_logic.equals("=")) {
-			if (statement == null) {
-				statement = "(" + KEY_TOUGHNESS + " GLOB '" + tou_choice + "')";
-			}
-			else {
-				statement += " AND (" + KEY_TOUGHNESS + " GLOB '" + tou_choice + "')";
-			}
+			statement += ")";
 		}
 
 		if(cmc != -1){

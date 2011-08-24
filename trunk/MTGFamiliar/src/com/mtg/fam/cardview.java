@@ -243,7 +243,7 @@ public class cardview extends Activity implements Runnable{
 		type.setText(c.getString(c.getColumnIndex(CardDbAdapter.KEY_TYPE)));
 		set.setText(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)));
 
-		String sAbility = c.getString(c.getColumnIndex(CardDbAdapter.KEY_ABILITY)).replace("£", "<br>")/*.replace("#_", "<i>").replace("_#", "</i>")*/.replace("{", "<img src=\"").replace("}", "\"/>");
+		String sAbility = c.getString(c.getColumnIndex(CardDbAdapter.KEY_ABILITY))/*.replace("£", "<br>")/*.replace("#_", "<i>").replace("_#", "</i>")*/.replace("{", "<img src=\"").replace("}", "\"/>");
 		CharSequence csAbility = Html.fromHtml(sAbility, imgGetter, null);
 		csAbility = italicizeBetweenTokens(csAbility, "##");
 		ability.setText(csAbility);
@@ -256,13 +256,40 @@ public class cardview extends Activity implements Runnable{
 		artist.setText(c.getString(c.getColumnIndex(CardDbAdapter.KEY_ARTIST)));
 
 		int loyalty = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_LOYALTY));
-		String t = (String) type.getText();
-		if(t.contains("Planeswalker")){
+		String typ = (String) type.getText();
+		if(typ.contains("Planeswalker")){
 			pt.setText(new Integer(loyalty).toString());
 		}
-		else if(t.contains("Creature")){
-			String spt = c.getString(c.getColumnIndex(CardDbAdapter.KEY_POWER)) + "/"
-			+ c.getString(c.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS));
+		else if(typ.contains("Creature")){
+			int p = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_POWER));
+			int t = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS));
+			
+			String spt = "";
+			
+			if(p == CardDbAdapter.STAR)
+				spt += "*";
+			else if(p== CardDbAdapter.ONEPLUSSTAR)
+				spt += "1+*";
+			else if(p== CardDbAdapter.TWOPLUSSTAR)
+				spt += "2+*";
+			else if(p == CardDbAdapter.SEVENMINUSSTAR)
+				spt += "7-*";
+			else
+				spt += p;
+			
+			spt += "/";
+			
+			if(t == CardDbAdapter.STAR)
+				spt += "*";
+			else if(t == CardDbAdapter.ONEPLUSSTAR)
+				spt += "1+*";
+			else if(t == CardDbAdapter.TWOPLUSSTAR)
+				spt += "2+*";
+			else if(t == CardDbAdapter.SEVENMINUSSTAR)
+				spt += "7-*";
+			else
+				spt += t;
+
 			pt.setText(spt);
 		}
 		else{

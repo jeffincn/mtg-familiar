@@ -34,10 +34,10 @@ public class resultlist extends ListActivity {
 		
 		c = mDbHelper.Search(this.getApplicationContext(), extras.getString(CardDbAdapter.KEY_NAME),
 				extras.getString(search.TEXT), extras.getString(search.TYPE), extras.getString(search.COLOR),
-				extras.getInt(search.COLORLOGIC), extras.getString(search.SET), extras.getInt(search.POW_CHOICE),
-				extras.getString(search.POW_LOGIC), extras.getInt(search.TOU_CHOICE), extras.getString(search.TOU_LOGIC),
+				extras.getInt(search.COLORLOGIC), extras.getString(search.SET), extras.getFloat(search.POW_CHOICE),
+				extras.getString(search.POW_LOGIC), extras.getFloat(search.TOU_CHOICE), extras.getString(search.TOU_LOGIC),
 				extras.getInt(search.CMC), extras.getString(search.CMC_LOGIC), extras.getString(search.FORMAT),
-				extras.getString(search.RARITY));
+				extras.getString(search.RARITY), extras.getString(search.FLAVOR), extras.getString(search.ARTIST));
 		startManagingCursor(c);
 		fillData(c);
 

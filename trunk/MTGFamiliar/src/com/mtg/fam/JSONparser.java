@@ -3,8 +3,6 @@ package com.mtg.fam;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import android.util.Log;
-
 import com.google.gson.stream.JsonReader;
 
 public class JSONparser {
@@ -129,9 +127,26 @@ public class JSONparser {
 											else if(ptstr.equals("7-*")){
 												c.power = CardDbAdapter.SEVENMINUSSTAR;
 											}
+											else if(ptstr.equals("*{^2}")){
+												c.power = CardDbAdapter.STARSQUARED;
+											}
+											else if(ptstr.equals("{1/2}")){
+												c.power = 0.5f;
+											}
+											else if(ptstr.equals("1{1/2}")){
+												c.power = 1.5f;
+											}
+											else if(ptstr.equals("2{1/2}")){
+												c.power = 2.5f;
+											}
+											else if(ptstr.equals("3{1/2}")){
+												c.power = 3.5f;
+											}
+											/*
 											else if(ptstr.length() > 0){
 												Log.d("power", ptstr);
 											}
+											*/
 										}
 									}
 									catch (Exception e) {
@@ -157,9 +172,26 @@ public class JSONparser {
 											else if(ptstr.equals("7-*")){
 												c.toughness = CardDbAdapter.SEVENMINUSSTAR;
 											}
+											else if(ptstr.equals("*{^2}")){
+												c.toughness = CardDbAdapter.STARSQUARED;
+											}
+											else if(ptstr.equals("{1/2}")){
+												c.toughness = 0.5f;
+											}
+											else if(ptstr.equals("1{1/2}")){
+												c.toughness = 1.5f;
+											}
+											else if(ptstr.equals("2{1/2}")){
+												c.toughness = 2.5f;
+											}
+											else if(ptstr.equals("3{1/2}")){
+												c.toughness = 3.5f;
+											}
+											/*
 											else if(ptstr.length() > 0){
 												Log.d("toughness", ptstr);
 											}
+											*/
 										}
 									}
 									catch (Exception e) {

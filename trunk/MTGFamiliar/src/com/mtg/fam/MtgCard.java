@@ -7,8 +7,8 @@ public class MtgCard {
 	public char rarity;
 	public String manacost;
 	public int cmc;
-	public int power;
-	public int toughness;
+	public float power;
+	public float toughness;
 	public int loyalty;
 	public String ability;
 	public String flavor;

@@ -1,18 +1,9 @@
 package com.mtg.fam;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.zip.GZIPInputStream;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -43,7 +34,6 @@ public class main extends Activity implements Runnable {
 	private int								numCards, numCardsAdded = 0;
 	private SharedPreferences	mPrefs;
 	private Editor						mPrefsEdit;
-	private String	xj;
 	private TextView	timer;
 	private static String			DB_INIT	= "DB_INIT";
 	
@@ -166,20 +156,13 @@ public class main extends Activity implements Runnable {
 		dialog.setCancelable(false);
 		dialog.show();
 		
-		xj = type;
-
 		numCardsAdded = 0;
 		Thread thread = new Thread(this);
 		thread.start();
 	}
 
 	public void run() {
-		if(xj.equals("XML")){
-			parseXML();
-		}
-		else if(xj.equals("JSON")){
-			parseJSON();
-		}
+		parseJSON();
 		handler.sendEmptyMessage(0);
 	}
 
@@ -193,56 +176,6 @@ public class main extends Activity implements Runnable {
 															mPrefsEdit.commit();
 														}
 													};
-
-	public void parseXML() {
-		URL u = null;
-		try {
-			u = new URL("http://members.cox.net/aefeinstein/cards.xml");
-			// For debugging, ap only:
-//			u = new URL("http://members.cox.net/aefeinstein/block.xml");
-		}
-		catch (MalformedURLException e3) {
-		}
-
-		/* Get a SAXParser from the SAXPArserFactory. */
-		SAXParserFactory spf = SAXParserFactory.newInstance();
-		SAXParser sp = null;
-		try {
-			sp = spf.newSAXParser();
-		}
-		catch (ParserConfigurationException e2) {
-		}
-		catch (SAXException e2) {
-		}
-
-		/* Get the XMLReader of the SAXParser we created. */
-		XMLReader xr = null;
-		try {
-			xr = sp.getXMLReader();
-		}
-		catch (SAXException e1) {
-		}
-		/* Create a new ContentHandler and apply it to the XML-Reader */
-		mDbHelper = new CardDbAdapter(this);
-		mDbHelper.open();
-		mDbHelper.dropCreateDB();
-
-		MtgXMLHandler XMLHandler = new MtgXMLHandler();
-		xr.setContentHandler(XMLHandler);
-		XMLHandler.setDb(mDbHelper);
-		XMLHandler.setMain(this);
-
-		/* Parse the xml-data from our URL. */
-		try {
-			xr.parse(new InputSource(u.openStream()));
-		}
-		catch (FileNotFoundException e) {
-		}
-		catch (IOException e) {
-		}
-		catch (SAXException e) {
-		}
-	}
 
 	public void setNumCards(int n) {
 		numCards = n;

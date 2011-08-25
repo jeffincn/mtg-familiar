@@ -34,6 +34,8 @@ public class search extends Activity{
 	protected static final String CMC_LOGIC = "cmc_logic";
 	protected static final String FORMAT = "format";
 	protected static final String RARITY = "rarity";
+	protected static final String ARTIST = "artist";
+	protected static final String FLAVOR = "flavor";
 
 	protected static final int SETLIST = 0;
 	protected static final int FORMATLIST = 1;
@@ -71,6 +73,8 @@ public class search extends Activity{
 	private Dialog	setDialog;
 	private Dialog	formatDialog;
 	private Dialog	rarityDialog;
+	private AutoCompleteTextView	flavorfield;
+	private AutoCompleteTextView	artistfield;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -84,8 +88,16 @@ public class search extends Activity{
 		namefield = (AutoCompleteTextView)findViewById(R.id.namesearch);
 		textfield = (AutoCompleteTextView)findViewById(R.id.textsearch);
 		typefield = (AutoCompleteTextView)findViewById(R.id.typesearch);
+		flavorfield = (AutoCompleteTextView)findViewById(R.id.flavorsearch);
+		artistfield = (AutoCompleteTextView)findViewById(R.id.artistsearch);
 		searchbutton = (Button)findViewById(R.id.searchbutton);
-
+		
+		/*
+		Cursor allCards = mDbHelper.fetchAllCards();	
+		CursorAdapter ca = new SimpleCursorAdapter((Context)this, R.layout.autolistitem, allCards, new String[]{CardDbAdapter.KEY_NAME}, new int[]{R.id.autocardname});
+		namefield.setAdapter(ca);
+		namefield.setThreshold(3);
+*/
 		checkboxW = (CheckBox)findViewById(R.id.checkBoxW);
 		checkboxU = (CheckBox)findViewById(R.id.checkBoxU);
 		checkboxB = (CheckBox)findViewById(R.id.checkBoxB);
@@ -159,6 +171,8 @@ public class search extends Activity{
 				String name = namefield.getText().toString();
 				String text = textfield.getText().toString();
 				String type = typefield.getText().toString();
+				String flavor = flavorfield.getText().toString();
+				String artist = artistfield.getText().toString();
 				
 				if(name.length() == 0){
 					name = null;
@@ -168,6 +182,12 @@ public class search extends Activity{
 				}
 				if(type.length() == 0){
 					type = null;
+				}
+				if(flavor.length() == 0){
+					flavor = null;
+				}
+				if(artist.length() == 0){
+					artist = null;
 				}
 				
 				String color = null;
@@ -251,9 +271,9 @@ public class search extends Activity{
 				String power = getResources().getStringArray(R.array.pt_spinner)[powChoice.getSelectedItemPosition()];
 				String toughness =  getResources().getStringArray(R.array.pt_spinner)[touChoice.getSelectedItemPosition()];
 				
-				int pow = CardDbAdapter.NOONECARES;
+				float pow = CardDbAdapter.NOONECARES;
 				try{
-					pow = Integer.parseInt(power);
+					pow = Float.parseFloat(power);
 				}
 				catch(NumberFormatException e){
 					if(power.equals("*")){
@@ -268,11 +288,14 @@ public class search extends Activity{
 					else if(power.equals("7-*")){
 						pow = CardDbAdapter.SEVENMINUSSTAR;
 					}
+					else if(power.equals("*^2")){
+						pow = CardDbAdapter.STARSQUARED;
+					}
 				}
 				
-				int tou = CardDbAdapter.NOONECARES;
+				float tou = CardDbAdapter.NOONECARES;
 				try{
-					tou = Integer.parseInt(toughness);
+					tou = Float.parseFloat(toughness);
 				}
 				catch(NumberFormatException e){
 					if(toughness.equals("*")){
@@ -286,6 +309,9 @@ public class search extends Activity{
 					}
 					else if(toughness.equals("7-*")){
 						tou = CardDbAdapter.SEVENMINUSSTAR;
+					}
+					else if(toughness.equals("*^2")){
+						tou = CardDbAdapter.STARSQUARED;
 					}
 				}
 				
@@ -312,6 +338,8 @@ public class search extends Activity{
 				i.putExtra(CMC, cmc);
 				i.putExtra(CMC_LOGIC, logicChoices[cmcLogic.getSelectedItemPosition()]);
 				i.putExtra(RARITY, rarity);
+				i.putExtra(ARTIST, artist);
+				i.putExtra(FLAVOR, flavor);
         startActivity(i);
 			}
 		});
@@ -435,13 +463,16 @@ public class search extends Activity{
 				this.removeDialog(SETLIST);
 				this.removeDialog(FORMATLIST);
 				this.removeDialog(RARITYLIST);
-/*
-				onCreateDialog(SETLIST);
-				onCreateDialog(FORMATLIST);
-				onCreateDialog(RARITYLIST);
-*/				return true;
+
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
+	}
+	
+	@Override
+	public boolean onSearchRequested() {
+			searchbutton.performClick();
+	    return super.onSearchRequested();
 	}
 }

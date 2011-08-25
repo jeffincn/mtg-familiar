@@ -52,7 +52,8 @@ public class Main implements ActionListener {
 
 		{"Ã\\u2020",								"Ae"},
 		{"â\\u20ac\\u201d",					"-"},
-		{"Â£",											"<br>"}};
+		{"Â£",											"<br>"},
+		{"â\\u20ac™",								"'"}};
 
 	private static JFrame			UIFrame;
 	private static JPanel			UIPanel;

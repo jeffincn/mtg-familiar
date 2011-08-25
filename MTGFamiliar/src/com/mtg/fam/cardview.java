@@ -261,8 +261,8 @@ public class cardview extends Activity implements Runnable{
 			pt.setText(new Integer(loyalty).toString());
 		}
 		else if(typ.contains("Creature")){
-			int p = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_POWER));
-			int t = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS));
+			float p = c.getFloat(c.getColumnIndex(CardDbAdapter.KEY_POWER));
+			float t = c.getFloat(c.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS));
 			
 			String spt = "";
 			
@@ -274,8 +274,16 @@ public class cardview extends Activity implements Runnable{
 				spt += "2+*";
 			else if(p == CardDbAdapter.SEVENMINUSSTAR)
 				spt += "7-*";
-			else
-				spt += p;
+			else if(p == CardDbAdapter.STARSQUARED)
+				spt += "*^2";
+			else{
+				if(p == (int)p){
+					spt += (int)p;
+				}
+				else{
+					spt += p;
+				}
+			}
 			
 			spt += "/";
 			
@@ -287,8 +295,16 @@ public class cardview extends Activity implements Runnable{
 				spt += "2+*";
 			else if(t == CardDbAdapter.SEVENMINUSSTAR)
 				spt += "7-*";
-			else
-				spt += t;
+			else if(t == CardDbAdapter.STARSQUARED)
+				spt += "*^2";
+			else{
+				if(t == (int)t){
+					spt += (int)t;
+				}
+				else{
+					spt += t;
+				}
+			}
 
 			pt.setText(spt);
 		}

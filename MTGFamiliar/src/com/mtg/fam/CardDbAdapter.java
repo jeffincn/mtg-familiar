@@ -43,7 +43,8 @@ public class CardDbAdapter {
 	public static final int ONEPLUSSTAR = -1001;
 	public static final int TWOPLUSSTAR = -1002;
 	public static final int SEVENMINUSSTAR = -1003;
-	public static final int NOONECARES = -1004;
+	public static final int STARSQUARED = -1004;
+	public static final int NOONECARES = -1005;
 	
 	public static final int AND = 0;
 	public static final int OR = 1;
@@ -51,7 +52,7 @@ public class CardDbAdapter {
 	private static final String DATABASE_NAME = "data";
 	private static final String DATABASE_TABLE_CARDS = "cards";
 	private static final String DATABASE_TABLE_SETS = "sets";
-	private static final int DATABASE_VERSION = 9;
+	private static final int DATABASE_VERSION = 10;
 
 	public static final String KEY_ID = "_id";
 	public static final String KEY_NAME = "name";
@@ -86,8 +87,8 @@ public class CardDbAdapter {
 			KEY_RARITY + " integer, " +
 			KEY_MANACOST + " text, " +
 			KEY_CMC + " integer not null, " +
-			KEY_POWER + " integer, " +
-			KEY_TOUGHNESS + " integer, " +
+			KEY_POWER + " real, " +
+			KEY_TOUGHNESS + " real, " +
 			KEY_LOYALTY + " integer, " +
 			KEY_ABILITY	+ " text, " +
 			KEY_FLAVOR	+ " text, " +
@@ -175,7 +176,7 @@ public class CardDbAdapter {
 	 * @return rowId or -1 if failed
 	 */
 	public long createCard(String name, String set, String type, char rarity, String manacost,
-			int cmc, int power, int toughness, int loyalty, String ability, String flavor,
+			int cmc, float power, float toughness, int loyalty, String ability, String flavor,
 			String artist, int number, String color) {
 		ContentValues initialValues = new ContentValues();
 
@@ -263,6 +264,17 @@ public class CardDbAdapter {
 				KEY_CODE, KEY_CODE_MTGI }, null, null, null, null, KEY_NAME);
 	}
 	
+	/**
+	 * Return a Cursor over the list of all Cards in the database
+	 * 
+	 * @return Cursor over all Cards
+	 */
+	public Cursor fetchAllCards() {
+
+		return mDb.query(DATABASE_TABLE_CARDS, new String[] { KEY_ID, KEY_NAME,
+				}, null, null, null, null, KEY_NAME);
+	}
+	
 	public String getCodeMtgi(String code){
 		Cursor c = mDb.query(DATABASE_TABLE_SETS, new String[] {KEY_CODE_MTGI}, KEY_CODE + "=\"" + code+"\"", null, null, null, null);
 		c.moveToFirst();
@@ -306,7 +318,7 @@ public class CardDbAdapter {
 	 * @return true if the Card was successfully updated, false otherwise
 	 */
 	public boolean updateCard(long id, String name, String set, String type, char rarity, String manacost,
-			int cmc, int power, int toughness, int loyalty, String ability, String flavor,
+			int cmc, float power, float toughness, int loyalty, String ability, String flavor,
 			String artist, int number, String color) {
 		ContentValues args = new ContentValues();
 
@@ -329,8 +341,9 @@ public class CardDbAdapter {
 	}
 
 	public Cursor Search(Context mCtx, String cardname, String cardtext, String cardtype,
-			String color, int colorlogic, String sets, int pow_choice,
-			String pow_logic, int tou_choice, String tou_logic, int cmc, String cmcLogic, String formats, String rarity) {
+			String color, int colorlogic, String sets, float pow_choice,
+			String pow_logic, float tou_choice, String tou_logic, int cmc, String cmcLogic,
+			String formats, String rarity, String flavor, String artist) {
 		Cursor mCursor = null;
 
 		String statement = null;
@@ -369,6 +382,24 @@ public class CardDbAdapter {
 			statement += ")";
 		}
 
+		if (flavor != null) {
+			if (statement == null) {
+				statement = "(" + KEY_FLAVOR + " LIKE '%" + flavor + "%')";
+			}
+			else {
+				statement += " AND (" + KEY_FLAVOR + " LIKE '%" + flavor + "%')";
+			}
+		}
+		
+		if (artist != null) {
+			if (statement == null) {
+				statement = "(" + KEY_ARTIST + " LIKE '%" + artist + "%')";
+			}
+			else {
+				statement += " AND (" + KEY_ARTIST + " LIKE '%" + artist + "%')";
+			}
+		}
+		
 		if (!(color.equals("wubrgl") || (color.equals("WUBRGL") && colorlogic == 0))) {
 			boolean firstprint = true;
 

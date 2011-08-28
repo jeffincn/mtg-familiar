@@ -4,23 +4,38 @@
 	android:layout_width="fill_parent" android:orientation="vertical">
 	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 		android:id="@+id/linearLayout2" android:layout_width="fill_parent"
-		android:orientation="horizontal" android:layout_weight="1"
-		android:layout_height="0dp">
+		android:orientation="horizontal" android:layout_height="wrap_content">
 		<ImageView android:id="@+id/imageView1" android:src="@drawable/iconbig"
 			android:layout_width="wrap_content" android:layout_height="wrap_content"
 			android:layout_gravity="center" />
 		<TextView android:textAppearance="?android:attr/textAppearanceLarge"
 			android:layout_width="fill_parent" android:layout_height="fill_parent"
 			android:layout_gravity="bottom" android:text="@string/app_name"
-			android:gravity="center" android:textSize="50dip" android:id="@+id/title" />
+			android:gravity="center" android:textSize="45dip" android:id="@+id/title" />
 	</LinearLayout>
 	<Button android:layout_width="fill_parent" android:text="@string/cardsearch"
 		android:id="@+id/cardsearch" android:layout_height="0dp"
-		android:layout_weight="1" android:textSize="30dip" />
+		android:textSize="30dip" android:layout_weight="1" />
 	<Button android:layout_width="fill_parent" android:text="@string/lifecounter"
 		android:id="@+id/lifecounter" android:layout_height="0dp"
-		android:layout_weight="1" android:textSize="30dip" />
+		android:textSize="30dip" android:layout_weight="1" />
 	<Button android:layout_width="fill_parent" android:text="@string/random"
-		android:id="@+id/rng" android:layout_height="0dp"
-		android:layout_weight="1" android:textSize="30dip" />
+		android:id="@+id/rng" android:layout_height="0dp" android:textSize="30dip"
+		android:layout_weight="1" />
+	<Button android:layout_width="fill_parent" android:layout_height="0dp" android:textSize="30dip"
+		android:layout_weight="1" android:text="@string/about" android:id="@+id/about"/>
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/linearLayout3" android:layout_width="fill_parent"
+		android:orientation="horizontal" android:layout_height="wrap_content">
+		<ImageView android:id="@+id/imageView2" android:src="@drawable/w"
+			android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp"/>
+		<ImageView android:id="@+id/imageView2" android:src="@drawable/u"
+			android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp"/>
+		<ImageView android:id="@+id/imageView2" android:src="@drawable/b"
+			android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp"/>
+		<ImageView android:id="@+id/imageView2" android:src="@drawable/r"
+			android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp"/>
+		<ImageView android:id="@+id/imageView2" android:src="@drawable/g"
+			android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp"/>
+	</LinearLayout>
 </LinearLayout>

@@ -28,6 +28,7 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class cardview extends Activity implements Runnable{
@@ -185,6 +186,8 @@ public class cardview extends Activity implements Runnable{
 	private ImageView	image;
 	private BitmapDrawable	d;
 	private Bitmap bmp;
+	private long	cardID;
+	private Cursor	formats = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -192,12 +195,12 @@ public class cardview extends Activity implements Runnable{
 		setContentView(R.layout.cardview);
 
 		Bundle extras = getIntent().getExtras();
-		long id = extras.getLong("id");
+		cardID = extras.getLong("id");
 
 		mDbHelper = new CardDbAdapter(this);
 		mDbHelper.open();
 
-		c = mDbHelper.fetchCard(id);
+		c = mDbHelper.fetchCard(cardID);
 		c.moveToFirst();
 
 		//http://magiccards.info/scans/en/mt/55.jpg
@@ -263,9 +266,9 @@ public class cardview extends Activity implements Runnable{
 		else if(typ.contains("Creature")){
 			float p = c.getFloat(c.getColumnIndex(CardDbAdapter.KEY_POWER));
 			float t = c.getFloat(c.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS));
-			
+
 			String spt = "";
-			
+
 			if(p == CardDbAdapter.STAR)
 				spt += "*";
 			else if(p== CardDbAdapter.ONEPLUSSTAR)
@@ -284,9 +287,9 @@ public class cardview extends Activity implements Runnable{
 					spt += p;
 				}
 			}
-			
+
 			spt += "/";
-			
+
 			if(t == CardDbAdapter.STAR)
 				spt += "*";
 			else if(t == CardDbAdapter.ONEPLUSSTAR)
@@ -324,7 +327,12 @@ public class cardview extends Activity implements Runnable{
 	@Override
 	protected	void onDestroy(){
 		super.onDestroy();
+		if(formats!=null){
+			formats.deactivate();
+			formats.close();
+		}
 		if(c!=null){
+			c.deactivate();
 			c.close();
 		}
 		if(mDbHelper != null){
@@ -355,6 +363,9 @@ public class cardview extends Activity implements Runnable{
 			case R.id.price:
 				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://magictraders.com/cgi-bin/query.cgi?list=magic&target=" + cardname.replace(' ', '+') + "&field=0")));
 				return true;
+			case R.id.legality:
+				showDialog(1);
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
@@ -363,17 +374,41 @@ public class cardview extends Activity implements Runnable{
 	@Override
 	protected Dialog onCreateDialog( int id ) 
 	{
-		Dialog dialog = new Dialog(this);
-		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		if(id == 0){
+			Dialog dialog = new Dialog(this);
+			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-		dialog.setContentView(R.layout.image_dialog);
+			dialog.setContentView(R.layout.image_dialog);
 
-		image = (ImageView) dialog.findViewById(R.id.cardimage);		
+			image = (ImageView) dialog.findViewById(R.id.cardimage);		
 
-		Thread thread = new Thread(this);
-		thread.start();
+			Thread thread = new Thread(this);
+			thread.start();
 
-		return dialog;
+			return dialog;
+		}
+		else if(id == 1){
+			Dialog dialog = new Dialog(this);
+			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+			dialog.setContentView(R.layout.legalitydialog);
+
+			formats = mDbHelper.fetchAllFormats();
+			String[] formatNames = new String[formats.getCount()];
+			formats.moveToFirst();
+			for(int i=0; i < formats.getCount(); i++){
+				formatNames[i] = formats.getString(formats.getColumnIndex(CardDbAdapter.KEY_NAME));
+				formats.moveToNext();	
+			}
+			
+			//Context context, int layout, Cursor c, String[] from, int[] to
+			LegalListAdapter lla = new LegalListAdapter(this, R.layout.legal_row, formats, new String[]{CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_NAME}, new int[]{R.id.format, R.id.status}, cardID, mDbHelper);
+			ListView lv = (ListView)dialog.findViewById(R.id.legallist);
+			lv.setAdapter(lla);
+
+			return dialog;
+		}
+		return null;
 	}
 
 	/**
@@ -425,10 +460,10 @@ public class cardview extends Activity implements Runnable{
 			URL u = new URL(url);
 			Object content = u.getContent();
 			InputStream is = (InputStream)content;
-			
+
 			d = new BitmapDrawable(getResources(), is);
 			bmp = d.getBitmap();
-			
+
 			Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 			float scale = (display.getWidth()-20) / (float)d.getIntrinsicWidth();
 			int newWidth = Math.round(bmp.getWidth()*scale);
@@ -436,16 +471,16 @@ public class cardview extends Activity implements Runnable{
 
 			bmp = Bitmap.createScaledBitmap(d.getBitmap(), newWidth, newHeight, true);
 			d = new BitmapDrawable(bmp);
- 		}
+		}
 		catch (IOException e) {
 			d = (BitmapDrawable) getResources().getDrawable(R.drawable.nonet);
 		}
 		catch (Exception e) {
 			d = (BitmapDrawable) getResources().getDrawable(R.drawable.nonet);
 		}
-    handler.sendEmptyMessage(0);
+		handler.sendEmptyMessage(0);
 	}
-	
+
 	private Handler	handler	= new Handler() {
 		@Override
 		public void handleMessage(Message msg) {

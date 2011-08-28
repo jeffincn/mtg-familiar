@@ -2,26 +2,10 @@
 <resources>
 	<string name="app_name">MTG Familiar</string>
 
-	<string name="and">And</string>
-	<string name="or">Or</string>
-
-	<string-array name="logic_array">
-		<item>And</item>
-		<item>Or</item>
-	</string-array>
-
 	<string-array name="logic_spinner">
 		<item>></item>
 		<item>&lt;</item>
 		<item>=</item>
-	</string-array>
-	
-	<string-array name="format_names">
-		<item>Block</item>
-		<item>Standard</item>
-		<item>Extended</item>
-		<item>Legacy</item>
-		<item>Vintage</item>
 	</string-array>
 	
 	<string-array name="rarities">
@@ -104,12 +88,10 @@
 	<string name="plus">+</string>
 	<string name="minus">-</string>
 	<string name="searchrarity">Rarity</string>
-	<string name="dbdownloadmsg">Before you can search through a database of cards, you must download it. Do you want to download it now? You can always download the database by pressing the menu button on this screen and choosing &quot;Refresh Database&quot;.</string>
-	<string name="dlnow">Download Now</string>
-	<string name="dllater">Download Later</string>
 	<string name="clear">Clear Fields</string>
 
-	<string name="refreshDB">XML</string>
+	<string name="refreshDB">Refresh DB from APK</string>
 	<string name="JSON">JSON</string>
 
+	<string name="legality">Legality</string>
 </resources>

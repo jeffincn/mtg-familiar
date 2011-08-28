@@ -38,7 +38,6 @@ public class resultlist extends ListActivity {
 				extras.getString(search.POW_LOGIC), extras.getFloat(search.TOU_CHOICE), extras.getString(search.TOU_LOGIC),
 				extras.getInt(search.CMC), extras.getString(search.CMC_LOGIC), extras.getString(search.FORMAT),
 				extras.getString(search.RARITY), extras.getString(search.FLAVOR), extras.getString(search.ARTIST));
-		startManagingCursor(c);
 		fillData(c);
 
 		registerForContextMenu(getListView());
@@ -68,6 +67,7 @@ public class resultlist extends ListActivity {
 	public void onDestroy() {
 		super.onDestroy();
 		if (c != null) {
+			c.deactivate();
 			c.close();
 		}
 		if (mDbHelper != null) {

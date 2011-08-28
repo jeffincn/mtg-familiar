@@ -5,12 +5,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import com.google.gson.stream.JsonReader;
 
-public class JSONparser {
+public class JsonCardParser {
 	private main					mMain;
 	private CardDbAdapter	mDbHelper;
 	private String	ptstr;
 
-	public JSONparser(main m, CardDbAdapter cda) {
+	public JsonCardParser(main m, CardDbAdapter cda) {
 		mMain = m;
 		mDbHelper = cda;
 	}

@@ -91,13 +91,7 @@ public class search extends Activity{
 		flavorfield = (AutoCompleteTextView)findViewById(R.id.flavorsearch);
 		artistfield = (AutoCompleteTextView)findViewById(R.id.artistsearch);
 		searchbutton = (Button)findViewById(R.id.searchbutton);
-		
-		/*
-		Cursor allCards = mDbHelper.fetchAllCards();	
-		CursorAdapter ca = new SimpleCursorAdapter((Context)this, R.layout.autolistitem, allCards, new String[]{CardDbAdapter.KEY_NAME}, new int[]{R.id.autocardname});
-		namefield.setAdapter(ca);
-		namefield.setThreshold(3);
-*/
+
 		checkboxW = (CheckBox)findViewById(R.id.checkBoxW);
 		checkboxU = (CheckBox)findViewById(R.id.checkBoxU);
 		checkboxB = (CheckBox)findViewById(R.id.checkBoxB);
@@ -358,12 +352,21 @@ public class search extends Activity{
 			setCursor.moveToNext();
 		}
 		
+		setCursor.deactivate();
 		setCursor.close();
 		
-		Resources res = getResources();
-		formatNames = res.getStringArray(R.array.format_names);
+		Cursor c = mDbHelper.fetchAllFormats();
+		formatNames = new String[c.getCount()];
+		c.moveToFirst();
+		for(int i=0; i < c.getCount(); i++){
+			formatNames[i] = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
+			c.moveToNext();	
+		}
+		c.deactivate();
+		c.close();
 		formatChecked = new boolean[formatNames.length];
-		
+
+		Resources res = getResources();		
 		rarityNames = res.getStringArray(R.array.rarities);
 		rarityChecked = new boolean[rarityNames.length];
 	}
@@ -435,6 +438,8 @@ public class search extends Activity{
 				namefield.setText("");
 				typefield.setText("");
 				textfield.setText("");
+				artistfield.setText("");
+				flavorfield.setText("");
 				
 				checkboxW.setChecked(false);
 				checkboxU.setChecked(false);

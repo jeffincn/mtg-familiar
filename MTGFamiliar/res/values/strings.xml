@@ -94,4 +94,6 @@
 	<string name="JSON">JSON</string>
 
 	<string name="legality">Legality</string>
+
+	<string name="about">About This App</string>
 </resources>

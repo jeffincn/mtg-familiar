@@ -10,18 +10,26 @@ import java.net.URL;
 import java.util.zip.GZIPInputStream;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources.NotFoundException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
 
 public class main extends Activity implements Runnable {
 	private static final String DB_PATH = "/data/data/com.mtg.fam/databases/";
@@ -35,6 +43,7 @@ public class main extends Activity implements Runnable {
 	private ProgressDialog		dialog;
 	private int								numCards, numCardsAdded = 0;
 	private int	threadType;
+	private Button	about;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -46,6 +55,7 @@ public class main extends Activity implements Runnable {
 		search = (Button) findViewById(R.id.cardsearch);
 		life = (Button) findViewById(R.id.lifecounter);
 		rng = (Button) findViewById(R.id.rng);
+		about = (Button) findViewById(R.id.about);
 
 		search.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -65,6 +75,12 @@ public class main extends Activity implements Runnable {
 			public void onClick(View v) {
 				Intent i = new Intent(mCtx, rng.class);
 				startActivity(i);
+			}
+		});
+		
+		about.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				showDialog(0);
 			}
 		});
 		
@@ -270,5 +286,43 @@ public class main extends Activity implements Runnable {
 		catch (IOException e) {
 			return;
 		}
+	}
+	
+	@Override
+	protected Dialog onCreateDialog( int id ) 
+	{
+		Context mContext = this;
+		Dialog aboutDialog = new Dialog(mContext);
+		aboutDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+		aboutDialog.setContentView(R.layout.aboutdialog);
+		aboutDialog.setTitle("About " + getString(R.string.app_name));
+
+		TextView text = (TextView) aboutDialog.findViewById(R.id.aboutfield);
+		text.setAutoLinkMask(Linkify.EMAIL_ADDRESSES | Linkify.WEB_URLS);
+		text.setText("This app is my gift to the MTG community."+'\n'+'\n'+
+				"Please send questions, comments, concerns, and praise to mtg.familiar@gmail.com"+'\n'+'\n'+
+				"Join the open source project at http://code.google.com/p/mtg-familiar"+'\n'+'\n'+
+				"Special thanks to Richard Garfield and the rest of the folks at Wizards of the Coast!"+'\n'+'\n'+
+				"They own and copyright all of this stuff, none of it is mine."+'\n'+'\n'+
+				"-gelakinetic");
+			
+		return aboutDialog;
+		/*
+		TextView tv = null;
+		tv
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("About " + getString(R.string.app_name))
+						.setMessage()
+		       .setCancelable(false).
+		       setNeutralButton("Thanks!", new DialogInterface.OnClickListener() {
+	           public void onClick(DialogInterface dialog, int id) {
+               dialog.cancel();
+          }
+      });
+
+		AlertDialog alert = builder.create();
+		return alert;
+		*/
 	}
 }

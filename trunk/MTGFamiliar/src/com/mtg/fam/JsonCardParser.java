@@ -3,22 +3,15 @@ package com.mtg.fam;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
 import com.google.gson.stream.JsonReader;
 
 public class JsonCardParser {
-	private main					mMain;
-	private CardDbAdapter	mDbHelper;
-	private String	ptstr;
 
-	public JsonCardParser(main m, CardDbAdapter cda) {
-		mMain = m;
-		mDbHelper = cda;
-	}
+	public static void readJsonStream(InputStream in, main mMain, CardDbAdapter mDbHelper) throws IOException {
+		JsonReader reader = new JsonReader(new InputStreamReader(in, "ISO-8859-1"));
 
-	public void readJsonStream(InputStream in) throws IOException {
-		JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
-
-		String s;
+		String s, s1, ptstr;
 
 		reader.beginObject();
 		s = reader.nextName();
@@ -34,7 +27,6 @@ public class JsonCardParser {
 				reader.skipValue();
 			}
 			if (s.equalsIgnoreCase("s")) { // sets
-				String s1;
 
 				reader.beginObject();
 				while (reader.hasNext()) {
@@ -68,7 +60,6 @@ public class JsonCardParser {
 				reader.endObject();
 			}
 			if (s.equalsIgnoreCase("p")) { // cards
-				String s1;
 
 				reader.beginObject();
 				while (reader.hasNext()) {
@@ -142,11 +133,6 @@ public class JsonCardParser {
 											else if(ptstr.equals("3{1/2}")){
 												c.power = 3.5f;
 											}
-											/*
-											else if(ptstr.length() > 0){
-												Log.d("power", ptstr);
-											}
-											*/
 										}
 									}
 									catch (Exception e) {
@@ -187,11 +173,6 @@ public class JsonCardParser {
 											else if(ptstr.equals("3{1/2}")){
 												c.toughness = 3.5f;
 											}
-											/*
-											else if(ptstr.length() > 0){
-												Log.d("toughness", ptstr);
-											}
-											*/
 										}
 									}
 									catch (Exception e) {

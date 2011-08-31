@@ -10,7 +10,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -19,8 +18,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Html;
 import android.text.Html.ImageGetter;
-import android.text.SpannableStringBuilder;
-import android.text.style.StyleSpan;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -234,8 +231,7 @@ public class cardview extends Activity implements Runnable{
 		}
 
 		String sCost = c.getString(c.getColumnIndex(CardDbAdapter.KEY_MANACOST));
-		sCost = sCost.replace("{", "<img src=\"");
-		sCost = sCost.replace("}", "\"/>");
+		sCost = sCost.replace("{", "<img src=\"").replace("}", "\"/>");
 
 		CharSequence csCost= Html.fromHtml(sCost, imgGetter, null);
 
@@ -246,14 +242,12 @@ public class cardview extends Activity implements Runnable{
 		type.setText(c.getString(c.getColumnIndex(CardDbAdapter.KEY_TYPE)));
 		set.setText(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)));
 
-		String sAbility = c.getString(c.getColumnIndex(CardDbAdapter.KEY_ABILITY))/*.replace("£", "<br>")/*.replace("#_", "<i>").replace("_#", "</i>")*/.replace("{", "<img src=\"").replace("}", "\"/>");
+		String sAbility = c.getString(c.getColumnIndex(CardDbAdapter.KEY_ABILITY)).replace("{", "<img src=\"").replace("}", "\"/>");
 		CharSequence csAbility = Html.fromHtml(sAbility, imgGetter, null);
-		csAbility = italicizeBetweenTokens(csAbility, "##");
 		ability.setText(csAbility);
 
-		String sFlavor = c.getString(c.getColumnIndex(CardDbAdapter.KEY_FLAVOR)).replace("£", "<br>")/*.replace("#_", "<i>").replace("_#", "</i>")*/;
+		String sFlavor = c.getString(c.getColumnIndex(CardDbAdapter.KEY_FLAVOR));
 		CharSequence csFlavor = Html.fromHtml(sFlavor, imgGetter, null);
-		csFlavor = italicizeBetweenTokens(csFlavor, "##");
 		flavor.setText(csFlavor);
 
 		artist.setText(c.getString(c.getColumnIndex(CardDbAdapter.KEY_ARTIST)));
@@ -409,50 +403,6 @@ public class cardview extends Activity implements Runnable{
 			return dialog;
 		}
 		return null;
-	}
-
-	/**
-	 * Given either a Spannable String or a regular String and a token, apply
-	 * the given CharacterStyle to the span between the tokens, and also
-	 * remove tokens.
-	 * <p>
-	 * For example, {@code setSpanBetweenTokens("Hello ##world##!", "##",
-	 * new ForegroundColorSpan(0xFFFF0000));} will return a CharSequence
-	 * {@code "Hello world!"} with {@code world} in red.
-	 *
-	 * @param text The text, with the tokens, to adjust.
-	 * @param token The token string; there should be at least two instances
-	 *	     of token in text.
-	 * @param cs The style to apply to the CharSequence. WARNING: You cannot
-	 *	    send the same two instances of this parameter, otherwise
-	 *	    the second call will remove the original span.
-	 * @return A Spannable CharSequence with the new style applied.
-	 *
-	 * @see http://developer.android.com/reference/android/text/style/CharacterStyle.html
-	 */
-	public static CharSequence italicizeBetweenTokens(CharSequence text,
-			String token)
-	{
-		while(text.toString().contains(token)){
-			// Start and end refer to the points where the span will apply
-			int tokenLen = token.length();
-			int start = text.toString().indexOf(token) + tokenLen;
-			int end = text.toString().indexOf(token, start);
-
-			if (start > -1 && end > -1)
-			{
-				// Copy the spannable string to a mutable spannable string
-				SpannableStringBuilder ssb = new SpannableStringBuilder(text);
-				ssb.setSpan(new StyleSpan(Typeface.ITALIC) , start, end, 0);
-
-				// Delete the tokens before and after the span
-				ssb.delete(end, end + tokenLen);
-				ssb.delete(start - tokenLen, start);
-
-				text = ssb;
-			}
-		}
-		return text;
 	}
 
 	public void run() {

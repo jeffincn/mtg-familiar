@@ -273,16 +273,18 @@ public class CardDbAdapter {
 		return mDb.query(DATABASE_TABLE_SETS, new String[] { KEY_ID, KEY_NAME,
 				KEY_CODE, KEY_CODE_MTGI }, null, null, null, null, KEY_NAME);
 	}
+	
+	public boolean doesSetExist(String code) {
 
-	/**
-	 * Return a Cursor over the list of all Cards in the database
-	 * 
-	 * @return Cursor over all Cards
-	 */
-	public Cursor fetchAllCards() {
-
-		return mDb.query(DATABASE_TABLE_CARDS, new String[] { KEY_ID, KEY_NAME,
-		}, null, null, null, null, KEY_NAME);
+		String statement = "(" + KEY_CODE + " LIKE '%" + code + "%')";
+		
+		Cursor c = mDb.query(true, DATABASE_TABLE_SETS, new String[] { KEY_ID},
+				statement, null, null, null, KEY_NAME, null);
+		
+		if(c.getCount()>0){
+			return true;
+		}
+		return false;
 	}
 
 	public String getCodeMtgi(String code){
@@ -359,6 +361,17 @@ public class CardDbAdapter {
 			String formats, String rarity, String flavor, String artist) {
 		Cursor mCursor = null;
 
+		if(cardname != null)
+			cardname = cardname.replace("'", "''");
+		if(cardtext != null)
+			cardtext = cardtext.replace("'", "''");
+		if(cardtype != null)
+			cardtype = cardtype.replace("'", "''");
+		if(flavor != null)
+			flavor = flavor.replace("'", "''");
+		if(artist != null)
+			artist = artist.replace("'", "''");
+		
 		String statement = null;
 
 		if (cardname != null) {
@@ -709,7 +722,8 @@ public class CardDbAdapter {
 	
 	public int checkLegality(long mCardID, String name) {
 		
-		
+		if(name != null)
+			name = name.replace("'","''");
 	// get all sets in the format
 		Cursor cSets = mDb.query(name + SET_POSTIFX, new String[] { KEY_ID, KEY_NAME,
 		}, null, null, null, null, KEY_NAME);

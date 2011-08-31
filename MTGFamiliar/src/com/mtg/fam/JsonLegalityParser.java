@@ -22,8 +22,8 @@ public class JsonLegalityParser {
 		mDbHelper = cda;
 	}
 
-	public static void readJsonStream(InputStream in, CardDbAdapter cda, boolean isCheck, SharedPreferences settings) throws IOException {
-		JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
+	public static void readJsonStream(InputStream in, CardDbAdapter cda, SharedPreferences settings) throws IOException {
+		JsonReader reader = new JsonReader(new InputStreamReader(in, "ISO-8859-1"));
 
 		mDbHelper = cda;
 		
@@ -34,13 +34,14 @@ public class JsonLegalityParser {
 			if (jsonTopLevelName.equalsIgnoreCase("Date")) {
 				date = reader.nextString();
 				
-				if(isCheck){
-					//compare date, maybe return, update sharedprefs
-					String spDate = settings.getString("date", null);
-					if(spDate != null && spDate.equals(date)){
-						return;
-					}
+				//compare date, maybe return, update sharedprefs
+				String spDate = settings.getString("date", null);
+				if(spDate != null && spDate.equals(date)){
+					//TODO this always refreshes, shouldn't when checking OTA
+//					return; // dates match, nothing new here.
 				}
+
+				// refresh everything!
 				mDbHelper.dropFormatTable();
 				mDbHelper.createFormatTable();
 			}

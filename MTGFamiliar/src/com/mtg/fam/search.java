@@ -356,16 +356,21 @@ public class search extends Activity{
 		setCursor.close();
 		
 		Cursor c = mDbHelper.fetchAllFormats();
-		formatNames = new String[c.getCount()];
-		c.moveToFirst();
-		for(int i=0; i < c.getCount(); i++){
-			formatNames[i] = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
-			c.moveToNext();	
+		if(c != null){
+			formatNames = new String[c.getCount()];
+			c.moveToFirst();
+			for(int i=0; i < c.getCount(); i++){
+				formatNames[i] = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
+				c.moveToNext();	
+			}
+			c.deactivate();
+			c.close();
+			formatChecked = new boolean[formatNames.length];
 		}
-		c.deactivate();
-		c.close();
-		formatChecked = new boolean[formatNames.length];
-
+		else{
+			formatNames = new String[0];
+			formatChecked = new boolean[0];
+		}
 		Resources res = getResources();		
 		rarityNames = res.getStringArray(R.array.rarities);
 		rarityChecked = new boolean[rarityNames.length];

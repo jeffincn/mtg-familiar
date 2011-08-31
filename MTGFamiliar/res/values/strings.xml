@@ -91,7 +91,7 @@
 	<string name="clear">Clear Fields</string>
 
 	<string name="refreshDB">Refresh DB from APK</string>
-	<string name="JSON">JSON</string>
+	<string name="JSON">Refresh DB from Web</string>
 
 	<string name="legality">Legality</string>
 

@@ -2,11 +2,13 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 import java.util.zip.GZIPOutputStream;
 
 import javax.swing.BorderFactory;
@@ -39,7 +41,7 @@ public class Main implements ActionListener {
 		{"\"artist\"",							"\"l\""},
 		{"\"number\"",							"\"m\""},
 		{"\"color\"",								"\"n\""},
-		
+
 		{"\"card\"",								"\"o\""},
 		{"\"cards\"",								"\"p\""},
 		{"\"code\"",								"\"q\""},
@@ -50,10 +52,12 @@ public class Main implements ActionListener {
 		{"\"bdd_date\"",						"\"v\""},
 		{"\"num_cards\"",						"\"w\""},
 
-		{"Ã\\u2020",								"Ae"},
-		{"â\\u20ac\\u201d",					"-"},
-		{"Â£",											"<br>"},
-		{"â\\u20ac™",								"'"}};
+		{"£", 											"<br>"},
+		{"#_",											"<i>"},
+		{"_#",											"</i>"},
+
+		{"‘",												"'"},
+		{"'",												"'"}};
 
 	private static JFrame			UIFrame;
 	private static JPanel			UIPanel;
@@ -88,8 +92,8 @@ public class Main implements ActionListener {
 	}
 
 	private static String readFileAsString(String filePath) throws java.io.IOException {
-		StringBuffer fileData = new StringBuffer(1000);
-		BufferedReader reader = new BufferedReader(new FileReader(filePath));
+		StringBuilder fileData = new StringBuilder(6000000);
+		InputStreamReader reader = new InputStreamReader(new FileInputStream(filePath), "UTF-8");
 		char[] buf = new char[1024];
 		int numRead = 0;
 		while ((numRead = reader.read(buf)) != -1) {
@@ -146,7 +150,6 @@ public class Main implements ActionListener {
 			}
 		}
 		else if (event.getSource() == convertButton) {
-			// TODO check XML file and number, do conversion;
 			if (XMLfile != null) {
 				if (XMLfile.getName().endsWith("xml")) {
 					int num_cards;
@@ -169,8 +172,23 @@ public class Main implements ActionListener {
 		}
 	}
 
+	static CharsetEncoder asciiEncoder = 
+		Charset.forName("US-ASCII").newEncoder(); // or "ISO-8859-1" for ISO Latin 1
+
+	public static boolean isPureAscii(String v) {
+		for (int i = 0; i < subs.length; i++) {
+			v = v.replace(subs[i][0], subs[i][1]);
+		}
+		boolean retval = asciiEncoder.canEncode(v);
+
+		if(retval == false){
+			System.out.println(v);
+		}
+
+		return retval;
+	}
+
 	private void convertXMLtoJSON(File f, int num_cards) {
-		// TODO Auto-generated method stub
 		try {
 			JSONObject jo = XML.toJSONObject(readFileAsString(f.getAbsolutePath()));
 
@@ -179,6 +197,7 @@ public class Main implements ActionListener {
 			JSONArray card = cards.getJSONArray("card");
 			for (int i = 0; i < card.length(); i++) {
 				JSONObject c = card.getJSONObject(i);
+
 				if (c.getString("name").contains("//")) {
 
 					String names[] = c.getString("name").split(" // ");
@@ -228,11 +247,6 @@ public class Main implements ActionListener {
 				}
 			}
 
-			String name = f.getName().substring(0, f.getName().length() - 4);
-
-			File fout = new File(f.getParent(), name + ".json.gzip");
-
-			FileOutputStream fos = new FileOutputStream(fout);
 			String s = jo.toString();
 
 			for (int i = 0; i < subs.length; i++) {
@@ -241,11 +255,33 @@ public class Main implements ActionListener {
 
 			s = new StringBuffer(s).insert(6, "\"w\":" + num_cards + ",").toString();
 
-			GZIPOutputStream gos = new GZIPOutputStream(fos);
-			gos.write(s.getBytes());
-			gos.close();
+			String name = f.getName().substring(0, f.getName().length() - 4);
+			
+			// Write the ISO-whatever
+			File jsonout = new File(f.getParent(), name + ".json");
+			FileOutputStream fos = new FileOutputStream(jsonout);
+			fos.write(s.getBytes());
+			fos.flush();
 			fos.close();
+			
+			// Compress it
+			File gzipout = new File(f.getParent(), name + ".json.gzip");
+			GZIPOutputStream gos = new GZIPOutputStream(new FileOutputStream(gzipout));
+			FileInputStream fis = new FileInputStream(jsonout);
+						
+			byte[] buffer = new byte[1024];
+			int length;
+			int totalwritten=0;
+			while ((length = fis.read(buffer))>0){
+				gos.write(buffer, 0, length);
+				totalwritten+=length;
+			}
 
+			//Close the streams
+			gos.flush();
+			gos.close();
+			fis.close();
+			
 			statusLabel.setText("All done");
 		}
 		catch (JSONException e) {

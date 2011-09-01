@@ -500,7 +500,7 @@ public class CardDbAdapter {
 				else {
 					statement += " OR ";
 				}
-				statement += KEY_SET + " LIKE '%" + s + "%'";
+				statement += KEY_SET + "=\"" + s+"\"";
 			}
 
 			statement += ")";

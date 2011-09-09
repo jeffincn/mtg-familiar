@@ -2,17 +2,16 @@ package com.mtg.fam;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -39,10 +38,15 @@ public class cardview extends Activity implements Runnable{
 	private TextView pt;
 	private TextView	flavor;
 	private TextView	artist;
-
-	private String cardname;
-	private String url;
-
+	private Cursor	c;
+	private ImageView	image;
+	private BitmapDrawable	d;
+	private Bitmap bmp;
+	private long	cardID;
+	private Cursor	formats = null;
+	private String	mtgi_code;
+	private static String	priceurl;
+	private String picurl;
 
 	private ImageGetter imgGetter = new ImageGetter() {
 		public Drawable getDrawable(String source) {
@@ -179,12 +183,6 @@ public class cardview extends Activity implements Runnable{
 			return d;
 		}
 	};
-	private Cursor	c;
-	private ImageView	image;
-	private BitmapDrawable	d;
-	private Bitmap bmp;
-	private long	cardID;
-	private Cursor	formats = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -202,10 +200,11 @@ public class cardview extends Activity implements Runnable{
 
 		//http://magiccards.info/scans/en/mt/55.jpg
 
-		String mtgi_code = mDbHelper.getCodeMtgi(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)));
-		url = "http://magiccards.info/scans/en/" + mtgi_code + "/" +c.getString(c.getColumnIndex(CardDbAdapter.KEY_NUMBER)) + ".jpg";
-		url = url.toLowerCase();
-
+		mtgi_code = mDbHelper.getCodeMtgi(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)));
+		picurl = "http://magiccards.info/scans/en/" + mtgi_code + "/" +c.getString(c.getColumnIndex(CardDbAdapter.KEY_NUMBER)) + ".jpg";
+		picurl = picurl.toLowerCase();
+		priceurl = "http://partner.tcgplayer.com/syn/synhighlow.ashx?pk=MAGCINFO&pi="+mtgi_code+"-"+c.getString(c.getColumnIndex(CardDbAdapter.KEY_NUMBER));
+		
 		name = (TextView) findViewById(R.id.name);
 		cost = (TextView) findViewById(R.id.cost);
 		type = (TextView) findViewById(R.id.type);
@@ -235,7 +234,7 @@ public class cardview extends Activity implements Runnable{
 
 		CharSequence csCost= Html.fromHtml(sCost, imgGetter, null);
 
-		cardname = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
+		c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
 
 		name.setText(c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME)));
 		cost.setText(csCost);
@@ -253,13 +252,12 @@ public class cardview extends Activity implements Runnable{
 		artist.setText(c.getString(c.getColumnIndex(CardDbAdapter.KEY_ARTIST)));
 
 		int loyalty = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_LOYALTY));
-		String typ = (String) type.getText();
-		if(typ.contains("Planeswalker")){
+		float p = c.getFloat(c.getColumnIndex(CardDbAdapter.KEY_POWER));
+		float t = c.getFloat(c.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS));
+		if(loyalty != CardDbAdapter.NOONECARES){
 			pt.setText(new Integer(loyalty).toString());
 		}
-		else if(typ.contains("Creature")){
-			float p = c.getFloat(c.getColumnIndex(CardDbAdapter.KEY_POWER));
-			float t = c.getFloat(c.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS));
+		else if(p != CardDbAdapter.NOONECARES && t != CardDbAdapter.NOONECARES){
 
 			String spt = "";
 
@@ -355,7 +353,7 @@ public class cardview extends Activity implements Runnable{
 				showDialog(0);
 				return true;
 			case R.id.price:
-				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://magictraders.com/cgi-bin/query.cgi?list=magic&target=" + cardname.replace(' ', '+') + "&field=0")));
+				showDialog(2);
 				return true;
 			case R.id.legality:
 				showDialog(1);
@@ -395,10 +393,34 @@ public class cardview extends Activity implements Runnable{
 				formats.moveToNext();	
 			}
 			
-			//Context context, int layout, Cursor c, String[] from, int[] to
 			LegalListAdapter lla = new LegalListAdapter(this, R.layout.legal_row, formats, new String[]{CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_NAME}, new int[]{R.id.format, R.id.status}, cardID, mDbHelper);
 			ListView lv = (ListView)dialog.findViewById(R.id.legallist);
 			lv.setAdapter(lla);
+
+			return dialog;
+		}
+		else if(id == 2){
+			Dialog dialog = new Dialog(this);
+			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+			dialog.setContentView(R.layout.pricedialog);
+			
+			TextView l = (TextView)dialog.findViewById(R.id.low);
+			TextView m = (TextView)dialog.findViewById(R.id.med);
+			TextView h = (TextView)dialog.findViewById(R.id.high);
+
+			float[] prices = scrapePrices(mtgi_code, 0);
+			
+			if(prices[0]==0 &&prices[1]==0 &&prices[2]==0){
+				l.setText("No");
+				m.setText("Internet");
+				h.setText("Connection");				
+			}
+			else{
+				l.setText(String.format("$%.2f",prices[0]));
+				m.setText(String.format("$%.2f",prices[1]));
+				h.setText(String.format("$%.2f",prices[2]));
+			}
 
 			return dialog;
 		}
@@ -407,7 +429,7 @@ public class cardview extends Activity implements Runnable{
 
 	public void run() {
 		try {
-			URL u = new URL(url);
+			URL u = new URL(picurl);
 			Object content = u.getContent();
 			InputStream is = (InputStream)content;
 
@@ -437,4 +459,40 @@ public class cardview extends Activity implements Runnable{
 			image.setImageDrawable(d);
 		}
 	};
+	
+	static float[] scrapePrices(String set, int num){
+		URL u;
+		try {
+			u = new URL(priceurl);
+			InputStream is = u.openStream();
+			
+			int BUFSIZE=128;
+			byte[] buf = new byte[BUFSIZE];
+			
+			StringBuilder sb = new StringBuilder();
+			int read;
+			while((read=is.read(buf)) == BUFSIZE){
+					sb.append(new String(buf));
+			}
+			for(int i=0; i < read; i++){
+				sb.append((char)buf[i]);
+			}
+			
+			String[] arr = sb.toString().split("\\$");
+			float[] prices = new float[3];
+
+			for(int i=1; i < arr.length; i++){
+				prices[i-1] = Float.parseFloat(arr[i].substring(0, arr[i].indexOf('<')));
+			}
+			return prices;
+		}
+		catch (MalformedURLException e) {
+			float[] f = {0,0,0};
+			return f;
+		}
+		catch (IOException e) {
+			float[] f = {0,0,0};
+			return f;
+		}
+	}
 }

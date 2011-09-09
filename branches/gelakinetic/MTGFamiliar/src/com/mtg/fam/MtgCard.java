@@ -23,9 +23,9 @@ public class MtgCard {
 		rarity = '\0';
 		manacost = "";
 		cmc = 0;
-		power = 0;
-		toughness = 0;
-		loyalty = 0;
+		power = CardDbAdapter.NOONECARES;
+		toughness = CardDbAdapter.NOONECARES;
+		loyalty = CardDbAdapter.NOONECARES;
 		ability = "";
 		flavor = "";
 		artist = "";

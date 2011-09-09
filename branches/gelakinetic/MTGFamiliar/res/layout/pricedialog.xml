@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:background="@color/black" android:id="@+id/linearLayout1"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:orientation="vertical">
+	<TextView style="@style/text" android:id="@+id/textView1"
+		android:layout_height="wrap_content" android:layout_width="fill_parent"
+		android:gravity="center" android:text="@string/pricetitle"
+		android:layout_margin="5dip" />
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/linearLayout2" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:orientation="horizontal"
+		android:layout_margin="5dip">
+		<TextView style="@style/text" android:id="@+id/lowlabel"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:text="@string/low" />
+		<TextView android:text="TextView" style="@style/text"
+			android:id="@+id/low" android:layout_height="wrap_content"
+			android:layout_width="fill_parent" android:gravity="right"
+			android:layout_marginLeft="20dip" />
+	</LinearLayout>
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/linearLayout3" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:orientation="horizontal"
+		android:layout_margin="5dip">
+		<TextView style="@style/text" android:id="@+id/medlabel"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:text="@string/med" />
+		<TextView android:text="TextView" style="@style/text"
+			android:id="@+id/med" android:layout_height="wrap_content"
+			android:layout_gravity="right" android:gravity="right"
+			android:layout_width="fill_parent" android:layout_marginLeft="20dip" />
+	</LinearLayout>
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/linearLayout4" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:orientation="horizontal"
+		android:layout_margin="5dip">
+		<TextView style="@style/text" android:id="@+id/highlabel"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:text="@string/high" />
+		<TextView android:text="TextView" style="@style/text"
+			android:id="@+id/high" android:layout_height="wrap_content"
+			android:layout_width="fill_parent" android:gravity="right"
+			android:layout_marginLeft="20dip" />
+	</LinearLayout>
+</LinearLayout>

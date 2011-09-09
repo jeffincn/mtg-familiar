@@ -6,8 +6,8 @@
 	<TextView android:text="TextView"
 		android:layout_alignParentLeft="true" android:layout_height="wrap_content"
 		android:layout_weight="1" style="@style/text" android:layout_width="fill_parent"
-		android:id="@+id/format" />
+		android:id="@+id/format" android:layout_margin="5dip"/>
 	<TextView android:layout_height="wrap_content"
 		android:layout_width="wrap_content" android:text="TextView" style="@style/text"
-		android:layout_alignParentRight="true" android:id="@+id/status" />
+		android:layout_alignParentRight="true" android:id="@+id/status" android:layout_margin="5dip"/>
 </LinearLayout>

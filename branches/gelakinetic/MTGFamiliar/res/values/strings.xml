@@ -96,4 +96,12 @@
 	<string name="legality">Legality</string>
 
 	<string name="about">About This App</string>
+
+	<string name="high">High:</string>
+
+	<string name="med">Mid:</string>
+
+	<string name="low">Low:</string>
+
+	<string name="pricetitle">TCGPlayer.com Prices</string>
 </resources>

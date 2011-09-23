@@ -29,6 +29,8 @@ import android.widget.TextView;
 
 public class cardview extends Activity implements Runnable{
 
+	private static final int	PICLOAD	= 0;
+	private static final int	PRICELOAD	= 1;
 	private CardDbAdapter mDbHelper;
 	private TextView name;
 	private TextView cost;
@@ -183,6 +185,11 @@ public class cardview extends Activity implements Runnable{
 			return d;
 		}
 	};
+	private int	threadtype;
+	private float[]	prices;
+	private TextView	l;
+	private TextView	m;
+	private TextView	h;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -374,6 +381,7 @@ public class cardview extends Activity implements Runnable{
 
 			image = (ImageView) dialog.findViewById(R.id.cardimage);		
 
+			threadtype = PICLOAD;
 			Thread thread = new Thread(this);
 			thread.start();
 
@@ -399,16 +407,24 @@ public class cardview extends Activity implements Runnable{
 
 			return dialog;
 		}
-		else if(id == 2){
+		else if(id == 2){ // price
 			Dialog dialog = new Dialog(this);
 			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 			dialog.setContentView(R.layout.pricedialog);
 			
-			TextView l = (TextView)dialog.findViewById(R.id.low);
-			TextView m = (TextView)dialog.findViewById(R.id.med);
-			TextView h = (TextView)dialog.findViewById(R.id.high);
+			l = (TextView)dialog.findViewById(R.id.low);
+			m = (TextView)dialog.findViewById(R.id.med);
+			h = (TextView)dialog.findViewById(R.id.high);
+			
+			l.setText("Loading");
+			m.setText("Loading");
+			h.setText("Loading");
 
+			threadtype = PRICELOAD;
+			Thread thread = new Thread(this);
+			thread.start();
+			/*
 			float[] prices = scrapePrices(mtgi_code, 0);
 			
 			if(prices[0]==0 &&prices[1]==0 &&prices[2]==0){
@@ -421,42 +437,66 @@ public class cardview extends Activity implements Runnable{
 				m.setText(String.format("$%.2f",prices[1]));
 				h.setText(String.format("$%.2f",prices[2]));
 			}
-
+*/
 			return dialog;
 		}
 		return null;
 	}
 
 	public void run() {
-		try {
-			URL u = new URL(picurl);
-			Object content = u.getContent();
-			InputStream is = (InputStream)content;
+		switch(threadtype){
+			case(PICLOAD):
+				try {
+					URL u = new URL(picurl);
+					Object content = u.getContent();
+					InputStream is = (InputStream)content;
 
-			d = new BitmapDrawable(getResources(), is);
-			bmp = d.getBitmap();
+					d = new BitmapDrawable(getResources(), is);
+					bmp = d.getBitmap();
 
-			Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-			float scale = (display.getWidth()-20) / (float)d.getIntrinsicWidth();
-			int newWidth = Math.round(bmp.getWidth()*scale);
-			int newHeight = Math.round(bmp.getHeight()*scale);
+					Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+					float scale = (display.getWidth()-20) / (float)d.getIntrinsicWidth();
+					int newWidth = Math.round(bmp.getWidth()*scale);
+					int newHeight = Math.round(bmp.getHeight()*scale);
 
-			bmp = Bitmap.createScaledBitmap(d.getBitmap(), newWidth, newHeight, true);
-			d = new BitmapDrawable(bmp);
+					bmp = Bitmap.createScaledBitmap(d.getBitmap(), newWidth, newHeight, true);
+					d = new BitmapDrawable(bmp);
+				}
+				catch (IOException e) {
+					d = (BitmapDrawable) getResources().getDrawable(R.drawable.nonet);
+				}
+				catch (Exception e) {
+					d = (BitmapDrawable) getResources().getDrawable(R.drawable.nonet);
+				}
+				handler.sendEmptyMessage(PICLOAD);
+			break;
+			case(PRICELOAD):
+				prices = scrapePrices(mtgi_code, 0);
+				handler.sendEmptyMessage(PRICELOAD);
+			break;
 		}
-		catch (IOException e) {
-			d = (BitmapDrawable) getResources().getDrawable(R.drawable.nonet);
-		}
-		catch (Exception e) {
-			d = (BitmapDrawable) getResources().getDrawable(R.drawable.nonet);
-		}
-		handler.sendEmptyMessage(0);
 	}
 
 	private Handler	handler	= new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			image.setImageDrawable(d);
+			switch(msg.what){
+				case PICLOAD:
+					image.setImageDrawable(d);
+					break;
+				case PRICELOAD:
+					if(prices[0]==0 &&prices[1]==0 &&prices[2]==0){
+						l.setText("No");
+						m.setText("Internet");
+						h.setText("Connection");				
+					}
+					else{
+						l.setText(String.format("$%.2f",prices[0]));
+						m.setText(String.format("$%.2f",prices[1]));
+						h.setText(String.format("$%.2f",prices[2]));
+					}
+					break;
+			}
 		}
 	};
 	

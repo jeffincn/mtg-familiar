@@ -15,10 +15,12 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources.NotFoundException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
@@ -43,9 +45,9 @@ public class main extends Activity implements Runnable {
 	private ProgressDialog			dialog;
 	private int									numCards, numCardsAdded = 0;
 	private int									threadType;
-	private Button							about;
 	private String							patchname;
 	private boolean							dialogReady;
+	private SharedPreferences	preferences;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -57,7 +59,6 @@ public class main extends Activity implements Runnable {
 		search = (Button) findViewById(R.id.cardsearch);
 		life = (Button) findViewById(R.id.lifecounter);
 		rng = (Button) findViewById(R.id.rng);
-		about = (Button) findViewById(R.id.about);
 
 		search.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -79,13 +80,8 @@ public class main extends Activity implements Runnable {
 				startActivity(i);
 			}
 		});
-
-		about.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				showDialog(0);
-			}
-		});
-
+		preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		
 		File f = new File(DB_PATH, DB_NAME);
 		if (!f.exists()) {
 			startThread(DBFROMAPK);
@@ -93,7 +89,9 @@ public class main extends Activity implements Runnable {
 		else {
 			mDbHelper = new CardDbAdapter(this);
 			mDbHelper.open();
-			startThread(OTAPATCH);
+			if(preferences.getBoolean("autoupdate",false)){
+				startThread(OTAPATCH);
+			}
 		}
 	}
 
@@ -161,8 +159,14 @@ public class main extends Activity implements Runnable {
 			case R.id.refreshDB:
 				startThread(DBFROMAPK);
 				return true;
-			case R.id.JSON:
+			case R.id.checkUpdate:
 				startThread(OTAPATCH);
+				return true;
+			case R.id.preferences:
+				startActivity(new Intent().setClass(this, PreferencesActivity.class));
+				return true;
+			case R.id.aboutapp:
+				showDialog(0);
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -181,9 +185,6 @@ public class main extends Activity implements Runnable {
 			thread.start();
 		}
 		else if (type == OTAPATCH) {
-			// TODO grab the manifest file, check for differences
-			// If there are, spawn a dialog, parse the JSON into the db
-
 			dialog = new ProgressDialog(main.this);
 			dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 			dialog.setMessage("Checking for Updates. Please wait...");
@@ -209,8 +210,6 @@ public class main extends Activity implements Runnable {
 					parseLegality(new URL("http://members.cox.net/aefeinstein/legality.json"));
 				}
 				catch (MalformedURLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
 				}
 				for (int i = 0; i < patchInfo.size(); i++) {
 					String[] set = patchInfo.get(i);
@@ -225,8 +224,6 @@ public class main extends Activity implements Runnable {
 							parseJSON(new URL(set[1]));
 						}
 						catch (MalformedURLException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
 						}
 					}
 				}
@@ -293,6 +290,9 @@ public class main extends Activity implements Runnable {
 	}
 
 	private void copyDB() {
+		if (mDbHelper != null) {
+			mDbHelper.close();
+		}
 		try {
 			File folder = new File(DB_PATH);
 			if (!folder.exists()) {
@@ -301,6 +301,10 @@ public class main extends Activity implements Runnable {
 			File db = new File(folder, DB_NAME);
 			if (db.exists()) {
 				db.delete();
+				SharedPreferences settings = this.getSharedPreferences("prefs", 0);
+		    SharedPreferences.Editor editor = settings.edit();
+		    editor.putString("lastUpdate", "");
+		    editor.commit();
 			}
 			if (!db.exists()) {
 

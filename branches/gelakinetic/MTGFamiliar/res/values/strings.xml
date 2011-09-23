@@ -104,4 +104,10 @@
 	<string name="low">Low:</string>
 
 	<string name="pricetitle">TCGPlayer.com Prices</string>
+
+	<string name="settings">Settings</string>
+
+	<string name="chkupd">Check for Updates</string>
+
+	<string name="preferences">Preferences</string>
 </resources>

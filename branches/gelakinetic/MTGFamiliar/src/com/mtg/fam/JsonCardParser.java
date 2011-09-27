@@ -216,7 +216,7 @@ public class JsonCardParser {
 								}
 								else if (s2.equalsIgnoreCase("m")) { // number
 									try {
-										c.number = reader.nextInt();
+										c.number = reader.nextString();
 									}
 									catch (Exception e) {
 										reader.skipValue();

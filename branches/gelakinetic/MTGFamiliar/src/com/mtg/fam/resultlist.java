@@ -48,7 +48,7 @@ public class resultlist extends ListActivity {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Intent i = new Intent(mCtx, cardview.class);
 				i.putExtra("id", id);
-				startActivity(i);
+				startActivityForResult(i, 0);
 			}
 		});
 	}
@@ -89,4 +89,28 @@ public class resultlist extends ListActivity {
 		SimpleCursorAdapter notes = new SimpleCursorAdapter(this, R.layout.card_row, c, from, to);
 		setListAdapter(notes);
 	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+  if (requestCode == 0) {
+      if (resultCode == cardview.TRANSFORM) {
+      	String number = data.getStringExtra(cardview.NUMBER);
+      	String set = data.getStringExtra(cardview.SET);
+      	if(number.contains("a")){
+      		number = number.replace("a", "b");
+      	}
+      	else if(number.contains("b")){
+      		number = number.replace("b", "a");
+      	}
+      	
+      	long id = mDbHelper.getTransform(set, number);
+      	if(id!=-1){
+					Intent i = new Intent(mCtx, cardview.class);
+					i.putExtra("id", id);
+					startActivityForResult(i, 0);
+      	}
+      }
+  }
+}
+
 }

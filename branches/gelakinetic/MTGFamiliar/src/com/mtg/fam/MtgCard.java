@@ -13,7 +13,7 @@ public class MtgCard {
 	public String ability;
 	public String flavor;
 	public String artist;
-	public int number;
+	public String number;
 	public String color;
 	
 	public MtgCard(){
@@ -29,7 +29,7 @@ public class MtgCard {
 		ability = "";
 		flavor = "";
 		artist = "";
-		number = 0;
+		number = "";
 		color = "";
 	}
 }

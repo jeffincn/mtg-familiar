@@ -110,4 +110,6 @@
 	<string name="chkupd">Check for Updates</string>
 
 	<string name="preferences">Preferences</string>
+
+	<string name="transform">Transform</string>
 </resources>

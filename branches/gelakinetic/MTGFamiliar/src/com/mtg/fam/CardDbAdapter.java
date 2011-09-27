@@ -98,7 +98,7 @@ public class CardDbAdapter {
 		KEY_ABILITY	+ " text, " +
 		KEY_FLAVOR	+ " text, " +
 		KEY_ARTIST	+ " text, " +
-		KEY_NUMBER	+ " integer, " +
+		KEY_NUMBER	+ " text, " +
 		KEY_COLOR + " text not null);";
 
 	private static final String DATABASE_CREATE_SETS =
@@ -187,7 +187,7 @@ public class CardDbAdapter {
 	 */
 	public long createCard(String name, String set, String type, char rarity, String manacost,
 			int cmc, float power, float toughness, int loyalty, String ability, String flavor,
-			String artist, int number, String color) {
+			String artist, String number, String color) {
 		ContentValues initialValues = new ContentValues();
 
 		initialValues.put(KEY_NAME, name);
@@ -334,7 +334,7 @@ public class CardDbAdapter {
 	 */
 	public boolean updateCard(long id, String name, String set, String type, char rarity, String manacost,
 			int cmc, float power, float toughness, int loyalty, String ability, String flavor,
-			String artist, int number, String color) {
+			String artist, String number, String color) {
 		ContentValues args = new ContentValues();
 
 		args.put(KEY_NAME, name);
@@ -644,6 +644,21 @@ public class CardDbAdapter {
 			mCursor.moveToFirst();
 		}
 		return mCursor;
+	}
+	
+	public int getTransform(String set, String number) {
+		Cursor mCursor = null;
+		int ID;
+		String statement = "(" + KEY_NUMBER + " = '" + number + "') AND (" + KEY_SET + " = '" + set + "')";
+		try {
+			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID}, statement, null, null, null, KEY_ID, null);
+			mCursor.moveToFirst();
+			ID = mCursor.getInt(mCursor.getColumnIndex(KEY_ID));
+		}
+		catch (Exception e) {
+			return -1;
+		}
+		return ID;
 	}
 
 	public void createFormatTable(){

@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.google.gson.stream.JsonReader;
 
@@ -20,7 +21,7 @@ public class JsonUpdateParser {
 		ArrayList<String[]> patchInfo = new ArrayList<String[]>();
 		URL update;
 		
-    SharedPreferences settings = mMain.getSharedPreferences("prefs", 0);
+    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mMain);
 
 		try {
 			update = new URL("http://members.cox.net/aefeinstein/patches.json");

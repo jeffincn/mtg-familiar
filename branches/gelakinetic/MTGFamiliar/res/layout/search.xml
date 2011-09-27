@@ -6,16 +6,16 @@
 		android:layout_width="fill_parent" android:layout_height="fill_parent">
 		<AutoCompleteTextView android:layout_width="fill_parent"
 			android:id="@+id/namesearch" android:hint="Name"
-			android:layout_weight="1" android:layout_height="0dp" />
+			android:layout_weight="1" android:layout_height="wrap_content" />
 		<AutoCompleteTextView android:id="@+id/typesearch"
 			android:layout_width="fill_parent" android:hint="Type"
-			android:layout_weight="1" android:layout_height="0dp" />
+			android:layout_weight="1" android:layout_height="wrap_content" />
 		<AutoCompleteTextView android:layout_width="fill_parent"
 			android:id="@+id/textsearch" android:hint="Text"
-			android:layout_weight="1" android:layout_height="0dp" />
+			android:layout_weight="1" android:layout_height="wrap_content" />
 		<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 			android:orientation="horizontal" android:layout_width="fill_parent"
-			android:layout_height="0dp" android:layout_weight="1">
+			android:layout_height="wrap_content" android:layout_weight="1">
 			<CheckBox android:id="@+id/checkBoxW" android:layout_width="wrap_content"
 				android:layout_height="wrap_content" />
 			<ImageView android:src="@drawable/w" android:id="@+id/imageView1"
@@ -36,7 +36,7 @@
 		</LinearLayout>
 		<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 			android:orientation="horizontal" android:layout_width="fill_parent"
-			android:layout_weight="1" android:layout_height="0dp">
+			android:layout_weight="1" android:layout_height="wrap_content">
 
 			<CheckBox android:id="@+id/checkBoxR" android:layout_width="wrap_content"
 				android:layout_height="wrap_content" />
@@ -55,7 +55,7 @@
 				android:layout_gravity="center" android:layout_weight="1" />
 		</LinearLayout>
 		<Spinner android:id="@+id/colorlogic" android:layout_width="fill_parent"
-			android:layout_weight="1" android:layout_height="0dp" />
+			android:layout_weight="1" android:layout_height="wrap_content" />
 		<LinearLayout android:layout_width="fill_parent"
 			android:id="@+id/linearLayout2" android:layout_weight="1"
 			android:layout_height="wrap_content">
@@ -72,8 +72,8 @@
 			android:id="@+id/linearLayout3" android:layout_weight="1"
 			android:layout_height="wrap_content">
 			<TextView android:id="@+id/textView2" android:layout_height="wrap_content"
-				android:text="@string/tou" android:layout_gravity="center"
-				style="@style/text" android:layout_width="120dip" />
+				android:text="@string/tou" android:layout_gravity="center" style="@style/text"
+				android:layout_width="120dip" />
 			<Spinner android:layout_width="wrap_content"
 				android:layout_height="wrap_content" android:layout_weight="1"
 				android:id="@+id/touLogic" />
@@ -85,7 +85,7 @@
 			android:id="@+id/linearLayout4" android:layout_weight="1"
 			android:layout_height="wrap_content">
 			<TextView android:id="@+id/textView3" android:layout_height="wrap_content"
-				android:layout_gravity="center" style="@style/text" 
+				android:layout_gravity="center" style="@style/text"
 				android:layout_width="120dip" android:text="@string/cmc" />
 			<Spinner android:layout_width="wrap_content"
 				android:layout_height="wrap_content" android:layout_weight="1"
@@ -96,7 +96,7 @@
 		</LinearLayout>
 		<LinearLayout android:id="@+id/linearLayout4"
 			android:layout_width="fill_parent" android:orientation="horizontal"
-			android:layout_weight="1" android:layout_height="0dp">
+			android:layout_weight="1" android:layout_height="wrap_content">
 			<Button android:layout_width="wrap_content" android:id="@+id/setsearch"
 				android:layout_height="wrap_content" android:text="@string/setsearch"
 				android:layout_weight="1" />
@@ -109,13 +109,13 @@
 		</LinearLayout>
 		<AutoCompleteTextView android:layout_width="fill_parent"
 			android:id="@+id/flavorsearch" android:hint="Flavor Text"
-			android:layout_weight="1" android:layout_height="0dp" />
+			android:layout_weight="1" android:layout_height="wrap_content" />
 		<AutoCompleteTextView android:layout_width="fill_parent"
 			android:id="@+id/artistsearch" android:hint="Artist"
-			android:layout_weight="1" android:layout_height="0dp" />
+			android:layout_weight="1" android:layout_height="wrap_content" />
 		<Button android:text="Search for Cardname" android:id="@+id/searchbutton"
 			android:layout_width="fill_parent" android:layout_weight="1"
-			android:layout_height="0dp" />
+			android:layout_height="wrap_content" />
 
 	</LinearLayout>
 </ScrollView>

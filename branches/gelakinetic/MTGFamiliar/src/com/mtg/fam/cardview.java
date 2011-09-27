@@ -8,6 +8,7 @@ import java.net.URL;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -21,8 +22,10 @@ import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -31,6 +34,9 @@ public class cardview extends Activity implements Runnable{
 
 	private static final int	PICLOAD	= 0;
 	private static final int	PRICELOAD	= 1;
+	protected static final int	TRANSFORM	= 7;
+	protected static final String	NUMBER	= "number";
+	protected static final String	SET	= "set";
 	private CardDbAdapter mDbHelper;
 	private TextView name;
 	private TextView cost;
@@ -190,6 +196,9 @@ public class cardview extends Activity implements Runnable{
 	private TextView	l;
 	private TextView	m;
 	private TextView	h;
+	private Button	transform;
+	private String	number;
+	private String	setName;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -207,10 +216,12 @@ public class cardview extends Activity implements Runnable{
 
 		//http://magiccards.info/scans/en/mt/55.jpg
 
+		setName = c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET));
 		mtgi_code = mDbHelper.getCodeMtgi(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)));
-		picurl = "http://magiccards.info/scans/en/" + mtgi_code + "/" +c.getString(c.getColumnIndex(CardDbAdapter.KEY_NUMBER)) + ".jpg";
+		number = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NUMBER));
+		picurl = "http://magiccards.info/scans/en/" + mtgi_code + "/" + number + ".jpg";
 		picurl = picurl.toLowerCase();
-		priceurl = "http://partner.tcgplayer.com/syn/synhighlow.ashx?pk=MAGCINFO&pi="+mtgi_code+"-"+c.getString(c.getColumnIndex(CardDbAdapter.KEY_NUMBER));
+		priceurl = "http://partner.tcgplayer.com/syn/synhighlow.ashx?pk=MAGCINFO&pi="+mtgi_code+"-"+number;
 		
 		name = (TextView) findViewById(R.id.name);
 		cost = (TextView) findViewById(R.id.cost);
@@ -220,6 +231,7 @@ public class cardview extends Activity implements Runnable{
 		flavor = (TextView) findViewById(R.id.flavor);
 		artist = (TextView) findViewById(R.id.artist);
 		pt = (TextView) findViewById(R.id.pt);
+		transform = (Button)findViewById(R.id.transformbutton);
 
 		switch((char)c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY))){
 			case 'C':
@@ -312,6 +324,21 @@ public class cardview extends Activity implements Runnable{
 		}
 		else{
 			pt.setText("");
+		}
+		
+		if(number.contains("a") || number.contains("b")){
+			transform.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					Intent i = new Intent();
+					i.putExtra(SET, setName);
+					i.putExtra(NUMBER, number);
+					setResult(TRANSFORM, i);
+					finish();// transform!
+				}
+			});
+		}
+		else{
+			transform.setVisibility(View.GONE);
 		}
 	}
 
@@ -424,20 +451,7 @@ public class cardview extends Activity implements Runnable{
 			threadtype = PRICELOAD;
 			Thread thread = new Thread(this);
 			thread.start();
-			/*
-			float[] prices = scrapePrices(mtgi_code, 0);
-			
-			if(prices[0]==0 &&prices[1]==0 &&prices[2]==0){
-				l.setText("No");
-				m.setText("Internet");
-				h.setText("Connection");				
-			}
-			else{
-				l.setText(String.format("$%.2f",prices[0]));
-				m.setText(String.format("$%.2f",prices[1]));
-				h.setText(String.format("$%.2f",prices[2]));
-			}
-*/
+
 			return dialog;
 		}
 		return null;

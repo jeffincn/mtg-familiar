@@ -37,6 +37,7 @@ public class main extends Activity implements Runnable {
 	private static final int		DBFROMAPK			= 0;
 	private static final int		OTAPATCH			= 1;
 	protected static final int	APPLYINGPATCH	= 3;
+	private static final int	DATABASE_VERSION	= 2;
 	private Button							search;
 	private Button							life;
 	private Button							rng;
@@ -47,7 +48,7 @@ public class main extends Activity implements Runnable {
 	private int									threadType;
 	private String							patchname;
 	private boolean							dialogReady;
-	private SharedPreferences	preferences;
+	private SharedPreferences		preferences;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -83,7 +84,7 @@ public class main extends Activity implements Runnable {
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		
 		File f = new File(DB_PATH, DB_NAME);
-		if (!f.exists()) {
+		if (!f.exists() || preferences.getInt("databaseVersion", -1) != DATABASE_VERSION) {
 			startThread(DBFROMAPK);
 		}
 		else {
@@ -279,7 +280,7 @@ public class main extends Activity implements Runnable {
 	void parseLegality(URL legal) {
 		try {
 			InputStream in = new BufferedInputStream(legal.openStream());
-			JsonLegalityParser.readJsonStream(in, mDbHelper, getSharedPreferences("prefs", 0));
+			JsonLegalityParser.readJsonStream(in, mDbHelper, preferences);
 		}
 		catch (MalformedURLException e) {
 			return;
@@ -290,7 +291,9 @@ public class main extends Activity implements Runnable {
 	}
 
 	private void copyDB() {
-		if (mDbHelper != null) {
+    SharedPreferences.Editor editor = preferences.edit();
+
+    if (mDbHelper != null) {
 			mDbHelper.close();
 		}
 		try {
@@ -301,9 +304,8 @@ public class main extends Activity implements Runnable {
 			File db = new File(folder, DB_NAME);
 			if (db.exists()) {
 				db.delete();
-				SharedPreferences settings = this.getSharedPreferences("prefs", 0);
-		    SharedPreferences.Editor editor = settings.edit();
 		    editor.putString("lastUpdate", "");
+		    editor.putInt("databaseVersion", -1);
 		    editor.commit();
 			}
 			if (!db.exists()) {
@@ -319,6 +321,9 @@ public class main extends Activity implements Runnable {
 					totalwritten += length;
 				}
 
+		    editor.putInt("databaseVersion", DATABASE_VERSION);
+		    editor.commit();
+		    
 				// Close the streams
 				fos.flush();
 				fos.close();

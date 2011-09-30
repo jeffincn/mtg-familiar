@@ -1,9 +1,0 @@
-
-    <resources>
-        <color name="textcolor">#00FF00</color>
-        <color name="common">#FFFFFF</color>
-        <color name="rare">#FDD017</color>
-        <color name="uncommon">#C0C0C0</color>
-        <color name="mythic">#FFA500</color>
-        <color name="black">#000000</color>
-    </resources>

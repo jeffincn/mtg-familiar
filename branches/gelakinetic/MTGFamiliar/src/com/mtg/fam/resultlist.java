@@ -107,6 +107,7 @@ public class resultlist extends ListActivity {
       	if(id!=-1){
 					Intent i = new Intent(mCtx, cardview.class);
 					i.putExtra("id", id);
+					i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 					startActivityForResult(i, 0);
       	}
       }

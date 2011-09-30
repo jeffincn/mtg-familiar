@@ -112,4 +112,9 @@
 	<string name="preferences">Preferences</string>
 
 	<string name="transform">Transform</string>
+
+	<string name="d2title">Treat D2 As Coin</string>
+
+	<string name="webDB">Build DB from Web</string>
+
 </resources>

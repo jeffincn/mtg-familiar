@@ -38,6 +38,7 @@ public class main extends Activity implements Runnable {
 	private static final int		OTAPATCH			= 1;
 	protected static final int	APPLYINGPATCH	= 3;
 	private static final int	DATABASE_VERSION	= 2;
+	private static final int	DBFROMWEB	= 4;
 	private Button							search;
 	private Button							life;
 	private Button							rng;
@@ -157,9 +158,14 @@ public class main extends Activity implements Runnable {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
+			/*
+			case R.id.buildWebDB:
+				startThread(DBFROMWEB);
+				return true;
 			case R.id.refreshDB:
 				startThread(DBFROMAPK);
 				return true;
+*/
 			case R.id.checkUpdate:
 				startThread(OTAPATCH);
 				return true;
@@ -196,6 +202,18 @@ public class main extends Activity implements Runnable {
 			Thread thread = new Thread(this);
 			thread.start();
 		}
+		else if(type == DBFROMWEB){
+			dialog = new ProgressDialog(main.this);
+			dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			dialog.setMessage("Downloading and parsing an update. Please wait...");
+			dialog.setCancelable(false);
+			dialog.show();
+			
+			numCardsAdded = 0;
+			threadType = type;
+			Thread thread = new Thread(this);
+			thread.start();
+		}
 	}
 
 	public void run() {
@@ -204,7 +222,10 @@ public class main extends Activity implements Runnable {
 			handler.sendEmptyMessage(DBFROMAPK);
 		}
 		else if (threadType == OTAPATCH) {
-
+			if(mDbHelper == null){
+				mDbHelper = new CardDbAdapter(this);
+				mDbHelper.open();
+			}
 			ArrayList<String[]> patchInfo = JsonUpdateParser.readJsonStream(this);
 			if (patchInfo != null) {
 				try {
@@ -231,6 +252,21 @@ public class main extends Activity implements Runnable {
 			}
 			handler.sendEmptyMessage(OTAPATCH);
 		}
+		else if(threadType == DBFROMWEB){
+			try {
+				if(mDbHelper == null){
+					mDbHelper = new CardDbAdapter(this);
+					mDbHelper.open();
+				}
+				mDbHelper.dropCreateDB();
+
+				parseJSON(new URL("http://members.cox.net/aefeinstein/cards.json.gzip"));
+				parseLegality(new URL("http://members.cox.net/aefeinstein/legality.json"));
+			}
+			catch (MalformedURLException e) {
+			}
+			handler.sendEmptyMessage(DBFROMWEB);
+		}
 		threadType = -1;
 	}
 
@@ -239,6 +275,9 @@ public class main extends Activity implements Runnable {
 														@Override
 														public void handleMessage(Message msg) {
 															switch (msg.what) {
+																case DBFROMWEB:
+																	dialog.dismiss();
+																	break;
 																case DBFROMAPK:
 																	mDbHelper = new CardDbAdapter(mCtx);
 																	mDbHelper.open();

@@ -153,6 +153,9 @@ public class cardview extends Activity implements Runnable{
 			else if(source.equalsIgnoreCase("pg")){
 				d = getResources().getDrawable(R.drawable.pg);
 			}
+			else if(source.equalsIgnoreCase("p")){
+				d = getResources().getDrawable(R.drawable.p);
+			}
 			else if(source.equalsIgnoreCase("+oo")){
 				d = getResources().getDrawable(R.drawable.inf);
 			}
@@ -334,6 +337,7 @@ public class cardview extends Activity implements Runnable{
 					i.putExtra(NUMBER, number);
 					setResult(TRANSFORM, i);
 					finish();// transform!
+					overridePendingTransition(0, 0);
 				}
 			});
 		}

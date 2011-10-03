@@ -337,7 +337,8 @@ public class cardview extends Activity implements Runnable{
 					i.putExtra(NUMBER, number);
 					setResult(TRANSFORM, i);
 					finish();// transform!
-					overridePendingTransition(0, 0);
+//				Froyo+ only, disabled animations
+//				overridePendingTransition(0, 0);
 				}
 			});
 		}
@@ -466,10 +467,7 @@ public class cardview extends Activity implements Runnable{
 			case(PICLOAD):
 				try {
 					URL u = new URL(picurl);
-					Object content = u.getContent();
-					InputStream is = (InputStream)content;
-
-					d = new BitmapDrawable(getResources(), is);
+					d = new BitmapDrawable(u.openStream());
 					bmp = d.getBitmap();
 
 					Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();

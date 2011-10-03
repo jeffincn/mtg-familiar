@@ -57,7 +57,7 @@ public class counter extends Activity
     private Object timerLock;
     private Player player[];
     private ImageView poisonButton, lifeButton, dieButton, poolButton, resetButton;
-	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private Handler handler;
     private Type activeType;
 
@@ -408,7 +408,7 @@ public class counter extends Activity
         public ListView history;
         public int life, poison;
         public HistoryAdapter lifeAdapter, poisonAdapter;
-        public Context context;
+//        public Context context;
 
         public Player(Context context, Button plus1, Button plus5, Button minus1, Button minus5,
                 TextView readout, ListView history)
@@ -431,7 +431,7 @@ public class counter extends Activity
         private ArrayList<Vector<Integer>> list;
         private Context context;
 
-        public static final int ABSOLUTE = 0, RELATIVE = 1;
+        public static final int ABSOLUTE = 0;//, RELATIVE = 1;
 
         public HistoryAdapter(Context context, int initialValue)
         {
@@ -458,7 +458,7 @@ public class counter extends Activity
             {
                 lastValue = list.get(list.size()-1).get(ABSOLUTE).intValue();
             }
-            Vector v = new Vector<Integer>();
+            Vector<Integer> v = new Vector<Integer>();
             v.add(new Integer(lastValue + delta));
             v.add(new Integer(delta));
             list.add(v);
@@ -467,13 +467,11 @@ public class counter extends Activity
             notifyDataSetChanged();
         }
 
-        @Override
         public int getCount()
         {
             return count;
         }
 
-        @Override
         public Object getItem(int position)
         {
             if(position < 0 || position >= count)
@@ -483,7 +481,6 @@ public class counter extends Activity
             return list.get(position);
         }
 
-        @Override
         public long getItemId(int position)
         {
             if(position < 0 || position >= count)
@@ -493,13 +490,13 @@ public class counter extends Activity
             return (long) position;
         }
 
-        @Override
+//        @Override
         public View getView(int position, View convertView, ViewGroup parent)
         {
-            TextView absolute, relative;
+            TextView relative;//, absolute;
             LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View v = vi.inflate(R.layout.history_adapter_row, null);
-            absolute = (TextView) v.findViewById(R.id.absolute);
+//            absolute = (TextView) v.findViewById(R.id.absolute);
             relative = (TextView) v.findViewById(R.id.relative);
             if(relative != null)
             {

@@ -113,9 +113,9 @@
 		<AutoCompleteTextView android:layout_width="fill_parent"
 			android:id="@+id/artistsearch" android:hint="Artist"
 			android:layout_weight="1" android:layout_height="wrap_content" />
-		<Button android:text="Search for Cardname" android:id="@+id/searchbutton"
+		<Button android:id="@+id/searchbutton"
 			android:layout_width="fill_parent" android:layout_weight="1"
-			android:layout_height="wrap_content" />
+			android:layout_height="wrap_content" android:text="@string/searchButton"/>
 
 	</LinearLayout>
 </ScrollView>

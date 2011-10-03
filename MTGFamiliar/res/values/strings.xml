@@ -117,4 +117,6 @@
 
 	<string name="webDB">Build DB from Web</string>
 
+	<string name="searchButton">Search!</string>
+
 </resources>

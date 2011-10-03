@@ -5,12 +5,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -32,13 +36,14 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class main extends Activity implements Runnable {
-	private static final String	DB_PATH				= "/data/data/com.mtg.fam/databases/";
-	private static final String	DB_NAME				= "data";
-	private static final int		DBFROMAPK			= 0;
-	private static final int		OTAPATCH			= 1;
-	protected static final int	APPLYINGPATCH	= 3;
-	private static final int	DATABASE_VERSION	= 2;
-	private static final int	DBFROMWEB	= 4;
+	private static final String	DB_PATH						= "/data/data/com.mtg.fam/databases/";
+	private static final String	DB_NAME						= "data";
+	private static final int		DBFROMAPK					= 0;
+	private static final int		OTAPATCH					= 1;
+	private static final int		APPLYINGPATCH			= 3;
+	private static final int		DBFROMWEB					= 4;
+	private static final int		DATABASE_VERSION	= 2;
+	private static final int		EXCEPTION					= 99;
 	private Button							search;
 	private Button							life;
 	private Button							rng;
@@ -50,6 +55,7 @@ public class main extends Activity implements Runnable {
 	private String							patchname;
 	private boolean							dialogReady;
 	private SharedPreferences		preferences;
+	private String	stacktrace;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -83,7 +89,7 @@ public class main extends Activity implements Runnable {
 			}
 		});
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		
+
 		File f = new File(DB_PATH, DB_NAME);
 		if (!f.exists() || preferences.getInt("databaseVersion", -1) != DATABASE_VERSION) {
 			startThread(DBFROMAPK);
@@ -91,7 +97,7 @@ public class main extends Activity implements Runnable {
 		else {
 			mDbHelper = new CardDbAdapter(this);
 			mDbHelper.open();
-			if(preferences.getBoolean("autoupdate",false)){
+			if (preferences.getBoolean("autoupdate", false)) {
 				startThread(OTAPATCH);
 			}
 		}
@@ -158,14 +164,10 @@ public class main extends Activity implements Runnable {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-			/*
-			case R.id.buildWebDB:
-				startThread(DBFROMWEB);
-				return true;
-			case R.id.refreshDB:
-				startThread(DBFROMAPK);
-				return true;
-*/
+
+			// case R.id.buildWebDB: startThread(DBFROMWEB); return true;
+			// case R.id.refreshDB: startThread(DBFROMAPK); return true;
+
 			case R.id.checkUpdate:
 				startThread(OTAPATCH);
 				return true;
@@ -202,13 +204,13 @@ public class main extends Activity implements Runnable {
 			Thread thread = new Thread(this);
 			thread.start();
 		}
-		else if(type == DBFROMWEB){
+		else if (type == DBFROMWEB) {
 			dialog = new ProgressDialog(main.this);
 			dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			dialog.setMessage("Downloading and parsing an update. Please wait...");
 			dialog.setCancelable(false);
 			dialog.show();
-			
+
 			numCardsAdded = 0;
 			threadType = type;
 			Thread thread = new Thread(this);
@@ -217,57 +219,67 @@ public class main extends Activity implements Runnable {
 	}
 
 	public void run() {
-		if (threadType == DBFROMAPK) {
-			copyDB();
-			handler.sendEmptyMessage(DBFROMAPK);
-		}
-		else if (threadType == OTAPATCH) {
-			if(mDbHelper == null){
-				mDbHelper = new CardDbAdapter(this);
-				mDbHelper.open();
+		try {			
+			if (threadType == DBFROMAPK) {
+				copyDB();
+				handler.sendEmptyMessage(DBFROMAPK);
 			}
-			ArrayList<String[]> patchInfo = JsonUpdateParser.readJsonStream(this);
-			if (patchInfo != null) {
-				try {
-					parseLegality(new URL("http://members.cox.net/aefeinstein/legality.json"));
-				}
-				catch (MalformedURLException e1) {
-				}
-				for (int i = 0; i < patchInfo.size(); i++) {
-					String[] set = patchInfo.get(i);
-					if (!mDbHelper.doesSetExist(set[2])) {
-						try {
-							patchname = set[0];
-							dialogReady = false;
-							handler.sendEmptyMessage(APPLYINGPATCH);
-							while (!dialogReady) {
-								;// spin in this thread until the dialog is ready
-							}
-							parseJSON(new URL(set[1]));
-						}
-						catch (MalformedURLException e) {
-						}
-					}
-				}
-			}
-			handler.sendEmptyMessage(OTAPATCH);
-		}
-		else if(threadType == DBFROMWEB){
-			try {
-				if(mDbHelper == null){
+			else if (threadType == OTAPATCH) {
+				if (mDbHelper == null) {
 					mDbHelper = new CardDbAdapter(this);
 					mDbHelper.open();
 				}
-				mDbHelper.dropCreateDB();
+				ArrayList<String[]> patchInfo = JsonUpdateParser.readJsonStream(this);
+				if (patchInfo != null) {
+					try {
+						parseLegality(new URL("http://members.cox.net/aefeinstein/legality.json"));
+					}
+					catch (MalformedURLException e1) {
+					}
+					for (int i = 0; i < patchInfo.size(); i++) {
+						String[] set = patchInfo.get(i);
+						if (!mDbHelper.doesSetExist(set[2])) {
+							try {
+								patchname = set[0];
+								dialogReady = false;
+								handler.sendEmptyMessage(APPLYINGPATCH);
+								while (!dialogReady) {
+									;// spin in this thread until the dialog is ready
+								}
+								parseJSON(new URL(set[1]));
+							}
+							catch (MalformedURLException e) {
+							}
+						}
+					}
+				}
+				handler.sendEmptyMessage(OTAPATCH);
+			}
+			else if (threadType == DBFROMWEB) {
+				try {
+					if (mDbHelper == null) {
+						mDbHelper = new CardDbAdapter(this);
+						mDbHelper.open();
+					}
+					mDbHelper.dropCreateDB();
 
-				parseJSON(new URL("http://members.cox.net/aefeinstein/cards.json.gzip"));
-				parseLegality(new URL("http://members.cox.net/aefeinstein/legality.json"));
+					parseJSON(new URL("http://members.cox.net/aefeinstein/cards.json.gzip"));
+					parseLegality(new URL("http://members.cox.net/aefeinstein/legality.json"));
+				}
+				catch (MalformedURLException e) {
+				}
+				handler.sendEmptyMessage(DBFROMWEB);
 			}
-			catch (MalformedURLException e) {
-			}
-			handler.sendEmptyMessage(DBFROMWEB);
+			threadType = -1;
 		}
-		threadType = -1;
+		catch (Exception e) {
+			final Writer result = new StringWriter();
+	    final PrintWriter printWriter = new PrintWriter(result);
+	    e.printStackTrace(printWriter);
+	    stacktrace = result.toString();
+	    
+			handler.sendEmptyMessage(EXCEPTION);
+		}
 	}
 
 	private Handler	handler	= new Handler() {
@@ -299,6 +311,17 @@ public class main extends Activity implements Runnable {
 
 																	dialogReady = true;
 																	break;
+																case EXCEPTION:
+																	dialog.dismiss();
+																	
+
+																	
+																	AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
+																	builder.setMessage(stacktrace).setCancelable(true);
+																	AlertDialog alert = builder.create();
+																	alert.show();
+
+																	stacktrace.toString();
 															}
 														}
 													};
@@ -330,9 +353,9 @@ public class main extends Activity implements Runnable {
 	}
 
 	private void copyDB() {
-    SharedPreferences.Editor editor = preferences.edit();
+		SharedPreferences.Editor editor = preferences.edit();
 
-    if (mDbHelper != null) {
+		if (mDbHelper != null) {
 			mDbHelper.close();
 		}
 		try {
@@ -343,9 +366,9 @@ public class main extends Activity implements Runnable {
 			File db = new File(folder, DB_NAME);
 			if (db.exists()) {
 				db.delete();
-		    editor.putString("lastUpdate", "");
-		    editor.putInt("databaseVersion", -1);
-		    editor.commit();
+				editor.putString("lastUpdate", "");
+				editor.putInt("databaseVersion", -1);
+				editor.commit();
 			}
 			if (!db.exists()) {
 
@@ -360,9 +383,9 @@ public class main extends Activity implements Runnable {
 					totalwritten += length;
 				}
 
-		    editor.putInt("databaseVersion", DATABASE_VERSION);
-		    editor.commit();
-		    
+				editor.putInt("databaseVersion", DATABASE_VERSION);
+				editor.commit();
+
 				// Close the streams
 				fos.flush();
 				fos.close();

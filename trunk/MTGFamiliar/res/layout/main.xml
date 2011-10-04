@@ -22,6 +22,8 @@
 	<Button android:layout_width="fill_parent" android:text="@string/random"
 		android:id="@+id/rng" android:layout_height="wrap_content" android:textSize="30dip"
 		android:layout_weight="1" />
+		<Button android:layout_width="fill_parent" android:layout_height="wrap_content" android:textSize="30dip"
+		android:layout_weight="1" android:id="@+id/deckmanager" android:text="@string/deckmanagement"/>
 	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 		android:id="@+id/linearLayout3" android:layout_width="fill_parent"
 		android:orientation="horizontal" android:layout_height="wrap_content">

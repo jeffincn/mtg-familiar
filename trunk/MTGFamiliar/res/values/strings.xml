@@ -119,4 +119,16 @@
 
 	<string name="searchButton">Search!</string>
 
+	<string name="deckmanagement">Deck Management</string>
+
+	<string name="defaultdeckpath">/Android/data/com.gelakinetic.mtgfam/</string>
+
+	<string name="defaultpathtitle">Path To Decks</string>
+
+	<string name="defaultpathsummary">This is the place on your SD card where decks are saved to and read from</string>
+
+	<string name="default_deck_path_key">default_deck_path</string>
+
+	<string name="default_deck_path_dialog_title">Enter Path Here</string>
+
 </resources>

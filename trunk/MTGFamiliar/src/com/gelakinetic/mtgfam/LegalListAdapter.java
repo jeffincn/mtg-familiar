@@ -1,4 +1,6 @@
-package com.mtg.fam;
+package com.gelakinetic.mtgfam;
+
+
 
 import android.content.Context;
 import android.database.Cursor;

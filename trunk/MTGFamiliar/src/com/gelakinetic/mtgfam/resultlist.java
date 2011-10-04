@@ -1,4 +1,6 @@
-package com.mtg.fam;
+package com.gelakinetic.mtgfam;
+
+
 
 import android.app.ListActivity;
 import android.content.Context;

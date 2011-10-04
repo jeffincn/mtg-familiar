@@ -531,10 +531,4 @@ public class search extends Activity {
 				return super.onOptionsItemSelected(item);
 		}
 	}
-
-	@Override
-	public boolean onSearchRequested() {
-		searchbutton.performClick();
-		return super.onSearchRequested();
-	}
 }

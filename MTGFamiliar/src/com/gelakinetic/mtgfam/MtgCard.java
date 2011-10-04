@@ -1,4 +1,4 @@
-package com.mtg.fam;
+package com.gelakinetic.mtgfam;
 
 public class MtgCard {
 	public String name;

@@ -1,4 +1,6 @@
-package com.mtg.fam;
+package com.gelakinetic.mtgfam;
+
+
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;

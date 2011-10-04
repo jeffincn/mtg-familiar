@@ -1,4 +1,4 @@
-package com.mtg.fam;
+package com.gelakinetic.mtgfam;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

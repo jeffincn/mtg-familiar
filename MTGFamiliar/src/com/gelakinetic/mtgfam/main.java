@@ -1,4 +1,4 @@
-package com.mtg.fam;
+package com.gelakinetic.mtgfam;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -12,6 +12,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
+
+
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -56,6 +58,7 @@ public class main extends Activity implements Runnable {
 	private boolean							dialogReady;
 	private SharedPreferences		preferences;
 	private String	stacktrace;
+	private Button	deckmanagement;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -67,6 +70,7 @@ public class main extends Activity implements Runnable {
 		search = (Button) findViewById(R.id.cardsearch);
 		life = (Button) findViewById(R.id.lifecounter);
 		rng = (Button) findViewById(R.id.rng);
+		deckmanagement = (Button) findViewById(R.id.deckmanager);
 
 		search.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -88,6 +92,17 @@ public class main extends Activity implements Runnable {
 				startActivity(i);
 			}
 		});
+		
+		deckmanagement.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Intent i = new Intent(mCtx, DeckManagement.class);
+				startActivity(i);
+			}
+		});
+		
+		// Uncomment to get to deck management, currently under construction
+		deckmanagement.setVisibility(View.GONE);
+		
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		File f = new File(DB_PATH, DB_NAME);

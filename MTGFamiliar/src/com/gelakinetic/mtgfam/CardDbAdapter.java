@@ -20,7 +20,7 @@
  * 
  */
 
-package com.mtg.fam;
+package com.gelakinetic.mtgfam;
 
 import android.content.ContentValues;
 import android.content.Context;

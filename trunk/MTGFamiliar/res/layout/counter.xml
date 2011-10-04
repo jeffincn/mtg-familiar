@@ -111,6 +111,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
                 android:id="@+id/p1_history"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
+                android:padding="1dp"
                 />
         </LinearLayout>
     </LinearLayout>
@@ -285,6 +286,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
                 android:id="@+id/p2_history"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
+                android:padding="1dp"
                 />
         </LinearLayout>
     </LinearLayout>

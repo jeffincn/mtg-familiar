@@ -48,6 +48,7 @@ import android.widget.Toast;
 public class counter extends Activity
 {
     public static final int INITIAL_LIFE = 20, INITIAL_POISON = 0, TERMINAL_LIFE = 0, TERMINAL_POISON = 10;
+    public static final int CONSTRAINT_POISON = 0, CONSTRAINT_LIFE = Integer.MAX_VALUE - 1;
     public static final int ONE = 0, TWO = 1;
     public static final int NUM_PLAYERS = 2;
     public static final int DIALOG_RESET_CONFIRM = 0;
@@ -248,6 +249,10 @@ public class counter extends Activity
                         timerValue -= timerTick;
                         if(timerValue <= 0)
                         {
+                            /*
+                             * This is used instead of having the commit loop
+                             * here so I don't have to think about deadlock
+                             */
                             doCommit = true;
                         }
                     }
@@ -355,9 +360,17 @@ public class counter extends Activity
         switch(type)
         {
             case LIFE:
+                if(value > CONSTRAINT_LIFE)
+                {
+                    value = CONSTRAINT_LIFE;
+                }
                 player[playerNum].life = value;
                 break;
             case POISON:
+                if(value < CONSTRAINT_POISON)
+                {
+                    value = CONSTRAINT_POISON;
+                }
                 player[playerNum].poison = value;
         }
     }
@@ -374,10 +387,18 @@ public class counter extends Activity
         {
             case LIFE:
                 value = player[playerNum].life;
+                if(value + delta > CONSTRAINT_LIFE)
+                {
+                    return;
+                }
                 player[playerNum].lifeAdapter.update(delta);
                 break;
             case POISON:
                 value = player[playerNum].poison;
+                if(value + delta < CONSTRAINT_POISON)
+                {
+                    return;
+                }
                 player[playerNum].poisonAdapter.update(delta);
                 break;
         }
@@ -410,7 +431,6 @@ public class counter extends Activity
         public ListView history;
         public int life, poison;
         public HistoryAdapter lifeAdapter, poisonAdapter;
-//        public Context context;
 
         public Player(Context context, Button plus1, Button plus5, Button minus1, Button minus5,
                 TextView readout, ListView history)
@@ -433,7 +453,7 @@ public class counter extends Activity
         private ArrayList<Vector<Integer>> list;
         private Context context;
 
-        public static final int ABSOLUTE = 0;//, RELATIVE = 1;
+        public static final int ABSOLUTE = 0, RELATIVE = 1;
 
         public HistoryAdapter(Context context, int initialValue)
         {
@@ -458,12 +478,12 @@ public class counter extends Activity
             }
             if(count > 0)
             {
-                lastValue = list.get(list.size()-1).get(ABSOLUTE).intValue();
+                lastValue = list.get(0).get(ABSOLUTE).intValue();
             }
             Vector<Integer> v = new Vector<Integer>();
             v.add(new Integer(lastValue + delta));
             v.add(new Integer(delta));
-            list.add(v);
+            list.add(0,v);
             count++;
             delta = 0;
             notifyDataSetChanged();
@@ -492,19 +512,31 @@ public class counter extends Activity
             return (long) position;
         }
 
-//        @Override
+        @Override
         public View getView(int position, View convertView, ViewGroup parent)
         {
-            TextView relative;//, absolute;
+            TextView relative, absolute;
             LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View v = vi.inflate(R.layout.history_adapter_row, null);
-//            absolute = (TextView) v.findViewById(R.id.absolute);
+            Vector<Integer> row = list.get(position);
+            absolute = (TextView) v.findViewById(R.id.absolute);
             relative = (TextView) v.findViewById(R.id.relative);
-            if(relative != null)
+            if(relative == null || absolute == null)
             {
-                relative.setBackgroundColor(0xFFFFFFFF);
-                System.out.println("set bg color");
+                Log.e("Life Counter", "failed to inflate history adapter row view correctly");
+                TextView error = new TextView(context);
+                error.setText("ERROR!");
+                return error;
             }
+            absolute.setText("" + row.get(ABSOLUTE).intValue());
+            String relativeString = "";
+            int relativeValue = row.get(RELATIVE).intValue();
+            if(relativeValue > 0)
+            {
+                relativeString += "+";
+            }
+            relativeString += relativeValue;
+            relative.setText(relativeString);
             return v;
         }
     }

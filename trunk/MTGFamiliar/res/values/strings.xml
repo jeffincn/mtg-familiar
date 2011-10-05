@@ -90,6 +90,7 @@
 	<string name="minus">-</string>
 	<string name="searchrarity">Rarity</string>
 	<string name="clear">Clear Fields</string>
+	<string name="clear_all">Clear All</string>
 
 	<string name="refreshDB">Refresh DB from APK</string>
 	<string name="JSON">Refresh DB from Web</string>

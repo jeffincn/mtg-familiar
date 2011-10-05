@@ -22,6 +22,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.content.res.Resources.NotFoundException;
 import android.os.Bundle;
 import android.os.Handler;
@@ -440,4 +441,10 @@ public class main extends Activity implements Runnable {
 	public void setNumCards(int n) {
 		numCards = n;
 	}
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig)
+    {
+        super.onConfigurationChanged(newConfig);
+    }
 }

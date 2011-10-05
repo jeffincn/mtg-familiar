@@ -27,6 +27,7 @@ import java.util.Random;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -175,4 +176,10 @@ public class rng extends Activity {
 			}, updateDelay, TimeUnit.MILLISECONDS);
 		}
 	}
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig)
+    {
+        super.onConfigurationChanged(newConfig);
+    }
 }

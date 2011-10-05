@@ -5,6 +5,7 @@ package com.gelakinetic.mtgfam;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
@@ -123,5 +124,11 @@ public class resultlist extends ListActivity {
       }
   }
 }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig)
+    {
+        super.onConfigurationChanged(newConfig);
+    }
 
 }

@@ -8,6 +8,7 @@ import java.util.List;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -67,4 +68,10 @@ public class DeckManagement extends ListActivity {
 			startActivity(i);
 		}
 	}
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig)
+    {
+        super.onConfigurationChanged(newConfig);
+    }
 }

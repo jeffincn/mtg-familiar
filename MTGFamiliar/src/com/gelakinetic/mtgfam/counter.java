@@ -30,6 +30,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -283,6 +284,7 @@ public class counter extends Activity
     @Override
     protected Dialog onCreateDialog(int id)
     {
+        final Context context = (Context) this;
         Dialog dialog;
         switch(id)
         {
@@ -293,6 +295,7 @@ public class counter extends Activity
                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                            public void onClick(DialogInterface dialog, int id) {
                                reset();
+                               ManaPoolActivity.reset(context);
                                update();
                            }
                        })
@@ -388,7 +391,7 @@ public class counter extends Activity
                 value = player[playerNum].life;
                 if(value + delta > CONSTRAINT_LIFE)
                 {
-                    return;
+                    delta = CONSTRAINT_LIFE - value;
                 }
                 player[playerNum].lifeAdapter.update(delta);
                 break;
@@ -396,7 +399,7 @@ public class counter extends Activity
                 value = player[playerNum].poison;
                 if(value + delta < CONSTRAINT_POISON)
                 {
-                    return;
+                    delta = CONSTRAINT_POISON - value;
                 }
                 player[playerNum].poisonAdapter.update(delta);
                 break;
@@ -537,5 +540,11 @@ public class counter extends Activity
             relative.setText(relativeString);
             return v;
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig)
+    {
+        super.onConfigurationChanged(newConfig);
     }
 }

@@ -511,7 +511,6 @@ public class counter extends Activity
             return (long) position;
         }
 
-        @Override
         public View getView(int position, View convertView, ViewGroup parent)
         {
             TextView relative, absolute;

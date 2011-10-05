@@ -1,7 +1,5 @@
 package com.gelakinetic.mtgfam;
 
-
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -23,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 public class search extends Activity {
 	protected static final String	NAME				= "name";
@@ -48,9 +47,9 @@ public class search extends Activity {
 
 	private CardDbAdapter					mDbHelper;
 	private Button								searchbutton;
-	private EditText											namefield;
-	private EditText											textfield;
-	private EditText											typefield;
+	private EditText							namefield;
+	private EditText							textfield;
+	private EditText							typefield;
 	private CheckBox							checkboxW;
 	private CheckBox							checkboxU;
 	private CheckBox							checkboxB;
@@ -95,7 +94,7 @@ public class search extends Activity {
 		typefield = (EditText) findViewById(R.id.typesearch);
 		flavorfield = (EditText) findViewById(R.id.flavorsearch);
 		artistfield = (EditText) findViewById(R.id.artistsearch);
-		
+
 		namefield.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
 
 		namefield.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -107,7 +106,7 @@ public class search extends Activity {
 				return false;
 			}
 		});
-		
+
 		textfield.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
 				if (arg1 == EditorInfo.IME_ACTION_SEARCH) {
@@ -117,7 +116,7 @@ public class search extends Activity {
 				return false;
 			}
 		});
-		
+
 		typefield.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
 				if (arg1 == EditorInfo.IME_ACTION_SEARCH) {
@@ -127,7 +126,7 @@ public class search extends Activity {
 				return false;
 			}
 		});
-		
+
 		flavorfield.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
 				if (arg1 == EditorInfo.IME_ACTION_SEARCH) {
@@ -137,7 +136,7 @@ public class search extends Activity {
 				return false;
 			}
 		});
-		
+
 		artistfield.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
 				if (arg1 == EditorInfo.IME_ACTION_SEARCH) {
@@ -399,7 +398,7 @@ public class search extends Activity {
 				i.putExtra(RARITY, rarity);
 				i.putExtra(ARTIST, artist);
 				i.putExtra(FLAVOR, flavor);
-				startActivity(i);
+				startActivityForResult(i, 0);
 			}
 		});
 
@@ -529,6 +528,15 @@ public class search extends Activity {
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == 0) {
+			if (resultCode == resultlist.NO_RESULT) {
+				Toast.makeText(this, getString(R.string.toast_no_result), Toast.LENGTH_SHORT).show();
+			}
 		}
 	}
 }

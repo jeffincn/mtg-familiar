@@ -1,11 +1,16 @@
 package com.gelakinetic.mtgfam;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -20,6 +25,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Html;
 import android.text.Html.ImageGetter;
+import android.text.method.LinkMovementMethod;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -55,8 +61,18 @@ public class cardview extends Activity implements Runnable {
 	private long									cardID;
 	private Cursor								formats		= null;
 	private String								mtgi_code;
-	private static String					priceurl;
+	private URL										priceurl;
 	private String								picurl;
+	private int										threadtype;
+	private TextView							l;
+	private TextView							m;
+	private TextView							h;
+	private TextView							pricelink;
+	private Button								transform;
+	private String								number;
+	private String								setCode;
+	private String								setName;
+	private String								cardName;
 
 	private ImageGetter						imgGetter	= new ImageGetter() {
 																						public Drawable getDrawable(String source) {
@@ -193,14 +209,6 @@ public class cardview extends Activity implements Runnable {
 																							return d;
 																						}
 																					};
-	private int										threadtype;
-	private float[]								prices;
-	private TextView							l;
-	private TextView							m;
-	private TextView							h;
-	private Button								transform;
-	private String								number;
-	private String								setName;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -218,12 +226,21 @@ public class cardview extends Activity implements Runnable {
 
 		// http://magiccards.info/scans/en/mt/55.jpg
 
-		setName = c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET));
+		setCode = c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET));
 		mtgi_code = mDbHelper.getCodeMtgi(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)));
 		number = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NUMBER));
 		picurl = "http://magiccards.info/scans/en/" + mtgi_code + "/" + number + ".jpg";
 		picurl = picurl.toLowerCase();
-		priceurl = "http://partner.tcgplayer.com/syn/synhighlow.ashx?pk=MAGCINFO&pi=" + mtgi_code + "-" + number;
+
+		setName = mDbHelper.getFullSetName(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)));
+		cardName = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
+		try {
+			priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=TCGTEST&s=" + setName + "&p="
+					+ cardName).replace(" ", "%20"));
+		}
+		catch (MalformedURLException e) {
+			priceurl = null;
+		}
 
 		name = (TextView) findViewById(R.id.name);
 		cost = (TextView) findViewById(R.id.cost);
@@ -333,7 +350,7 @@ public class cardview extends Activity implements Runnable {
 			transform.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					Intent i = new Intent();
-					i.putExtra(SET, setName);
+					i.putExtra(SET, setCode);
 					i.putExtra(NUMBER, number);
 					setResult(TRANSFORM, i);
 					finish();// transform!
@@ -371,7 +388,7 @@ public class cardview extends Activity implements Runnable {
 		if (mDbHelper != null) {
 			mDbHelper.close();
 		}
-		if(bmp != null){
+		if (bmp != null) {
 			bmp.recycle();
 		}
 	}
@@ -451,10 +468,12 @@ public class cardview extends Activity implements Runnable {
 			l = (TextView) dialog.findViewById(R.id.low);
 			m = (TextView) dialog.findViewById(R.id.med);
 			h = (TextView) dialog.findViewById(R.id.high);
+			pricelink = (TextView) dialog.findViewById(R.id.pricelink);
 
 			l.setText("Loading");
 			m.setText("Loading");
 			h.setText("Loading");
+			pricelink.setText("");
 
 			threadtype = PRICELOAD;
 			Thread thread = new Thread(this);
@@ -490,68 +509,68 @@ public class cardview extends Activity implements Runnable {
 				handler.sendEmptyMessage(PICLOAD);
 				break;
 			case (PRICELOAD):
-				prices = scrapePrices(mtgi_code, 0);
+				fetchPrices();
 				handler.sendEmptyMessage(PRICELOAD);
 				break;
 		}
 	}
 
-	private Handler	handler	= new Handler() {
-														@Override
-														public void handleMessage(Message msg) {
-															switch (msg.what) {
-																case PICLOAD:
-																	image.setImageDrawable(d);
-																	break;
-																case PRICELOAD:
-																	if (prices[0] == 0 && prices[1] == 0 && prices[2] == 0) {
-																		l.setText("No");
-																		m.setText("Internet");
-																		h.setText("Connection");
-																	}
-																	else {
-																		l.setText(String.format("$%.2f", prices[0]));
-																		m.setText(String.format("$%.2f", prices[1]));
-																		h.setText(String.format("$%.2f", prices[2]));
-																	}
-																	break;
-															}
-														}
-													};
+	private Handler							handler	= new Handler() {
+																				@Override
+																				public void handleMessage(Message msg) {
+																					switch (msg.what) {
+																						case PICLOAD:
+																							image.setImageDrawable(d);
+																							break;
+																						case PRICELOAD:
+																							if (XMLhandler == null) {
+																								l.setText("No");
+																								m.setText("Internet");
+																								h.setText("Connection");
+																							}
+																							else {
+																								l.setText("$" + XMLhandler.lowprice);
+																								m.setText("$" + XMLhandler.avgprice);
+																								h.setText("$" + XMLhandler.hiprice);
 
-	static float[] scrapePrices(String set, int num) {
-		URL u;
+																								pricelink.setMovementMethod(LinkMovementMethod.getInstance());
+																								pricelink.setText(Html.fromHtml("<a href=\"" + XMLhandler.link + "\">"
+																										+ getString(R.string.tcgplayerlink) + "</a>"));
+																							}
+																							break;
+																					}
+																				}
+																			};
+
+	private TCGPlayerXMLHandler	XMLhandler;
+
+	void fetchPrices() {
 		try {
-			u = new URL(priceurl);
-			InputStream is = u.openStream();
+			// Get a SAXParser from the SAXPArserFactory.
+			SAXParserFactory spf = SAXParserFactory.newInstance();
+			SAXParser sp = spf.newSAXParser();
 
-			int BUFSIZE = 128;
-			byte[] buf = new byte[BUFSIZE];
+			// Get the XMLReader of the SAXParser we created.
+			XMLReader xr = sp.getXMLReader();
+			// Create a new ContentHandler and apply it to the XML-Reader
+			XMLhandler = new TCGPlayerXMLHandler();
+			xr.setContentHandler(XMLhandler);
 
-			StringBuilder sb = new StringBuilder();
-			int read;
-			while ((read = is.read(buf)) == BUFSIZE) {
-				sb.append(new String(buf));
-			}
-			for (int i = 0; i < read; i++) {
-				sb.append((char) buf[i]);
-			}
-
-			String[] arr = sb.toString().split("\\$");
-			float[] prices = new float[3];
-
-			for (int i = 1; i < arr.length; i++) {
-				prices[i - 1] = Float.parseFloat(arr[i].substring(0, arr[i].indexOf('<')));
-			}
-			return prices;
+			// Parse the xml-data from our URL.
+			xr.parse(new InputSource(priceurl.openStream()));
+			// Parsing has finished.
 		}
 		catch (MalformedURLException e) {
-			float[] f = { 0, 0, 0 };
-			return f;
+			XMLhandler = null;
 		}
 		catch (IOException e) {
-			float[] f = { 0, 0, 0 };
-			return f;
+			XMLhandler = null;
+		}
+		catch (SAXException e) {
+			XMLhandler = null;
+		}
+		catch (ParserConfigurationException e) {
+			XMLhandler = null;
 		}
 	}
 }

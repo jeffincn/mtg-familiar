@@ -295,6 +295,15 @@ public class CardDbAdapter {
 		c.close();
 		return retval;
 	}
+	
+	public String getFullSetName(String code){
+		Cursor c = mDb.query(DATABASE_TABLE_SETS, new String[] {KEY_NAME}, KEY_CODE + "=\"" + code+"\"", null, null, null, null);
+		c.moveToFirst();
+		String retval =  c.getString(c.getColumnIndex(KEY_NAME));
+		c.deactivate();
+		c.close();
+		return retval;
+	}
 
 	/**
 	 * Return a Cursor positioned at the Card that matches the given rowId

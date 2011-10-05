@@ -39,7 +39,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class main extends Activity implements Runnable {
-	private static final String	DB_PATH						= "/data/data/com.mtg.fam/databases/";
+	private static final String	DB_PATH						= "/data/data/com.gelakinetic.mtgfam/databases/";
 	private static final String	DB_NAME						= "data";
 	private static final int		DBFROMAPK					= 0;
 	private static final int		OTAPATCH					= 1;
@@ -116,13 +116,15 @@ public class main extends Activity implements Runnable {
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		File f = new File(DB_PATH, DB_NAME);
-		if (!f.exists() || preferences.getInt("databaseVersion", -1) != DATABASE_VERSION) {
+		int dbVersion = preferences.getInt("databaseVersion", -1);
+		if (!f.exists() || dbVersion != DATABASE_VERSION) {
 			startThread(DBFROMAPK);
 		}
 		else {
 			mDbHelper = new CardDbAdapter(this);
 			mDbHelper.open();
-			if (preferences.getBoolean("autoupdate", false)) {
+			boolean autoupdate = preferences.getBoolean("autoupdate", true);
+			if (autoupdate) {
 				startThread(OTAPATCH);
 			}
 		}

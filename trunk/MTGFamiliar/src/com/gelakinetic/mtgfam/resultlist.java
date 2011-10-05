@@ -15,6 +15,7 @@ import android.widget.SimpleCursorAdapter;
 
 public class resultlist extends ListActivity {
 
+	static final int	NO_RESULT	= 1;
 	private CardDbAdapter	mDbHelper;
 	private ListView			lv;
 	private Context				mCtx;
@@ -40,6 +41,12 @@ public class resultlist extends ListActivity {
 				extras.getString(search.POW_LOGIC), extras.getFloat(search.TOU_CHOICE), extras.getString(search.TOU_LOGIC),
 				extras.getInt(search.CMC), extras.getString(search.CMC_LOGIC), extras.getString(search.FORMAT),
 				extras.getString(search.RARITY), extras.getString(search.FLAVOR), extras.getString(search.ARTIST));
+		
+		if(c.getCount() == 0){
+			Intent i = new Intent();
+			setResult(NO_RESULT, i);
+			finish();
+		}
 		fillData(c);
 
 		registerForContextMenu(getListView());

@@ -100,7 +100,7 @@
 
 	<string name="high">High:</string>
 
-	<string name="med">Mid:</string>
+	<string name="med">Average:</string>
 
 	<string name="low">Low:</string>
 
@@ -131,5 +131,9 @@
 	<string name="default_deck_path_key">default_deck_path</string>
 
 	<string name="default_deck_path_dialog_title">Enter Path Here</string>
+
+	<string name="tcgplayerlink">Click here for all prices and trend info</string>
+	
+	<string name="toast_no_result">No Results Found</string>
 
 </resources>

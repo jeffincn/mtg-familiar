@@ -27,16 +27,33 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:orientation="vertical"
         >
         <!-- Roll output -->
-        <TextView
-            android:id="@+id/die_output"
+        <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:padding="0dp"
-            android:background="@drawable/textview_backdrop"
-            android:textSize="80sp"
-            android:text="0"
-            />
+            android:orientation="horizontal"
+            >
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                />
+            <TextView
+                android:id="@+id/die_output"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="8"
+                android:gravity="center"
+                android:padding="0dp"
+                android:background="@drawable/textview_backdrop"
+                android:textSize="80sp"
+                android:text="0"
+                />
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                />
+        </LinearLayout>
         <!-- First die row -->
         <LinearLayout
             android:layout_width="fill_parent"
@@ -45,26 +62,43 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
             android:gravity="center"
             android:paddingTop="10dp"
             >
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                />
             <ImageView
                 android:id="@+id/d2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/d2"
-                android:padding="10dp"
+                />
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
                 />
             <ImageView
                 android:id="@+id/d4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/d4"
-                android:padding="10dp"
+                />
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
                 />
             <ImageView
                 android:id="@+id/d6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/d6"
-                android:padding="10dp"
+                />
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
                 />
         </LinearLayout>
         <!-- Second die row -->
@@ -74,26 +108,43 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
             android:orientation="horizontal"
             android:gravity="center"
             >
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                />
             <ImageView
                 android:id="@+id/d8"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/d8"
-                android:padding="10dp"
+                />
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
                 />
             <ImageView
                 android:id="@+id/d10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/d10"
-                android:padding="10dp"
+                />
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
                 />
             <ImageView
                 android:id="@+id/d12"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/d12"
-                android:padding="10dp"
+                />
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
                 />
         </LinearLayout>
         <!-- Third die row -->
@@ -103,19 +154,32 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
             android:orientation="horizontal"
             android:gravity="center"
             >
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                />
             <ImageView
                 android:id="@+id/d20"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/d20"
-                android:padding="10dp"
+                />
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
                 />
             <ImageView
                 android:id="@+id/d100"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/d100"
-                android:padding="10dp"
+                />
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
                 />
         </LinearLayout>
     </LinearLayout>

@@ -82,7 +82,8 @@
 	<string name="price">Card Price</string>
 	<string name="cardsearch">Card Search</string>
 	<string name="lifecounter">Life Counter</string>
-	<string name="random">Random Number Generator</string>
+	<string name="manapool">Mana Pool</string>
+	<string name="random">Dice</string>
 	<string name="roll">Roll!</string>
 	<string name="dieroll">Roll a D</string>
 	<string name="plus">+</string>

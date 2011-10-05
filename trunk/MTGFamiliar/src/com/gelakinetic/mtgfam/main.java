@@ -35,6 +35,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class main extends Activity implements Runnable {
@@ -46,9 +47,10 @@ public class main extends Activity implements Runnable {
 	private static final int		DBFROMWEB					= 4;
 	private static final int		DATABASE_VERSION	= 2;
 	private static final int		EXCEPTION					= 99;
-	private Button							search;
-	private Button							life;
-	private Button							rng;
+	private LinearLayout							search;
+	private LinearLayout							life;
+	private LinearLayout							rng;
+	private LinearLayout							manapool;
 	private Context							mCtx;
 	private CardDbAdapter				mDbHelper;
 	private ProgressDialog			dialog;
@@ -67,9 +69,10 @@ public class main extends Activity implements Runnable {
 
 		mCtx = this;
 
-		search = (Button) findViewById(R.id.cardsearch);
-		life = (Button) findViewById(R.id.lifecounter);
-		rng = (Button) findViewById(R.id.rng);
+		search = (LinearLayout) findViewById(R.id.cardsearch);
+		life = (LinearLayout) findViewById(R.id.lifecounter);
+		rng = (LinearLayout) findViewById(R.id.rng);
+		manapool = (LinearLayout) findViewById(R.id.manapool);
 		deckmanagement = (Button) findViewById(R.id.deckmanager);
 
 		search.setOnClickListener(new View.OnClickListener() {
@@ -89,6 +92,13 @@ public class main extends Activity implements Runnable {
 		rng.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent(mCtx, rng.class);
+				startActivity(i);
+			}
+		});
+
+		manapool.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Intent i = new Intent(mCtx, ManaPoolActivity.class);
 				startActivity(i);
 			}
 		});

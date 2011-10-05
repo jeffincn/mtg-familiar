@@ -24,8 +24,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -136,7 +134,8 @@ public class counter extends Activity
         poolButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view)
             {
-                Toast.makeText(anchor, "Mana pool isn't implemented yet", Toast.LENGTH_LONG).show();
+                Intent nextActivity = new Intent(anchor, ManaPoolActivity.class);
+                startActivity(nextActivity);
             }
         });
         resetButton.setOnClickListener(new View.OnClickListener() {

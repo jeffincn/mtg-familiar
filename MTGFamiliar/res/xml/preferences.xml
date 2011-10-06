@@ -19,12 +19,16 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-	<PreferenceCategory android:title="Preferences">
+	<PreferenceCategory android:title="Card Search">
 		<CheckBoxPreference android:title="Automatic Updates"
 			android:summary="Check for new sets and bannings each time the app opens"
 			android:defaultValue="true" android:key="autoupdate" />
+	</PreferenceCategory>
+	<PreferenceCategory android:title="Dice">
 		<CheckBoxPreference android:title="@string/d2title"
 			android:key="d2AsCoin" android:defaultValue="true" />
+	</PreferenceCategory>
+	<PreferenceCategory android:title="Deck Manager">
 		<EditTextPreference android:defaultValue="@string/defaultdeckpath"
 			android:summary="@string/defaultpathsummary" android:title="@string/defaultpathtitle" android:key="@string/default_deck_path_key" android:dialogTitle="@string/default_deck_path_dialog_title"/>
 	</PreferenceCategory>

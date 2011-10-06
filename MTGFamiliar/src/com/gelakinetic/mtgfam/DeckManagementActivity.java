@@ -1,3 +1,22 @@
+/**
+Copyright 2011 Adam Feinstein
+
+This file is part of MTG Familiar.
+
+MTG Familiar is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+MTG Familiar is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.gelakinetic.mtgfam;
 
 import java.io.File;
@@ -16,7 +35,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
-public class DeckManagement extends ListActivity {
+public class DeckManagementActivity extends ListActivity {
 	private SharedPreferences	preferences;
 	private String						path;
 	private File							SDcard;
@@ -27,7 +46,7 @@ public class DeckManagement extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.deckmanagement);
+		setContentView(R.layout.deck_management_activity);
 
 		list = getListView();
 
@@ -63,15 +82,14 @@ public class DeckManagement extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		if (decks[(int) id].isFile()) {
-			Intent i = new Intent(DeckManagement.this, DeckView.class);
+			Intent i = new Intent(DeckManagementActivity.this, DeckViewActivity.class);
 			i.putExtra("file_name", decks[(int) id].getName());
 			startActivity(i);
 		}
 	}
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig)
-    {
-        super.onConfigurationChanged(newConfig);
-    }
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+	}
 }

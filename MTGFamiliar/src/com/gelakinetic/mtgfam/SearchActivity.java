@@ -1,3 +1,22 @@
+/**
+Copyright 2011 Adam Feinstein
+
+This file is part of MTG Familiar.
+
+MTG Familiar is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+MTG Familiar is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.gelakinetic.mtgfam;
 
 import android.app.Activity;
@@ -24,7 +43,7 @@ import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-public class search extends Activity {
+public class SearchActivity extends Activity {
 	protected static final String	NAME				= "name";
 	protected static final String	TEXT				= "text";
 	protected static final String	TYPE				= "type";
@@ -85,7 +104,7 @@ public class search extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.search);
+		setContentView(R.layout.search_activity);
 
 		mDbHelper = new CardDbAdapter(this);
 		mDbHelper.open();
@@ -382,7 +401,7 @@ public class search extends Activity {
 				catch (NumberFormatException e) {
 					cmc = -1;
 				}
-				Intent i = new Intent(mCtx, resultlist.class);
+				Intent i = new Intent(mCtx, ResultListActivity.class);
 				i.putExtra(NAME, name);
 				i.putExtra(TEXT, text);
 				i.putExtra(TYPE, type);
@@ -535,15 +554,14 @@ public class search extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == 0) {
-			if (resultCode == resultlist.NO_RESULT) {
+			if (resultCode == ResultListActivity.NO_RESULT) {
 				Toast.makeText(this, getString(R.string.toast_no_result), Toast.LENGTH_SHORT).show();
 			}
 		}
 	}
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig)
-    {
-        super.onConfigurationChanged(newConfig);
-    }
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+	}
 }

@@ -15,15 +15,13 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package com.gelakinetic.mtgfam;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.Random;
-
-
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -35,7 +33,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class rng extends Activity {
+public class DiceActivity extends Activity {
 	private Random													r;
 	private ImageView												d2, d4, d6, d8, d10, d12, d20, d100;
 	private TextView												dieOutput;
@@ -48,12 +46,12 @@ public class rng extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.rng);
+		setContentView(R.layout.dice_activity);
 
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 		d2AsCoin = settings.getBoolean("d2AsCoin", true);
 
-		final rng anchor = this;
+		final DiceActivity anchor = this;
 		r = new Random();
 		handler = new Handler();
 
@@ -177,9 +175,8 @@ public class rng extends Activity {
 		}
 	}
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig)
-    {
-        super.onConfigurationChanged(newConfig);
-    }
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+	}
 }

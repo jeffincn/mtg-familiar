@@ -1,3 +1,22 @@
+/**
+Copyright 2011 Adam Feinstein
+
+This file is part of MTG Familiar.
+
+MTG Familiar is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+MTG Familiar is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.gelakinetic.mtgfam;
 
 import org.xml.sax.Attributes;
@@ -9,35 +28,32 @@ public class TCGPlayerXMLHandler extends DefaultHandler {
 	// ===========================================================
 	// Fields
 	// ===========================================================
-/*
-	private boolean	in_products	= false;
-	private boolean	in_product	= false;
-	private boolean	in_id				= false;
-	*/
+	/*
+	 * private boolean in_products = false; private boolean in_product = false;
+	 * private boolean in_id = false;
+	 */
 	private boolean	in_hiprice	= false;
 	private boolean	in_lowprice	= false;
 	private boolean	in_avgprice	= false;
 	private boolean	in_link			= false;
-	
-	String hiprice;
-	String avgprice;
-	String lowprice;
-	String link;
+
+	String					hiprice;
+	String					avgprice;
+	String					lowprice;
+	String					link;
 
 	// ===========================================================
 	// Methods
 	// ===========================================================
 	@Override
 	public void startDocument() throws SAXException {
-/*
-		in_products	= false;
-		in_product	= false;
-		in_id				= false;
-		*/
-		in_hiprice	= false;
-		in_lowprice	= false;
-		in_avgprice	= false;
-		in_link			= false;
+		/*
+		 * in_products = false; in_product = false; in_id = false;
+		 */
+		in_hiprice = false;
+		in_lowprice = false;
+		in_avgprice = false;
+		in_link = false;
 	}
 
 	@Override
@@ -50,18 +66,13 @@ public class TCGPlayerXMLHandler extends DefaultHandler {
 	 */
 	@Override
 	public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
-/*
-		if (localName.equals("products")) {
-			in_products = true;
-		}
-		else if (localName.equals("product")) {
-			in_product = true;
-		}
-		else if (localName.equals("id")) {
-			in_id = true;
-		}
-
-		else*/ if (localName.equals("hiprice")) {
+		/*
+		 * if (localName.equals("products")) { in_products = true; } else if
+		 * (localName.equals("product")) { in_product = true; } else if
+		 * (localName.equals("id")) { in_id = true; }
+		 * 
+		 * else
+		 */if (localName.equals("hiprice")) {
 			in_hiprice = true;
 		}
 		else if (localName.equals("lowprice")) {
@@ -80,16 +91,11 @@ public class TCGPlayerXMLHandler extends DefaultHandler {
 	 */
 	@Override
 	public void endElement(String namespaceURI, String localName, String qName) throws SAXException {
-/*		if (localName.equals("products")) {
-			in_products = false;
-		}
-		else if (localName.equals("product")) {
-			in_product = false;
-		}
-		else if (localName.equals("id")) {
-			in_id = false;
-		}
-		else */if (localName.equals("hiprice")) {
+		/*
+		 * if (localName.equals("products")) { in_products = false; } else if
+		 * (localName.equals("product")) { in_product = false; } else if
+		 * (localName.equals("id")) { in_id = false; } else
+		 */if (localName.equals("hiprice")) {
 			in_hiprice = false;
 		}
 		else if (localName.equals("lowprice")) {
@@ -119,10 +125,10 @@ public class TCGPlayerXMLHandler extends DefaultHandler {
 			avgprice = s;
 		}
 		if (in_link) {
-			if(link == null){
+			if (link == null) {
 				link = s;
 			}
-			else{
+			else {
 				link += s;
 			}
 		}

@@ -1,3 +1,22 @@
+/**
+Copyright 2011 Adam Feinstein
+
+This file is part of MTG Familiar.
+
+MTG Familiar is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+MTG Familiar is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.gelakinetic.mtgfam;
 
 import java.io.IOException;
@@ -39,7 +58,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class cardview extends Activity implements Runnable {
+public class CardViewActivity extends Activity implements Runnable {
 
 	private static final int			PICLOAD		= 0;
 	private static final int			PRICELOAD	= 1;
@@ -214,7 +233,7 @@ public class cardview extends Activity implements Runnable {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.cardview);
+		setContentView(R.layout.card_view_activity);
 
 		Bundle extras = getIntent().getExtras();
 		cardID = extras.getLong("id");
@@ -443,7 +462,7 @@ public class cardview extends Activity implements Runnable {
 			Dialog dialog = new Dialog(this);
 			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-			dialog.setContentView(R.layout.legalitydialog);
+			dialog.setContentView(R.layout.legality_dialog);
 
 			formats = mDbHelper.fetchAllFormats();
 			String[] formatNames = new String[formats.getCount()];
@@ -464,7 +483,7 @@ public class cardview extends Activity implements Runnable {
 			Dialog dialog = new Dialog(this);
 			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-			dialog.setContentView(R.layout.pricedialog);
+			dialog.setContentView(R.layout.price_dialog);
 
 			l = (TextView) dialog.findViewById(R.id.low);
 			m = (TextView) dialog.findViewById(R.id.med);
@@ -575,9 +594,8 @@ public class cardview extends Activity implements Runnable {
 		}
 	}
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig)
-    {
-        super.onConfigurationChanged(newConfig);
-    }
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+	}
 }

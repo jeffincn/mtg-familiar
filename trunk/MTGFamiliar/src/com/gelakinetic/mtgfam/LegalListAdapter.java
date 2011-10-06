@@ -1,6 +1,23 @@
+/**
+Copyright 2011 Adam Feinstein
+
+This file is part of MTG Familiar.
+
+MTG Familiar is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+MTG Familiar is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.gelakinetic.mtgfam;
-
-
 
 import android.content.Context;
 import android.database.Cursor;
@@ -55,7 +72,7 @@ public class LegalListAdapter extends SimpleCursorAdapter {
 		int nameCol = c.getColumnIndex(CardDbAdapter.KEY_NAME);
 
 		String name = c.getString(nameCol);
-		
+
 		int legality = mDbHelper.checkLegality(mCardID, name);
 
 		/**
@@ -68,13 +85,13 @@ public class LegalListAdapter extends SimpleCursorAdapter {
 
 		TextView status_text = (TextView) v.findViewById(R.id.status);
 		if (status_text != null) {
-			if(legality == CardDbAdapter.LEGAL){
+			if (legality == CardDbAdapter.LEGAL) {
 				status_text.setText("Legal");
 			}
-			else if(legality == CardDbAdapter.BANNED){
+			else if (legality == CardDbAdapter.BANNED) {
 				status_text.setText("Banned");
 			}
-			else if(legality == CardDbAdapter.RESTRICTED){
+			else if (legality == CardDbAdapter.RESTRICTED) {
 				status_text.setText("Restricted");
 			}
 		}

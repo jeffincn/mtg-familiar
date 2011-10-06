@@ -1,23 +1,20 @@
-/*
- * Copyright (C) 2008 Google Inc.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- */
+/**
+Copyright 2011 Adam Feinstein
 
-/*
- * This code is modified from the excellent example code given by Google here:
- * http://developer.android.com/resources/tutorials/notepad/index.html
- * 
+This file is part of MTG Familiar.
+
+MTG Familiar is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+MTG Familiar is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.gelakinetic.mtgfam;
@@ -29,7 +26,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 /**
  * Simple Cards database access helper class. Defines the basic CRUD operations
@@ -38,82 +34,68 @@ import android.util.Log;
  */
 public class CardDbAdapter {
 
-	public static final int STAR = -1000;
-	public static final int ONEPLUSSTAR = -1001;
-	public static final int TWOPLUSSTAR = -1002;
-	public static final int SEVENMINUSSTAR = -1003;
-	public static final int STARSQUARED = -1004;
-	public static final int NOONECARES = -1005;
+	public static final int			STAR										= -1000;
+	public static final int			ONEPLUSSTAR							= -1001;
+	public static final int			TWOPLUSSTAR							= -1002;
+	public static final int			SEVENMINUSSTAR					= -1003;
+	public static final int			STARSQUARED							= -1004;
+	public static final int			NOONECARES							= -1005;
 
-	public static final int AND = 0;
-	public static final int OR = 1;
+	public static final int			AND											= 0;
+	public static final int			OR											= 1;
 
-	private static final String DATABASE_NAME = "data";
-	private static final String DATABASE_TABLE_CARDS = "cards";
-	private static final String DATABASE_TABLE_FORMATS = "formats";
-	private static final String DATABASE_TABLE_SETS = "sets";
-	private static final int DATABASE_VERSION = 10;
+	private static final String	DATABASE_NAME						= "data";
+	private static final String	DATABASE_TABLE_CARDS		= "cards";
+	private static final String	DATABASE_TABLE_FORMATS	= "formats";
+	private static final String	DATABASE_TABLE_SETS			= "sets";
+	private static final int		DATABASE_VERSION				= 10;
 
-	public static final String KEY_ID = "_id";
-	public static final String KEY_NAME = "name";
-	public static final String KEY_SET = "expansion";
-	public static final String KEY_TYPE = "type";
-	public static final String KEY_ABILITY = "cardtext";
-	public static final String KEY_COLOR = "color";
-	public static final String KEY_MANACOST = "manacost";
-	public static final String KEY_CMC = "cmc";
-	public static final String KEY_POWER = "power";
-	public static final String KEY_TOUGHNESS = "toughness";
-	public static final String KEY_RARITY = "rarity";
-	public static final String KEY_LOYALTY = "loyalty";
-	public static final String KEY_FLAVOR = "flavor";
-	public static final String KEY_ARTIST = "artist";
-	public static final String KEY_NUMBER = "number";
+	public static final String	KEY_ID									= "_id";
+	public static final String	KEY_NAME								= "name";
+	public static final String	KEY_SET									= "expansion";
+	public static final String	KEY_TYPE								= "type";
+	public static final String	KEY_ABILITY							= "cardtext";
+	public static final String	KEY_COLOR								= "color";
+	public static final String	KEY_MANACOST						= "manacost";
+	public static final String	KEY_CMC									= "cmc";
+	public static final String	KEY_POWER								= "power";
+	public static final String	KEY_TOUGHNESS						= "toughness";
+	public static final String	KEY_RARITY							= "rarity";
+	public static final String	KEY_LOYALTY							= "loyalty";
+	public static final String	KEY_FLAVOR							= "flavor";
+	public static final String	KEY_ARTIST							= "artist";
+	public static final String	KEY_NUMBER							= "number";
 
-	public static final String KEY_CODE = "code";
-	public static final String KEY_CODE_MTGI = "code_mtgi";
+	public static final String	KEY_CODE								= "code";
+	public static final String	KEY_CODE_MTGI						= "code_mtgi";
 
-	private static final String TAG = "CardDbAdapter";
+	private static final String	SET_POSTIFX							= "_SET";
+	private static final String	BAN_POSTIFX							= "_BAN";
+	private static final String	RESTRICT_POSTIFX				= "_RESTRICT";
 
-	private static final String SET_POSTIFX = "_SET";
-	private static final String BAN_POSTIFX = "_BAN";
-	private static final String RESTRICT_POSTIFX = "_RESTRICT";
+	private DatabaseHelper			mDbHelper;
+	private SQLiteDatabase			mDb;
 
+	private static final String	DATABASE_CREATE_CARDS		= "create table " + DATABASE_TABLE_CARDS + "(" + KEY_ID
+																													+ " integer primary key autoincrement, " + KEY_NAME
+																													+ " text not null, " + KEY_SET + " text not null, "
+																													+ KEY_TYPE + " text not null, " + KEY_RARITY + " integer, "
+																													+ KEY_MANACOST + " text, " + KEY_CMC + " integer not null, "
+																													+ KEY_POWER + " real, " + KEY_TOUGHNESS + " real, "
+																													+ KEY_LOYALTY + " integer, " + KEY_ABILITY + " text, "
+																													+ KEY_FLAVOR + " text, " + KEY_ARTIST + " text, "
+																													+ KEY_NUMBER + " text, " + KEY_COLOR + " text not null);";
 
-	private DatabaseHelper mDbHelper;
-	private SQLiteDatabase mDb;
+	private static final String	DATABASE_CREATE_SETS		= "create table " + DATABASE_TABLE_SETS + "(" + KEY_ID
+																													+ " integer primary key autoincrement, " + KEY_NAME
+																													+ " text not null, " + KEY_CODE + " text not null, "
+																													+ KEY_CODE_MTGI + " text not null);";
 
-	private static final String DATABASE_CREATE_CARDS =
-		"create table "	+ DATABASE_TABLE_CARDS + "(" +
-		KEY_ID + " integer primary key autoincrement, " +
-		KEY_NAME + " text not null, " +
-		KEY_SET + " text not null, " +
-		KEY_TYPE + " text not null, " +
-		KEY_RARITY + " integer, " +
-		KEY_MANACOST + " text, " +
-		KEY_CMC + " integer not null, " +
-		KEY_POWER + " real, " +
-		KEY_TOUGHNESS + " real, " +
-		KEY_LOYALTY + " integer, " +
-		KEY_ABILITY	+ " text, " +
-		KEY_FLAVOR	+ " text, " +
-		KEY_ARTIST	+ " text, " +
-		KEY_NUMBER	+ " text, " +
-		KEY_COLOR + " text not null);";
+	private static final String	DATABASE_CREATE_FORMATS	= "create table " + DATABASE_TABLE_FORMATS + "(" + KEY_ID
+																													+ " integer primary key autoincrement, " + KEY_NAME
+																													+ " text not null);";
 
-	private static final String DATABASE_CREATE_SETS =
-		"create table "	+ DATABASE_TABLE_SETS + "(" +
-		KEY_ID + " integer primary key autoincrement, " +
-		KEY_NAME + " text not null, " +
-		KEY_CODE + " text not null, " +
-		KEY_CODE_MTGI + " text not null);";
-
-	private static final String DATABASE_CREATE_FORMATS =
-		"create table "	+ DATABASE_TABLE_FORMATS + "(" +
-		KEY_ID + " integer primary key autoincrement, " +
-		KEY_NAME + " text not null);";
-
-	private final Context mCtx;
+	private final Context				mCtx;
 
 	private static class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -129,8 +111,8 @@ public class CardDbAdapter {
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
-					+ newVersion + ", which will destroy all old data");
+			// Log.w(TAG, "Upgrading database from version " + oldVersion + " to " +
+			// newVersion + ", which will destroy all old data");
 			db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_CARDS);
 			db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_SETS);
 			onCreate(db);
@@ -167,7 +149,7 @@ public class CardDbAdapter {
 		mDbHelper.close();
 	}
 
-	public void dropCreateDB(){
+	public void dropCreateDB() {
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_CARDS);
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_SETS);
 		mDb.execSQL(DATABASE_CREATE_CARDS);
@@ -185,15 +167,14 @@ public class CardDbAdapter {
 	 *          the body of the Card
 	 * @return rowId or -1 if failed
 	 */
-	public long createCard(String name, String set, String type, char rarity, String manacost,
-			int cmc, float power, float toughness, int loyalty, String ability, String flavor,
-			String artist, String number, String color) {
+	public long createCard(String name, String set, String type, char rarity, String manacost, int cmc, float power,
+			float toughness, int loyalty, String ability, String flavor, String artist, String number, String color) {
 		ContentValues initialValues = new ContentValues();
 
 		initialValues.put(KEY_NAME, name);
 		initialValues.put(KEY_SET, set);
 		initialValues.put(KEY_TYPE, type);
-		initialValues.put(KEY_RARITY, (int)rarity);
+		initialValues.put(KEY_RARITY, (int) rarity);
 		initialValues.put(KEY_MANACOST, manacost);
 		initialValues.put(KEY_CMC, cmc);
 		initialValues.put(KEY_POWER, power);
@@ -214,7 +195,7 @@ public class CardDbAdapter {
 		initialValues.put(KEY_NAME, c.name);
 		initialValues.put(KEY_SET, c.set);
 		initialValues.put(KEY_TYPE, c.type);
-		initialValues.put(KEY_RARITY, (int)c.rarity);
+		initialValues.put(KEY_RARITY, (int) c.rarity);
 		initialValues.put(KEY_MANACOST, c.manacost);
 		initialValues.put(KEY_CMC, c.cmc);
 		initialValues.put(KEY_POWER, c.power);
@@ -228,7 +209,6 @@ public class CardDbAdapter {
 
 		return mDb.insert(DATABASE_TABLE_CARDS, null, initialValues);
 	}
-
 
 	public long createSet(String name, String code, String code_mtgi) {
 		ContentValues initialValues = new ContentValues();
@@ -270,36 +250,38 @@ public class CardDbAdapter {
 	 */
 	public Cursor fetchAllSets() {
 
-		return mDb.query(DATABASE_TABLE_SETS, new String[] { KEY_ID, KEY_NAME,
-				KEY_CODE, KEY_CODE_MTGI }, null, null, null, null, KEY_NAME);
+		return mDb.query(DATABASE_TABLE_SETS, new String[] { KEY_ID, KEY_NAME, KEY_CODE, KEY_CODE_MTGI }, null, null, null,
+				null, KEY_NAME);
 	}
-	
+
 	public boolean doesSetExist(String code) {
 
 		String statement = "(" + KEY_CODE + " LIKE '%" + code + "%')";
-		
-		Cursor c = mDb.query(true, DATABASE_TABLE_SETS, new String[] { KEY_ID},
-				statement, null, null, null, KEY_NAME, null);
-		
-		if(c.getCount()>0){
+
+		Cursor c = mDb.query(true, DATABASE_TABLE_SETS, new String[] { KEY_ID }, statement, null, null, null, KEY_NAME,
+				null);
+
+		if (c.getCount() > 0) {
 			return true;
 		}
 		return false;
 	}
 
-	public String getCodeMtgi(String code){
-		Cursor c = mDb.query(DATABASE_TABLE_SETS, new String[] {KEY_CODE_MTGI}, KEY_CODE + "=\"" + code+"\"", null, null, null, null);
+	public String getCodeMtgi(String code) {
+		Cursor c = mDb.query(DATABASE_TABLE_SETS, new String[] { KEY_CODE_MTGI }, KEY_CODE + "=\"" + code + "\"", null,
+				null, null, null);
 		c.moveToFirst();
-		String retval =  c.getString(c.getColumnIndex(KEY_CODE_MTGI));
+		String retval = c.getString(c.getColumnIndex(KEY_CODE_MTGI));
 		c.deactivate();
 		c.close();
 		return retval;
 	}
-	
-	public String getFullSetName(String code){
-		Cursor c = mDb.query(DATABASE_TABLE_SETS, new String[] {KEY_NAME}, KEY_CODE + "=\"" + code+"\"", null, null, null, null);
+
+	public String getFullSetName(String code) {
+		Cursor c = mDb.query(DATABASE_TABLE_SETS, new String[] { KEY_NAME }, KEY_CODE + "=\"" + code + "\"", null, null,
+				null, null);
 		c.moveToFirst();
-		String retval =  c.getString(c.getColumnIndex(KEY_NAME));
+		String retval = c.getString(c.getColumnIndex(KEY_NAME));
 		c.deactivate();
 		c.close();
 		return retval;
@@ -316,11 +298,9 @@ public class CardDbAdapter {
 	 */
 	public Cursor fetchCard(long id) throws SQLException {
 
-		Cursor mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] {
-				KEY_NAME, KEY_SET, KEY_TYPE, KEY_RARITY, KEY_MANACOST, KEY_CMC,
-				KEY_POWER, KEY_TOUGHNESS, KEY_LOYALTY, KEY_ABILITY, KEY_FLAVOR,
-				KEY_ARTIST, KEY_NUMBER, KEY_COLOR}, KEY_ID + "=" + id,
-				null, null, null, KEY_NAME, null);
+		Cursor mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_NAME, KEY_SET, KEY_TYPE, KEY_RARITY,
+				KEY_MANACOST, KEY_CMC, KEY_POWER, KEY_TOUGHNESS, KEY_LOYALTY, KEY_ABILITY, KEY_FLAVOR, KEY_ARTIST, KEY_NUMBER,
+				KEY_COLOR }, KEY_ID + "=" + id, null, null, null, KEY_NAME, null);
 		if (mCursor != null) {
 			mCursor.moveToFirst();
 		}
@@ -341,15 +321,15 @@ public class CardDbAdapter {
 	 *          value to set Card body to
 	 * @return true if the Card was successfully updated, false otherwise
 	 */
-	public boolean updateCard(long id, String name, String set, String type, char rarity, String manacost,
-			int cmc, float power, float toughness, int loyalty, String ability, String flavor,
-			String artist, String number, String color) {
+	public boolean updateCard(long id, String name, String set, String type, char rarity, String manacost, int cmc,
+			float power, float toughness, int loyalty, String ability, String flavor, String artist, String number,
+			String color) {
 		ContentValues args = new ContentValues();
 
 		args.put(KEY_NAME, name);
 		args.put(KEY_SET, set);
 		args.put(KEY_TYPE, type);
-		args.put(KEY_RARITY, (int)rarity);
+		args.put(KEY_RARITY, (int) rarity);
 		args.put(KEY_MANACOST, manacost);
 		args.put(KEY_CMC, cmc);
 		args.put(KEY_POWER, power);
@@ -364,23 +344,22 @@ public class CardDbAdapter {
 		return mDb.update(DATABASE_TABLE_CARDS, args, KEY_ID + "=" + id, null) > 0;
 	}
 
-	public Cursor Search(Context mCtx, String cardname, String cardtext, String cardtype,
-			String color, int colorlogic, String sets, float pow_choice,
-			String pow_logic, float tou_choice, String tou_logic, int cmc, String cmcLogic,
+	public Cursor Search(Context mCtx, String cardname, String cardtext, String cardtype, String color, int colorlogic,
+			String sets, float pow_choice, String pow_logic, float tou_choice, String tou_logic, int cmc, String cmcLogic,
 			String formats, String rarity, String flavor, String artist) {
 		Cursor mCursor = null;
 
-		if(cardname != null)
+		if (cardname != null)
 			cardname = cardname.replace("'", "''");
-		if(cardtext != null)
+		if (cardtext != null)
 			cardtext = cardtext.replace("'", "''");
-		if(cardtype != null)
+		if (cardtype != null)
 			cardtype = cardtype.replace("'", "''");
-		if(flavor != null)
+		if (flavor != null)
 			flavor = flavor.replace("'", "''");
-		if(artist != null)
+		if (artist != null)
 			artist = artist.replace("'", "''");
-		
+
 		String statement = null;
 
 		if (cardname != null) {
@@ -398,16 +377,16 @@ public class CardDbAdapter {
 
 		if (cardtype != null) {
 			String[] types = cardtype.split(" ");
-			if(statement == null){
+			if (statement == null) {
 				statement = "(";
 			}
-			else{
+			else {
 				statement += " AND (";
 			}
 
 			boolean firstType = false;
-			for(String s : types){
-				if(firstType){
+			for (String s : types) {
+				if (firstType) {
 					statement += " AND ";
 				}
 				statement += KEY_TYPE + " LIKE '%" + s + "%'";
@@ -447,20 +426,19 @@ public class CardDbAdapter {
 
 			// Can't contain these colors
 			for (byte b : color.getBytes()) {
-				char c = (char)b;
+				char c = (char) b;
 
 				if (c > 'a') {
-					if(firstprint == false){
+					if (firstprint == false) {
 						statement += " AND ";
 					}
 					firstprint = false;
 
-					if(c == 'l' || c == 'L'){
+					if (c == 'l' || c == 'L') {
 						statement += KEY_COLOR + " NOT GLOB '[CLA]'";
 					}
-					else{
-						statement += KEY_COLOR + " NOT LIKE '%"
-						+ Character.toUpperCase(c) + "%'";						
+					else {
+						statement += KEY_COLOR + " NOT LIKE '%" + Character.toUpperCase(c) + "%'";
 					}
 				}
 			}
@@ -470,20 +448,20 @@ public class CardDbAdapter {
 
 			// Might contain these colors
 			for (byte b : color.getBytes()) {
-				char c = (char)b;
+				char c = (char) b;
 				if (c < 'a') {
 					if (firstprint == false && colorlogic == 1) {
 						statement += " AND ";
 					}
-					else if(firstprint == false){
+					else if (firstprint == false) {
 						statement += " OR ";
 					}
 					firstprint = false;
 
-					if(c == 'l' || c == 'L'){
+					if (c == 'l' || c == 'L') {
 						statement += KEY_COLOR + " GLOB '[CLA]'";
 					}
-					else{
+					else {
 						statement += KEY_COLOR + " LIKE '%" + c + "%'";
 					}
 
@@ -509,96 +487,96 @@ public class CardDbAdapter {
 				else {
 					statement += " OR ";
 				}
-				statement += KEY_SET + "=\"" + s+"\"";
+				statement += KEY_SET + "=\"" + s + "\"";
 			}
 
 			statement += ")";
 		}
 
-		if(pow_choice != NOONECARES){
-			if(statement == null){
-				statement ="(";
+		if (pow_choice != NOONECARES) {
+			if (statement == null) {
+				statement = "(";
 			}
-			else{
+			else {
 				statement += " AND (";
 			}
 
-			if(pow_choice > STAR){
+			if (pow_choice > STAR) {
 				statement += KEY_POWER + " " + pow_logic + " " + pow_choice;
-				if(pow_logic.equals("<")){
+				if (pow_logic.equals("<")) {
 					statement += " AND " + KEY_POWER + " > " + STAR;
 				}
 			}
-			else if(pow_logic.equals("=")){
+			else if (pow_logic.equals("=")) {
 				statement += KEY_POWER + " " + pow_logic + " " + pow_choice;
 			}
 			statement += ")";
 		}
 
-		if(tou_choice != NOONECARES){
-			if(statement == null){
-				statement ="(";
+		if (tou_choice != NOONECARES) {
+			if (statement == null) {
+				statement = "(";
 			}
-			else{
+			else {
 				statement += " AND (";
 			}
 
-			if(tou_choice > STAR){
+			if (tou_choice > STAR) {
 				statement += KEY_TOUGHNESS + " " + tou_logic + " " + tou_choice;
-				if(tou_logic.equals("<")){
+				if (tou_logic.equals("<")) {
 					statement += " AND " + KEY_TOUGHNESS + " > " + STAR;
 				}
 			}
-			else if(tou_logic.equals("=")){
+			else if (tou_logic.equals("=")) {
 				statement += KEY_TOUGHNESS + " " + tou_logic + " " + tou_choice;
 			}
 			statement += ")";
 		}
 
-		if(cmc != -1){
-			if (statement == null){
+		if (cmc != -1) {
+			if (statement == null) {
 				statement = "(";
 			}
-			else{
+			else {
 				statement += " AND (";
 			}
 
-			statement += KEY_CMC + " " + cmcLogic + " " + cmc +")";
+			statement += KEY_CMC + " " + cmcLogic + " " + cmc + ")";
 		}
 
-		if(rarity != null){
-			if (statement == null){
+		if (rarity != null) {
+			if (statement == null) {
 				statement = "(";
 			}
-			else{
+			else {
 				statement += " AND (";
 			}
 
 			boolean firstprint = false;
-			for (int i=0; i < rarity.length(); i++){
-				if(!firstprint){
-					statement += KEY_RARITY + " = " + (int)rarity.toUpperCase().charAt(i) + "";
+			for (int i = 0; i < rarity.length(); i++) {
+				if (!firstprint) {
+					statement += KEY_RARITY + " = " + (int) rarity.toUpperCase().charAt(i) + "";
 					firstprint = true;
 				}
-				else{
-					statement += " OR " + KEY_RARITY + " = " + (int)rarity.toUpperCase().charAt(i) + "";					
+				else {
+					statement += " OR " + KEY_RARITY + " = " + (int) rarity.toUpperCase().charAt(i) + "";
 				}
 			}
 			statement += ")";
 		}
 
-		if(formats != null){
+		if (formats != null) {
 
 			Cursor c = fetchAllFormats();
 			String[] formatNames = new String[c.getCount()];
 			c.moveToFirst();
-			for(int i=0; i < c.getCount(); i++){
+			for (int i = 0; i < c.getCount(); i++) {
 				formatNames[i] = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
-				c.moveToNext();	
+				c.moveToNext();
 			}
 			c.deactivate();
 			c.close();
-			
+
 			if (statement == null) {
 				statement = "(";
 			}
@@ -608,32 +586,32 @@ public class CardDbAdapter {
 
 			boolean first = true;
 
-			for(int i=0; i < formatNames.length; i++){
-				if(formats.contains(formatNames[i])){
+			for (int i = 0; i < formatNames.length; i++) {
+				if (formats.contains(formatNames[i])) {
 					if (first) {
 						first = false;
 					}
 					else {
 						statement += " AND ";
 					}
-					
+
 					// get all sets in the format
-					Cursor cSets = mDb.query(formatNames[i] + SET_POSTIFX, new String[] { KEY_ID, KEY_NAME,
-					}, null, null, null, null, KEY_NAME);
-					
-					if(cSets.getCount() != 0){
-						statement += "EXISTS (SELECT * FROM " + formatNames[i] + SET_POSTIFX + " WHERE " + 
-						DATABASE_TABLE_CARDS + "." + KEY_SET + " = " + formatNames[i] + SET_POSTIFX + "." + KEY_NAME + ")";
-						
-						statement += " AND NOT EXISTS (SELECT * FROM " + formatNames[i] + BAN_POSTIFX + " WHERE " + 
-						DATABASE_TABLE_CARDS + "." + KEY_NAME + " = " + formatNames[i] + BAN_POSTIFX + "." + KEY_NAME + ")";
+					Cursor cSets = mDb.query(formatNames[i] + SET_POSTIFX, new String[] { KEY_ID, KEY_NAME, }, null, null, null,
+							null, KEY_NAME);
+
+					if (cSets.getCount() != 0) {
+						statement += "EXISTS (SELECT * FROM " + formatNames[i] + SET_POSTIFX + " WHERE " + DATABASE_TABLE_CARDS
+								+ "." + KEY_SET + " = " + formatNames[i] + SET_POSTIFX + "." + KEY_NAME + ")";
+
+						statement += " AND NOT EXISTS (SELECT * FROM " + formatNames[i] + BAN_POSTIFX + " WHERE "
+								+ DATABASE_TABLE_CARDS + "." + KEY_NAME + " = " + formatNames[i] + BAN_POSTIFX + "." + KEY_NAME + ")";
 					}
-					else{
-						statement += "NOT EXISTS (SELECT * FROM " + formatNames[i] + BAN_POSTIFX + " WHERE " + 
-						DATABASE_TABLE_CARDS + "." + KEY_NAME + " = " + formatNames[i] + BAN_POSTIFX + "." + KEY_NAME + ")";
+					else {
+						statement += "NOT EXISTS (SELECT * FROM " + formatNames[i] + BAN_POSTIFX + " WHERE " + DATABASE_TABLE_CARDS
+								+ "." + KEY_NAME + " = " + formatNames[i] + BAN_POSTIFX + "." + KEY_NAME + ")";
 					}
-					
-					if(cSets != null){
+
+					if (cSets != null) {
 						cSets.deactivate();
 						cSets.close();
 					}
@@ -641,26 +619,27 @@ public class CardDbAdapter {
 			}
 			statement += ")";
 		}
-		
+
 		try {
-			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID,
-					KEY_NAME, KEY_SET}, statement, null, null, null, KEY_NAME, null);
+			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID, KEY_NAME, KEY_SET }, statement, null,
+					null, null, KEY_NAME, null);
 		}
 		catch (SQLiteException e) {
-			Log.v("tag", e.toString());
+			// Log.v("tag", e.toString());
 		}
 		if (mCursor != null) {
 			mCursor.moveToFirst();
 		}
 		return mCursor;
 	}
-	
+
 	public int getTransform(String set, String number) {
 		Cursor mCursor = null;
 		int ID;
 		String statement = "(" + KEY_NUMBER + " = '" + number + "') AND (" + KEY_SET + " = '" + set + "')";
 		try {
-			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID}, statement, null, null, null, KEY_ID, null);
+			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID }, statement, null, null, null, KEY_ID,
+					null);
 			mCursor.moveToFirst();
 			ID = mCursor.getInt(mCursor.getColumnIndex(KEY_ID));
 		}
@@ -670,37 +649,36 @@ public class CardDbAdapter {
 		return ID;
 	}
 
-	public void createFormatTable(){
+	public void createFormatTable() {
 		mDb.execSQL(DATABASE_CREATE_FORMATS);
 	}
 
-	public void createFormatSetTable(String format){
-		mDb.execSQL("create table "	+ format + SET_POSTIFX + "(" +
-				KEY_ID + " integer primary key autoincrement, " +
-				KEY_NAME + " text not null);");
-	}
-	public void createFormatBanTable(String format){
-		mDb.execSQL("create table "	+ format + BAN_POSTIFX + "(" +
-				KEY_ID + " integer primary key autoincrement, " +
-				KEY_NAME + " text not null);");
-	}
-	public void createFormatRestrictedTable(String format){
-		mDb.execSQL("create table "	+ format + RESTRICT_POSTIFX + "(" +
-				KEY_ID + " integer primary key autoincrement, " +
-				KEY_NAME + " text not null);");
+	public void createFormatSetTable(String format) {
+		mDb.execSQL("create table " + format + SET_POSTIFX + "(" + KEY_ID + " integer primary key autoincrement, "
+				+ KEY_NAME + " text not null);");
 	}
 
-	public void dropFormatTable(){
+	public void createFormatBanTable(String format) {
+		mDb.execSQL("create table " + format + BAN_POSTIFX + "(" + KEY_ID + " integer primary key autoincrement, "
+				+ KEY_NAME + " text not null);");
+	}
+
+	public void createFormatRestrictedTable(String format) {
+		mDb.execSQL("create table " + format + RESTRICT_POSTIFX + "(" + KEY_ID + " integer primary key autoincrement, "
+				+ KEY_NAME + " text not null);");
+	}
+
+	public void dropFormatTable() {
 		String format;
 		Cursor c = fetchAllFormats();
-		if(c!=null){
+		if (c != null) {
 			c.moveToFirst();
-			for(int i=0; i < c.getCount(); i++){
+			for (int i = 0; i < c.getCount(); i++) {
 				format = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
-				mDb.execSQL("DROP TABLE IF EXISTS " + format + "" +SET_POSTIFX);			
-				mDb.execSQL("DROP TABLE IF EXISTS " + format + "" +BAN_POSTIFX);			
-				mDb.execSQL("DROP TABLE IF EXISTS " + format + "" +RESTRICT_POSTIFX);			
-				c.moveToNext();	
+				mDb.execSQL("DROP TABLE IF EXISTS " + format + "" + SET_POSTIFX);
+				mDb.execSQL("DROP TABLE IF EXISTS " + format + "" + BAN_POSTIFX);
+				mDb.execSQL("DROP TABLE IF EXISTS " + format + "" + RESTRICT_POSTIFX);
+				c.moveToNext();
 			}
 			c.deactivate();
 			c.close();
@@ -719,11 +697,13 @@ public class CardDbAdapter {
 		initialValues.put(KEY_NAME, set);
 		return mDb.insert(format + SET_POSTIFX, null, initialValues);
 	}
+
 	public long createFormatBan(String format, String set) {
 		ContentValues initialValues = new ContentValues();
 		initialValues.put(KEY_NAME, set);
 		return mDb.insert(format + BAN_POSTIFX, null, initialValues);
 	}
+
 	public long createFormatRestricted(String format, String set) {
 		ContentValues initialValues = new ContentValues();
 		initialValues.put(KEY_NAME, set);
@@ -731,59 +711,57 @@ public class CardDbAdapter {
 	}
 
 	public Cursor fetchAllFormats() {
-		try{
-			return mDb.query(DATABASE_TABLE_FORMATS, new String[] { KEY_ID, KEY_NAME,
-			}, null, null, null, null, KEY_NAME);
-		}catch(SQLiteException e){
+		try {
+			return mDb.query(DATABASE_TABLE_FORMATS, new String[] { KEY_ID, KEY_NAME, }, null, null, null, null, KEY_NAME);
+		}
+		catch (SQLiteException e) {
 			return null;
 		}
 	}
 
-	public static final int LEGAL = 0;
-	public static final int BANNED = 1;
-	public static final int RESTRICTED = 2;
-	
-	
-	public int checkLegality(long mCardID, String name) {
-		
-		if(name != null)
-			name = name.replace("'","''");
-	// get all sets in the format
-		Cursor cSets = mDb.query(name + SET_POSTIFX, new String[] { KEY_ID, KEY_NAME,
-		}, null, null, null, null, KEY_NAME);
-		
-		String banStatement = "(" +KEY_ID+ "=" + mCardID + ")";
-		String restrictStatement = "(" +KEY_ID+ "=" + mCardID + ")";
-			
-		if(cSets.getCount() != 0){
-			banStatement += "AND EXISTS (SELECT * FROM " + name + SET_POSTIFX + " WHERE " + 
-			DATABASE_TABLE_CARDS + "." + KEY_SET + " = " + name + SET_POSTIFX + "." + KEY_NAME + ")";
-			
-			banStatement += " AND NOT EXISTS (SELECT * FROM " + name + BAN_POSTIFX + " WHERE " + 
-			DATABASE_TABLE_CARDS + "." + KEY_NAME + " = " + name + BAN_POSTIFX + "." + KEY_NAME + ")";
+	public static final int	LEGAL				= 0;
+	public static final int	BANNED			= 1;
+	public static final int	RESTRICTED	= 2;
 
-			restrictStatement += "AND EXISTS (SELECT * FROM " + name + SET_POSTIFX + " WHERE " + 
-			DATABASE_TABLE_CARDS + "." + KEY_SET + " = " + name + SET_POSTIFX + "." + KEY_NAME + ")";
-			
-			restrictStatement += " AND NOT EXISTS (SELECT * FROM " + name + RESTRICT_POSTIFX + " WHERE " + 
-			DATABASE_TABLE_CARDS + "." + KEY_NAME + " = " + name + RESTRICT_POSTIFX + "." + KEY_NAME + ")";
-}
-		else{
-			banStatement += "AND NOT EXISTS (SELECT * FROM " + name + BAN_POSTIFX + " WHERE " + 
-			DATABASE_TABLE_CARDS + "." + KEY_NAME + " = " + name + BAN_POSTIFX + "." + KEY_NAME + ")";
-			
-			restrictStatement += "AND NOT EXISTS (SELECT * FROM " + name + RESTRICT_POSTIFX + " WHERE " + 
-			DATABASE_TABLE_CARDS + "." + KEY_NAME + " = " + name + RESTRICT_POSTIFX + "." + KEY_NAME + ")";
+	public int checkLegality(long mCardID, String name) {
+
+		if (name != null)
+			name = name.replace("'", "''");
+		// get all sets in the format
+		Cursor cSets = mDb.query(name + SET_POSTIFX, new String[] { KEY_ID, KEY_NAME, }, null, null, null, null, KEY_NAME);
+
+		String banStatement = "(" + KEY_ID + "=" + mCardID + ")";
+		String restrictStatement = "(" + KEY_ID + "=" + mCardID + ")";
+
+		if (cSets.getCount() != 0) {
+			banStatement += "AND EXISTS (SELECT * FROM " + name + SET_POSTIFX + " WHERE " + DATABASE_TABLE_CARDS + "."
+					+ KEY_SET + " = " + name + SET_POSTIFX + "." + KEY_NAME + ")";
+
+			banStatement += " AND NOT EXISTS (SELECT * FROM " + name + BAN_POSTIFX + " WHERE " + DATABASE_TABLE_CARDS + "."
+					+ KEY_NAME + " = " + name + BAN_POSTIFX + "." + KEY_NAME + ")";
+
+			restrictStatement += "AND EXISTS (SELECT * FROM " + name + SET_POSTIFX + " WHERE " + DATABASE_TABLE_CARDS + "."
+					+ KEY_SET + " = " + name + SET_POSTIFX + "." + KEY_NAME + ")";
+
+			restrictStatement += " AND NOT EXISTS (SELECT * FROM " + name + RESTRICT_POSTIFX + " WHERE "
+					+ DATABASE_TABLE_CARDS + "." + KEY_NAME + " = " + name + RESTRICT_POSTIFX + "." + KEY_NAME + ")";
 		}
-		
-		Cursor banCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID,
-		}, banStatement, null, null, null, KEY_ID, null);
-		
-		Cursor restrictCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID,
-		}, restrictStatement, null, null, null, KEY_ID, null);
-		
-		if(banCursor.getCount() >= 1){
-			if(restrictCursor.getCount() >= 1){
+		else {
+			banStatement += "AND NOT EXISTS (SELECT * FROM " + name + BAN_POSTIFX + " WHERE " + DATABASE_TABLE_CARDS + "."
+					+ KEY_NAME + " = " + name + BAN_POSTIFX + "." + KEY_NAME + ")";
+
+			restrictStatement += "AND NOT EXISTS (SELECT * FROM " + name + RESTRICT_POSTIFX + " WHERE "
+					+ DATABASE_TABLE_CARDS + "." + KEY_NAME + " = " + name + RESTRICT_POSTIFX + "." + KEY_NAME + ")";
+		}
+
+		Cursor banCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID, }, banStatement, null, null, null,
+				KEY_ID, null);
+
+		Cursor restrictCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID, }, restrictStatement, null,
+				null, null, KEY_ID, null);
+
+		if (banCursor.getCount() >= 1) {
+			if (restrictCursor.getCount() >= 1) {
 				cSets.deactivate();
 				cSets.close();
 				banCursor.deactivate();
@@ -792,7 +770,7 @@ public class CardDbAdapter {
 				restrictCursor.close();
 				return LEGAL;
 			}
-			else{
+			else {
 				cSets.deactivate();
 				cSets.close();
 				banCursor.deactivate();

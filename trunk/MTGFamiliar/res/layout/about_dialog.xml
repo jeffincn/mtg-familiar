@@ -8,11 +8,14 @@
 	or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for 
 	more details. You should have received a copy of the GNU General Public License 
 	along with MTG Familiar. If not, see <http://www.gnu.org/licenses/>. -->
-<LinearLayout android:id="@+id/relativeLayout1"
-	android:layout_width="fill_parent" android:layout_height="fill_parent"
-	android:layout_margin="5dip" xmlns:android="http://schemas.android.com/apk/res/android">
-	<TextView android:text="TextView"
-		android:layout_alignParentLeft="true" android:layout_height="wrap_content"
-		android:layout_weight="1" style="@style/text" android:layout_width="fill_parent"
-		android:id="@+id/deckname" />
-</LinearLayout>
+<ScrollView android:id="@+id/scrollView1"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent">
+	<LinearLayout android:id="@+id/linearLayout1"
+		android:layout_width="fill_parent" android:layout_height="fill_parent" android:orientation="vertical">
+		<TextView android:text="TextView" android:layout_height="wrap_content" android:id="@+id/aboutfield"
+			style="@style/text" android:background="@color/black" android:layout_width="fill_parent"/>
+		<ImageView android:src="@drawable/gpl" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:padding="10dp" />
+	</LinearLayout>
+</ScrollView>

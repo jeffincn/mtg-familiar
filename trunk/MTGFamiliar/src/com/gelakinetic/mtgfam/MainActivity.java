@@ -1,3 +1,22 @@
+/**
+Copyright 2011 Adam Feinstein
+
+This file is part of MTG Familiar.
+
+MTG Familiar is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+MTG Familiar is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.gelakinetic.mtgfam;
 
 import java.io.BufferedInputStream;
@@ -13,8 +32,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
 
-
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -29,7 +46,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -39,7 +55,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class main extends Activity implements Runnable {
+public class MainActivity extends Activity implements Runnable {
 	private static final String	DB_PATH						= "/data/data/com.gelakinetic.mtgfam/databases/";
 	private static final String	DB_NAME						= "data";
 	private static final int		DBFROMAPK					= 0;
@@ -48,10 +64,10 @@ public class main extends Activity implements Runnable {
 	private static final int		DBFROMWEB					= 4;
 	private static final int		DATABASE_VERSION	= 2;
 	private static final int		EXCEPTION					= 99;
-	private LinearLayout							search;
-	private LinearLayout							life;
-	private LinearLayout							rng;
-	private LinearLayout							manapool;
+	private LinearLayout				search;
+	private LinearLayout				life;
+	private LinearLayout				rng;
+	private LinearLayout				manapool;
 	private Context							mCtx;
 	private CardDbAdapter				mDbHelper;
 	private ProgressDialog			dialog;
@@ -60,13 +76,13 @@ public class main extends Activity implements Runnable {
 	private String							patchname;
 	private boolean							dialogReady;
 	private SharedPreferences		preferences;
-	private String	stacktrace;
-	private Button	deckmanagement;
+	private String							stacktrace;
+	private Button							deckmanagement;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
+		setContentView(R.layout.main_activity);
 
 		mCtx = this;
 
@@ -78,21 +94,21 @@ public class main extends Activity implements Runnable {
 
 		search.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Intent i = new Intent(mCtx, search.class);
+				Intent i = new Intent(mCtx, SearchActivity.class);
 				startActivity(i);
 			}
 		});
 
 		life.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Intent i = new Intent(mCtx, counter.class);
+				Intent i = new Intent(mCtx, LifeCounterActivity.class);
 				startActivity(i);
 			}
 		});
 
 		rng.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Intent i = new Intent(mCtx, rng.class);
+				Intent i = new Intent(mCtx, DiceActivity.class);
 				startActivity(i);
 			}
 		});
@@ -103,17 +119,17 @@ public class main extends Activity implements Runnable {
 				startActivity(i);
 			}
 		});
-		
+
 		deckmanagement.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Intent i = new Intent(mCtx, DeckManagement.class);
+				Intent i = new Intent(mCtx, DeckManagementActivity.class);
 				startActivity(i);
 			}
 		});
-		
+
 		// Uncomment to get to deck management, currently under construction
 		deckmanagement.setVisibility(View.GONE);
-		
+
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		File f = new File(DB_PATH, DB_NAME);
@@ -165,18 +181,12 @@ public class main extends Activity implements Runnable {
 		Dialog aboutDialog = new Dialog(mContext);
 		aboutDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-		aboutDialog.setContentView(R.layout.aboutdialog);
+		aboutDialog.setContentView(R.layout.about_dialog);
 		aboutDialog.setTitle("About " + getString(R.string.app_name));
 
 		TextView text = (TextView) aboutDialog.findViewById(R.id.aboutfield);
 		text.setAutoLinkMask(Linkify.EMAIL_ADDRESSES | Linkify.WEB_URLS);
-		text.setText("This app is my gift to the MTG community." + '\n' + '\n'
-				+ "Please send questions, comments, concerns, and praise to mtg.familiar@gmail.com" + '\n' + '\n'
-				+ "Join the open source project at http://code.google.com/p/mtg-familiar" + '\n' + '\n'
-				+ "Thanks to chaudakh from MTG:Salvation for the wonderful Gatherer Extractor program." + '\n' + '\n'
-				+ "Thanks to zagaberoo from FNM for letting me bounce ideas off of." + '\n' + '\n'
-				+ "Special thanks to Richard Garfield and the rest of the folks at Wizards of the Coast!" + '\n' + '\n'
-				+ "They own and copyright all of this stuff, none of it is mine." + '\n' + '\n' + "-gelakinetic");
+		text.setText(R.string.about_this_app);
 
 		return aboutDialog;
 	}
@@ -212,7 +222,7 @@ public class main extends Activity implements Runnable {
 
 	public void startThread(int type) {
 		if (type == DBFROMAPK) {
-			dialog = new ProgressDialog(main.this);
+			dialog = new ProgressDialog(MainActivity.this);
 			dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 			dialog.setMessage("Decompressing database...");
 			dialog.setCancelable(false);
@@ -222,7 +232,7 @@ public class main extends Activity implements Runnable {
 			thread.start();
 		}
 		else if (type == OTAPATCH) {
-			dialog = new ProgressDialog(main.this);
+			dialog = new ProgressDialog(MainActivity.this);
 			dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 			dialog.setMessage("Checking for Updates. Please wait...");
 			dialog.setCancelable(false);
@@ -233,7 +243,7 @@ public class main extends Activity implements Runnable {
 			thread.start();
 		}
 		else if (type == DBFROMWEB) {
-			dialog = new ProgressDialog(main.this);
+			dialog = new ProgressDialog(MainActivity.this);
 			dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			dialog.setMessage("Downloading and parsing an update. Please wait...");
 			dialog.setCancelable(false);
@@ -247,7 +257,7 @@ public class main extends Activity implements Runnable {
 	}
 
 	public void run() {
-		try {			
+		try {
 			if (threadType == DBFROMAPK) {
 				copyDB();
 				handler.sendEmptyMessage(DBFROMAPK);
@@ -257,7 +267,7 @@ public class main extends Activity implements Runnable {
 					mDbHelper = new CardDbAdapter(this);
 					mDbHelper.open();
 				}
-				ArrayList<String[]> patchInfo = JsonUpdateParser.readJsonStream(this);
+				ArrayList<String[]> patchInfo = JsonParser.readUpdateJsonStream(this);
 				if (patchInfo != null) {
 					try {
 						parseLegality(new URL("http://members.cox.net/aefeinstein/legality.json"));
@@ -302,10 +312,10 @@ public class main extends Activity implements Runnable {
 		}
 		catch (Exception e) {
 			final Writer result = new StringWriter();
-	    final PrintWriter printWriter = new PrintWriter(result);
-	    e.printStackTrace(printWriter);
-	    stacktrace = result.toString();
-	    
+			final PrintWriter printWriter = new PrintWriter(result);
+			e.printStackTrace(printWriter);
+			stacktrace = result.toString();
+
 			handler.sendEmptyMessage(EXCEPTION);
 		}
 	}
@@ -331,7 +341,7 @@ public class main extends Activity implements Runnable {
 																	numCardsAdded = 0;
 
 																	dialog.dismiss();
-																	dialog = new ProgressDialog(main.this);
+																	dialog = new ProgressDialog(MainActivity.this);
 																	dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 																	dialog.setMessage("Adding " + patchname + ". Please wait...");
 																	dialog.setCancelable(false);
@@ -341,9 +351,7 @@ public class main extends Activity implements Runnable {
 																	break;
 																case EXCEPTION:
 																	dialog.dismiss();
-																	
 
-																	
 																	AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
 																	builder.setMessage(stacktrace).setCancelable(true);
 																	AlertDialog alert = builder.create();
@@ -357,20 +365,20 @@ public class main extends Activity implements Runnable {
 	private void parseJSON(URL cards) {
 		try {
 			GZIPInputStream gis = new GZIPInputStream(cards.openStream());
-			JsonCardParser.readJsonStream(gis, this, mDbHelper);
+			JsonParser.readCardJsonStream(gis, this, mDbHelper);
 		}
 		catch (MalformedURLException e) {
-			Log.e("JSON error", e.toString());
+			// Log.e("JSON error", e.toString());
 		}
 		catch (IOException e) {
-			Log.e("JSON error", e.toString());
+			// Log.e("JSON error", e.toString());
 		}
 	}
 
 	void parseLegality(URL legal) {
 		try {
 			InputStream in = new BufferedInputStream(legal.openStream());
-			JsonLegalityParser.readJsonStream(in, mDbHelper, preferences);
+			JsonParser.readLegalityJsonStream(in, mDbHelper, preferences);
 		}
 		catch (MalformedURLException e) {
 			return;
@@ -442,9 +450,8 @@ public class main extends Activity implements Runnable {
 		numCards = n;
 	}
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig)
-    {
-        super.onConfigurationChanged(newConfig);
-    }
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+	}
 }

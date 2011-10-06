@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-	<PreferenceCategory android:title="Updates">
-		<CheckBoxPreference android:title="Automatic Updates" android:summary="Check for new sets and bannings each time the app opens"
-			android:defaultValue="true" android:key="autoupdate" />
-		<CheckBoxPreference android:title="@string/d2title" android:key="d2AsCoin"></CheckBoxPreference>
-	</PreferenceCategory>
-</PreferenceScreen>

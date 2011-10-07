@@ -255,7 +255,7 @@ public class CardViewActivity extends Activity implements Runnable {
 		setName = mDbHelper.getFullSetName(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)));
 		cardName = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
 		try {
-			priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=TCGTEST&s=" + setName + "&p="
+			priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + setName + "&p="
 					+ cardName).replace(" ", "%20"));
 		}
 		catch (MalformedURLException e) {

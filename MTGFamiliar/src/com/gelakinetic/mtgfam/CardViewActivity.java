@@ -40,6 +40,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -436,6 +437,17 @@ public class CardViewActivity extends Activity implements Runnable {
 				return true;
 			case R.id.legality:
 				showDialog(1);
+				return true;
+			case R.id.gatherer:
+				String parts[] = name.getText().toString().split(" ");
+				String url = "http://gatherer.wizards.com/Pages/Search/Default.aspx?action=advanced&name=";
+
+				for (int i = 0; i < parts.length; i++) {
+					url += "+[" + parts[i] + "]";
+				}
+
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+				startActivity(browserIntent);
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

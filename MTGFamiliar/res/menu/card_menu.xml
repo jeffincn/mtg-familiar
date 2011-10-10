@@ -21,4 +21,5 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <item android:title="@string/image" android:id="@+id/image"/>
     <item android:title="@string/price" android:id="@+id/price"/>
     <item android:title="@string/legality" android:id="@+id/legality"></item>
+    <item android:title="@string/gatherer" android:id="@+id/gatherer"></item>
 </menu>

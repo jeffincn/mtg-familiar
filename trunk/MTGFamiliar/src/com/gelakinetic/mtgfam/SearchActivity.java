@@ -28,6 +28,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.PorterDuff.Mode;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -458,26 +459,61 @@ public class SearchActivity extends Activity {
 		Resources res = getResources();
 		rarityNames = res.getStringArray(R.array.rarities);
 		rarityChecked = new boolean[rarityNames.length];
+		
+
+		setDialog = new AlertDialog.Builder(this).setTitle("Sets")
+				.setMultiChoiceItems(setNames, setChecked, new DialogSelectionClickHandler())
+				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
+		formatDialog = new AlertDialog.Builder(this).setTitle("Formats")
+				.setMultiChoiceItems(formatNames, formatChecked, new DialogSelectionClickHandler())
+				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
+		rarityDialog = new AlertDialog.Builder(this).setTitle("Rarities")
+				.setMultiChoiceItems(rarityNames, rarityChecked, new DialogSelectionClickHandler())
+				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
+
+		setDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			public void onDismiss(DialogInterface arg0) {
+				setButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
+				for (int i = 0; i < setChecked.length; i++) {
+					if (setChecked[i]) {
+						setButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
+					}
+				}
+			}
+		});
+
+		formatDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			public void onDismiss(DialogInterface arg0) {
+				formatButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
+				for (int i = 0; i < formatChecked.length; i++) {
+					if (formatChecked[i]) {
+						formatButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
+					}
+				}
+			}
+		});
+
+		rarityDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			public void onDismiss(DialogInterface arg0) {
+				rarityButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
+				for (int i = 0; i < rarityChecked.length; i++) {
+					if (rarityChecked[i]) {
+						rarityButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
+					}
+				}
+			}
+		});
 	}
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		if (id == SETLIST) {
-			setDialog = new AlertDialog.Builder(this).setTitle("Sets")
-					.setMultiChoiceItems(setNames, setChecked, new DialogSelectionClickHandler())
-					.setPositiveButton("OK", new DialogButtonClickHandler()).create();
 			return setDialog;
 		}
 		else if (id == FORMATLIST) {
-			formatDialog = new AlertDialog.Builder(this).setTitle("Formats")
-					.setMultiChoiceItems(formatNames, formatChecked, new DialogSelectionClickHandler())
-					.setPositiveButton("OK", new DialogButtonClickHandler()).create();
 			return formatDialog;
 		}
 		else if (id == RARITYLIST) {
-			rarityDialog = new AlertDialog.Builder(this).setTitle("Rarities")
-					.setMultiChoiceItems(rarityNames, rarityChecked, new DialogSelectionClickHandler())
-					.setPositiveButton("OK", new DialogButtonClickHandler()).create();
 			return rarityDialog;
 		}
 		return null;

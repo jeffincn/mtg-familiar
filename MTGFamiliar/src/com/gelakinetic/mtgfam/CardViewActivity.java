@@ -38,6 +38,8 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -113,15 +115,25 @@ public class CardViewActivity extends Activity implements Runnable {
 		c.moveToFirst();
 
 		// http://magiccards.info/scans/en/mt/55.jpg
-
+		cardName = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
 		setCode = c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET));
+		setName = mDbHelper.getFullSetName(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)));
+
 		mtgi_code = mDbHelper.getCodeMtgi(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)));
 		number = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NUMBER));
-		picurl = "http://magiccards.info/scans/en/" + mtgi_code + "/" + number + ".jpg";
+		if(setCode.equals("PCP")){
+			picurl = "http://magiccards.info/extras/plane/planechase/"+ cardName +".jpg";
+			picurl = picurl.replace(" ","-");
+		}
+		else if(setCode.equals("ARS")){
+			picurl = "http://magiccards.info/extras/scheme/archenemy/"+ cardName +".jpg";
+			picurl = picurl.replace(" ","-");
+		}
+		else{
+			picurl = "http://magiccards.info/scans/en/" + mtgi_code + "/" + number + ".jpg";
+		}
 		picurl = picurl.toLowerCase();
 
-		setName = mDbHelper.getFullSetName(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)));
-		cardName = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
 		try {
 			priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + setName + "&p="
 					+ cardName).replace(" ", "%20").replace("Magic: The Gathering-Commander", "Commander").replace("Æ", "Ae"));
@@ -390,13 +402,24 @@ public class CardViewActivity extends Activity implements Runnable {
 					URL u = new URL(picurl);
 					d = new BitmapDrawable(u.openStream());
 					bmp = d.getBitmap();
-
+					
 					Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-					float scale = (display.getWidth() - 20) / (float) d.getIntrinsicWidth();
-					int newWidth = Math.round(bmp.getWidth() * scale);
-					int newHeight = Math.round(bmp.getHeight() * scale);
-
-					bmp = Bitmap.createScaledBitmap(d.getBitmap(), newWidth, newHeight, true);
+					int newHeight;
+					int newWidth;
+					if(setCode.equals("PCP")){
+						Matrix mat = new Matrix();
+		        mat.setRotate(90);
+		        bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), mat, true);
+						float scale = (display.getWidth() - 20) / (float) d.getIntrinsicHeight();
+						newWidth = Math.round(bmp.getWidth() * scale);
+						newHeight = Math.round(bmp.getHeight() * scale);
+					}
+					else{
+						float scale = (display.getWidth() - 20) / (float) d.getIntrinsicWidth();
+						newWidth = Math.round(bmp.getWidth() * scale);
+						newHeight = Math.round(bmp.getHeight() * scale);
+					}
+					bmp = Bitmap.createScaledBitmap(bmp, newWidth, newHeight, true);
 					d = new BitmapDrawable(bmp);
 				}
 				catch (IOException e) {

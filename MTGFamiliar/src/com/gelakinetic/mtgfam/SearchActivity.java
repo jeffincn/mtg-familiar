@@ -581,6 +581,10 @@ public class SearchActivity extends Activity {
 				this.removeDialog(FORMATLIST);
 				this.removeDialog(RARITYLIST);
 
+				setButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
+				formatButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
+				rarityButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
+
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

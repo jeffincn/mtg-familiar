@@ -124,7 +124,7 @@ public class CardViewActivity extends Activity implements Runnable {
 		cardName = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
 		try {
 			priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + setName + "&p="
-					+ cardName).replace(" ", "%20").replace("Magic: The Gathering-Commander", "Commander").replace("", "Ae"));
+					+ cardName).replace(" ", "%20").replace("Magic: The Gathering-Commander", "Commander").replace("Æ", "Ae"));
 		}
 		catch (MalformedURLException e) {
 			priceurl = null;
@@ -422,7 +422,7 @@ public class CardViewActivity extends Activity implements Runnable {
 																							image.setImageDrawable(d);
 																							break;
 																						case PRICELOAD:
-																							if (XMLhandler == null) {
+																							if (XMLhandler == null || XMLhandler.link == null) {
 																								l.setText("No");
 																								m.setText("Internet");
 																								h.setText("Connection");

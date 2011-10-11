@@ -14,15 +14,12 @@
 	<TextView style="@style/text" android:layout_width="wrap_content"
 		android:text="TextView" android:layout_height="wrap_content"
 		android:id="@+id/cardcost" android:layout_alignParentTop="true"
-		android:layout_alignParentRight="true" />
+		android:layout_alignParentRight="true" android:layout_marginLeft="3dip" android:layout_marginRight="3dip" android:layout_marginTop="3dip" android:layout_marginBottom="2dip"/>
 	<TextView style="@style/text" android:layout_width="wrap_content"
 		android:text="TextView" android:layout_height="wrap_content"
 		android:id="@+id/cardset" android:layout_below="@+id/cardcost"
-		android:layout_alignParentRight="true" />
-	<TextView style="@style/text" android:layout_width="fill_parent"
-		android:text="TextView" android:layout_height="wrap_content"
-		android:id="@+id/cardname" android:layout_alignParentLeft="true"
-		android:layout_alignBottom="@+id/cardset"
+		android:layout_alignParentRight="true" android:layout_marginLeft="3dip" android:layout_marginRight="3dip" android:layout_marginTop="1dip" android:layout_marginBottom="3dip"/>
+	<TextView style="@style/text" android:text="TextView" android:id="@+id/cardname" android:layout_alignParentLeft="true"
 		android:layout_alignParentTop="true" android:layout_toLeftOf="@+id/cardcost"
-		android:gravity="center_vertical" />
+		android:gravity="center_vertical" android:layout_height="fill_parent" android:layout_width="fill_parent" android:layout_alignBottom="@+id/cardset" android:layout_marginLeft="3dip" android:layout_marginRight="3dip"/>
 </RelativeLayout>

@@ -94,148 +94,15 @@ public class CardViewActivity extends Activity implements Runnable {
 	private String								setCode;
 	private String								setName;
 	private String								cardName;
-
-	private ImageGetter						imgGetter	= new ImageGetter() {
-																						public Drawable getDrawable(String source) {
-																							Drawable d = null;
-
-																							int[] drawableNums = { R.drawable.zero, R.drawable.one, R.drawable.two,
-			R.drawable.three, R.drawable.four, R.drawable.five, R.drawable.six, R.drawable.seven, R.drawable.eight,
-			R.drawable.nine, R.drawable.ten, R.drawable.eleven, R.drawable.twelve, R.drawable.thirteen, R.drawable.fourteen,
-			R.drawable.fifteen, R.drawable.sixteen, R.drawable.seventeen, R.drawable.eighteen, R.drawable.ninteen,
-			R.drawable.twenty											};
-
-																							if (source.equalsIgnoreCase("w")) {
-																								d = getResources().getDrawable(R.drawable.w);
-																							}
-																							else if (source.equalsIgnoreCase("u")) {
-																								d = getResources().getDrawable(R.drawable.u);
-																							}
-																							else if (source.equalsIgnoreCase("b")) {
-																								d = getResources().getDrawable(R.drawable.b);
-																							}
-																							else if (source.equalsIgnoreCase("r")) {
-																								d = getResources().getDrawable(R.drawable.r);
-																							}
-																							else if (source.equalsIgnoreCase("g")) {
-																								d = getResources().getDrawable(R.drawable.g);
-																							}
-																							else if (source.equalsIgnoreCase("t")) {
-																								d = getResources().getDrawable(R.drawable.tap);
-																							}
-																							else if (source.equalsIgnoreCase("q")) {
-																								d = getResources().getDrawable(R.drawable.untap);
-																							}
-																							else if (source.equalsIgnoreCase("wu")) {
-																								d = getResources().getDrawable(R.drawable.wu);
-																							}
-																							else if (source.equalsIgnoreCase("ub")) {
-																								d = getResources().getDrawable(R.drawable.ub);
-																							}
-																							else if (source.equalsIgnoreCase("br")) {
-																								d = getResources().getDrawable(R.drawable.br);
-																							}
-																							else if (source.equalsIgnoreCase("rg")) {
-																								d = getResources().getDrawable(R.drawable.rg);
-																							}
-																							else if (source.equalsIgnoreCase("gw")) {
-																								d = getResources().getDrawable(R.drawable.gw);
-																							}
-																							else if (source.equalsIgnoreCase("wb")) {
-																								d = getResources().getDrawable(R.drawable.wb);
-																							}
-																							else if (source.equalsIgnoreCase("bg")) {
-																								d = getResources().getDrawable(R.drawable.bg);
-																							}
-																							else if (source.equalsIgnoreCase("gu")) {
-																								d = getResources().getDrawable(R.drawable.gu);
-																							}
-																							else if (source.equalsIgnoreCase("ur")) {
-																								d = getResources().getDrawable(R.drawable.ur);
-																							}
-																							else if (source.equalsIgnoreCase("rw")) {
-																								d = getResources().getDrawable(R.drawable.rw);
-																							}
-																							else if (source.equalsIgnoreCase("2w")) {
-																								d = getResources().getDrawable(R.drawable.w2);
-																							}
-																							else if (source.equalsIgnoreCase("2u")) {
-																								d = getResources().getDrawable(R.drawable.u2);
-																							}
-																							else if (source.equalsIgnoreCase("2b")) {
-																								d = getResources().getDrawable(R.drawable.b2);
-																							}
-																							else if (source.equalsIgnoreCase("2r")) {
-																								d = getResources().getDrawable(R.drawable.r2);
-																							}
-																							else if (source.equalsIgnoreCase("2g")) {
-																								d = getResources().getDrawable(R.drawable.g2);
-																							}
-																							else if (source.equalsIgnoreCase("s")) {
-																								d = getResources().getDrawable(R.drawable.s);
-																							}
-																							else if (source.equalsIgnoreCase("pw")) {
-																								d = getResources().getDrawable(R.drawable.pw);
-																							}
-																							else if (source.equalsIgnoreCase("pu")) {
-																								d = getResources().getDrawable(R.drawable.pu);
-																							}
-																							else if (source.equalsIgnoreCase("pb")) {
-																								d = getResources().getDrawable(R.drawable.pb);
-																							}
-																							else if (source.equalsIgnoreCase("pr")) {
-																								d = getResources().getDrawable(R.drawable.pr);
-																							}
-																							else if (source.equalsIgnoreCase("pg")) {
-																								d = getResources().getDrawable(R.drawable.pg);
-																							}
-																							else if (source.equalsIgnoreCase("p")) {
-																								d = getResources().getDrawable(R.drawable.p);
-																							}
-																							else if (source.equalsIgnoreCase("+oo")) {
-																								d = getResources().getDrawable(R.drawable.inf);
-																							}
-																							else if (source.equalsIgnoreCase("100")) {
-																								d = getResources().getDrawable(R.drawable.hundred);
-																							}
-																							else if (source.equalsIgnoreCase("1000000")) {
-																								d = getResources().getDrawable(R.drawable.million);
-																							}
-																							else if (source.equalsIgnoreCase("hr")) {
-																								d = getResources().getDrawable(R.drawable.hr);
-																							}
-																							else if (source.equalsIgnoreCase("hw")) {
-																								d = getResources().getDrawable(R.drawable.hw);
-																							}
-																							else if (source.equalsIgnoreCase("c")) {
-																								d = getResources().getDrawable(R.drawable.c);
-																							}
-																							else if (source.equalsIgnoreCase("z")) {
-																								d = getResources().getDrawable(R.drawable.z);
-																							}
-																							else if (source.equalsIgnoreCase("y")) {
-																								d = getResources().getDrawable(R.drawable.y);
-																							}
-																							else if (source.equalsIgnoreCase("x")) {
-																								d = getResources().getDrawable(R.drawable.x);
-																							}
-
-																							for (int i = 0; i < drawableNums.length; i++) {
-																								if (source.equals(new Integer(i).toString())) {
-																									d = getResources().getDrawable(drawableNums[i]);
-																								}
-																							}
-
-																							d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
-																							return d;
-																						}
-																					};
+	private ImageGetter	imgGetter;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.card_view_activity);
 
+		imgGetter = ImageGetterHelper.GlyphGetter(getResources());
+		
 		Bundle extras = getIntent().getExtras();
 		cardID = extras.getLong("id");
 
@@ -257,7 +124,7 @@ public class CardViewActivity extends Activity implements Runnable {
 		cardName = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
 		try {
 			priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + setName + "&p="
-					+ cardName).replace(" ", "%20"));
+					+ cardName).replace(" ", "%20").replace("Magic: The Gathering-Commander", "Commander").replace("", "Ae"));
 		}
 		catch (MalformedURLException e) {
 			priceurl = null;

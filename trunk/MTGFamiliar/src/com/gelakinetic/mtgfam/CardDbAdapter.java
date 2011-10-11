@@ -621,7 +621,7 @@ public class CardDbAdapter {
 		}
 
 		try {
-			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID, KEY_NAME, KEY_SET }, statement, null,
+			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID, KEY_NAME, KEY_SET, KEY_RARITY, KEY_MANACOST }, statement, null,
 					null, null, KEY_NAME, null);
 		}
 		catch (SQLiteException e) {

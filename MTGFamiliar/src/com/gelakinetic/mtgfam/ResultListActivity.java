@@ -29,7 +29,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 
 public class ResultListActivity extends ListActivity {
 
@@ -109,15 +108,14 @@ public class ResultListActivity extends ListActivity {
 
 		// Create an array to specify the fields we want to display in the list
 		// (only TITLE)
-		String[] from = new String[] { CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_SET };
+		String[] from = new String[] { CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_SET, CardDbAdapter.KEY_MANACOST };
 
 		// and an array of the fields we want to bind those fields to (in this case
 		// just text1)
-		int[] to = new int[] { R.id.cardname, R.id.cardset };
-
-		// Now create a simple cursor adapter and set it to display
-		SimpleCursorAdapter notes = new SimpleCursorAdapter(this, R.layout.card_row, c, from, to);
-		setListAdapter(notes);
+		int[] to = new int[] { R.id.cardname, R.id.cardset, R.id.cardcost };
+		
+		ResultListAdapter rla = new ResultListAdapter(this, R.layout.card_row, c, from, to, this.getResources());
+		setListAdapter(rla);
 	}
 
 	@Override

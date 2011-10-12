@@ -41,6 +41,7 @@ public class Main implements ActionListener {
 		{"\"artist\"",							"\"l\""},
 		{"\"number\"",							"\"m\""},
 		{"\"color\"",								"\"n\""},
+		{"\"id\"",									"\"x\""},
 
 		{"\"card\"",								"\"o\""},
 		{"\"cards\"",								"\"p\""},

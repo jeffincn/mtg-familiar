@@ -38,7 +38,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -94,7 +93,6 @@ public class CardViewActivity extends Activity implements Runnable {
 	private Button								transform;
 	private String								number;
 	private String								setCode;
-	private String								setName;
 	private String								cardName;
 	private ImageGetter	imgGetter;
 
@@ -117,13 +115,27 @@ public class CardViewActivity extends Activity implements Runnable {
 		// http://magiccards.info/scans/en/mt/55.jpg
 		cardName = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
 		setCode = c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET));
-		setName = mDbHelper.getFullSetName(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)));
 
 		mtgi_code = mDbHelper.getCodeMtgi(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)));
 		number = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NUMBER));
 		if(setCode.equals("PCP")){
-			picurl = "http://magiccards.info/extras/plane/planechase/"+ cardName +".jpg";
-			picurl = picurl.replace(" ","-");
+			cardName = cardName.replace("Æ", "Ae");
+			if(cardName.equalsIgnoreCase("tazeem")){
+				cardName = "tazeem-release-promo";
+				picurl = "http://magiccards.info/extras/plane/planechase/"+ cardName +".jpg";
+			}
+			if(cardName.equalsIgnoreCase("celestine reef")){
+				cardName = "celestine-reef-pre-release-promo";
+				picurl = "http://magiccards.info/extras/plane/planechase/"+ cardName +".jpg";
+			}
+			if(cardName.equalsIgnoreCase("horizon boughs")){
+				cardName = "horizon-boughs-gateway-promo";
+				picurl = "http://magiccards.info/extras/plane/planechase/"+ cardName +".jpg";
+			}
+			else{
+				picurl = "http://magiccards.info/extras/plane/planechase/"+ cardName +".jpg";
+				picurl = picurl.replace(" ","-");
+			}
 		}
 		else if(setCode.equals("ARS")){
 			picurl = "http://magiccards.info/extras/scheme/archenemy/"+ cardName +".jpg";
@@ -135,8 +147,9 @@ public class CardViewActivity extends Activity implements Runnable {
 		picurl = picurl.toLowerCase();
 
 		try {
-			priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + setName + "&p="
-					+ cardName).replace(" ", "%20").replace("Magic: The Gathering-Commander", "Commander").replace("Æ", "Ae"));
+			String tcgname = mDbHelper.getTCGname(setCode);
+			priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p="
+					+ cardName).replace(" ", "%20").replace("Æ", "Ae"));
 		}
 		catch (MalformedURLException e) {
 			priceurl = null;
@@ -318,13 +331,7 @@ public class CardViewActivity extends Activity implements Runnable {
 				showDialog(1);
 				return true;
 			case R.id.gatherer:
-				String parts[] = name.getText().toString().split(" ");
-				String url = "http://gatherer.wizards.com/Pages/Search/Default.aspx?action=advanced&name=";
-
-				for (int i = 0; i < parts.length; i++) {
-					url += "+[" + parts[i] + "]";
-				}
-
+				String url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + c.getInt(c.getColumnIndex(CardDbAdapter.KEY_MULTIVERSEID));
 				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 				startActivity(browserIntent);
 				return true;

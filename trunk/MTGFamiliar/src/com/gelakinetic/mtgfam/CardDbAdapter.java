@@ -34,66 +34,75 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class CardDbAdapter {
 
-	public static final int			STAR										= -1000;
-	public static final int			ONEPLUSSTAR							= -1001;
-	public static final int			TWOPLUSSTAR							= -1002;
-	public static final int			SEVENMINUSSTAR					= -1003;
-	public static final int			STARSQUARED							= -1004;
-	public static final int			NOONECARES							= -1005;
+	public static final int			STAR											= -1000;
+	public static final int			ONEPLUSSTAR								= -1001;
+	public static final int			TWOPLUSSTAR								= -1002;
+	public static final int			SEVENMINUSSTAR						= -1003;
+	public static final int			STARSQUARED								= -1004;
+	public static final int			NOONECARES								= -1005;
 
-	public static final int			AND											= 0;
-	public static final int			OR											= 1;
+	public static final int			AND												= 0;
+	public static final int			OR												= 1;
 
-	private static final String	DATABASE_NAME						= "data";
-	private static final String	DATABASE_TABLE_CARDS		= "cards";
-	private static final String	DATABASE_TABLE_FORMATS	= "formats";
-	private static final String	DATABASE_TABLE_SETS			= "sets";
-	private static final int		DATABASE_VERSION				= 10;
+	private static final String	DATABASE_NAME							= "data";
+	private static final String	DATABASE_TABLE_CARDS			= "cards";
+	private static final String	DATABASE_TABLE_FORMATS		= "formats";
+	private static final String	DATABASE_TABLE_SETS				= "sets";
+	private static final String	DATABASE_TABLE_TCGNAMES		= "tcgnames";
 
-	public static final String	KEY_ID									= "_id";
-	public static final String	KEY_NAME								= "name";
-	public static final String	KEY_SET									= "expansion";
-	public static final String	KEY_TYPE								= "type";
-	public static final String	KEY_ABILITY							= "cardtext";
-	public static final String	KEY_COLOR								= "color";
-	public static final String	KEY_MANACOST						= "manacost";
-	public static final String	KEY_CMC									= "cmc";
-	public static final String	KEY_POWER								= "power";
-	public static final String	KEY_TOUGHNESS						= "toughness";
-	public static final String	KEY_RARITY							= "rarity";
-	public static final String	KEY_LOYALTY							= "loyalty";
-	public static final String	KEY_FLAVOR							= "flavor";
-	public static final String	KEY_ARTIST							= "artist";
-	public static final String	KEY_NUMBER							= "number";
+	private static final int		DATABASE_VERSION					= 10;
 
-	public static final String	KEY_CODE								= "code";
-	public static final String	KEY_CODE_MTGI						= "code_mtgi";
+	public static final String	KEY_ID										= "_id";
+	public static final String	KEY_NAME									= "name";
+	public static final String	KEY_SET										= "expansion";
+	public static final String	KEY_TYPE									= "type";
+	public static final String	KEY_ABILITY								= "cardtext";
+	public static final String	KEY_COLOR									= "color";
+	public static final String	KEY_MANACOST							= "manacost";
+	public static final String	KEY_CMC										= "cmc";
+	public static final String	KEY_POWER									= "power";
+	public static final String	KEY_TOUGHNESS							= "toughness";
+	public static final String	KEY_RARITY								= "rarity";
+	public static final String	KEY_LOYALTY								= "loyalty";
+	public static final String	KEY_FLAVOR								= "flavor";
+	public static final String	KEY_ARTIST								= "artist";
+	public static final String	KEY_NUMBER								= "number";
+	public static final String	KEY_MULTIVERSEID					= "multiverseID";
 
-	private static final String	SET_POSTIFX							= "_SET";
-	private static final String	BAN_POSTIFX							= "_BAN";
-	private static final String	RESTRICT_POSTIFX				= "_RESTRICT";
+	public static final String	KEY_CODE									= "code";
+	public static final String	KEY_CODE_MTGI							= "code_mtgi";
+
+	private static final String	SET_POSTIFX								= "_SET";
+	private static final String	BAN_POSTIFX								= "_BAN";
+	private static final String	RESTRICT_POSTIFX					= "_RESTRICT";
 
 	private DatabaseHelper			mDbHelper;
 	private SQLiteDatabase			mDb;
 
-	private static final String	DATABASE_CREATE_CARDS		= "create table " + DATABASE_TABLE_CARDS + "(" + KEY_ID
-																													+ " integer primary key autoincrement, " + KEY_NAME
-																													+ " text not null, " + KEY_SET + " text not null, "
-																													+ KEY_TYPE + " text not null, " + KEY_RARITY + " integer, "
-																													+ KEY_MANACOST + " text, " + KEY_CMC + " integer not null, "
-																													+ KEY_POWER + " real, " + KEY_TOUGHNESS + " real, "
-																													+ KEY_LOYALTY + " integer, " + KEY_ABILITY + " text, "
-																													+ KEY_FLAVOR + " text, " + KEY_ARTIST + " text, "
-																													+ KEY_NUMBER + " text, " + KEY_COLOR + " text not null);";
+	private static final String	DATABASE_CREATE_CARDS			= "create table " + DATABASE_TABLE_CARDS + "(" + KEY_ID
+																														+ " integer primary key autoincrement, " + KEY_NAME
+																														+ " text not null, " + KEY_SET + " text not null, "
+																														+ KEY_TYPE + " text not null, " + KEY_RARITY + " integer, "
+																														+ KEY_MANACOST + " text, " + KEY_CMC
+																														+ " integer not null, " + KEY_POWER + " real, "
+																														+ KEY_TOUGHNESS + " real, " + KEY_LOYALTY + " integer, "
+																														+ KEY_ABILITY + " text, " + KEY_FLAVOR + " text, "
+																														+ KEY_ARTIST + " text, " + KEY_NUMBER + " text, "
+																														+ KEY_MULTIVERSEID + " integer not null, " + KEY_COLOR
+																														+ " text not null);";
 
-	private static final String	DATABASE_CREATE_SETS		= "create table " + DATABASE_TABLE_SETS + "(" + KEY_ID
-																													+ " integer primary key autoincrement, " + KEY_NAME
-																													+ " text not null, " + KEY_CODE + " text not null, "
-																													+ KEY_CODE_MTGI + " text not null);";
+	private static final String	DATABASE_CREATE_SETS			= "create table " + DATABASE_TABLE_SETS + "(" + KEY_ID
+																														+ " integer primary key autoincrement, " + KEY_NAME
+																														+ " text not null, " + KEY_CODE + " text not null, "
+																														+ KEY_CODE_MTGI + " text not null);";
 
-	private static final String	DATABASE_CREATE_FORMATS	= "create table " + DATABASE_TABLE_FORMATS + "(" + KEY_ID
-																													+ " integer primary key autoincrement, " + KEY_NAME
-																													+ " text not null);";
+	private static final String	DATABASE_CREATE_FORMATS		= "create table " + DATABASE_TABLE_FORMATS + "(" + KEY_ID
+																														+ " integer primary key autoincrement, " + KEY_NAME
+																														+ " text not null);";
+
+	private static final String	DATABASE_CREATE_TCGNAMES	= "create table " + DATABASE_TABLE_TCGNAMES + "(" + KEY_ID
+																														+ " integer primary key autoincrement, " + KEY_NAME
+																														+ " text not null, " + KEY_CODE + " text not null);";
 
 	private final Context				mCtx;
 
@@ -107,6 +116,7 @@ public class CardDbAdapter {
 		public void onCreate(SQLiteDatabase db) {
 			db.execSQL(DATABASE_CREATE_CARDS);
 			db.execSQL(DATABASE_CREATE_SETS);
+			db.execSQL(DATABASE_CREATE_TCGNAMES);
 		}
 
 		@Override
@@ -115,6 +125,7 @@ public class CardDbAdapter {
 			// newVersion + ", which will destroy all old data");
 			db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_CARDS);
 			db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_SETS);
+			db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_TCGNAMES);
 			onCreate(db);
 		}
 	}
@@ -152,8 +163,10 @@ public class CardDbAdapter {
 	public void dropCreateDB() {
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_CARDS);
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_SETS);
+		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_TCGNAMES);
 		mDb.execSQL(DATABASE_CREATE_CARDS);
 		mDb.execSQL(DATABASE_CREATE_SETS);
+		mDb.execSQL(DATABASE_CREATE_TCGNAMES);
 	}
 
 	/**
@@ -168,7 +181,7 @@ public class CardDbAdapter {
 	 * @return rowId or -1 if failed
 	 */
 	public long createCard(String name, String set, String type, char rarity, String manacost, int cmc, float power,
-			float toughness, int loyalty, String ability, String flavor, String artist, String number, String color) {
+			float toughness, int loyalty, String ability, String flavor, String artist, String number, String color, int m_id) {
 		ContentValues initialValues = new ContentValues();
 
 		initialValues.put(KEY_NAME, name);
@@ -185,6 +198,7 @@ public class CardDbAdapter {
 		initialValues.put(KEY_ARTIST, artist);
 		initialValues.put(KEY_NUMBER, number);
 		initialValues.put(KEY_COLOR, color);
+		initialValues.put(KEY_MULTIVERSEID, m_id);
 
 		return mDb.insert(DATABASE_TABLE_CARDS, null, initialValues);
 	}
@@ -206,6 +220,7 @@ public class CardDbAdapter {
 		initialValues.put(KEY_ARTIST, c.artist);
 		initialValues.put(KEY_NUMBER, c.number);
 		initialValues.put(KEY_COLOR, c.color);
+		initialValues.put(KEY_MULTIVERSEID, c.multiverse_id);
 
 		return mDb.insert(DATABASE_TABLE_CARDS, null, initialValues);
 	}
@@ -229,6 +244,15 @@ public class CardDbAdapter {
 		initialValues.put(KEY_CODE_MTGI, set.code_magiccards);
 
 		return mDb.insert(DATABASE_TABLE_SETS, null, initialValues);
+	}
+	
+	public long createTCGname(String name, String code) {
+		ContentValues initialValues = new ContentValues();
+
+		initialValues.put(KEY_CODE, code);
+		initialValues.put(KEY_NAME, name);
+
+		return mDb.insert(DATABASE_TABLE_TCGNAMES, null, initialValues);
 	}
 
 	/**
@@ -300,7 +324,7 @@ public class CardDbAdapter {
 
 		Cursor mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_NAME, KEY_SET, KEY_TYPE, KEY_RARITY,
 				KEY_MANACOST, KEY_CMC, KEY_POWER, KEY_TOUGHNESS, KEY_LOYALTY, KEY_ABILITY, KEY_FLAVOR, KEY_ARTIST, KEY_NUMBER,
-				KEY_COLOR }, KEY_ID + "=" + id, null, null, null, KEY_NAME, null);
+				KEY_COLOR, KEY_MULTIVERSEID }, KEY_ID + "=" + id, null, null, null, KEY_NAME, null);
 		if (mCursor != null) {
 			mCursor.moveToFirst();
 		}
@@ -323,7 +347,7 @@ public class CardDbAdapter {
 	 */
 	public boolean updateCard(long id, String name, String set, String type, char rarity, String manacost, int cmc,
 			float power, float toughness, int loyalty, String ability, String flavor, String artist, String number,
-			String color) {
+			String color, int m_id) {
 		ContentValues args = new ContentValues();
 
 		args.put(KEY_NAME, name);
@@ -340,6 +364,7 @@ public class CardDbAdapter {
 		args.put(KEY_ARTIST, artist);
 		args.put(KEY_NUMBER, number);
 		args.put(KEY_COLOR, color);
+		args.put(KEY_MULTIVERSEID, m_id);
 
 		return mDb.update(DATABASE_TABLE_CARDS, args, KEY_ID + "=" + id, null) > 0;
 	}
@@ -621,8 +646,8 @@ public class CardDbAdapter {
 		}
 
 		try {
-			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID, KEY_NAME, KEY_SET, KEY_RARITY, KEY_MANACOST }, statement, null,
-					null, null, KEY_NAME, null);
+			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID, KEY_NAME, KEY_SET, KEY_RARITY,
+					KEY_MANACOST }, statement, null, null, null, KEY_NAME, null);
 		}
 		catch (SQLiteException e) {
 			// Log.v("tag", e.toString());
@@ -787,5 +812,21 @@ public class CardDbAdapter {
 		restrictCursor.deactivate();
 		restrictCursor.close();
 		return BANNED;
+	}
+
+	public String getTCGname(String setCode) {
+		Cursor mCursor = null;
+		String name;
+		String statement = "(" + KEY_CODE + " = '" + setCode+ "')";
+		try {
+			mCursor = mDb.query(true, DATABASE_TABLE_TCGNAMES, new String[] { KEY_NAME }, statement, null, null, null, KEY_NAME,
+					null);
+			mCursor.moveToFirst();
+			name = mCursor.getString(mCursor.getColumnIndex(KEY_NAME));
+		}
+		catch (Exception e) {
+			return null;
+		}
+		return name;
 	}
 }

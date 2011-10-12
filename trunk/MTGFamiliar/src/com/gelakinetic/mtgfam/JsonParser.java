@@ -250,6 +250,9 @@ public class JsonParser {
 								else if (s2.equalsIgnoreCase("n")) { // color
 									c.color = reader.nextString();
 								}
+								else if (s2.equalsIgnoreCase("x")) { // multiverse id
+									c.multiverse_id = reader.nextInt();
+								}
 							}
 							mDbHelper.createCard(c);
 							mMain.cardAdded();
@@ -420,5 +423,61 @@ public class JsonParser {
 		editor.commit();
 
 		return;
+	}
+	
+	public static void readTCGNameJsonStream(MainActivity mMain, CardDbAdapter mDbHelper) {
+		URL update;
+		String label;
+		String date = null;
+		String label2;
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mMain);
+		String name = null, code = null;
+		
+		try {
+			update = new URL("http://members.cox.net/aefeinstein/TCGnames.json");
+			InputStreamReader isr = new InputStreamReader(update.openStream(), "ISO-8859-1");
+			JsonReader reader = new JsonReader(isr);
+
+			reader.beginObject();
+			while (reader.hasNext()) {
+				label = reader.nextName();
+
+				if (label.equals("Date")) {
+					String lastUpdate = settings.getString("lastTCGNameUpdate", "");
+					date = reader.nextString();
+					if (lastUpdate.equals(date)) {
+						return;
+					}
+				}
+				else if (label.equals("Sets")) {
+					reader.beginArray();
+					while (reader.hasNext()) {
+						reader.beginObject();
+						while (reader.hasNext()) {
+							label2 = reader.nextName();
+							if (label2.equals("Code")) {
+								code = reader.nextString();
+							}
+							else if (label2.equals("TCGName")) {
+								name = reader.nextString();
+							}
+						}
+						mDbHelper.createTCGname(name, code);
+						reader.endObject();
+					}
+					reader.endArray();
+				}
+			}
+			reader.endObject();
+		}
+		catch (MalformedURLException e) {
+			return;
+		}
+		catch (IOException e) {
+			return;
+		}
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString("lastTCGNameUpdate", date);
+		editor.commit();
 	}
 }

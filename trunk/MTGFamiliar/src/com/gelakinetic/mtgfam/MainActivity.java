@@ -62,7 +62,7 @@ public class MainActivity extends Activity implements Runnable {
 	private static final int		OTAPATCH					= 1;
 	private static final int		APPLYINGPATCH			= 3;
 	private static final int		DBFROMWEB					= 4;
-	private static final int		DATABASE_VERSION	= 2;
+	private static final int		DATABASE_VERSION	= 4;
 	private static final int		EXCEPTION					= 99;
 	private LinearLayout				search;
 	private LinearLayout				life;
@@ -203,8 +203,8 @@ public class MainActivity extends Activity implements Runnable {
 		// Handle item selection
 		switch (item.getItemId()) {
 
-			// case R.id.buildWebDB: startThread(DBFROMWEB); return true;
-			// case R.id.refreshDB: startThread(DBFROMAPK); return true;
+//			case R.id.buildWebDB: startThread(DBFROMWEB); return true;
+//			case R.id.refreshDB: startThread(DBFROMAPK); return true;
 
 			case R.id.checkUpdate:
 				startThread(OTAPATCH);
@@ -263,6 +263,7 @@ public class MainActivity extends Activity implements Runnable {
 				handler.sendEmptyMessage(DBFROMAPK);
 			}
 			else if (threadType == OTAPATCH) {
+				
 				if (mDbHelper == null) {
 					mDbHelper = new CardDbAdapter(this);
 					mDbHelper.open();
@@ -290,6 +291,7 @@ public class MainActivity extends Activity implements Runnable {
 							}
 						}
 					}
+					parseTCGNames();
 				}
 				handler.sendEmptyMessage(OTAPATCH);
 			}
@@ -299,10 +301,19 @@ public class MainActivity extends Activity implements Runnable {
 						mDbHelper = new CardDbAdapter(this);
 						mDbHelper.open();
 					}
+					
 					mDbHelper.dropCreateDB();
+					
+					SharedPreferences.Editor editor = preferences.edit();
+					editor.putString("lastTCGNameUpdate", "");
+					editor.putString("lastUpdate", "");
+					editor.putString("date", "");
+					editor.commit();
 
 					parseJSON(new URL("http://members.cox.net/aefeinstein/cards.json.gzip"));
+//					parseJSON(new URL("http://members.cox.net/aefeinstein/pcp.json.gzip"));
 					parseLegality(new URL("http://members.cox.net/aefeinstein/legality.json"));
+					parseTCGNames();
 				}
 				catch (MalformedURLException e) {
 				}
@@ -386,6 +397,10 @@ public class MainActivity extends Activity implements Runnable {
 		catch (IOException e) {
 			return;
 		}
+	}
+	
+	void parseTCGNames() {
+			JsonParser.readTCGNameJsonStream(this, mDbHelper);
 	}
 
 	private void copyDB() {

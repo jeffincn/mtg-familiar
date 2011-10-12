@@ -34,6 +34,7 @@ public class MtgCard {
 	public String	artist;
 	public String	number;
 	public String	color;
+	public int	multiverse_id;
 
 	public MtgCard() {
 		name = "";
@@ -50,5 +51,6 @@ public class MtgCard {
 		artist = "";
 		number = "";
 		color = "";
+		multiverse_id=0;
 	}
 }

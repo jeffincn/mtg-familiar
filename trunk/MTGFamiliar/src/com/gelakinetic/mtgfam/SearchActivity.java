@@ -459,7 +459,6 @@ public class SearchActivity extends Activity {
 		Resources res = getResources();
 		rarityNames = res.getStringArray(R.array.rarities);
 		rarityChecked = new boolean[rarityNames.length];
-		
 
 		setDialog = new AlertDialog.Builder(this).setTitle("Sets")
 				.setMultiChoiceItems(setNames, setChecked, new DialogSelectionClickHandler())
@@ -580,6 +579,49 @@ public class SearchActivity extends Activity {
 				this.removeDialog(SETLIST);
 				this.removeDialog(FORMATLIST);
 				this.removeDialog(RARITYLIST);
+
+				setDialog = new AlertDialog.Builder(this).setTitle("Sets")
+						.setMultiChoiceItems(setNames, setChecked, new DialogSelectionClickHandler())
+						.setPositiveButton("OK", new DialogButtonClickHandler()).create();
+				formatDialog = new AlertDialog.Builder(this).setTitle("Formats")
+						.setMultiChoiceItems(formatNames, formatChecked, new DialogSelectionClickHandler())
+						.setPositiveButton("OK", new DialogButtonClickHandler()).create();
+				rarityDialog = new AlertDialog.Builder(this).setTitle("Rarities")
+						.setMultiChoiceItems(rarityNames, rarityChecked, new DialogSelectionClickHandler())
+						.setPositiveButton("OK", new DialogButtonClickHandler()).create();
+
+				setDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					public void onDismiss(DialogInterface arg0) {
+						setButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
+						for (int i = 0; i < setChecked.length; i++) {
+							if (setChecked[i]) {
+								setButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
+							}
+						}
+					}
+				});
+
+				formatDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					public void onDismiss(DialogInterface arg0) {
+						formatButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
+						for (int i = 0; i < formatChecked.length; i++) {
+							if (formatChecked[i]) {
+								formatButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
+							}
+						}
+					}
+				});
+
+				rarityDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					public void onDismiss(DialogInterface arg0) {
+						rarityButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
+						for (int i = 0; i < rarityChecked.length; i++) {
+							if (rarityChecked[i]) {
+								rarityButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
+							}
+						}
+					}
+				});
 
 				setButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
 				formatButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);

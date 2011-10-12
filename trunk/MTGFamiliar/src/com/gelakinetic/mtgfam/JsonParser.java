@@ -321,13 +321,9 @@ public class JsonParser {
 			reader.endObject();
 		}
 		catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 			return null;
 		}
 		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 			return null;
 		}
 		SharedPreferences.Editor editor = settings.edit();

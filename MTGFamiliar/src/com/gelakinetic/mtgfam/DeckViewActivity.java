@@ -68,8 +68,6 @@ public class DeckViewActivity extends ListActivity {
 			br = new BufferedReader(new FileReader(deck));
 		}
 		catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		}
 
 		String[] from = new String[] { "name" };
@@ -86,8 +84,6 @@ public class DeckViewActivity extends ListActivity {
 			}
 		}
 		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 		SimpleAdapter adapter = new SimpleAdapter(this, fillMaps, R.layout.deck_row, from, to);

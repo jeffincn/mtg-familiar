@@ -146,10 +146,18 @@ public class CardViewActivity extends Activity implements Runnable {
 		}
 		picurl = picurl.toLowerCase();
 
+
+		
 		try {
 			String tcgname = mDbHelper.getTCGname(setCode);
-			priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p="
-					+ cardName).replace(" ", "%20").replace("Æ", "Ae"));
+			if(number.contains("b")){
+				priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p="
+						+ mDbHelper.getTransformName(setCode, number.replace("b", "a"))).replace(" ", "%20").replace("Æ", "Ae"));
+			}
+			else{
+				priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p="
+						+ cardName).replace(" ", "%20").replace("Æ", "Ae"));
+			}
 		}
 		catch (MalformedURLException e) {
 			priceurl = null;
@@ -363,15 +371,9 @@ public class CardViewActivity extends Activity implements Runnable {
 			dialog.setContentView(R.layout.legality_dialog);
 
 			formats = mDbHelper.fetchAllFormats();
-			String[] formatNames = new String[formats.getCount()];
-			formats.moveToFirst();
-			for (int i = 0; i < formats.getCount(); i++) {
-				formatNames[i] = formats.getString(formats.getColumnIndex(CardDbAdapter.KEY_NAME));
-				formats.moveToNext();
-			}
 
 			LegalListAdapter lla = new LegalListAdapter(this, R.layout.legal_row, formats, new String[] {
-					CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_NAME }, new int[] { R.id.format, R.id.status }, cardID, mDbHelper);
+					CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_NAME }, new int[] { R.id.format, R.id.status }, cardID, mDbHelper, setCode);
 			ListView lv = (ListView) dialog.findViewById(R.id.legallist);
 			lv.setAdapter(lla);
 

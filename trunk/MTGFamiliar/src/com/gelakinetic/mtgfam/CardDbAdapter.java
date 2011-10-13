@@ -48,9 +48,8 @@ public class CardDbAdapter {
 	private static final String	DATABASE_TABLE_CARDS			= "cards";
 	private static final String	DATABASE_TABLE_FORMATS		= "formats";
 	private static final String	DATABASE_TABLE_SETS				= "sets";
-	private static final String	DATABASE_TABLE_TCGNAMES		= "tcgnames";
 
-	private static final int		DATABASE_VERSION					= 10;
+	private static final int		DATABASE_VERSION					= 11;
 
 	public static final String	KEY_ID										= "_id";
 	public static final String	KEY_NAME									= "name";
@@ -71,6 +70,7 @@ public class CardDbAdapter {
 
 	public static final String	KEY_CODE									= "code";
 	public static final String	KEY_CODE_MTGI							= "code_mtgi";
+	public static final String	KEY_NAME_TCGPLAYER				= "name_tcgplayer";
 
 	private static final String	SET_POSTIFX								= "_SET";
 	private static final String	BAN_POSTIFX								= "_BAN";
@@ -93,16 +93,13 @@ public class CardDbAdapter {
 
 	private static final String	DATABASE_CREATE_SETS			= "create table " + DATABASE_TABLE_SETS + "(" + KEY_ID
 																														+ " integer primary key autoincrement, " + KEY_NAME
-																														+ " text not null, " + KEY_CODE + " text not null, "
-																														+ KEY_CODE_MTGI + " text not null);";
+																														+ " text not null, " + KEY_CODE + " text not null unique, "
+																														+ KEY_CODE_MTGI + " text not null, " + KEY_NAME_TCGPLAYER
+																														+ " text);";
 
 	private static final String	DATABASE_CREATE_FORMATS		= "create table " + DATABASE_TABLE_FORMATS + "(" + KEY_ID
 																														+ " integer primary key autoincrement, " + KEY_NAME
 																														+ " text not null);";
-
-	private static final String	DATABASE_CREATE_TCGNAMES	= "create table " + DATABASE_TABLE_TCGNAMES + "(" + KEY_ID
-																														+ " integer primary key autoincrement, " + KEY_NAME
-																														+ " text not null, " + KEY_CODE + " text not null);";
 
 	private final Context				mCtx;
 
@@ -116,7 +113,6 @@ public class CardDbAdapter {
 		public void onCreate(SQLiteDatabase db) {
 			db.execSQL(DATABASE_CREATE_CARDS);
 			db.execSQL(DATABASE_CREATE_SETS);
-			db.execSQL(DATABASE_CREATE_TCGNAMES);
 		}
 
 		@Override
@@ -125,7 +121,6 @@ public class CardDbAdapter {
 			// newVersion + ", which will destroy all old data");
 			db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_CARDS);
 			db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_SETS);
-			db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_TCGNAMES);
 			onCreate(db);
 		}
 	}
@@ -163,10 +158,8 @@ public class CardDbAdapter {
 	public void dropCreateDB() {
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_CARDS);
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_SETS);
-		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_TCGNAMES);
 		mDb.execSQL(DATABASE_CREATE_CARDS);
 		mDb.execSQL(DATABASE_CREATE_SETS);
-		mDb.execSQL(DATABASE_CREATE_TCGNAMES);
 	}
 
 	/**
@@ -245,14 +238,13 @@ public class CardDbAdapter {
 
 		return mDb.insert(DATABASE_TABLE_SETS, null, initialValues);
 	}
-	
-	public long createTCGname(String name, String code) {
-		ContentValues initialValues = new ContentValues();
 
-		initialValues.put(KEY_CODE, code);
-		initialValues.put(KEY_NAME, name);
+	public boolean addTCGname(String name, String code) {
+		ContentValues args = new ContentValues();
 
-		return mDb.insert(DATABASE_TABLE_TCGNAMES, null, initialValues);
+		args.put(KEY_NAME_TCGPLAYER, name);
+
+		return mDb.update(DATABASE_TABLE_SETS, args, KEY_CODE + " = '" + code + "'", null) > 0;
 	}
 
 	/**
@@ -673,6 +665,22 @@ public class CardDbAdapter {
 		}
 		return ID;
 	}
+	
+	public String getTransformName(String set, String number) {
+		Cursor mCursor = null;
+		String name = null;
+		String statement = "(" + KEY_NUMBER + " = '" + number + "') AND (" + KEY_SET + " = '" + set + "')";
+		try {
+			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_NAME }, statement, null, null, null, KEY_NAME,
+					null);
+			mCursor.moveToFirst();
+			name = mCursor.getString(mCursor.getColumnIndex(KEY_NAME));
+		}
+		catch (Exception e) {
+			return null;
+		}
+		return name;
+	}
 
 	public void createFormatTable() {
 		mDb.execSQL(DATABASE_CREATE_FORMATS);
@@ -817,12 +825,12 @@ public class CardDbAdapter {
 	public String getTCGname(String setCode) {
 		Cursor mCursor = null;
 		String name;
-		String statement = "(" + KEY_CODE + " = '" + setCode+ "')";
+		String statement = "(" + KEY_CODE + " = '" + setCode + "')";
 		try {
-			mCursor = mDb.query(true, DATABASE_TABLE_TCGNAMES, new String[] { KEY_NAME }, statement, null, null, null, KEY_NAME,
-					null);
+			mCursor = mDb.query(true, DATABASE_TABLE_SETS, new String[] { KEY_NAME_TCGPLAYER }, statement, null, null, null,
+					KEY_NAME_TCGPLAYER, null);
 			mCursor.moveToFirst();
-			name = mCursor.getString(mCursor.getColumnIndex(KEY_NAME));
+			name = mCursor.getString(mCursor.getColumnIndex(KEY_NAME_TCGPLAYER));
 		}
 		catch (Exception e) {
 			return null;

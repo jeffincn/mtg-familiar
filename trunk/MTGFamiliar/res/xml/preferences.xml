@@ -19,6 +19,9 @@
 		<CheckBoxPreference android:title="@string/d2title"
 			android:key="d2AsCoin" android:defaultValue="true" />
 	</PreferenceCategory>
+	<PreferenceCategory android:title="@string/lifetitle">
+		<CheckBoxPreference android:key="wakelock" android:defaultValue="true" android:summary="@string/wakelocksummary" android:title="@string/wakelocktitle"/>
+	</PreferenceCategory>
 	<!-- 
 	<PreferenceCategory android:title="Deck Manager">
 		<EditTextPreference android:defaultValue="@string/defaultdeckpath"

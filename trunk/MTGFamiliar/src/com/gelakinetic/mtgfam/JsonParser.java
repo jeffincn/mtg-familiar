@@ -458,7 +458,7 @@ public class JsonParser {
 								name = reader.nextString();
 							}
 						}
-						mDbHelper.createTCGname(name, code);
+						mDbHelper.addTCGname(name, code);
 						reader.endObject();
 					}
 					reader.endArray();

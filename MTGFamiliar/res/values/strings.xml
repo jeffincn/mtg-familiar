@@ -166,4 +166,10 @@
 
 	<string name="gatherer">Gatherer Page</string>
 
+	<string name="lifetitle">Life Counter</string>
+
+	<string name="wakelocksummary">Force the life counter screen to never go to sleep</string>
+
+	<string name="wakelocktitle">Wake Lock</string>
+
 </resources>

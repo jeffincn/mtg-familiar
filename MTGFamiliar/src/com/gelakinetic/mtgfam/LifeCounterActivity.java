@@ -1,5 +1,5 @@
 /**
-Copyright 2011 Michael Shick
+Copyright 2011 Michael Shick, Adam Feinstein
 
 This file is part of MTG Familiar.
 
@@ -30,9 +30,13 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,6 +65,10 @@ public class LifeCounterActivity extends Activity {
 	private final ScheduledExecutorService	scheduler	= Executors.newScheduledThreadPool(1);
 	private Handler													handler;
 	private Type														activeType;
+	private PowerManager	pm;
+	private WakeLock	wl;
+	private SharedPreferences	preferences;
+	private boolean	canGetLock;
 
 	@Override
 	public void onCreate(Bundle savedInstance) {
@@ -69,6 +77,9 @@ public class LifeCounterActivity extends Activity {
 
 		handler = new Handler();
 
+		preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		canGetLock = preferences.getBoolean("wakelock", true);
+		
 		timerStart = 1000;
 		timerTick = 100;
 		timerValue = 0;
@@ -80,10 +91,10 @@ public class LifeCounterActivity extends Activity {
 
 		player[ONE] = new Player(this, (Button) findViewById(R.id.p1_plus1), (Button) findViewById(R.id.p1_plus5),
 				(Button) findViewById(R.id.p1_minus1), (Button) findViewById(R.id.p1_minus5),
-				(TextView) findViewById(R.id.p1_readout), (ListView) findViewById(R.id.p1_history));
+				(TextView) findViewById(R.id.p1_readout), (ListView) findViewById(R.id.p1_history), ONE);
 		player[TWO] = new Player(this, (Button) findViewById(R.id.p2_plus1), (Button) findViewById(R.id.p2_plus5),
 				(Button) findViewById(R.id.p2_minus1), (Button) findViewById(R.id.p2_minus5),
-				(TextView) findViewById(R.id.p2_readout), (ListView) findViewById(R.id.p2_history));
+				(TextView) findViewById(R.id.p2_readout), (ListView) findViewById(R.id.p2_history), TWO);
 
 		poisonButton = (ImageView) findViewById(R.id.poison_button);
 		lifeButton = (ImageView) findViewById(R.id.life_button);
@@ -209,7 +220,8 @@ public class LifeCounterActivity extends Activity {
 			}
 		});
 
-		reset();
+//		reset();
+		setType(Type.LIFE);
 		update();
 
 		scheduler.scheduleWithFixedDelay(new Runnable() {
@@ -246,7 +258,33 @@ public class LifeCounterActivity extends Activity {
 		}, timerTick, timerTick, TimeUnit.MILLISECONDS);
 	}
 
+
 	@Override
+	protected void onResume(){
+		super.onStart();
+		if(canGetLock){
+			pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+			wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
+			wl.acquire();
+		}
+	}
+
+	@Override
+	protected void onPause(){
+		super.onPause();
+		if(canGetLock){
+			wl.release();
+		}
+		
+		SharedPreferences.Editor editor = preferences.edit();
+		editor.putInt("p1life", player[ONE].life);
+		editor.putInt("p1poison", player[ONE].poison);
+		editor.putInt("p2life", player[TWO].life);
+		editor.putInt("p2poison", player[TWO].poison);
+		editor.commit();
+	}
+
+@Override
 	protected Dialog onCreateDialog(int id) {
 		final Context context = (Context) this;
 		Dialog dialog;
@@ -379,7 +417,7 @@ public class LifeCounterActivity extends Activity {
 		public HistoryAdapter	lifeAdapter, poisonAdapter;
 
 		public Player(Context context, Button plus1, Button plus5, Button minus1, Button minus5, TextView readout,
-				ListView history) {
+				ListView history, int number) {
 			this.plus1 = plus1;
 			this.plus5 = plus5;
 			this.minus1 = minus1;
@@ -387,8 +425,16 @@ public class LifeCounterActivity extends Activity {
 			this.readout = readout;
 			this.history = history;
 
-			this.lifeAdapter = new HistoryAdapter(context, INITIAL_LIFE);
-			this.poisonAdapter = new HistoryAdapter(context, INITIAL_POISON);
+			if(number == ONE){
+				life = preferences.getInt("p1life", INITIAL_LIFE);
+				poison = preferences.getInt("p1poison", INITIAL_POISON);
+			}
+			else if(number == TWO){
+				life = preferences.getInt("p2life", INITIAL_LIFE);
+				poison = preferences.getInt("p2poison", INITIAL_POISON);
+			}
+			this.lifeAdapter = new HistoryAdapter(context, life);
+			this.poisonAdapter = new HistoryAdapter(context, poison);
 		}
 	}
 

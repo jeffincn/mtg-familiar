@@ -25,10 +25,6 @@
 				android:gravity="right" style="@style/text" android:id="@+id/cost"
 				android:layout_width="wrap_content" android:layout_margin="3dip" />
 		</LinearLayout>
-
-		<ImageView android:src="@drawable/divider" android:id="@+id/imageView1"
-			android:layout_width="wrap_content" android:layout_height="wrap_content"
-			android:layout_weight="1" android:layout_gravity="center" />
 		<LinearLayout android:id="@+id/linearLayout3"
 			android:layout_width="fill_parent" android:layout_height="wrap_content"
 			android:layout_weight="1">
@@ -41,25 +37,16 @@
 				android:layout_width="wrap_content" android:textColor="@color/mythic"
 				android:layout_margin="3dip" />
 		</LinearLayout>
-		<ImageView android:src="@drawable/divider" android:id="@+id/imageView2"
-			android:layout_width="wrap_content" android:layout_height="wrap_content"
-			android:layout_weight="1" android:layout_gravity="center" />
 		<TextView
 			android:text="{T}: Search your library for a legendary card, reveal that card, and put it into your hand. Then shuffle your library."
 			style="@style/text" android:layout_width="fill_parent" android:id="@+id/ability"
 			android:gravity="center_vertical" android:layout_height="wrap_content"
-			android:layout_weight="1" android:layout_margin="3dip" />
-		<ImageView android:src="@drawable/divider" android:id="@+id/imageView3"
-			android:layout_width="wrap_content" android:layout_height="wrap_content"
-			android:layout_weight="1" android:layout_gravity="center" />
+			android:layout_weight="1" android:layout_margin="3dip" android:paddingTop="20sp"/>
 
-		<TextView android:text="They certainly are" style="@style/text"
+		<TextView style="@style/text"
 			android:layout_width="fill_parent" android:id="@+id/flavor"
 			android:layout_height="wrap_content" android:layout_weight="1"
-			android:layout_margin="3dip" />
-		<ImageView android:src="@drawable/divider" android:id="@+id/imageView4"
-			android:layout_width="wrap_content" android:layout_height="wrap_content"
-			android:layout_weight="1" android:layout_gravity="center" />
+			android:layout_margin="3dip" android:textStyle="italic" android:typeface="serif" android:text="Neque porro quisquam est qui dolorem ipsum quia dolor sit amet flavor text." android:textSize="20sp" android:paddingBottom="20sp" android:paddingLeft="10sp" android:paddingRight="10sp"/>
 
 		<LinearLayout android:id="@+id/linearLayout2"
 			android:layout_width="fill_parent" android:layout_height="wrap_content"

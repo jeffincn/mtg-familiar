@@ -45,7 +45,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.text.util.Linkify;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -185,8 +186,8 @@ public class MainActivity extends Activity implements Runnable {
 		aboutDialog.setTitle("About " + getString(R.string.app_name));
 
 		TextView text = (TextView) aboutDialog.findViewById(R.id.aboutfield);
-		text.setAutoLinkMask(Linkify.EMAIL_ADDRESSES | Linkify.WEB_URLS);
-		text.setText(R.string.about_this_app);
+		text.setText(Html.fromHtml(getString(R.string.about_this_app)));
+		text.setMovementMethod(LinkMovementMethod.getInstance());
 
 		return aboutDialog;
 	}

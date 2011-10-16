@@ -80,6 +80,14 @@ public class ResultListActivity extends ListActivity {
 				startActivityForResult(i, 0);
 			}
 		});
+		
+		if(c.getCount()==1){
+			Intent i = new Intent(mCtx, CardViewActivity.class);
+			c.moveToFirst();
+			long id = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_ID));
+			i.putExtra("id", id);
+			startActivityForResult(i, 0);
+		}
 	}
 
 	@Override

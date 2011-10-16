@@ -560,7 +560,11 @@ public class SearchActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-			case R.id.clear:
+		case R.id.search_menu_search:
+			doSearch();
+			return true;
+			
+			case R.id.search_menu_clear:
 				namefield.setText("");
 				typefield.setText("");
 				textfield.setText("");

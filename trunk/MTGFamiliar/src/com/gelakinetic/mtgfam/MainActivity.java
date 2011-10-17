@@ -30,6 +30,7 @@ import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.zip.GZIPInputStream;
 
 import android.app.Activity;
@@ -53,7 +54,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -134,6 +134,7 @@ public class MainActivity extends Activity implements Runnable {
 		deckmanagement.setVisibility(View.GONE);
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
 
 		File f = new File(DB_PATH, DB_NAME);
 		int dbVersion = preferences.getInt("databaseVersion", -1);
@@ -242,15 +243,21 @@ public class MainActivity extends Activity implements Runnable {
 			thread.start();
 		}
 		else if (type == OTAPATCH) {
-			dialog = new ProgressDialog(MainActivity.this);
-			dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			dialog.setMessage("Checking for Updates. Please wait...");
-			dialog.setCancelable(false);
-			dialog.show();
+			// Only update the banning list if it hasn't been updated recently
+			int curTime = (int) (new Date().getTime() * .001);
+			int lastLegalityUpdate = preferences.getInt("lastLegalityUpdate", 0); // should be global
 
-			threadType = type;
-			Thread thread = new Thread(this);
-			thread.start();
+			if ((curTime - lastLegalityUpdate) > (3 * 24 * 60 * 60)) { // should maybe be stored in the preferences.xml, hidden somehow?
+				dialog = new ProgressDialog(MainActivity.this);
+				dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+				dialog.setMessage("Checking for Updates. Please wait...");
+				dialog.setCancelable(false);
+				dialog.show();
+	
+				threadType = type;
+				Thread thread = new Thread(this);
+				thread.start();
+			}
 		}
 		else if (type == DBFROMWEB) {
 			dialog = new ProgressDialog(MainActivity.this);
@@ -279,6 +286,16 @@ public class MainActivity extends Activity implements Runnable {
 					mDbHelper.open();
 				}
 				ArrayList<String[]> patchInfo = JsonParser.readUpdateJsonStream(this);
+
+				// If it successfully updated, update the timestamp
+				int curTime = (int) (new Date().getTime() * .001); // should be global?
+				int lastLegalityUpdate = preferences.getInt("lastLegalityUpdate", 0);
+				if (curTime - lastLegalityUpdate > 3 * 24 * 60 * 60) { // should maybe be stored in the preferences.xml, hidden somehow?
+					SharedPreferences.Editor editor = preferences.edit();
+					editor.putInt("lastLegalityUpdate", curTime);
+					editor.commit();
+				}
+
 				if (patchInfo != null) {
 					try {
 						parseLegality(new URL("http://members.cox.net/aefeinstein/legality.json"));

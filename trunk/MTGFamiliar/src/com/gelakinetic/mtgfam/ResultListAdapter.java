@@ -27,17 +27,20 @@ import android.text.Html.ImageGetter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AlphabetIndexer;
+import android.widget.SectionIndexer;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-public class ResultListAdapter extends SimpleCursorAdapter {
+public class ResultListAdapter extends SimpleCursorAdapter implements SectionIndexer{
 
 	private int						layout;
 	String[] from;
 	int[] to;
 	private Resources	resources;
 	private ImageGetter	imgGetter;
-
+	AlphabetIndexer alphaIndexer;
+	
 	public ResultListAdapter(Context context, int layout, Cursor c, String[] f, int[] t, Resources r) {
 		super(context, layout, c, f, t);
 		from = f;
@@ -45,6 +48,7 @@ public class ResultListAdapter extends SimpleCursorAdapter {
 		resources = r;
 		this.layout = layout;
 		imgGetter = ImageGetterHelper.GlyphGetter(r);
+		alphaIndexer=new AlphabetIndexer(c, c.getColumnIndex(CardDbAdapter.KEY_NAME), "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 	}
 
 	@Override
@@ -106,5 +110,17 @@ public class ResultListAdapter extends SimpleCursorAdapter {
 				}
 			}
 		}
+	}
+
+	public int getPositionForSection(int section) {
+		return alphaIndexer.getPositionForSection(section); //use the indexer
+	}
+
+	public int getSectionForPosition(int position) {
+		return alphaIndexer.getSectionForPosition(position); //use the indexer
+	}
+
+	public Object[] getSections() {
+		return alphaIndexer.getSections(); //use the indexer
 	}
 }

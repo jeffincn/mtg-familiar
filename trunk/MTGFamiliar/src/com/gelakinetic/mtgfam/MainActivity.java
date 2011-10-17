@@ -1,5 +1,5 @@
 /**
-Copyright 2011 Adam Feinstein
+Copyright 2011 Adam Feinstein and April King.
 
 This file is part of MTG Familiar.
 

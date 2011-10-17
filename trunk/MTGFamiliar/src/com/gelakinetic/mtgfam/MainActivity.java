@@ -38,6 +38,8 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources.NotFoundException;
@@ -180,11 +182,18 @@ public class MainActivity extends Activity implements Runnable {
 	protected Dialog onCreateDialog(int id) {
 		Context mContext = this;
 		Dialog aboutDialog = new Dialog(mContext);
-		aboutDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 		aboutDialog.setContentView(R.layout.about_dialog);
-		aboutDialog.setTitle("About " + getString(R.string.app_name));
 
+		// You have to catch the exception because the package stuff is all run-time
+		PackageInfo pInfo;
+		try {
+			pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+			aboutDialog.setTitle("About " + getString(R.string.app_name) + " " + pInfo.versionName);
+		} catch (NameNotFoundException e) {
+			aboutDialog.setTitle("About " + getString(R.string.app_name));
+		}
+		
 		TextView text = (TextView) aboutDialog.findViewById(R.id.aboutfield);
 		text.setText(Html.fromHtml(getString(R.string.about_this_app)));
 		text.setMovementMethod(LinkMovementMethod.getInstance());

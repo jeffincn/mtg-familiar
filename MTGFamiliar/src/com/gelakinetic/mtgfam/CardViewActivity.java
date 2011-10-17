@@ -67,6 +67,7 @@ public class CardViewActivity extends Activity implements Runnable {
 	protected static final int		TRANSFORM	= 7;
 	protected static final String	NUMBER		= "number";
 	protected static final String	SET				= "set";
+	protected static final String	ISSINGLE	= "isSingle";
 	private CardDbAdapter					mDbHelper;
 	private TextView							name;
 	private TextView							cost;

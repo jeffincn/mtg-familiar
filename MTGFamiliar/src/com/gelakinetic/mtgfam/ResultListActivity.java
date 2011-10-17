@@ -37,6 +37,7 @@ public class ResultListActivity extends ListActivity {
 	private ListView			lv;
 	private Context				mCtx;
 	private Cursor				c;
+	private boolean				isSingle	= false;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -80,8 +81,9 @@ public class ResultListActivity extends ListActivity {
 				startActivityForResult(i, 0);
 			}
 		});
-		
-		if(c.getCount()==1){
+
+		if (c.getCount() == 1) {
+			isSingle = true;
 			Intent i = new Intent(mCtx, CardViewActivity.class);
 			c.moveToFirst();
 			long id = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_ID));
@@ -121,7 +123,7 @@ public class ResultListActivity extends ListActivity {
 		// and an array of the fields we want to bind those fields to (in this case
 		// just text1)
 		int[] to = new int[] { R.id.cardname, R.id.cardset, R.id.cardcost };
-		
+
 		ResultListAdapter rla = new ResultListAdapter(this, R.layout.card_row, c, from, to, this.getResources());
 		setListAdapter(rla);
 	}
@@ -147,6 +149,9 @@ public class ResultListActivity extends ListActivity {
 					// i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 					startActivityForResult(i, 0);
 				}
+			}
+			else if (isSingle) {
+				this.finish();
 			}
 		}
 	}

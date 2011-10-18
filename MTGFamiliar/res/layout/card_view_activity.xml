@@ -15,7 +15,7 @@
         <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:id="@+id/linearLayout1" android:layout_height="wrap_content">
             <LinearLayout android:id="@+id/linearLayout2" android:layout_height="wrap_content" android:layout_width="fill_parent">
                 <TextView android:layout_weight="1" android:text="Vorinclex, Voice of Hunger" android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/name" android:layout_margin="3dip" style="@style/text"></TextView>
-                <TextView android:text="6GG" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/cost" android:layout_marginRight="3dip" android:layout_gravity="center_vertical" android:layout_marginLeft="3dip" style="@style/text" android:gravity="right"></TextView>
+                <TextView android:text="6GG" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/cost" android:layout_marginRight="3dip" android:layout_gravity="center_vertical" android:layout_marginLeft="3dip" style="@style/text" android:gravity="right" android:maxWidth="120sp"></TextView>
             </LinearLayout>
             <LinearLayout android:layout_marginTop="-14sp" android:id="@+id/linearLayout3" android:layout_height="wrap_content" android:layout_width="fill_parent">
                 <TextView android:layout_weight="1" android:text="Legendary Creature — Human Soldier" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/type" android:layout_margin="3dip" android:textSize="20sp" style="@style/text"></TextView>

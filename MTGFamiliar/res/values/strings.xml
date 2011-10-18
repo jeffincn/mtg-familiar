@@ -170,4 +170,6 @@ Media licenced under under the &lt;a href=&quot;http://creativecommons.org/licen
 
 	<string name="wakelocktitle">Wake Lock</string>
 
+	<string name="copy">Copy Text To Clipboard</string>
+
 </resources>

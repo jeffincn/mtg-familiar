@@ -45,9 +45,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.ClipboardManager;
 import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.text.method.LinkMovementMethod;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -62,12 +65,14 @@ import android.widget.TextView;
 
 public class CardViewActivity extends Activity implements Runnable {
 
-	private static final int			PICLOAD		= 0;
-	private static final int			PRICELOAD	= 1;
-	protected static final int		TRANSFORM	= 7;
-	protected static final String	NUMBER		= "number";
-	protected static final String	SET				= "set";
-	protected static final String	ISSINGLE	= "isSingle";
+	private static final int			PICLOAD				= 0;
+	private static final int			PRICELOAD			= 1;
+	protected static final int		TRANSFORM			= 7;
+	protected static final String	NUMBER				= "number";
+	protected static final String	SET						= "set";
+	protected static final String	ISSINGLE			= "isSingle";
+	private static final String		NO_INTERNET		= "no_internet";
+	private String								NO_ERROR			= "no_error";
 	private CardDbAdapter					mDbHelper;
 	private TextView							name;
 	private TextView							cost;
@@ -82,7 +87,7 @@ public class CardViewActivity extends Activity implements Runnable {
 	private BitmapDrawable				d;
 	private Bitmap								bmp;
 	private long									cardID;
-	private Cursor								formats		= null;
+	private Cursor								formats				= null;
 	private String								mtgi_code;
 	private URL										priceurl;
 	private String								picurl;
@@ -95,7 +100,9 @@ public class CardViewActivity extends Activity implements Runnable {
 	private String								number;
 	private String								setCode;
 	private String								cardName;
-	private ImageGetter	imgGetter;
+	private ImageGetter						imgGetter;
+	private TCGPlayerXMLHandler		XMLhandler;
+	private String								priceErrType	= NO_ERROR;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -103,7 +110,7 @@ public class CardViewActivity extends Activity implements Runnable {
 		setContentView(R.layout.card_view_activity);
 
 		imgGetter = ImageGetterHelper.GlyphGetter(getResources());
-		
+
 		Bundle extras = getIntent().getExtras();
 		cardID = extras.getLong("id");
 
@@ -119,43 +126,41 @@ public class CardViewActivity extends Activity implements Runnable {
 
 		mtgi_code = mDbHelper.getCodeMtgi(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)));
 		number = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NUMBER));
-		if(setCode.equals("PCP")){
+		if (setCode.equals("PCP")) {
 			cardName = cardName.replace("Æ", "Ae");
-			if(cardName.equalsIgnoreCase("tazeem")){
+			if (cardName.equalsIgnoreCase("tazeem")) {
 				cardName = "tazeem-release-promo";
-				picurl = "http://magiccards.info/extras/plane/planechase/"+ cardName +".jpg";
+				picurl = "http://magiccards.info/extras/plane/planechase/" + cardName + ".jpg";
 			}
-			if(cardName.equalsIgnoreCase("celestine reef")){
+			if (cardName.equalsIgnoreCase("celestine reef")) {
 				cardName = "celestine-reef-pre-release-promo";
-				picurl = "http://magiccards.info/extras/plane/planechase/"+ cardName +".jpg";
+				picurl = "http://magiccards.info/extras/plane/planechase/" + cardName + ".jpg";
 			}
-			if(cardName.equalsIgnoreCase("horizon boughs")){
+			if (cardName.equalsIgnoreCase("horizon boughs")) {
 				cardName = "horizon-boughs-gateway-promo";
-				picurl = "http://magiccards.info/extras/plane/planechase/"+ cardName +".jpg";
+				picurl = "http://magiccards.info/extras/plane/planechase/" + cardName + ".jpg";
 			}
-			else{
-				picurl = "http://magiccards.info/extras/plane/planechase/"+ cardName +".jpg";
-				picurl = picurl.replace(" ","-");
+			else {
+				picurl = "http://magiccards.info/extras/plane/planechase/" + cardName + ".jpg";
+				picurl = picurl.replace(" ", "-");
 			}
 		}
-		else if(setCode.equals("ARS")){
-			picurl = "http://magiccards.info/extras/scheme/archenemy/"+ cardName +".jpg";
-			picurl = picurl.replace(" ","-");
+		else if (setCode.equals("ARS")) {
+			picurl = "http://magiccards.info/extras/scheme/archenemy/" + cardName + ".jpg";
+			picurl = picurl.replace(" ", "-");
 		}
-		else{
+		else {
 			picurl = "http://magiccards.info/scans/en/" + mtgi_code + "/" + number + ".jpg";
 		}
 		picurl = picurl.toLowerCase();
 
-
-		
 		try {
 			String tcgname = mDbHelper.getTCGname(setCode);
-			if(number.contains("b")){
+			if (number.contains("b")) {
 				priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p="
 						+ mDbHelper.getTransformName(setCode, number.replace("b", "a"))).replace(" ", "%20").replace("Æ", "Ae"));
 			}
-			else{
+			else {
 				priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p="
 						+ cardName).replace(" ", "%20").replace("Æ", "Ae"));
 			}
@@ -284,6 +289,15 @@ public class CardViewActivity extends Activity implements Runnable {
 		else {
 			transform.setVisibility(View.GONE);
 		}
+
+		registerForContextMenu(name);
+		registerForContextMenu(cost);
+		registerForContextMenu(type);
+		registerForContextMenu(set);
+		registerForContextMenu(ability);
+		registerForContextMenu(pt);
+		registerForContextMenu(flavor);
+		registerForContextMenu(artist);
 	}
 
 	@Override
@@ -340,7 +354,8 @@ public class CardViewActivity extends Activity implements Runnable {
 				showDialog(1);
 				return true;
 			case R.id.gatherer:
-				String url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + c.getInt(c.getColumnIndex(CardDbAdapter.KEY_MULTIVERSEID));
+				String url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid="
+						+ c.getInt(c.getColumnIndex(CardDbAdapter.KEY_MULTIVERSEID));
 				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 				startActivity(browserIntent);
 				return true;
@@ -374,7 +389,8 @@ public class CardViewActivity extends Activity implements Runnable {
 			formats = mDbHelper.fetchAllFormats();
 
 			LegalListAdapter lla = new LegalListAdapter(this, R.layout.legal_row, formats, new String[] {
-					CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_NAME }, new int[] { R.id.format, R.id.status }, cardID, mDbHelper, setCode);
+					CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_NAME }, new int[] { R.id.format, R.id.status }, cardID, mDbHelper,
+					setCode);
 			ListView lv = (ListView) dialog.findViewById(R.id.legallist);
 			lv.setAdapter(lla);
 
@@ -412,19 +428,19 @@ public class CardViewActivity extends Activity implements Runnable {
 					URL u = new URL(picurl);
 					d = new BitmapDrawable(u.openStream());
 					bmp = d.getBitmap();
-					
+
 					Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 					int newHeight;
 					int newWidth;
-					if(setCode.equals("PCP")){
+					if (setCode.equals("PCP")) {
 						Matrix mat = new Matrix();
-		        mat.setRotate(90);
-		        bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), mat, true);
+						mat.setRotate(90);
+						bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), mat, true);
 						float scale = (display.getWidth() - 20) / (float) d.getIntrinsicHeight();
 						newWidth = Math.round(bmp.getWidth() * scale);
 						newHeight = Math.round(bmp.getHeight() * scale);
 					}
-					else{
+					else {
 						float scale = (display.getWidth() - 20) / (float) d.getIntrinsicWidth();
 						newWidth = Math.round(bmp.getWidth() * scale);
 						newHeight = Math.round(bmp.getHeight() * scale);
@@ -447,34 +463,37 @@ public class CardViewActivity extends Activity implements Runnable {
 		}
 	}
 
-	private Handler							handler	= new Handler() {
-																				@Override
-																				public void handleMessage(Message msg) {
-																					switch (msg.what) {
-																						case PICLOAD:
-																							image.setImageDrawable(d);
-																							break;
-																						case PRICELOAD:
-																							if (XMLhandler == null || XMLhandler.link == null) {
-																								l.setText("No");
-																								m.setText("Internet");
-																								h.setText("Connection");
-																							}
-																							else {
-																								l.setText("$" + XMLhandler.lowprice);
-																								m.setText("$" + XMLhandler.avgprice);
-																								h.setText("$" + XMLhandler.hiprice);
+	private Handler	handler	= new Handler() {
+														@Override
+														public void handleMessage(Message msg) {
+															switch (msg.what) {
+																case PICLOAD:
+																	image.setImageDrawable(d);
+																	break;
+																case PRICELOAD:
+																	if (priceErrType.equals(NO_INTERNET)) {
+																		l.setText("No");
+																		m.setText("Internet");
+																		h.setText("Connection");
+																	}
+																	else if (XMLhandler == null || XMLhandler.link == null) {
+																		l.setText("Price");
+																		m.setText("Fetch");
+																		h.setText("Failed");
+																	}
+																	else {
+																		l.setText("$" + XMLhandler.lowprice);
+																		m.setText("$" + XMLhandler.avgprice);
+																		h.setText("$" + XMLhandler.hiprice);
 
-																								pricelink.setMovementMethod(LinkMovementMethod.getInstance());
-																								pricelink.setText(Html.fromHtml("<a href=\"" + XMLhandler.link + "\">"
-																										+ getString(R.string.tcgplayerlink) + "</a>"));
-																							}
-																							break;
-																					}
-																				}
-																			};
-
-	private TCGPlayerXMLHandler	XMLhandler;
+																		pricelink.setMovementMethod(LinkMovementMethod.getInstance());
+																		pricelink.setText(Html.fromHtml("<a href=\"" + XMLhandler.link + "\">"
+																				+ getString(R.string.tcgplayerlink) + "</a>"));
+																	}
+																	break;
+															}
+														}
+													};
 
 	void fetchPrices() {
 		try {
@@ -496,6 +515,7 @@ public class CardViewActivity extends Activity implements Runnable {
 			XMLhandler = null;
 		}
 		catch (IOException e) {
+			priceErrType = NO_INTERNET;
 			XMLhandler = null;
 		}
 		catch (SAXException e) {
@@ -510,4 +530,19 @@ public class CardViewActivity extends Activity implements Runnable {
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		// user has long pressed your TextView
+		menu.add(0, v.getId(), 0, getString(R.string.copy));
+
+		// cast the received View to TextView so that you can get its text
+		TextView tv = (TextView) v;
+		String text = tv.getText().toString();
+		text = text.replace("<img src=\"", "{").replace("\"/>", "}");
+		// place your TextView's text in clipboard
+		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+		clipboard.setText(text);
+	}
+
 }

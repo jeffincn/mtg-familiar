@@ -16,7 +16,7 @@
 		android:orientation="vertical">
 		<TextView android:text="TextView" android:layout_height="wrap_content"
 			android:id="@+id/aboutfield" style="@style/text"
-			android:layout_width="fill_parent" />
+			android:layout_width="fill_parent" android:textSize="20sp"/>
 		<ImageView android:src="@drawable/gpl" android:layout_width="fill_parent"
 			android:layout_height="wrap_content" android:padding="10dp" />
 		<ImageView android:src="@drawable/cc" android:layout_width="fill_parent"

@@ -209,6 +209,7 @@ public class Main implements ActionListener {
 					String abilities[] = c.getString("ability").split(" // ");
 					String artists[] = c.getString("artist").split(" // ");
 					String colors[] = c.getString("color").split(" // ");
+					String mID = c.getString("id");
 
 					JSONObject card1 = new JSONObject();
 					JSONObject card2 = new JSONObject();
@@ -241,6 +242,8 @@ public class Main implements ActionListener {
 					card2.put("number", c.getString("number"));
 					card1.put("color", colors[0]);
 					card2.put("color", colors[1]);
+					card1.put("id", mID);
+					card2.put("id", mID);
 
 					card.remove(i);
 					card.put(card1);

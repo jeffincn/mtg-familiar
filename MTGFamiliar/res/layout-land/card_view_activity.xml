@@ -12,8 +12,8 @@
 	android:layout_width="fill_parent" android:layout_height="fill_parent"
 	android:id="@+id/ScrollView1" android:fillViewport="true">
 	<LinearLayout android:orientation="vertical"
-		android:layout_width="wrap_content" android:id="@+id/linearLayout7"
-		android:layout_height="wrap_content">
+		android:id="@+id/linearLayout7"
+		android:layout_height="wrap_content" android:layout_width="fill_parent">
 		<LinearLayout android:orientation="vertical"
 			android:layout_width="fill_parent" android:id="@+id/linearLayout1"
 			android:layout_height="wrap_content">

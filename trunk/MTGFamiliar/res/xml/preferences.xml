@@ -10,10 +10,11 @@
 	along with MTG Familiar. If not, see <http://www.gnu.org/licenses/>. -->
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-	<PreferenceCategory android:title="Card Search">
+	<PreferenceCategory android:title="Automatic Updates">
 		<CheckBoxPreference android:title="Automatic Updates"
 			android:summary="Check for new sets and bannings each time the app opens"
 			android:defaultValue="true" android:key="autoupdate" />
+		<ListPreference android:key="updatefrequency" android:title="Update Frequency" android:summary="Number of days to go between checking for new sets and bannings." android:entryValues="@array/updatefrequencydaysvalues" android:entries="@array/updatefrequencydays"></ListPreference>
 	</PreferenceCategory>
 	<PreferenceCategory android:title="Dice">
 		<CheckBoxPreference android:title="@string/d2title"

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2011 Michael Shick This file is part of MTG Familiar. MTG 
+	Familiar is free software: you can redistribute it and/or modify it under 
+	the terms of the GNU General Public License as published by the Free Software 
+	Foundation, either version 3 of the License, or (at your option) any later 
+	version. MTG Familiar is distributed in the hope that it will be useful, 
+	but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+	or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for 
+	more details. You should have received a copy of the GNU General Public License 
+	along with MTG Familiar. If not, see <http://www.gnu.org/licenses/>. -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent">
+	<LinearLayout android:layout_width="fill_parent"
+		android:layout_height="fill_parent" android:orientation="vertical">
+		<!-- Roll output -->
+		<LinearLayout android:layout_width="fill_parent"
+			android:orientation="horizontal" android:layout_height="wrap_content">
+			<View android:layout_width="0dp" android:layout_height="fill_parent"
+				android:layout_weight="1" />
+			<TextView android:id="@+id/die_output" android:layout_width="0dp"
+				android:layout_height="wrap_content" android:layout_weight="8"
+				android:gravity="center" android:background="@drawable/textview_backdrop"
+				android:textSize="70sp" android:text="100" />
+			<View android:layout_width="0dp" android:layout_height="fill_parent"
+				android:layout_weight="1" />
+		</LinearLayout>
+		<!-- First die row -->
+		<LinearLayout android:layout_width="fill_parent"
+			android:orientation="horizontal" android:gravity="center"
+			android:layout_height="wrap_content">
+			<ImageView android:id="@+id/d2" android:layout_height="wrap_content"
+				android:src="@drawable/d2" android:layout_weight="1"
+				android:layout_width="0dp" />
+
+			<ImageView android:id="@+id/d4" android:layout_height="wrap_content"
+				android:src="@drawable/d4" android:layout_weight="1"
+				android:layout_width="0dp" />
+			<ImageView android:id="@+id/d6" android:layout_height="wrap_content"
+				android:src="@drawable/d6" android:layout_weight="1"
+				android:layout_width="0dp" />
+			<ImageView android:layout_height="wrap_content"
+				android:src="@drawable/d8" android:layout_width="0dp"
+				android:layout_weight="1" android:id="@+id/d8" />
+		</LinearLayout>
+		<!-- Second die row -->
+		<LinearLayout android:layout_width="fill_parent"
+			android:orientation="horizontal" android:gravity="center"
+			android:layout_height="wrap_content">
+			<ImageView android:id="@+id/d10" android:layout_height="wrap_content"
+				android:src="@drawable/d10" android:layout_weight="1"
+				android:layout_width="0dp" />
+			<ImageView android:id="@+id/d12" android:layout_height="wrap_content"
+				android:src="@drawable/d12" android:layout_weight="1"
+				android:layout_width="0dp" />
+			<ImageView android:layout_height="wrap_content"
+				android:src="@drawable/d20" android:layout_width="0dp"
+				android:layout_weight="1" android:id="@+id/d20" />
+			<ImageView android:layout_height="wrap_content"
+				android:src="@drawable/d100" android:layout_width="0dp"
+				android:layout_weight="1" android:id="@+id/d100" />
+		</LinearLayout>
+	</LinearLayout>
+</ScrollView>

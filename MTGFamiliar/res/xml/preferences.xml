@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright 2011 Adam Feinstein This file is part of MTG Familiar. MTG 
-	Familiar is free software: you can redistribute it and/or modify it under 
+<!-- Copyright 2011 Adam Feinstein and April King. This file is part of MTG Familiar.
+	MTG Familiar is free software: you can redistribute it and/or modify it under 
 	the terms of the GNU General Public License as published by the Free Software 
 	Foundation, either version 3 of the License, or (at your option) any later 
 	version. MTG Familiar is distributed in the hope that it will be useful, 
@@ -12,9 +12,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 	<PreferenceCategory android:title="Automatic Updates">
 		<CheckBoxPreference android:title="Automatic Updates"
-			android:summary="Check for new sets and bannings each time the app opens"
-			android:defaultValue="true" android:key="autoupdate" />
-		<ListPreference android:key="updatefrequency" android:title="Update Frequency" android:summary="Number of days to go between checking for new sets and bannings." android:entryValues="@array/updatefrequencydaysvalues" android:entries="@array/updatefrequencydays"></ListPreference>
+			android:defaultValue="true" android:key="autoupdate" android:summary="Check for new sets and bannings when the app opens"/>
+		<ListPreference android:key="updatefrequency" android:title="Update Frequency" android:entryValues="@array/updatefrequencydaysvalues" android:entries="@array/updatefrequencydays" android:summary="Number of days to go between checking for new sets and bannings"></ListPreference>
 	</PreferenceCategory>
 	<PreferenceCategory android:title="Dice">
 		<CheckBoxPreference android:title="@string/d2title"

@@ -14,11 +14,11 @@
 	<TextView android:id="@+id/relative" android:layout_width="0dp"
 		android:layout_height="wrap_content" android:layout_weight="1"
 		android:text="+0" android:textColor="#4fa5d5" android:textSize="25sp"
-		android:gravity="center" />
+		android:gravity="center" android:singleLine="true" />
 	<View android:layout_width="1dp" android:layout_height="fill_parent"
 		android:background="#4fa5d5" />
 	<TextView android:id="@+id/absolute" android:layout_width="0dp"
 		android:layout_height="wrap_content" android:layout_weight="1"
 		android:text="20" android:textColor="#4fa5d5" android:textSize="25sp"
-		android:gravity="center" />
+		android:gravity="center" android:singleLine="true" />
 </LinearLayout>

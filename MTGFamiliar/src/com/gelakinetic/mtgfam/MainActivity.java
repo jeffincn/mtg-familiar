@@ -136,7 +136,6 @@ public class MainActivity extends Activity implements Runnable {
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-
 		File f = new File(DB_PATH, DB_NAME);
 		int dbVersion = preferences.getInt("databaseVersion", -1);
 		if (!f.exists() || dbVersion != DATABASE_VERSION) {
@@ -290,15 +289,6 @@ public class MainActivity extends Activity implements Runnable {
 				}
 				ArrayList<String[]> patchInfo = JsonParser.readUpdateJsonStream(this);
 
-				// If it successfully updated, update the timestamp
-				int curTime = (int) (new Date().getTime() * .001); // should be global?
-				int lastLegalityUpdate = preferences.getInt("lastLegalityUpdate", 0);
-				if (curTime - lastLegalityUpdate > 3 * 24 * 60 * 60) { // should maybe be stored in the preferences.xml, hidden somehow?
-					SharedPreferences.Editor editor = preferences.edit();
-					editor.putInt("lastLegalityUpdate", curTime);
-					editor.commit();
-				}
-
 				if (patchInfo != null) {
 					try {
 						parseLegality(new URL("http://members.cox.net/aefeinstein/legality.json"));
@@ -375,6 +365,14 @@ public class MainActivity extends Activity implements Runnable {
 																	startThread(OTAPATCH);
 																	break;
 																case OTAPATCH:
+																	// If it successfully updated, update the timestamp
+																	int curTime = (int) (new Date().getTime() * .001); // should be global?
+																	int lastLegalityUpdate = preferences.getInt("lastLegalityUpdate", 0);
+																	if (curTime - lastLegalityUpdate > 3 * 24 * 60 * 60) { // should maybe be stored in the preferences.xml, hidden somehow?
+																		SharedPreferences.Editor editor = preferences.edit();
+																		editor.putInt("lastLegalityUpdate", curTime);
+																		editor.commit();
+																	}
 																	dialog.dismiss();
 																	break;
 																case APPLYINGPATCH:

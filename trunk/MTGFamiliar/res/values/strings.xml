@@ -197,10 +197,10 @@ Media licenced under under the &lt;a href=&quot;http://creativecommons.org/licen
 <string name="picfirstsummary">Be greeted by the card image when you select a card</string>
 
 <string name="resultlisttitle" >Result List</string>
-<string name="setPreftitle" >Show Set in Results</string>
-<string name="manacostPreftitle" >Show Manacost in Results</string>
-<string name="typePreftitle" >Show Type in Results</string>
-<string name="abilityPreftitle" >Show Ability in Results</string>
-<string name="ptPreftitle" >Show P/T in Results</string>
+<string name="setPreftitle" >Show Set</string>
+<string name="manacostPreftitle" >Show Mana Cost</string>
+<string name="typePreftitle" >Show Type/Subtype</string>
+<string name="abilityPreftitle" >Show Rules Text</string>
+<string name="ptPreftitle" >Show Power/Toughness</string>
 
 </resources>

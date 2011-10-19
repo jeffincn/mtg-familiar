@@ -19,12 +19,18 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam;
 
+import java.util.ArrayList;
+
 import android.app.ListActivity;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -32,12 +38,13 @@ import android.widget.ListView;
 
 public class ResultListActivity extends ListActivity {
 
-	static final int			NO_RESULT	= 1;
-	private CardDbAdapter	mDbHelper;
-	private ListView			lv;
-	private Context				mCtx;
-	private Cursor				c;
-	private boolean				isSingle	= false;
+	static final int					NO_RESULT	= 1;
+	private CardDbAdapter			mDbHelper;
+	private ListView					lv;
+	private Context						mCtx;
+	private Cursor						c;
+	private boolean						isSingle	= false;
+	private SharedPreferences	preferences;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -47,21 +54,28 @@ public class ResultListActivity extends ListActivity {
 
 		mDbHelper = new CardDbAdapter(this);
 		mDbHelper.open();
-
 		mCtx = this;
 
-		Bundle extras = getIntent().getExtras();
-		extras.getString(SearchActivity.POW_CHOICE);
+		Intent intent = getIntent();
+		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+			String query = intent.getStringExtra(SearchManager.QUERY);
+			c = mDbHelper.Search(this.getApplicationContext(), query, null, null, "wubrgl", 0, null,
+					CardDbAdapter.NOONECARES, null, CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null);
+		}
+		else {
 
-		c = mDbHelper.Search(this.getApplicationContext(), extras.getString(CardDbAdapter.KEY_NAME),
-				extras.getString(SearchActivity.TEXT), extras.getString(SearchActivity.TYPE),
-				extras.getString(SearchActivity.COLOR), extras.getInt(SearchActivity.COLORLOGIC),
-				extras.getString(SearchActivity.SET), extras.getFloat(SearchActivity.POW_CHOICE),
-				extras.getString(SearchActivity.POW_LOGIC), extras.getFloat(SearchActivity.TOU_CHOICE),
-				extras.getString(SearchActivity.TOU_LOGIC), extras.getInt(SearchActivity.CMC),
-				extras.getString(SearchActivity.CMC_LOGIC), extras.getString(SearchActivity.FORMAT),
-				extras.getString(SearchActivity.RARITY), extras.getString(SearchActivity.FLAVOR),
-				extras.getString(SearchActivity.ARTIST));
+			Bundle extras = intent.getExtras();
+
+			c = mDbHelper.Search(this.getApplicationContext(), extras.getString(CardDbAdapter.KEY_NAME),
+					extras.getString(SearchActivity.TEXT), extras.getString(SearchActivity.TYPE),
+					extras.getString(SearchActivity.COLOR), extras.getInt(SearchActivity.COLORLOGIC),
+					extras.getString(SearchActivity.SET), extras.getFloat(SearchActivity.POW_CHOICE),
+					extras.getString(SearchActivity.POW_LOGIC), extras.getFloat(SearchActivity.TOU_CHOICE),
+					extras.getString(SearchActivity.TOU_LOGIC), extras.getInt(SearchActivity.CMC),
+					extras.getString(SearchActivity.CMC_LOGIC), extras.getString(SearchActivity.FORMAT),
+					extras.getString(SearchActivity.RARITY), extras.getString(SearchActivity.FLAVOR),
+					extras.getString(SearchActivity.ARTIST));
+		}
 
 		if (c.getCount() == 0) {
 			Intent i = new Intent();
@@ -118,11 +132,51 @@ public class ResultListActivity extends ListActivity {
 
 		// Create an array to specify the fields we want to display in the list
 		// (only TITLE)
-		String[] from = new String[] { CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_SET, CardDbAdapter.KEY_MANACOST };
+		/*
+		 * String[] from = new String[] { CardDbAdapter.KEY_NAME,
+		 * CardDbAdapter.KEY_SET, CardDbAdapter.KEY_MANACOST,
+		 * CardDbAdapter.KEY_TYPE, CardDbAdapter.KEY_ABILITY,
+		 * CardDbAdapter.KEY_POWER, CardDbAdapter.KEY_TOUGHNESS,
+		 * CardDbAdapter.KEY_LOYALTY };
+		 */
 
+		preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+		ArrayList<String> fromList = new ArrayList<String>();
+		ArrayList<Integer> toList = new ArrayList<Integer>();
+		fromList.add(CardDbAdapter.KEY_NAME);
+		toList.add(R.id.cardname);
+		if (preferences.getBoolean("setPref", true)) {
+			fromList.add(CardDbAdapter.KEY_SET);
+			toList.add(R.id.cardset);
+		}
+		if (preferences.getBoolean("manacostPref", true)) {
+			fromList.add(CardDbAdapter.KEY_MANACOST);
+			toList.add(R.id.cardcost);
+		}
+		if (preferences.getBoolean("typePref", false)) {
+			fromList.add(CardDbAdapter.KEY_TYPE);
+			toList.add(R.id.cardtype);
+		}
+		if (preferences.getBoolean("abilityPref", false)) {
+			fromList.add(CardDbAdapter.KEY_ABILITY);
+			toList.add(R.id.cardability);
+		}
+		if (preferences.getBoolean("ptPref", false)) {
+			fromList.add(CardDbAdapter.KEY_POWER);
+			fromList.add(CardDbAdapter.KEY_TOUGHNESS);
+			fromList.add(CardDbAdapter.KEY_LOYALTY);
+		}
+		String[] from = new String[fromList.size()];
+		fromList.toArray(from);
+
+		int[] to = new int[toList.size()];
+		for(int i=0; i < to.length; i++){
+			to[i] = toList.get(i);
+		}
 		// and an array of the fields we want to bind those fields to (in this case
 		// just text1)
-		int[] to = new int[] { R.id.cardname, R.id.cardset, R.id.cardcost };
+//		int[] to = new int[] { R.id.cardname, R.id.cardset, R.id.cardcost, R.id.cardtype, R.id.cardability };
 
 		ResultListAdapter rla = new ResultListAdapter(this, R.layout.card_row, c, from, to, this.getResources());
 		setListAdapter(rla);

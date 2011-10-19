@@ -35,6 +35,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -45,6 +46,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.text.ClipboardManager;
 import android.text.Html;
 import android.text.Html.ImageGetter;
@@ -103,6 +105,7 @@ public class CardViewActivity extends Activity implements Runnable {
 	private ImageGetter						imgGetter;
 	private TCGPlayerXMLHandler		XMLhandler;
 	private String								priceErrType	= NO_ERROR;
+	private SharedPreferences	preferences;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -298,6 +301,11 @@ public class CardViewActivity extends Activity implements Runnable {
 		registerForContextMenu(pt);
 		registerForContextMenu(flavor);
 		registerForContextMenu(artist);
+		
+		preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		if(preferences.getBoolean("picFirst", false)){
+			showDialog(0);
+		}
 	}
 
 	@Override

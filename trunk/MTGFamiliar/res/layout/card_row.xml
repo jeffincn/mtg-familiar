@@ -8,28 +8,41 @@
 	or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for 
 	more details. You should have received a copy of the GNU General Public License 
 	along with MTG Familiar. If not, see <http://www.gnu.org/licenses/>. -->
-<RelativeLayout android:id="@+id/relativeLayout1"
+<LinearLayout android:id="@+id/relativeLayout1"
 	android:layout_width="fill_parent" android:layout_height="fill_parent"
-	android:layout_margin="5dip" xmlns:android="http://schemas.android.com/apk/res/android">
-	<LinearLayout android:orientation="vertical" android:id="@+id/linearLayout1"
-		android:layout_width="wrap_content" android:layout_height="wrap_content"
-		android:layout_alignParentTop="true" android:layout_alignParentRight="true">
-		<TextView style="@style/text" android:text="TextView"
-			android:layout_height="wrap_content" android:id="@+id/cardcost"
-			android:layout_marginLeft="3dip" android:layout_marginRight="3dip"
-			android:layout_marginTop="3dip" android:layout_marginBottom="2dip"
-			android:gravity="right" android:layout_width="fill_parent" />
-		<TextView android:layout_height="wrap_content" style="@style/text"
-			android:id="@+id/cardset" android:text="Text"
-			android:layout_marginLeft="3dip" android:layout_marginRight="3dip"
-			android:layout_marginTop="1dip" android:layout_marginBottom="3dip"
-			android:gravity="right" android:layout_width="fill_parent" />
+	android:orientation="vertical" android:layout_margin="5dip"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<LinearLayout android:orientation="horizontal" android:id="@+id/linearLayout1"
+		android:layout_height="wrap_content" android:layout_alignParentTop="true"
+		android:layout_alignParentRight="true" android:layout_width="match_parent">
+		<TextView style="@style/text" android:gravity="center_vertical"
+			android:id="@+id/cardname" android:text="Name"
+			android:layout_marginLeft="3dip" android:layout_width="wrap_content"
+			android:layout_height="match_parent" android:layout_weight="1" />
+
+		<LinearLayout android:orientation="vertical" android:id="@+id/linearLayout1"
+			android:layout_height="match_parent" android:layout_width="wrap_content">
+			<TextView android:gravity="right" android:layout_height="wrap_content"
+				android:id="@+id/cardcost" android:text="Cost" style="@style/text" android:layout_marginRight="3dip"
+				android:layout_marginBottom="2dip" android:layout_marginLeft="3dip"
+				android:layout_marginTop="3dip" android:layout_width="match_parent"/>
+			<TextView android:layout_height="wrap_content" style="@style/text"
+				android:id="@+id/cardset" android:text="Set"
+				android:layout_marginLeft="3dip" android:layout_marginRight="3dip"
+				android:layout_marginTop="1dip" android:layout_marginBottom="3dip"
+				android:gravity="right" android:layout_width="match_parent"/>
+		</LinearLayout>
 	</LinearLayout>
-	<TextView android:layout_height="fill_parent" style="@style/text"
-		android:gravity="center_vertical" android:id="@+id/cardname"
-		android:layout_width="fill_parent" android:text="TextView"
-		android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
-		android:layout_alignBottom="@+id/linearLayout1"
-		android:layout_toLeftOf="@+id/linearLayout1"
-		android:layout_marginLeft="3dip" />
-</RelativeLayout>
+
+	<TextView android:id="@+id/cardtype" android:layout_height="wrap_content"
+		android:text="Type" style="@style/text" android:textSize="18sp"
+		android:layout_width="match_parent" />
+	<TextView android:id="@+id/cardability" android:layout_height="wrap_content"
+		android:text="Ability" style="@style/text" android:textSize="18sp"
+		android:layout_width="match_parent" />
+	<TextView android:id="@+id/cardpt" android:layout_height="wrap_content"
+		android:text="p/t" style="@style/text" android:textSize="18sp"
+		android:gravity="right" android:layout_width="match_parent" />
+
+</LinearLayout>

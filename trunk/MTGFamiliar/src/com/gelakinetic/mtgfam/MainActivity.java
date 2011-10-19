@@ -65,7 +65,7 @@ public class MainActivity extends Activity implements Runnable {
 	private static final int		OTAPATCH					= 1;
 	private static final int		APPLYINGPATCH			= 3;
 	private static final int		DBFROMWEB					= 4;
-	private static final int		DATABASE_VERSION	= 4;
+	private static final int		DATABASE_VERSION	= 5;
 	private static final int		EXCEPTION					= 99;
 	private LinearLayout				search;
 	private LinearLayout				life;
@@ -81,6 +81,7 @@ public class MainActivity extends Activity implements Runnable {
 	private SharedPreferences		preferences;
 	private String							stacktrace;
 	private Button							deckmanagement;
+	private boolean	OTAforce = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -218,6 +219,7 @@ public class MainActivity extends Activity implements Runnable {
 //			case R.id.refreshDB: startThread(DBFROMAPK); return true;
 
 			case R.id.checkUpdate:
+				OTAforce  = true;
 				startThread(OTAPATCH);
 				return true;
 			case R.id.preferences:
@@ -247,7 +249,7 @@ public class MainActivity extends Activity implements Runnable {
 			int curTime = (int) (new Date().getTime() * .001);
 			int lastLegalityUpdate = preferences.getInt("lastLegalityUpdate", 0); // should be global
 
-			if ((curTime - lastLegalityUpdate) > (3 * 24 * 60 * 60)) { // should maybe be stored in the preferences.xml, hidden somehow?
+			if (OTAforce || (curTime - lastLegalityUpdate) > (3 * 24 * 60 * 60)) { // should maybe be stored in the preferences.xml, hidden somehow?
 				dialog = new ProgressDialog(MainActivity.this);
 				dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 				dialog.setMessage("Checking for Updates. Please wait...");
@@ -258,6 +260,7 @@ public class MainActivity extends Activity implements Runnable {
 				Thread thread = new Thread(this);
 				thread.start();
 			}
+			OTAforce = false;
 		}
 		else if (type == DBFROMWEB) {
 			dialog = new ProgressDialog(MainActivity.this);
@@ -337,8 +340,7 @@ public class MainActivity extends Activity implements Runnable {
 					editor.putString("date", "");
 					editor.commit();
 
-					parseJSON(new URL("http://members.cox.net/aefeinstein/cards.json.gzip"));
-//					parseJSON(new URL("http://members.cox.net/aefeinstein/pcp.json.gzip"));
+					parseJSON(new URL("http://members.cox.net/aefeinstein/uptoISD.json.gzip"));
 					parseLegality(new URL("http://members.cox.net/aefeinstein/legality.json"));
 					parseTCGNames();
 				}

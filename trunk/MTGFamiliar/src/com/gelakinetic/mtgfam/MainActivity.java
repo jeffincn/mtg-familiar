@@ -81,7 +81,6 @@ public class MainActivity extends Activity implements Runnable {
 	private SharedPreferences		preferences;
 	private String							stacktrace;
 	private Button							deckmanagement;
-	private boolean	OTAforce = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -218,7 +217,11 @@ public class MainActivity extends Activity implements Runnable {
 //			case R.id.refreshDB: startThread(DBFROMAPK); return true;
 
 			case R.id.checkUpdate:
-				OTAforce  = true;
+				// Set the last legality update time back to zero on a forced update
+				SharedPreferences.Editor editor = preferences.edit();
+				editor.putInt("lastLegalityUpdate", 0);
+				editor.commit();
+				
 				startThread(OTAPATCH);
 				return true;
 			case R.id.preferences:
@@ -246,9 +249,10 @@ public class MainActivity extends Activity implements Runnable {
 		else if (type == OTAPATCH) {
 			// Only update the banning list if it hasn't been updated recently
 			int curTime = (int) (new Date().getTime() * .001);
+			int updatefrequency = Integer.valueOf(preferences.getString("updatefrequency", "3"));
 			int lastLegalityUpdate = preferences.getInt("lastLegalityUpdate", 0); // should be global
 
-			if (OTAforce || (curTime - lastLegalityUpdate) > (3 * 24 * 60 * 60)) { // should maybe be stored in the preferences.xml, hidden somehow?
+			if ((curTime - lastLegalityUpdate) > (updatefrequency * 24 * 60 * 60)) {
 				dialog = new ProgressDialog(MainActivity.this);
 				dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 				dialog.setMessage("Checking for Updates. Please wait...");
@@ -259,7 +263,6 @@ public class MainActivity extends Activity implements Runnable {
 				Thread thread = new Thread(this);
 				thread.start();
 			}
-			OTAforce = false;
 		}
 		else if (type == DBFROMWEB) {
 			dialog = new ProgressDialog(MainActivity.this);
@@ -367,12 +370,10 @@ public class MainActivity extends Activity implements Runnable {
 																case OTAPATCH:
 																	// If it successfully updated, update the timestamp
 																	int curTime = (int) (new Date().getTime() * .001); // should be global?
-																	int lastLegalityUpdate = preferences.getInt("lastLegalityUpdate", 0);
-																	if (curTime - lastLegalityUpdate > 3 * 24 * 60 * 60) { // should maybe be stored in the preferences.xml, hidden somehow?
-																		SharedPreferences.Editor editor = preferences.edit();
-																		editor.putInt("lastLegalityUpdate", curTime);
-																		editor.commit();
-																	}
+																	SharedPreferences.Editor editor = preferences.edit();
+																	editor.putInt("lastLegalityUpdate", curTime);
+																	editor.commit();
+
 																	dialog.dismiss();
 																	break;
 																case APPLYINGPATCH:

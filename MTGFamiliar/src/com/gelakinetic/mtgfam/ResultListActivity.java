@@ -30,6 +30,9 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -81,11 +84,10 @@ public class ResultListActivity extends ListActivity {
 			setResult(NO_RESULT, i);
 			finish();
 		}
-		fillData(c);
-
-		registerForContextMenu(getListView());
-
+		
 		lv = getListView();
+
+		registerForContextMenu(lv);
 
 		lv.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -94,7 +96,7 @@ public class ResultListActivity extends ListActivity {
 				startActivityForResult(i, 0);
 			}
 		});
-
+		
 		if (c.getCount() == 1) {
 			isSingle = true;
 			Intent i = new Intent(mCtx, CardViewActivity.class);
@@ -105,6 +107,12 @@ public class ResultListActivity extends ListActivity {
 		}
 	}
 
+	@Override
+	protected void onResume(){
+		super.onResume();
+		fillData(c);
+	}
+	
 	@Override
 	public void onPause() {
 		super.onPause();
@@ -212,6 +220,25 @@ public class ResultListActivity extends ListActivity {
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.result_list_menu, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+			case R.id.preferences:
+				startActivity(new Intent().setClass(this, PreferencesActivity.class));
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
 	}
 
 }

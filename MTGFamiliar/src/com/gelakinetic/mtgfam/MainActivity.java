@@ -38,6 +38,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -50,10 +51,12 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -67,6 +70,8 @@ public class MainActivity extends Activity implements Runnable {
 	private static final int		DBFROMWEB					= 4;
 	private static final int		DATABASE_VERSION	= 5;
 	private static final int		EXCEPTION					= 99;
+	private static final int		ABOUTDIALOG				= 0;
+	private static final int		CHANGELOGDIALOG		= 1;
 	private LinearLayout				search;
 	private LinearLayout				life;
 	private LinearLayout				rng;
@@ -81,6 +86,7 @@ public class MainActivity extends Activity implements Runnable {
 	private SharedPreferences		preferences;
 	private String							stacktrace;
 	private Button							deckmanagement;
+	private PackageInfo	pInfo;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -148,6 +154,21 @@ public class MainActivity extends Activity implements Runnable {
 				startThread(OTAPATCH);
 			}
 		}
+		
+		try {
+			pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+		}
+		catch (NameNotFoundException e) {
+			pInfo = null;
+		}
+
+		int lastVersion = preferences.getInt("lastVersion", 0);
+		if(pInfo.versionCode != lastVersion){
+			showDialog(CHANGELOGDIALOG);
+			SharedPreferences.Editor editor = preferences.edit();
+			editor.putInt("lastVersion", pInfo.versionCode);
+			editor.commit();
+		}
 	}
 
 	@Override
@@ -180,25 +201,50 @@ public class MainActivity extends Activity implements Runnable {
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
-		Context mContext = this;
-		Dialog aboutDialog = new Dialog(mContext);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-		aboutDialog.setContentView(R.layout.about_dialog);
+		if (id == ABOUTDIALOG) {
+			// You have to catch the exception because the package stuff is all
+			// run-time
+			if(pInfo != null){
+				builder.setTitle("About " + getString(R.string.app_name) + " " + pInfo.versionName);
+			}
+			else {
+				builder.setTitle("About " + getString(R.string.app_name));
+			}
 
-		// You have to catch the exception because the package stuff is all run-time
-		PackageInfo pInfo;
-		try {
-			pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-			aboutDialog.setTitle("About " + getString(R.string.app_name) + " " + pInfo.versionName);
-		} catch (NameNotFoundException e) {
-			aboutDialog.setTitle("About " + getString(R.string.app_name));
+			builder.setNeutralButton("Thanks!", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.cancel();
+				}
+			});
+
+			LayoutInflater inflater = getLayoutInflater();
+			View dialoglayout = inflater.inflate(R.layout.about_dialog, (ViewGroup) findViewById(R.id.dialog_layout_root));
+
+			TextView text = (TextView) dialoglayout.findViewById(R.id.aboutfield);
+			text.setText(Html.fromHtml(getString(R.string.about_this_app)));
+			text.setMovementMethod(LinkMovementMethod.getInstance());
+
+			builder.setView(dialoglayout);
 		}
-		
-		TextView text = (TextView) aboutDialog.findViewById(R.id.aboutfield);
-		text.setText(Html.fromHtml(getString(R.string.about_this_app)));
-		text.setMovementMethod(LinkMovementMethod.getInstance());
+		else if (id == CHANGELOGDIALOG) {
+			if(pInfo != null){
+				builder.setTitle("What's New in Version " + pInfo.versionName);
+			}
+			else {
+				builder.setTitle("What's New");
+			}
 
-		return aboutDialog;
+			builder.setNeutralButton("Enjoy!", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.cancel();
+				}
+			});
+
+			builder.setMessage(Html.fromHtml(getString(R.string.whatsnew)));
+		}
+		return builder.create();
 	}
 
 	@Override
@@ -213,22 +259,22 @@ public class MainActivity extends Activity implements Runnable {
 		// Handle item selection
 		switch (item.getItemId()) {
 
-//			case R.id.buildWebDB: startThread(DBFROMWEB); return true;
-//			case R.id.refreshDB: startThread(DBFROMAPK); return true;
+			// case R.id.buildWebDB: startThread(DBFROMWEB); return true;
+			// case R.id.refreshDB: startThread(DBFROMAPK); return true;
 
 			case R.id.checkUpdate:
 				// Set the last legality update time back to zero on a forced update
 				SharedPreferences.Editor editor = preferences.edit();
 				editor.putInt("lastLegalityUpdate", 0);
 				editor.commit();
-				
+
 				startThread(OTAPATCH);
 				return true;
 			case R.id.preferences:
 				startActivity(new Intent().setClass(this, PreferencesActivity.class));
 				return true;
 			case R.id.aboutapp:
-				showDialog(0);
+				showDialog(ABOUTDIALOG);
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -250,7 +296,9 @@ public class MainActivity extends Activity implements Runnable {
 			// Only update the banning list if it hasn't been updated recently
 			int curTime = (int) (new Date().getTime() * .001);
 			int updatefrequency = Integer.valueOf(preferences.getString("updatefrequency", "3"));
-			int lastLegalityUpdate = preferences.getInt("lastLegalityUpdate", 0); // should be global
+			int lastLegalityUpdate = preferences.getInt("lastLegalityUpdate", 0); // should
+																																						// be
+																																						// global
 
 			if ((curTime - lastLegalityUpdate) > (updatefrequency * 24 * 60 * 60)) {
 				dialog = new ProgressDialog(MainActivity.this);
@@ -258,7 +306,7 @@ public class MainActivity extends Activity implements Runnable {
 				dialog.setMessage("Checking for Updates. Please wait...");
 				dialog.setCancelable(false);
 				dialog.show();
-	
+
 				threadType = type;
 				Thread thread = new Thread(this);
 				thread.start();
@@ -285,7 +333,7 @@ public class MainActivity extends Activity implements Runnable {
 				handler.sendEmptyMessage(DBFROMAPK);
 			}
 			else if (threadType == OTAPATCH) {
-				
+
 				if (mDbHelper == null) {
 					mDbHelper = new CardDbAdapter(this);
 					mDbHelper.open();
@@ -324,9 +372,9 @@ public class MainActivity extends Activity implements Runnable {
 						mDbHelper = new CardDbAdapter(this);
 						mDbHelper.open();
 					}
-					
+
 					mDbHelper.dropCreateDB();
-					
+
 					SharedPreferences.Editor editor = preferences.edit();
 					editor.putString("lastTCGNameUpdate", "");
 					editor.putString("lastUpdate", "");
@@ -368,8 +416,11 @@ public class MainActivity extends Activity implements Runnable {
 																	startThread(OTAPATCH);
 																	break;
 																case OTAPATCH:
-																	// If it successfully updated, update the timestamp
-																	int curTime = (int) (new Date().getTime() * .001); // should be global?
+																	// If it successfully updated, update the
+																	// timestamp
+																	int curTime = (int) (new Date().getTime() * .001); // should
+																																											// be
+																																											// global?
 																	SharedPreferences.Editor editor = preferences.edit();
 																	editor.putInt("lastLegalityUpdate", curTime);
 																	editor.commit();
@@ -426,9 +477,9 @@ public class MainActivity extends Activity implements Runnable {
 			return;
 		}
 	}
-	
+
 	void parseTCGNames() {
-			JsonParser.readTCGNameJsonStream(this, mDbHelper);
+		JsonParser.readTCGNameJsonStream(this, mDbHelper);
 	}
 
 	private void copyDB() {

@@ -17,8 +17,7 @@
 		<ImageView
 		    android:id="@+id/cardpic"
 		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:src="@drawable/loading" />
+		    android:src="@drawable/loading" android:layout_gravity="center_vertical" android:layout_height="fill_parent"/>
 
 		<LinearLayout android:orientation="vertical"
 			android:layout_width="fill_parent" android:id="@+id/linearLayout1"

@@ -11,13 +11,10 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 	<PreferenceCategory android:title="Automatic Updates">
-		<CheckBoxPreference android:title="Automatic Updates"
-			android:defaultValue="true" android:key="autoupdate"
-			android:summary="Check for new sets and bannings when the app opens" />
-		<ListPreference android:key="updatefrequency"
-			android:title="Update Frequency" android:entryValues="@array/updatefrequencydaysvalues"
+		<CheckBoxPreference android:defaultValue="true" android:key="autoupdate" android:summary="@string/automaticupdatesummary" android:title="@string/automaticupdatetitle"/>
+		<ListPreference android:entryValues="@array/updatefrequencydaysvalues"
 			android:entries="@array/updatefrequencydays"
-			android:summary="Number of days to go between checking for new sets and bannings" />
+			android:title="@string/updatefrequencytitle" android:key="updatefrequency" android:summary="@string/updatefrequencysummary"/>
 	</PreferenceCategory>
 	<PreferenceCategory android:title="@string/cardviewtitle">
 		<CheckBoxPreference android:key="picFirst" android:defaultValue="false" android:summary="@string/picfirstsummary" android:title="@string/picfirsttitle" />

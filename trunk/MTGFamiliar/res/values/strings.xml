@@ -188,8 +188,8 @@ Media licenced under under the &lt;a href=&quot;http://creativecommons.org/licen
 
 	<string name="wakelocktitle">Wake Lock</string>
 
-	<string name="copy">Copy Selected Text To Clipboard</string>
-	<string name="copyall">Copy All Text To Clipboard</string>
+	<string name="copy">Copy Section To Clipboard</string>
+	<string name="copyall">Copy Card To Clipboard</string>
 
 	<string-array name="updatefrequencydays">
 		<item>1 day</item>

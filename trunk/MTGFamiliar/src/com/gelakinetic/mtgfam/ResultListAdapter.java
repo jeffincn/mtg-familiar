@@ -77,9 +77,9 @@ public class ResultListAdapter extends SimpleCursorAdapter implements SectionInd
 	@Override
 	public void bindView(View v, Context context, Cursor c) {
 
-		int p = CardDbAdapter.NOONECARES;
-		int t = CardDbAdapter.NOONECARES;
-		int l = CardDbAdapter.NOONECARES;
+		float p = CardDbAdapter.NOONECARES;
+		float t = CardDbAdapter.NOONECARES;
+		float l = CardDbAdapter.NOONECARES;
 		
 		boolean hideCost = true;
 		boolean hideSet = true;
@@ -133,20 +133,20 @@ public class ResultListAdapter extends SimpleCursorAdapter implements SectionInd
 				textfield.setText(csq);
 			}
 			else if (CardDbAdapter.KEY_POWER.equals(from[i])) {
-				p = Integer.parseInt(name);
+				p = Float.parseFloat(name);
 			}
 			else if (CardDbAdapter.KEY_TOUGHNESS.equals(from[i])) {
-				t = Integer.parseInt(name);
+				t = Float.parseFloat(name);
 			}
 			else if (CardDbAdapter.KEY_LOYALTY.equals(from[i])) {
-				l = Integer.parseInt(name);
+				l = Float.parseFloat(name);
 			}
 		}
 
 		TextView pt = (TextView) v.findViewById(R.id.cardpt);
 
 		if (l != CardDbAdapter.NOONECARES) {
-			pt.setText(new Integer(l).toString());
+			pt.setText(new Integer((int)l).toString());
 		}
 		else if (p != CardDbAdapter.NOONECARES && t != CardDbAdapter.NOONECARES) {
 

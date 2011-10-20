@@ -74,6 +74,11 @@ public class CardViewActivity extends Activity implements Runnable {
 	protected static final String	SET						= "set";
 	protected static final String	ISSINGLE			= "isSingle";
 	private static final String		NO_INTERNET		= "no_internet";
+	private static final int			GETLEGALITY		= 0;
+	private static final int			GETPRICE			= 1;
+	private static final int			GETIMAGE			= 2;
+	private static final int			MAINPAGE			= 0;
+	private static final int			DIALOG				= 1;
 	private String								NO_ERROR			= "no_error";
 	private CardDbAdapter					mDbHelper;
 	private TextView							name;
@@ -105,7 +110,10 @@ public class CardViewActivity extends Activity implements Runnable {
 	private ImageGetter						imgGetter;
 	private TCGPlayerXMLHandler		XMLhandler;
 	private String								priceErrType	= NO_ERROR;
-	private SharedPreferences	preferences;
+	private SharedPreferences			preferences;
+	private ImageView							cardpic;
+	private int										loadTo;
+	private boolean								failedLoad		= false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -301,11 +309,28 @@ public class CardViewActivity extends Activity implements Runnable {
 		registerForContextMenu(pt);
 		registerForContextMenu(flavor);
 		registerForContextMenu(artist);
-		
+
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		if(preferences.getBoolean("picFirst", false)){
-			showDialog(0);
+		if (preferences.getBoolean("picFirst", false)) {
+			cardpic = (ImageView) findViewById(R.id.cardpic);
+			loadTo = MAINPAGE;
+			threadtype = PICLOAD;
+			Thread thread = new Thread(this);
+			thread.start();
+
+			name.setVisibility(View.GONE);
+			cost.setVisibility(View.GONE);
+			type.setVisibility(View.GONE);
+			set.setVisibility(View.GONE);
+			ability.setVisibility(View.GONE);
+			pt.setVisibility(View.GONE);
+			flavor.setVisibility(View.GONE);
+			artist.setVisibility(View.GONE);
 		}
+		else {
+			((ImageView) findViewById(R.id.cardpic)).setVisibility(View.GONE);
+		}
+
 	}
 
 	@Override
@@ -353,13 +378,13 @@ public class CardViewActivity extends Activity implements Runnable {
 		// Handle item selection
 		switch (item.getItemId()) {
 			case R.id.image:
-				showDialog(0);
+				showDialog(GETIMAGE);
 				return true;
 			case R.id.price:
-				showDialog(2);
+				showDialog(GETPRICE);
 				return true;
 			case R.id.legality:
-				showDialog(1);
+				showDialog(GETLEGALITY);
 				return true;
 			case R.id.gatherer:
 				String url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid="
@@ -374,13 +399,14 @@ public class CardViewActivity extends Activity implements Runnable {
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
-		if (id == 0) {
+		if (id == GETIMAGE) {
 			Dialog dialog = new Dialog(this);
 			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 			dialog.setContentView(R.layout.image_dialog);
 
 			image = (ImageView) dialog.findViewById(R.id.cardimage);
+			loadTo = DIALOG;
 
 			threadtype = PICLOAD;
 			Thread thread = new Thread(this);
@@ -388,7 +414,7 @@ public class CardViewActivity extends Activity implements Runnable {
 
 			return dialog;
 		}
-		else if (id == 1) {
+		else if (id == GETLEGALITY) {
 			Dialog dialog = new Dialog(this);
 			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
@@ -404,7 +430,7 @@ public class CardViewActivity extends Activity implements Runnable {
 
 			return dialog;
 		}
-		else if (id == 2) { // price
+		else if (id == GETPRICE) { // price
 			Dialog dialog = new Dialog(this);
 			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
@@ -458,6 +484,7 @@ public class CardViewActivity extends Activity implements Runnable {
 				}
 				catch (IOException e) {
 					d = (BitmapDrawable) getResources().getDrawable(R.drawable.nonet);
+					failedLoad = true;
 				}
 				catch (Exception e) {
 					d = (BitmapDrawable) getResources().getDrawable(R.drawable.nonet);
@@ -471,37 +498,56 @@ public class CardViewActivity extends Activity implements Runnable {
 		}
 	}
 
-	private Handler	handler	= new Handler() {
-														@Override
-														public void handleMessage(Message msg) {
-															switch (msg.what) {
-																case PICLOAD:
-																	image.setImageDrawable(d);
-																	break;
-																case PRICELOAD:
-																	if (priceErrType.equals(NO_INTERNET)) {
-																		l.setText("No");
-																		m.setText("Internet");
-																		h.setText("Connection");
-																	}
-																	else if (XMLhandler == null || XMLhandler.link == null) {
-																		l.setText("Price");
-																		m.setText("Fetch");
-																		h.setText("Failed");
-																	}
-																	else {
-																		l.setText("$" + XMLhandler.lowprice);
-																		m.setText("$" + XMLhandler.avgprice);
-																		h.setText("$" + XMLhandler.hiprice);
+	private Handler		handler	= new Handler() {
+															@Override
+															public void handleMessage(Message msg) {
+																switch (msg.what) {
+																	case PICLOAD:
+																		if (loadTo == MAINPAGE) {
+																			if (failedLoad) {
+																				cardpic.setVisibility(View.GONE);
+																				name.setVisibility(View.VISIBLE);
+																				cost.setVisibility(View.VISIBLE);
+																				type.setVisibility(View.VISIBLE);
+																				set.setVisibility(View.VISIBLE);
+																				ability.setVisibility(View.VISIBLE);
+																				pt.setVisibility(View.VISIBLE);
+																				flavor.setVisibility(View.VISIBLE);
+																				artist.setVisibility(View.VISIBLE);
+																			}
+																			else {
+																				cardpic.setImageDrawable(d);
+																			}
+																		}
+																		else if (loadTo == DIALOG) {
+																			image.setImageDrawable(d);
+																		}
+																		break;
+																	case PRICELOAD:
+																		if (priceErrType.equals(NO_INTERNET)) {
+																			l.setText("No");
+																			m.setText("Internet");
+																			h.setText("Connection");
+																		}
+																		else if (XMLhandler == null || XMLhandler.link == null) {
+																			l.setText("Price");
+																			m.setText("Fetch");
+																			h.setText("Failed");
+																		}
+																		else {
+																			l.setText("$" + XMLhandler.lowprice);
+																			m.setText("$" + XMLhandler.avgprice);
+																			h.setText("$" + XMLhandler.hiprice);
 
-																		pricelink.setMovementMethod(LinkMovementMethod.getInstance());
-																		pricelink.setText(Html.fromHtml("<a href=\"" + XMLhandler.link + "\">"
-																				+ getString(R.string.tcgplayerlink) + "</a>"));
-																	}
-																	break;
+																			pricelink.setMovementMethod(LinkMovementMethod.getInstance());
+																			pricelink.setText(Html.fromHtml("<a href=\"" + XMLhandler.link + "\">"
+																					+ getString(R.string.tcgplayerlink) + "</a>"));
+																		}
+																		break;
+																}
 															}
-														}
-													};
+														};
+	private TextView	copyView;
 
 	void fetchPrices() {
 		try {
@@ -541,16 +587,34 @@ public class CardViewActivity extends Activity implements Runnable {
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		// user has long pressed your TextView
-		menu.add(0, v.getId(), 0, getString(R.string.copy));
 
-		// cast the received View to TextView so that you can get its text
-		TextView tv = (TextView) v;
-		String text = tv.getText().toString();
-		text = text.replace("<img src=\"", "{").replace("\"/>", "}");
-		// place your TextView's text in clipboard
-		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-		clipboard.setText(text);
+		super.onCreateContextMenu(menu, v, menuInfo);
+
+		copyView = (TextView) v;
+
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.copy_menu, menu);
 	}
 
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+		switch (item.getItemId()) {
+			case R.id.copy:
+				String text = copyView.getText().toString();
+
+				clipboard.setText(text);
+				return true;
+
+			case R.id.copyall:
+				String cat = name.getText().toString() + '\n' + cost.getText().toString() + '\n' + type.getText().toString()
+						+ '\n' + set.getText().toString() + '\n' + ability.getText().toString() + '\n'
+						+ flavor.getText().toString() + '\n' + pt.getText().toString() + '\n' + artist.getText().toString();
+
+				clipboard.setText(cat);
+				return true;
+			default:
+				return super.onContextItemSelected(item);
+		}
+	}
 }

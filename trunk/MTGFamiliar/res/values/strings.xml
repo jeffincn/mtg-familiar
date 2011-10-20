@@ -164,6 +164,22 @@ Magic the Gathering and Magic the Gathering cards are ™ &amp; © Wizards of th
 Program licenced under the &lt;a href=&quot;http://www.gnu.org/licenses/gpl.html&quot;&gt;GNU General Public License v3+&lt;/a&gt;.&lt;br /&gt;&lt;br /&gt;
 Media licenced under under the &lt;a href=&quot;http://creativecommons.org/licenses/by-sa/3.0/&quot;&gt;Creative Commons Attribution-ShareAlike 3.0 Unported License&lt;a&gt;.</string>
 
+	<string name="whatsnew">
+- App supports "Move to SD"&lt;br /&gt;
+- App supports landscape orientation&lt;br /&gt;
+- Added global search button for simple card search&lt;br /&gt;
+- Reduced frequency of set &amp; legality update checks&lt;br /&gt;
+- Added preference to control frequency of set &amp; legality update checks&lt;br /&gt;
+- Search results support enhanced scrollbar&lt;br /&gt;
+- Search results can now display type/subtype, rules text, and power/toughness in addition to cost/set/rarity&lt;br /&gt;
+- Added preferences to control information display on results page&lt;br /&gt;
+- Added preference to view art instead of rules text in card view&lt;br /&gt;
+- Text is copyable in card view&lt;br /&gt;
+- Can determine between lack of internet connectivity and lack of pricing data&lt;br /&gt;
+- UI tweaks all over the place&lt;br /&gt;
+- General bugfixes
+	</string>    
+	    
 	<string name="gatherer">Gatherer Page</string>
 
 	<string name="lifetitle">Life Counter</string>
@@ -172,7 +188,9 @@ Media licenced under under the &lt;a href=&quot;http://creativecommons.org/licen
 
 	<string name="wakelocktitle">Wake Lock</string>
 
-	<string name="copy">Copy Text To Clipboard</string>
+	<string name="copy">Copy Selected Text To Clipboard</string>
+	<string name="copyall">Copy All Text To Clipboard</string>
+
 	<string-array name="updatefrequencydays">
 		<item>1 day</item>
 		<item>2 days</item>

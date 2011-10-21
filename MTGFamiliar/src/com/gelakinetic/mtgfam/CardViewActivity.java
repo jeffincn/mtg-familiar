@@ -61,6 +61,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -296,6 +297,7 @@ public class CardViewActivity extends Activity implements Runnable {
 					// overridePendingTransition(0, 0);
 				}
 			});
+			transform.setVisibility(View.VISIBLE);
 		}
 		else {
 			transform.setVisibility(View.GONE);
@@ -326,6 +328,8 @@ public class CardViewActivity extends Activity implements Runnable {
 			pt.setVisibility(View.GONE);
 			flavor.setVisibility(View.GONE);
 			artist.setVisibility(View.GONE);
+			
+			((FrameLayout)findViewById(R.id.frameLayout1)).setVisibility(View.GONE);
 		}
 		else {
 			((ImageView) findViewById(R.id.cardpic)).setVisibility(View.GONE);

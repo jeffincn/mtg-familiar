@@ -79,40 +79,41 @@ public class ResultListActivity extends ListActivity {
 					extras.getString(SearchActivity.ARTIST));
 		}
 
-		if (c.getCount() == 0) {
+		if (c == null || c.getCount() == 0) {
 			Intent i = new Intent();
 			setResult(NO_RESULT, i);
 			finish();
 		}
-		
-		lv = getListView();
+		else {
+			lv = getListView();
 
-		registerForContextMenu(lv);
+			registerForContextMenu(lv);
 
-		lv.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			lv.setOnItemClickListener(new OnItemClickListener() {
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					Intent i = new Intent(mCtx, CardViewActivity.class);
+					i.putExtra("id", id);
+					startActivityForResult(i, 0);
+				}
+			});
+
+			if (c.getCount() == 1) {
+				isSingle = true;
 				Intent i = new Intent(mCtx, CardViewActivity.class);
+				c.moveToFirst();
+				long id = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_ID));
 				i.putExtra("id", id);
 				startActivityForResult(i, 0);
 			}
-		});
-		
-		if (c.getCount() == 1) {
-			isSingle = true;
-			Intent i = new Intent(mCtx, CardViewActivity.class);
-			c.moveToFirst();
-			long id = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_ID));
-			i.putExtra("id", id);
-			startActivityForResult(i, 0);
 		}
 	}
 
 	@Override
-	protected void onResume(){
+	protected void onResume() {
 		super.onResume();
 		fillData(c);
 	}
-	
+
 	@Override
 	public void onPause() {
 		super.onPause();
@@ -181,12 +182,13 @@ public class ResultListActivity extends ListActivity {
 		fromList.toArray(from);
 
 		int[] to = new int[toList.size()];
-		for(int i=0; i < to.length; i++){
+		for (int i = 0; i < to.length; i++) {
 			to[i] = toList.get(i);
 		}
 		// and an array of the fields we want to bind those fields to (in this case
 		// just text1)
-//		int[] to = new int[] { R.id.cardname, R.id.cardset, R.id.cardcost, R.id.cardtype, R.id.cardability };
+		// int[] to = new int[] { R.id.cardname, R.id.cardset, R.id.cardcost,
+		// R.id.cardtype, R.id.cardability };
 
 		ResultListAdapter rla = new ResultListAdapter(this, R.layout.card_row, c, from, to, this.getResources());
 		setListAdapter(rla);
@@ -224,7 +226,7 @@ public class ResultListActivity extends ListActivity {
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();

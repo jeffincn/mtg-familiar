@@ -637,6 +637,10 @@ public class CardDbAdapter {
 			statement += ")";
 		}
 
+		if(statement == null){
+			return null;
+		}
+
 		try {
 			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID, KEY_NAME, KEY_SET, KEY_RARITY,
 					KEY_MANACOST, KEY_TYPE, KEY_ABILITY, KEY_POWER, KEY_TOUGHNESS, KEY_LOYALTY }, statement, null, null, null, KEY_NAME, null);

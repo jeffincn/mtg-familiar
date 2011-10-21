@@ -183,7 +183,6 @@ public class ResultListAdapter extends SimpleCursorAdapter implements SectionInd
 						}
 						else {
 							tou = new Float(t).toString();
-							;
 						}
 					}
 					textfield.setText(tou);
@@ -193,7 +192,12 @@ public class ResultListAdapter extends SimpleCursorAdapter implements SectionInd
 				float l = c.getFloat(c.getColumnIndex(from[i]));
 				if (l != CardDbAdapter.NOONECARES) {
 					hideLoyalty = false;
-					textfield.setText(Float.toString(l));
+					if (l == (int) l) {
+						textfield.setText(Integer.toString((int) l));
+					}
+					else {
+						textfield.setText(Float.toString(l));
+					}
 				}
 			}
 		}

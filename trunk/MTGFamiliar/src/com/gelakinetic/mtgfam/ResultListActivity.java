@@ -41,6 +41,8 @@ import android.widget.ListView;
 public class ResultListActivity extends ListActivity {
 
 	static final int					NO_RESULT	= 1;
+	static int						cursorPosition = 0;
+	static int						cursorPositionOffset = 0;
 	private CardDbAdapter			mDbHelper;
 	private ListView					lv;
 	private Context						mCtx;
@@ -91,6 +93,10 @@ public class ResultListActivity extends ListActivity {
 
 			lv.setOnItemClickListener(new OnItemClickListener() {
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					cursorPosition = lv.getFirstVisiblePosition();
+					View cursorPositionView = lv.getChildAt(0);
+					cursorPositionOffset = (cursorPositionView == null) ? 0 : cursorPositionView.getTop();
+					
 					Intent i = new Intent(mCtx, CardViewActivity.class);
 					i.putExtra("id", id);
 					startActivityForResult(i, 0);
@@ -112,6 +118,7 @@ public class ResultListActivity extends ListActivity {
 	protected void onResume() {
 		super.onResume();
 		fillData(c);
+		lv.setSelectionFromTop(cursorPosition, cursorPositionOffset);
 	}
 
 	@Override
@@ -229,6 +236,8 @@ public class ResultListActivity extends ListActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		cursorPosition = 0;
+		cursorPositionOffset = 0;
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.result_list_menu, menu);
 		return true;

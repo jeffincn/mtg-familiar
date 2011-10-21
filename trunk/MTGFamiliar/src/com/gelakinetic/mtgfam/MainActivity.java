@@ -68,7 +68,7 @@ public class MainActivity extends Activity implements Runnable {
 	private static final int		OTAPATCH					= 1;
 	private static final int		APPLYINGPATCH			= 3;
 	private static final int		DBFROMWEB					= 4;
-	private static final int		DATABASE_VERSION	= 5;
+	private static final int		DATABASE_VERSION	= 6;
 	private static final int		EXCEPTION					= 99;
 	private static final int		ABOUTDIALOG				= 0;
 	private static final int		CHANGELOGDIALOG		= 1;
@@ -259,8 +259,8 @@ public class MainActivity extends Activity implements Runnable {
 		// Handle item selection
 		switch (item.getItemId()) {
 
-			// case R.id.buildWebDB: startThread(DBFROMWEB); return true;
-			// case R.id.refreshDB: startThread(DBFROMAPK); return true;
+			//case R.id.buildWebDB: startThread(DBFROMWEB); return true;
+			//case R.id.refreshDB: startThread(DBFROMAPK); return true;
 
 			case R.id.checkUpdate:
 				// Set the last legality update time back to zero on a forced update

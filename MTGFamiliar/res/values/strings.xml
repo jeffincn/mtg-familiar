@@ -165,6 +165,7 @@ Program licenced under the &lt;a href=&quot;http://www.gnu.org/licenses/gpl.html
 Media licenced under under the &lt;a href=&quot;http://creativecommons.org/licenses/by-sa/3.0/&quot;&gt;Creative Commons Attribution-ShareAlike 3.0 Unported License&lt;a&gt;.</string>
 
 	<string name="whatsnew">
+<!-- 1.1
 - App supports "Move to SD"&lt;br /&gt;
 - App supports landscape orientation&lt;br /&gt;
 - Added global search button for simple card search&lt;br /&gt;
@@ -178,7 +179,10 @@ Media licenced under under the &lt;a href=&quot;http://creativecommons.org/licen
 - Can determine between lack of internet connectivity and lack of pricing data&lt;br /&gt;
 - UI tweaks all over the place&lt;br /&gt;
 - General bugfixes
-	</string>    
+ -->
+ <!-- 1.1.1 -->
+ - Fixed issue where result list would reset position
+ 	</string>    
 	    
 	<string name="gatherer">Gatherer Page</string>
 

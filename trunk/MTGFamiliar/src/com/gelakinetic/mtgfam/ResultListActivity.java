@@ -97,10 +97,6 @@ public class ResultListActivity extends ListActivity {
 
 			lv.setOnItemClickListener(new OnItemClickListener() {
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					cursorPosition = lv.getFirstVisiblePosition();
-					View cursorPositionView = lv.getChildAt(0);
-					cursorPositionOffset = (cursorPositionView == null) ? 0 : cursorPositionView.getTop();
-					
 					Intent i = new Intent(mCtx, CardViewActivity.class);
 					i.putExtra("id", id);
 					startActivityForResult(i, 0);
@@ -128,6 +124,9 @@ public class ResultListActivity extends ListActivity {
 	@Override
 	public void onPause() {
 		super.onPause();
+		cursorPosition = lv.getFirstVisiblePosition();
+		View cursorPositionView = lv.getChildAt(0);
+		cursorPositionOffset = (cursorPositionView == null) ? 0 : cursorPositionView.getTop();
 	}
 
 	@Override
@@ -148,16 +147,6 @@ public class ResultListActivity extends ListActivity {
 	}
 
 	private void fillData(Cursor c) {
-
-		// Create an array to specify the fields we want to display in the list
-		// (only TITLE)
-		/*
-		 * String[] from = new String[] { CardDbAdapter.KEY_NAME,
-		 * CardDbAdapter.KEY_SET, CardDbAdapter.KEY_MANACOST,
-		 * CardDbAdapter.KEY_TYPE, CardDbAdapter.KEY_ABILITY,
-		 * CardDbAdapter.KEY_POWER, CardDbAdapter.KEY_TOUGHNESS,
-		 * CardDbAdapter.KEY_LOYALTY };
-		 */
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -196,10 +185,6 @@ public class ResultListActivity extends ListActivity {
 		for (int i = 0; i < to.length; i++) {
 			to[i] = toList.get(i);
 		}
-		// and an array of the fields we want to bind those fields to (in this case
-		// just text1)
-		// int[] to = new int[] { R.id.cardname, R.id.cardset, R.id.cardcost,
-		// R.id.cardtype, R.id.cardability };
 
 		ResultListAdapter rla = new ResultListAdapter(this, R.layout.card_row, c, from, to, this.getResources());
 		setListAdapter(rla);
@@ -258,5 +243,4 @@ public class ResultListActivity extends ListActivity {
 				return super.onOptionsItemSelected(item);
 		}
 	}
-
 }

@@ -39,7 +39,6 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -51,6 +50,7 @@ import android.text.ClipboardManager;
 import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.text.method.LinkMovementMethod;
+import android.util.DisplayMetrics;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
@@ -466,19 +466,34 @@ public class CardViewActivity extends Activity implements Runnable {
 					Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 					int newHeight;
 					int newWidth;
-					if (setCode.equals("PCP")) {
-						Matrix mat = new Matrix();
-						mat.setRotate(90);
-						bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), mat, true);
-						float scale = (display.getWidth() - 20) / (float) d.getIntrinsicHeight();
-						newWidth = Math.round(bmp.getWidth() * scale);
-						newHeight = Math.round(bmp.getHeight() * scale);
+					float scale;
+					if (display.getWidth() < display.getHeight()) {
+						scale = (display.getWidth() - 20) / (float) d.getIntrinsicWidth();
 					}
 					else {
-						float scale = (display.getWidth() - 20) / (float) d.getIntrinsicWidth();
-						newWidth = Math.round(bmp.getWidth() * scale);
-						newHeight = Math.round(bmp.getHeight() * scale);
+						DisplayMetrics metrics = new DisplayMetrics();
+						getWindowManager().getDefaultDisplay().getMetrics(metrics);
+						int myHeight = 0;
+
+						switch (metrics.densityDpi) {
+							case DisplayMetrics.DENSITY_HIGH:
+								myHeight = display.getHeight() - 48;
+								break;
+							case DisplayMetrics.DENSITY_MEDIUM:
+								myHeight = display.getHeight() - 32;
+								break;
+							case DisplayMetrics.DENSITY_LOW:
+								myHeight = display.getHeight() - 24;
+								break;
+							default:
+								break;
+						}
+
+						scale = (myHeight - 10) / (float) d.getIntrinsicHeight();
 					}
+					newWidth = Math.round(bmp.getWidth() * scale);
+					newHeight = Math.round(bmp.getHeight() * scale);
+
 					bmp = Bitmap.createScaledBitmap(bmp, newWidth, newHeight, true);
 					d = new BitmapDrawable(bmp);
 				}

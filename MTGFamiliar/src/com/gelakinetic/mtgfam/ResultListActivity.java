@@ -171,8 +171,11 @@ public class ResultListActivity extends ListActivity {
 		}
 		if (preferences.getBoolean("ptPref", false)) {
 			fromList.add(CardDbAdapter.KEY_POWER);
+			toList.add(R.id.cardp);
 			fromList.add(CardDbAdapter.KEY_TOUGHNESS);
+			toList.add(R.id.cardt);
 			fromList.add(CardDbAdapter.KEY_LOYALTY);
+			toList.add(R.id.cardt);
 		}
 		String[] from = new String[fromList.size()];
 		fromList.toArray(from);

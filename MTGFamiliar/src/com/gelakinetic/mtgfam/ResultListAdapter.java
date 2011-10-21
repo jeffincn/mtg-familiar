@@ -77,33 +77,34 @@ public class ResultListAdapter extends SimpleCursorAdapter implements SectionInd
 	@Override
 	public void bindView(View v, Context context, Cursor c) {
 
-		float p = CardDbAdapter.NOONECARES;
-		float t = CardDbAdapter.NOONECARES;
-		float l = CardDbAdapter.NOONECARES;
-		
 		boolean hideCost = true;
 		boolean hideSet = true;
 		boolean hideType = true;
 		boolean hideAbility = true;
+		boolean hidePT = true;
+		boolean hideLoyalty = true;
+
+		((TextView) v.findViewById(R.id.cardp)).setVisibility(View.VISIBLE);
+		((TextView) v.findViewById(R.id.cardslash)).setVisibility(View.VISIBLE);
+		((TextView) v.findViewById(R.id.cardt)).setVisibility(View.VISIBLE);
 
 		for (int i = 0; i < from.length; i++) {
-			String name = c.getString(c.getColumnIndex(from[i]));
 
-			TextView textfield = null;
-			if (i < to.length) {
-				textfield = (TextView) v.findViewById(to[i]);
-			}
-			
+			TextView textfield = (TextView) v.findViewById(to[i]);
+
 			if (CardDbAdapter.KEY_NAME.equals(from[i])) {
+				String name = c.getString(c.getColumnIndex(from[i]));
 				textfield.setText(name);
 			}
 			else if (CardDbAdapter.KEY_MANACOST.equals(from[i])) {
+				String name = c.getString(c.getColumnIndex(from[i]));
 				hideCost = false;
 				name = name.replace("{", "<img src=\"").replace("}", "\"/>");
 				CharSequence csq = Html.fromHtml(name, imgGetter, null);
 				textfield.setText(csq);
 			}
 			else if (CardDbAdapter.KEY_SET.equals(from[i])) {
+				String name = c.getString(c.getColumnIndex(from[i]));
 				hideSet = false;
 				textfield.setText(name);
 				char rarity = (char) c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY));
@@ -123,94 +124,101 @@ public class ResultListAdapter extends SimpleCursorAdapter implements SectionInd
 				}
 			}
 			else if (CardDbAdapter.KEY_TYPE.equals(from[i])) {
+				String name = c.getString(c.getColumnIndex(from[i]));
 				hideType = false;
 				textfield.setText(name);
 			}
 			else if (CardDbAdapter.KEY_ABILITY.equals(from[i])) {
+				String name = c.getString(c.getColumnIndex(from[i]));
 				hideAbility = false;
 				name = name.replace("{", "<img src=\"").replace("}", "\"/>");
 				CharSequence csq = Html.fromHtml(name, imgGetter, null);
 				textfield.setText(csq);
 			}
 			else if (CardDbAdapter.KEY_POWER.equals(from[i])) {
-				p = Float.parseFloat(name);
+				float p = c.getFloat(c.getColumnIndex(from[i]));
+				if (p != CardDbAdapter.NOONECARES) {
+					String pow;
+					hidePT = false;
+					if (p == CardDbAdapter.STAR)
+						pow = "*";
+					else if (p == CardDbAdapter.ONEPLUSSTAR)
+						pow = "1+*";
+					else if (p == CardDbAdapter.TWOPLUSSTAR)
+						pow = "2+*";
+					else if (p == CardDbAdapter.SEVENMINUSSTAR)
+						pow = "7-*";
+					else if (p == CardDbAdapter.STARSQUARED)
+						pow = "*^2";
+					else {
+						if (p == (int) p) {
+							pow = new Integer((int) p).toString();
+						}
+						else {
+							pow = new Float(p).toString();
+							;
+						}
+					}
+					textfield.setText(pow);
+				}
 			}
 			else if (CardDbAdapter.KEY_TOUGHNESS.equals(from[i])) {
-				t = Float.parseFloat(name);
+				float t = c.getFloat(c.getColumnIndex(from[i]));
+				if (t != CardDbAdapter.NOONECARES) {
+					hidePT = false;
+					String tou;
+					if (t == CardDbAdapter.STAR)
+						tou = "*";
+					else if (t == CardDbAdapter.ONEPLUSSTAR)
+						tou = "1+*";
+					else if (t == CardDbAdapter.TWOPLUSSTAR)
+						tou = "2+*";
+					else if (t == CardDbAdapter.SEVENMINUSSTAR)
+						tou = "7-*";
+					else if (t == CardDbAdapter.STARSQUARED)
+						tou = "*^2";
+					else {
+						if (t == (int) t) {
+							tou = new Integer((int) t).toString();
+						}
+						else {
+							tou = new Float(t).toString();
+							;
+						}
+					}
+					textfield.setText(tou);
+				}
 			}
 			else if (CardDbAdapter.KEY_LOYALTY.equals(from[i])) {
-				l = Float.parseFloat(name);
-			}
-		}
-
-		TextView pt = (TextView) v.findViewById(R.id.cardpt);
-
-		if (l != CardDbAdapter.NOONECARES) {
-			pt.setText(new Integer((int)l).toString());
-		}
-		else if (p != CardDbAdapter.NOONECARES && t != CardDbAdapter.NOONECARES) {
-
-			String spt = "";
-
-			if (p == CardDbAdapter.STAR)
-				spt += "*";
-			else if (p == CardDbAdapter.ONEPLUSSTAR)
-				spt += "1+*";
-			else if (p == CardDbAdapter.TWOPLUSSTAR)
-				spt += "2+*";
-			else if (p == CardDbAdapter.SEVENMINUSSTAR)
-				spt += "7-*";
-			else if (p == CardDbAdapter.STARSQUARED)
-				spt += "*^2";
-			else {
-				if (p == (int) p) {
-					spt += (int) p;
-				}
-				else {
-					spt += p;
+				float l = c.getFloat(c.getColumnIndex(from[i]));
+				if (l != CardDbAdapter.NOONECARES) {
+					hideLoyalty = false;
+					textfield.setText(Float.toString(l));
 				}
 			}
-
-			spt += "/";
-
-			if (t == CardDbAdapter.STAR)
-				spt += "*";
-			else if (t == CardDbAdapter.ONEPLUSSTAR)
-				spt += "1+*";
-			else if (t == CardDbAdapter.TWOPLUSSTAR)
-				spt += "2+*";
-			else if (t == CardDbAdapter.SEVENMINUSSTAR)
-				spt += "7-*";
-			else if (t == CardDbAdapter.STARSQUARED)
-				spt += "*^2";
-			else {
-				if (t == (int) t) {
-					spt += (int) t;
-				}
-				else {
-					spt += t;
-				}
-			}
-
-			pt.setText(spt);
 		}
-		else {
-			pt.setVisibility(View.GONE);
-		}
-		
-		if(hideCost){
+
+		if (hideCost) {
 			((TextView) v.findViewById(R.id.cardcost)).setVisibility(View.GONE);
 		}
-		if(hideSet){
+		if (hideSet) {
 			((TextView) v.findViewById(R.id.cardset)).setVisibility(View.GONE);
 		}
-		if(hideType){
+		if (hideType) {
 			((TextView) v.findViewById(R.id.cardtype)).setVisibility(View.GONE);
 		}
-		if(hideAbility){
+		if (hideAbility) {
 			((TextView) v.findViewById(R.id.cardability)).setVisibility(View.GONE);
 		}
-
+		if (!hideLoyalty) {
+			((TextView) v.findViewById(R.id.cardp)).setVisibility(View.GONE);
+			((TextView) v.findViewById(R.id.cardslash)).setVisibility(View.GONE);
+		}
+		else if (hidePT) {
+			((TextView) v.findViewById(R.id.cardp)).setVisibility(View.GONE);
+			((TextView) v.findViewById(R.id.cardslash)).setVisibility(View.GONE);
+			((TextView) v.findViewById(R.id.cardt)).setVisibility(View.GONE);
+		}
 	}
 
 	public int getPositionForSection(int section) {

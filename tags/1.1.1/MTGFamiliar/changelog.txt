@@ -1,0 +1,33 @@
+Version 1.1:
+ - Supports Move to SD functionality
+ - Supports rotation in all views
+ - Can copy text in card view
+ - Card searches support enhanced scrollbar
+ - Search result view can now display type/subtype, rules text, and power/toughness in addition to cost/set/rarity
+ - Added preference to view art instead of rules text in card view
+ - Added global search button for simple card search
+ - Database adds now contains Innistrad, instead of having to download it
+ - Added preference to reduce frequency of set/legality update checks
+ - UI tweaks all over the place
+ - Can determine between lack of internet and lack of pricing data
+ - General bugfixes
+
+Version 1.0:
+ - First Market Release
+ - Many fixes involving card images and prices
+ - Card view can pull up Gatherer page
+ - Search result view revamped to show casting cost and set/rarity
+ - Life/poison counters persist
+ 
+Version 0.4 (Beta):
+ - Dramatic rewrite of life counter, now with history for both life and poison
+ - Mana pool to track mana and storm count
+ - Dice look nicer
+ - Various fixes and improvements to card search
+ - Shiny new main menu
+ - Supports Android 1.5
+
+Version 0.3 (Alpha):
+ - Much improved random number generator
+ - Added ability to automatically download new sets
+ - Bugfixes everywhere

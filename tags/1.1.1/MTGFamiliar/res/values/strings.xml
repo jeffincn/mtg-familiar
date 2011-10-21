@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2011 Adam Feinstein and April King. This file is part of MTG Familiar.
+	MTG Familiar is free software: you can redistribute it and/or modify it under 
+	the terms of the GNU General Public License as published by the Free Software 
+	Foundation, either version 3 of the License, or (at your option) any later 
+	version. MTG Familiar is distributed in the hope that it will be useful, 
+	but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+	or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for 
+	more details. You should have received a copy of the GNU General Public License 
+	along with MTG Familiar. If not, see <http://www.gnu.org/licenses/>. -->
+<resources>
+	<string name="app_name">MTG Familiar</string>
+
+	<string-array name="logic_spinner">
+		<item>></item>
+		<item>&lt;</item>
+		<item>=</item>
+	</string-array>
+
+	<string-array name="rarities">
+		<item>Common</item>
+		<item>Uncommon</item>
+		<item>Rare</item>
+		<item>Mythic</item>
+	</string-array>
+
+	<string-array name="pt_spinner">
+		<item />
+		<item>-1</item>
+		<item>0</item>
+		<item>1</item>
+		<item>2</item>
+		<item>3</item>
+		<item>4</item>
+		<item>5</item>
+		<item>6</item>
+		<item>7</item>
+		<item>8</item>
+		<item>9</item>
+		<item>10</item>
+		<item>11</item>
+		<item>12</item>
+		<item>13</item>
+		<item>14</item>
+		<item>15</item>
+		<item>*</item>
+		<item>1+*</item>
+		<item>2+*</item>
+		<item>7-*</item>
+		<item>99</item>
+		<item>*^2</item>
+		<item>0.5</item>
+		<item>1.5</item>
+		<item>2.5</item>
+		<item>3.5</item>
+	</string-array>
+
+	<string-array name="cmc_spinner">
+		<item />
+		<item>0</item>
+		<item>1</item>
+		<item>2</item>
+		<item>3</item>
+		<item>4</item>
+		<item>5</item>
+		<item>6</item>
+		<item>7</item>
+		<item>8</item>
+		<item>9</item>
+		<item>10</item>
+		<item>11</item>
+		<item>12</item>
+		<item>13</item>
+		<item>14</item>
+		<item>15</item>
+		<item>16</item>
+		<item>1000000</item>
+	</string-array>
+
+	<string-array name="color_spinner">
+		<item>May Include Any Colors</item>
+		<item>Must Include All Colors</item>
+	</string-array>
+
+	<string name="pow">Power</string>
+	<string name="tou">Toughness</string>
+	<string name="formatsearch">Format</string>
+	<string name="setsearch">Set</string>
+	<string name="cmc">CMC</string>
+	<string name="image">Card Image</string>
+	<string name="price">Card Price</string>
+	<string name="cardsearch">Card Search</string>
+	<string name="lifecounter">Life Counter</string>
+	<string name="manapool">Mana Pool</string>
+	<string name="random">Dice</string>
+	<string name="plus">+</string>
+	<string name="minus">-</string>
+	<string name="searchrarity">Rarity</string>
+	<string name="clear">Clear Fields</string>
+	<string name="clear_all">Clear All</string>
+
+	<string name="legality">Legality</string>
+
+	<string name="about">About App</string>
+
+	<string name="high">High:</string>
+
+	<string name="med">Average:</string>
+
+	<string name="low">Low:</string>
+
+	<string name="pricetitle">TCGPlayer.com Prices</string>
+
+	<string name="settings">Settings</string>
+
+	<string name="chkupd">Force Update</string>
+
+	<string name="preferences">Settings</string>
+
+	<string name="transform">Transform</string>
+
+	<string name="d2title">Treat D2 As Coin</string>
+
+	<string name="webDB">Build DB from Web</string>
+	<string name="refreshDB">Refresh DB from APK</string>
+
+	<string name="searchButton">Search!</string>
+
+	<string name="deckmanagement">Deck Management</string>
+
+	<string name="defaultdeckpath">/Android/data/com.gelakinetic.mtgfam/</string>
+
+	<string name="defaultpathtitle">Path To Decks</string>
+
+	<string name="defaultpathsummary">This is the place on your SD card where decks are
+		saved to and read from</string>
+
+	<string name="default_deck_path_key">default_deck_path</string>
+
+	<string name="default_deck_path_dialog_title">Enter Path Here</string>
+
+	<string name="tcgplayerlink">Click here for all prices and trend info</string>
+
+	<string name="toast_no_result">No Results Found</string>
+
+	<string name="name">Name</string>
+	<string name="type">Type</string>
+	<string name="text">Text</string>
+	<string name="flavor_text">Flavor Text</string>
+	<string name="artist">Artist</string>
+
+	<string name="about_this_app">This app is my gift to the MTG community.&lt;br /&gt;&lt;br /&gt;
+Please send questions, comments, concerns, and praise to &lt;a href=&quot;mailto:mtg.familiar@gmail.com&quot;&gt;mtg.familiar@gmail.com&lt;/a&gt;.&lt;br /&gt;&lt;br /&gt;
+Join the &lt;a href=&quot;http://code.google.com/p/mtg-familiar&quot;&gt;open source project&lt;/a&gt; on Google Code.&lt;br /&gt;&lt;br /&gt;
+Thanks to zagaberoo for beautiful graphics and even more beautiful code.&lt;br /&gt;&lt;br /&gt;
+Thanks to April King for the massive QA effort, and learning Java. Shh, don\'t tell anyone about that.&lt;br /&gt;&lt;br /&gt;
+Thanks to chaudakh for the wonderful Gatherer Extractor program.&lt;br /&gt;&lt;br /&gt;
+Thanks to reddit\'s &lt;a href=&quot;http://www.reddit.com/r/magicTCG/&quot;&gt;/r/magictcg&lt;/a&gt; for testing and feedback.&lt;br /&gt;&lt;br /&gt;
+Thanks to my brother for the icon.&lt;br /&gt;&lt;br /&gt;
+Thanks to Chedy @ &lt;a href=&quot;http://tcgplayer.com&quot;&gt;TCGPlayer.com&lt;/a&gt; for the price API.&lt;br /&gt;&lt;br /&gt;
+Special thanks to Richard Garfield and the rest of the folks at &lt;a href=&quot;http://www.wizards.com/magic&quot;&gt;Wizards of the Coast&lt;/a&gt;.&lt;br /&gt;&lt;br /&gt;
+--gelakinetic&lt;br /&gt;&lt;br /&gt;&lt;br /&gt;
+Magic the Gathering and Magic the Gathering cards are ™ &amp; © Wizards of the Coast LLC.&lt;br /&gt;&lt;br /&gt;
+Program licenced under the &lt;a href=&quot;http://www.gnu.org/licenses/gpl.html&quot;&gt;GNU General Public License v3+&lt;/a&gt;.&lt;br /&gt;&lt;br /&gt;
+Media licenced under under the &lt;a href=&quot;http://creativecommons.org/licenses/by-sa/3.0/&quot;&gt;Creative Commons Attribution-ShareAlike 3.0 Unported License&lt;a&gt;.</string>
+
+	<string name="whatsnew">
+- App supports "Move to SD"&lt;br /&gt;
+- App supports landscape orientation&lt;br /&gt;
+- Added global search button for simple card search&lt;br /&gt;
+- Reduced frequency of set &amp; legality update checks&lt;br /&gt;
+- Added preference to control frequency of set &amp; legality update checks&lt;br /&gt;
+- Search results support enhanced scrollbar&lt;br /&gt;
+- Search results can now display type/subtype, rules text, and power/toughness in addition to cost/set/rarity&lt;br /&gt;
+- Added preferences to control information display on results page&lt;br /&gt;
+- Added preference to view art instead of rules text in card view&lt;br /&gt;
+- Text is copyable in card view&lt;br /&gt;
+- Can determine between lack of internet connectivity and lack of pricing data&lt;br /&gt;
+- UI tweaks all over the place&lt;br /&gt;
+- General bugfixes
+	</string>    
+	    
+	<string name="gatherer">Gatherer Page</string>
+
+	<string name="lifetitle">Life Counter</string>
+
+	<string name="wakelocksummary">Force the life counter screen to never go to sleep</string>
+
+	<string name="wakelocktitle">Wake Lock</string>
+
+	<string name="copy">Copy Section To Clipboard</string>
+	<string name="copyall">Copy Card To Clipboard</string>
+
+	<string-array name="updatefrequencydays">
+		<item>1 day</item>
+		<item>2 days</item>
+		<item>3 days</item>
+		<item>5 days</item>
+		<item>1 week</item>
+		<item>2 weeks</item>
+	</string-array>
+	<string-array name="updatefrequencydaysvalues">
+		<item>1</item>
+		<item>2</item>
+		<item>3</item>
+		<item>5</item>
+		<item>7</item>
+		<item>14</item>
+	</string-array>
+	
+	<string name="search_hint">Search Names</string>
+
+<string name="cardviewtitle">Card View</string>
+<string name="picfirsttitle">Always Show Art</string>
+<string name="picfirstsummary">When viewing a card, load official card image instead of rules text</string>
+
+<string name="resultlisttitle" >Result List</string>
+<string name="setPreftitle" >Show Set</string>
+<string name="manacostPreftitle" >Show Mana Cost</string>
+<string name="typePreftitle" >Show Type/Subtype</string>
+<string name="abilityPreftitle" >Show Rules Text</string>
+<string name="ptPreftitle" >Show Power/Toughness</string>
+<string name="automaticupdatetitle">Automatic Updates</string>
+<string name="automaticupdatesummary">Check for new sets and bannings when the app opens</string>
+<string name="updatefrequencytitle">Update Frequency</string>
+<string name="updatefrequencysummary">Number of days to go between checking for new sets and bannings</string>
+
+</resources>

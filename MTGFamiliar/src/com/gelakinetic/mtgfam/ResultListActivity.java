@@ -53,6 +53,10 @@ public class ResultListActivity extends ListActivity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		// After a search, make sure the position is on top
+		cursorPosition = 0;
+		cursorPositionOffset = 0;
+		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.result_list_activity);
 

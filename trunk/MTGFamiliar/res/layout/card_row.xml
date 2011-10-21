@@ -27,7 +27,11 @@
 	</LinearLayout>
 	<LinearLayout android:orientation="vertical" android:id="@+id/linearLayout4" android:layout_height="wrap_content" android:layout_width="match_parent" android:paddingBottom="3sp">
 		<TextView android:text="Ability" android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/cardability" android:textSize="18sp" style="@style/text" android:paddingTop="3sp"></TextView>
-		<TextView android:text="P/T" android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/cardpt" android:textSize="18sp" style="@style/text" android:gravity="right"></TextView>
+		<LinearLayout android:orientation="horizontal" android:id="@+id/linearLayout5" android:layout_height="wrap_content" android:layout_width="match_parent" android:gravity="right">
+	   		<TextView android:text="P" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/cardp" android:textSize="18sp" style="@style/text" android:gravity="right"></TextView>
+	   		<TextView android:text="/" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/cardslash" android:textSize="18sp" style="@style/text" android:gravity="right"></TextView>
+	   		<TextView android:text="T" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/cardt" android:textSize="18sp" style="@style/text" android:gravity="right"></TextView>
+	   	</LinearLayout>
 	</LinearLayout>
 
 </LinearLayout>

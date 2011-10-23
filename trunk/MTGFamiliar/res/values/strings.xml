@@ -228,5 +228,6 @@ Media licenced under under the &lt;a href=&quot;http://creativecommons.org/licen
 <string name="automaticupdatesummary">Check for new sets and bannings when the app opens</string>
 <string name="updatefrequencytitle">Update Frequency</string>
 <string name="updatefrequencysummary">Number of days to go between checking for new sets and bannings</string>
+<string name="randomCard">Random Card</string>
 
 </resources>

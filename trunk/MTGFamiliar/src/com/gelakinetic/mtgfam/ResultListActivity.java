@@ -64,11 +64,14 @@ public class ResultListActivity extends ListActivity {
 		mDbHelper.open();
 		mCtx = this;
 
+		String[] returnTypes = new String[] { CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_SET, CardDbAdapter.KEY_RARITY,
+				CardDbAdapter.KEY_MANACOST, CardDbAdapter.KEY_TYPE, CardDbAdapter.KEY_ABILITY, CardDbAdapter.KEY_POWER, CardDbAdapter.KEY_TOUGHNESS, CardDbAdapter.KEY_LOYALTY };
+		
 		Intent intent = getIntent();
 		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
 			String query = intent.getStringExtra(SearchManager.QUERY);
 			c = mDbHelper.Search(this.getApplicationContext(), query, null, null, "wubrgl", 0, null,
-					CardDbAdapter.NOONECARES, null, CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null);
+					CardDbAdapter.NOONECARES, null, CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, returnTypes);
 		}
 		else {
 
@@ -82,7 +85,7 @@ public class ResultListActivity extends ListActivity {
 					extras.getString(SearchActivity.TOU_LOGIC), extras.getInt(SearchActivity.CMC),
 					extras.getString(SearchActivity.CMC_LOGIC), extras.getString(SearchActivity.FORMAT),
 					extras.getString(SearchActivity.RARITY), extras.getString(SearchActivity.FLAVOR),
-					extras.getString(SearchActivity.ARTIST));
+					extras.getString(SearchActivity.ARTIST), returnTypes);
 		}
 
 		if (c == null || c.getCount() == 0) {

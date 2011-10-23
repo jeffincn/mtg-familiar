@@ -77,6 +77,24 @@
 					android:layout_weight="3" style="@style/text"
 					android:layout_marginLeft="12dip" />
 			</LinearLayout>
+			<LinearLayout android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:id="@+id/randomCard"
+				android:gravity="center" android:orientation="horizontal">
+				<ImageView android:layout_width="0dp"
+					android:layout_height="wrap_content" android:src="@drawable/card_search_icon"
+					android:scaleType="center" android:layout_weight="1"
+					android:layout_marginTop="8dip" android:layout_marginBottom="8dip" />
+
+				<TextView
+				    style="@style/text"
+				    android:layout_width="0dp"
+				    android:layout_height="wrap_content"
+				    android:layout_marginLeft="12dip"
+				    android:layout_weight="3"
+				    android:text="@string/randomCard"
+				    android:textSize="30dip" />
+
+			</LinearLayout>
 			<Button android:layout_width="fill_parent"
 				android:layout_height="wrap_content" android:textSize="30dip"
 				android:layout_weight="1" android:id="@+id/deckmanager"

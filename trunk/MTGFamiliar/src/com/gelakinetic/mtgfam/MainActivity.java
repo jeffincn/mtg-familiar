@@ -87,6 +87,7 @@ public class MainActivity extends Activity implements Runnable {
 	private String							stacktrace;
 	private Button							deckmanagement;
 	private PackageInfo	pInfo;
+	private LinearLayout randomCard;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -99,6 +100,7 @@ public class MainActivity extends Activity implements Runnable {
 		life = (LinearLayout) findViewById(R.id.lifecounter);
 		rng = (LinearLayout) findViewById(R.id.rng);
 		manapool = (LinearLayout) findViewById(R.id.manapool);
+		randomCard = (LinearLayout) findViewById(R.id.randomCard);
 		deckmanagement = (Button) findViewById(R.id.deckmanager);
 
 		search.setOnClickListener(new View.OnClickListener() {
@@ -132,6 +134,13 @@ public class MainActivity extends Activity implements Runnable {
 		deckmanagement.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent(mCtx, DeckManagementActivity.class);
+				startActivity(i);
+			}
+		});
+		
+		randomCard.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Intent i = new Intent(mCtx, RandomCardActivity.class);
 				startActivity(i);
 			}
 		});
@@ -507,10 +516,8 @@ public class MainActivity extends Activity implements Runnable {
 
 				byte[] buffer = new byte[1024];
 				int length;
-				int totalwritten = 0;
 				while ((length = gis.read(buffer)) > 0) {
 					fos.write(buffer, 0, length);
-					totalwritten += length;
 				}
 
 				editor.putInt("databaseVersion", DATABASE_VERSION);

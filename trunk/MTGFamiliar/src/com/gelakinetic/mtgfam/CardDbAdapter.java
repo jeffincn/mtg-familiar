@@ -325,6 +325,28 @@ public class CardDbAdapter {
 	}
 
 	/**
+	 * Return a Cursor positioned at the Card that matches the given rowId
+	 * 
+	 * @param rowId
+	 *          id of Card to retrieve
+	 * @return Cursor positioned to matching Card, if found
+	 * @throws SQLException
+	 *           if Card could not be found/retrieved
+	 */
+	public Cursor fetchCardByName(String name) throws SQLException {
+		name = name.replace("'", "''");
+		String statement = "(" + KEY_NAME + " = '" + name+"')";
+		Cursor mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_NAME, KEY_SET, KEY_TYPE, KEY_RARITY,
+				KEY_MANACOST, KEY_CMC, KEY_POWER, KEY_TOUGHNESS, KEY_LOYALTY, KEY_ABILITY, KEY_FLAVOR, KEY_ARTIST, KEY_NUMBER,
+				KEY_COLOR, KEY_MULTIVERSEID }, statement, null, null, null, KEY_NAME, null);
+		if (mCursor != null) {
+			mCursor.moveToFirst();
+		}
+		return mCursor;
+
+	}
+
+	/**
 	 * Update the Card using the details provided. The Card to be updated is
 	 * specified using the rowId, and it is altered to use the title and body
 	 * values passed in
@@ -361,9 +383,9 @@ public class CardDbAdapter {
 		return mDb.update(DATABASE_TABLE_CARDS, args, KEY_ID + "=" + id, null) > 0;
 	}
 
-	public Cursor Search(Context mCtx, String cardname, String cardtext, String cardtype, String color, int colorlogic,
+	public Cursor Search(String cardname, String cardtext, String cardtype, String color, int colorlogic,
 			String sets, float pow_choice, String pow_logic, float tou_choice, String tou_logic, int cmc, String cmcLogic,
-			String formats, String rarity, String flavor, String artist, String[] returnTypes) {
+			String formats, String rarity, String flavor, String artist, boolean backface, String[] returnTypes) {
 		Cursor mCursor = null;
 
 		if (cardname != null)
@@ -635,6 +657,15 @@ public class CardDbAdapter {
 				}
 			}
 			statement += ")";
+		}
+		
+		if(!backface){
+				if (statement == null) {
+					statement = "(" + KEY_NUMBER + " NOT LIKE '%b%')";
+				}
+				else {
+					statement += " AND (" + KEY_NUMBER + " NOT LIKE '%b%')";
+				}
 		}
 
 		if(statement == null){

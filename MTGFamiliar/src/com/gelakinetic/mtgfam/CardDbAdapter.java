@@ -363,7 +363,7 @@ public class CardDbAdapter {
 
 	public Cursor Search(Context mCtx, String cardname, String cardtext, String cardtype, String color, int colorlogic,
 			String sets, float pow_choice, String pow_logic, float tou_choice, String tou_logic, int cmc, String cmcLogic,
-			String formats, String rarity, String flavor, String artist) {
+			String formats, String rarity, String flavor, String artist, String[] returnTypes) {
 		Cursor mCursor = null;
 
 		if (cardname != null)
@@ -642,8 +642,7 @@ public class CardDbAdapter {
 		}
 
 		try {
-			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID, KEY_NAME, KEY_SET, KEY_RARITY,
-					KEY_MANACOST, KEY_TYPE, KEY_ABILITY, KEY_POWER, KEY_TOUGHNESS, KEY_LOYALTY }, statement, null, null, null, KEY_NAME, null);
+			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, returnTypes, statement, null, null, null, KEY_NAME, null);
 		}
 		catch (SQLiteException e) {
 			// Log.v("tag", e.toString());

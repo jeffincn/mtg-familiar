@@ -70,14 +70,14 @@ public class ResultListActivity extends ListActivity {
 		Intent intent = getIntent();
 		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
 			String query = intent.getStringExtra(SearchManager.QUERY);
-			c = mDbHelper.Search(this.getApplicationContext(), query, null, null, "wubrgl", 0, null,
-					CardDbAdapter.NOONECARES, null, CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, returnTypes);
+			c = mDbHelper.Search(query, null, null, "wubrgl", 0, null,
+					CardDbAdapter.NOONECARES, null, CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, true, returnTypes);
 		}
 		else {
 
 			Bundle extras = intent.getExtras();
 
-			c = mDbHelper.Search(this.getApplicationContext(), extras.getString(CardDbAdapter.KEY_NAME),
+			c = mDbHelper.Search(extras.getString(CardDbAdapter.KEY_NAME),
 					extras.getString(SearchActivity.TEXT), extras.getString(SearchActivity.TYPE),
 					extras.getString(SearchActivity.COLOR), extras.getInt(SearchActivity.COLORLOGIC),
 					extras.getString(SearchActivity.SET), extras.getFloat(SearchActivity.POW_CHOICE),
@@ -85,7 +85,7 @@ public class ResultListActivity extends ListActivity {
 					extras.getString(SearchActivity.TOU_LOGIC), extras.getInt(SearchActivity.CMC),
 					extras.getString(SearchActivity.CMC_LOGIC), extras.getString(SearchActivity.FORMAT),
 					extras.getString(SearchActivity.RARITY), extras.getString(SearchActivity.FLAVOR),
-					extras.getString(SearchActivity.ARTIST), returnTypes);
+					extras.getString(SearchActivity.ARTIST), true, returnTypes);
 		}
 
 		if (c == null || c.getCount() == 0) {

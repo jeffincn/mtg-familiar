@@ -247,5 +247,12 @@ Media licenced under under the &lt;a href=&quot;http://creativecommons.org/licen
 <string name="updatefrequencytitle">Update Frequency</string>
 <string name="updatefrequencysummary">Number of days to go between checking for new sets and bannings</string>
 <string name="randomCard">Random Card</string>
+<string name="random_creature">Random Creature</string>
+<string name="random_eqipment">Random Equipment</string>
+<string name="random_instant">Three Random Instants</string>
+<string name="random_sorcery">Three Random Sorceries</string>
+<string name="momirlabel">CMC =</string>
+<string name="stonehewer_label">CMC ≤</string>
+<string name="mojhosto_label">MoJhoSto Basic</string>
 
 </resources>

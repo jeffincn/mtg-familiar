@@ -1,217 +1,184 @@
 package com.gelakinetic.mtgfam;
 
-import java.net.URL;
 import java.util.Random;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.Button;
 import android.widget.Spinner;
-import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.MotionEvent;
-import android.view.WindowManager;
-import android.view.GestureDetector.OnGestureListener;
-import android.view.GestureDetector;
-import android.widget.TextView;
+import android.view.View;
 
-public class RandomCardActivity extends Activity implements OnGestureListener, Runnable {
-	private LinearLayout		main;
-	private TextView				viewA;
-
-	private GestureDetector	gestureScanner;
+public class RandomCardActivity extends Activity {
 	private CardDbAdapter		mDbAdapter;
 	private Random					rand;
-	private ImageView				imgView;
-	private String					picurl;
-	private BitmapDrawable	d;
-	private Bitmap					bmp;
 	private String					name;
-	private Spinner					cmcChoice;
+	private Spinner					momirCmcChoice;
 	private String[]				cmcChoices;
-	private Cursor[]				momir_cursors;
+	private Button					momirButton;
+	private Context					mCtx;
+	private Button	stonehewerButton;
+	private Spinner	stonehewerCmcChoice;
+	private Button	jhoiraInstantButton;
+	private Button	jhoiraSorceryButton;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.random_card_activity);
 
-		gestureScanner = new GestureDetector(this);
+		momirButton = (Button) findViewById(R.id.momir_button);
+		stonehewerButton = (Button) findViewById(R.id.stonehewer_button);
+		jhoiraInstantButton = (Button)findViewById(R.id.jhorira_instant_button);
+		jhoiraSorceryButton = (Button)findViewById(R.id.jhorira_sorcery_button);
+		
+		mCtx = (Context) this;
 
-		main = (LinearLayout) findViewById(R.id.randomCardLinearLayout);
-		viewA = (TextView) findViewById(R.id.randomCardTextView);
-		imgView = (ImageView) findViewById(R.id.randomCardImage);
+		momirButton.setOnClickListener(new View.OnClickListener() {
 
-		setContentView(main);
+			public void onClick(View v) {
+				int cmc;
+				try {
+					cmc = Integer.parseInt(cmcChoices[momirCmcChoice.getSelectedItemPosition()]);
+				}
+				catch (NumberFormatException e) {
+					cmc = -1;
+				}
+				
+				String[] returnTypes = new String[] { CardDbAdapter.KEY_NAME };
+				
+				Cursor doods = mDbAdapter.Search(null, null, "Creature", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
+						CardDbAdapter.NOONECARES, null, cmc, "=", null, null, null, null, false, returnTypes);
 
-		cmcChoice = (Spinner) findViewById(R.id.momir_spinner);
+				int pos = rand.nextInt(doods.getCount());
+				doods.moveToPosition(pos);
+				name = doods.getString(doods.getColumnIndex(CardDbAdapter.KEY_NAME));
+
+				Intent i = new Intent(mCtx, ResultListActivity.class);
+				i.putExtra("id", mDbAdapter.fetchIdByName(name));
+				startActivityForResult(i, 0);
+			}
+		});
+		
+		stonehewerButton.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+				int cmc;
+				try {
+					cmc = Integer.parseInt(cmcChoices[stonehewerCmcChoice.getSelectedItemPosition()]);
+				}
+				catch (NumberFormatException e) {
+					cmc = -1;
+				}
+
+				String[] returnTypes = new String[] { CardDbAdapter.KEY_NAME };
+				
+				Cursor equipment = mDbAdapter.Search(null, null, "Equipment", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
+						CardDbAdapter.NOONECARES, null, cmc+1, "<", null, null, null, null, false, returnTypes);
+				
+				int pos = rand.nextInt(equipment.getCount());
+				equipment.moveToPosition(pos);
+				name = equipment.getString(equipment.getColumnIndex(CardDbAdapter.KEY_NAME));
+
+				Intent i = new Intent(mCtx, ResultListActivity.class);
+				i.putExtra("id", mDbAdapter.fetchIdByName(name));
+				startActivityForResult(i, 0);
+			}
+		});
+
+		jhoiraInstantButton.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+
+				String[] returnTypes = new String[] { CardDbAdapter.KEY_NAME };
+				
+				Cursor instants = mDbAdapter.Search(null, null, "instant", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
+						CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, false, returnTypes);
+
+				// Get 3 random, distinct numbers
+				int pos[] = new int[3];
+				pos[0] = rand.nextInt(instants.getCount());
+				pos[1] = rand.nextInt(instants.getCount());
+				while(pos[0] == pos[1]){
+					pos[1] = rand.nextInt(instants.getCount());					
+				}
+				pos[2] = rand.nextInt(instants.getCount());
+				while(pos[0] == pos[2] || pos[1] == pos[2]){
+					pos[2] = rand.nextInt(instants.getCount());					
+				}
+				
+				String names[] = new String[3];
+				Intent intent = new Intent(mCtx, ResultListActivity.class);
+				for(int i=0; i < 3; i++){
+					instants.moveToPosition(pos[i]);
+	 				names[i] = instants.getString(instants.getColumnIndex(CardDbAdapter.KEY_NAME));
+	 				intent.putExtra("id" + i, mDbAdapter.fetchIdByName(names[i]));
+				}
+				
+				startActivityForResult(intent, 0);
+			}
+		});
+		
+		jhoiraSorceryButton.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+
+				String[] returnTypes = new String[] { CardDbAdapter.KEY_NAME };
+				
+				Cursor sorceries = mDbAdapter.Search(null, null, "sorcery", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
+						CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, false, returnTypes);
+
+				// Get 3 random, distinct numbers
+				int pos[] = new int[3];
+				pos[0] = rand.nextInt(sorceries.getCount());
+				pos[1] = rand.nextInt(sorceries.getCount());
+				while(pos[0] == pos[1]){
+					pos[1] = rand.nextInt(sorceries.getCount());					
+				}
+				pos[2] = rand.nextInt(sorceries.getCount());
+				while(pos[0] == pos[2] || pos[1] == pos[2]){
+					pos[2] = rand.nextInt(sorceries.getCount());					
+				}
+				
+				String names[] = new String[3];
+				Intent intent = new Intent(mCtx, ResultListActivity.class);
+				for(int i=0; i < 3; i++){
+					sorceries.moveToPosition(pos[i]);
+	 				names[i] = sorceries.getString(sorceries.getColumnIndex(CardDbAdapter.KEY_NAME));
+	 				intent.putExtra("id" + i, mDbAdapter.fetchIdByName(names[i]));
+				}
+				
+				startActivityForResult(intent, 0);
+			}
+		});
+		
+		momirCmcChoice = (Spinner) findViewById(R.id.momir_spinner);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.momir_spinner,
 				android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		cmcChoice.setAdapter(adapter);
+		momirCmcChoice.setAdapter(adapter);
+
+		stonehewerCmcChoice = (Spinner) findViewById(R.id.stonehewer_spinner);
+		ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(this, R.array.momir_spinner,
+				android.R.layout.simple_spinner_item);
+		adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		stonehewerCmcChoice.setAdapter(adapter1);
 
 		mDbAdapter = new CardDbAdapter(this);
 		mDbAdapter.open();
 
-		String[] returnTypes = new String[] { /* CardDbAdapter.KEY_ID, */
-		CardDbAdapter.KEY_NAME };
-
 		cmcChoices = getResources().getStringArray(R.array.momir_spinner);
-		momir_cursors = new Cursor[cmcChoices.length];
-		for (int i = 0; i < cmcChoices.length; i++) {
-			momir_cursors[i] = mDbAdapter.Search(null, null, "Creature", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-					CardDbAdapter.NOONECARES, null, i, "=", null, null, null, null, false, returnTypes);
-		}
+
 		rand = new Random(System.currentTimeMillis());
-/*
-		// implements http://en.wikipedia.org/wiki/Fisher-Yates_shuffle
-		a = new int[numChoices];
-		int temp, i, j;
-		for (i = 0; i < numChoices; i++) {
-			a[i] = i;
-		}
-		for (i = numChoices - 1; i > 0; i--) {
-			j = rand.nextInt(i + 1);// j = random integer with 0 <= j <= i
-			temp = a[j];
-			a[j] = a[i];
-			a[i] = temp;
-		}
-		index = 0;
-*/
+		/*
+		 * // implements http://en.wikipedia.org/wiki/Fisher-Yates_shuffle a = new
+		 * int[numChoices]; int temp, i, j; for (i = 0; i < numChoices; i++) { a[i]
+		 * = i; } for (i = numChoices - 1; i > 0; i--) { j = rand.nextInt(i + 1);//
+		 * j = random integer with 0 <= j <= i temp = a[j]; a[j] = a[i]; a[i] =
+		 * temp; } index = 0;
+		 */
 	}
-
-	@Override
-	public boolean onTouchEvent(MotionEvent me) {
-		return gestureScanner.onTouchEvent(me);
-	}
-
-	public boolean onDown(MotionEvent arg0) {
-		return true;
-	}
-
-	public boolean onFling(MotionEvent arg0, MotionEvent arg1, float arg2, float arg3) {
-		if (arg2 < -1200) {
-			int cmc;
-			/*
-			 * index++; if (index >= numChoices) { index -= numChoices; }
-			 * c.moveToPosition(a[index]); name =
-			 * c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
-			 */
-			try {
-				cmc = Integer.parseInt(cmcChoices[cmcChoice.getSelectedItemPosition()]);
-			}
-			catch (NumberFormatException e) {
-				cmc = -1;
-			}
-
-			int pos = rand.nextInt(momir_cursors[cmc].getCount());
-			momir_cursors[cmc].moveToPosition(pos);
-			name = momir_cursors[cmc].getString(momir_cursors[cmc].getColumnIndex(CardDbAdapter.KEY_NAME));
-
-			viewA.setText(name);
-			loadImage();
-		}
-		else if (arg2 > 1200) {
-			/*
-			index--;
-			if (index < 0) {
-				index += numChoices;
-			}
-			c.moveToPosition(a[index]);
-			name = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
-			viewA.setText(name);
-			loadImage();
-			*/
-		}
-		return true;
-	}
-
-	public void onLongPress(MotionEvent arg0) {
-		viewA.setText("");
-	}
-
-	public boolean onScroll(MotionEvent arg0, MotionEvent arg1, float arg2, float arg3) {
-		return true;
-	}
-
-	public void onShowPress(MotionEvent arg0) {
-	}
-
-	public boolean onSingleTapUp(MotionEvent arg0) {
-		return true;
-	}
-
-	void loadImage() {
-		imgView.setImageResource(R.drawable.loading);
-		Cursor card = mDbAdapter.fetchCardByName(name);
-
-		String number = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NUMBER));
-		String mtgi_code = mDbAdapter.getCodeMtgi(card.getString(card.getColumnIndex(CardDbAdapter.KEY_SET)));
-
-		picurl = "http://magiccards.info/scans/en/" + mtgi_code + "/" + number + ".jpg";
-		picurl = picurl.toLowerCase();
-		Thread thread = new Thread(this);
-		thread.start();
-	}
-
-	public void run() {
-		try {
-			URL u = new URL(picurl);
-			d = new BitmapDrawable(u.openStream());
-			bmp = d.getBitmap();
-
-			Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-			int newHeight;
-			int newWidth;
-			float scale;
-			if (display.getWidth() < display.getHeight()) {
-				scale = (display.getWidth() - 20) / (float) d.getIntrinsicWidth();
-			}
-			else {
-				DisplayMetrics metrics = new DisplayMetrics();
-				getWindowManager().getDefaultDisplay().getMetrics(metrics);
-				int myHeight = 0;
-
-				switch (metrics.densityDpi) {
-					case DisplayMetrics.DENSITY_HIGH:
-						myHeight = display.getHeight() - 48;
-						break;
-					case DisplayMetrics.DENSITY_MEDIUM:
-						myHeight = display.getHeight() - 32;
-						break;
-					case DisplayMetrics.DENSITY_LOW:
-						myHeight = display.getHeight() - 24;
-						break;
-					default:
-						break;
-				}
-
-				scale = (myHeight - 10) / (float) d.getIntrinsicHeight();
-			}
-			newWidth = Math.round(bmp.getWidth() * scale);
-			newHeight = Math.round(bmp.getHeight() * scale);
-
-			bmp = Bitmap.createScaledBitmap(bmp, newWidth, newHeight, true);
-			d = new BitmapDrawable(bmp);
-			handler.sendEmptyMessage(0);
-		}
-		catch (Exception e) {
-
-		}
-	}
-
-	private Handler	handler	= new Handler() {
-														@Override
-														public void handleMessage(Message msg) {
-															imgView.setImageDrawable(d);
-														}
-													};
 }

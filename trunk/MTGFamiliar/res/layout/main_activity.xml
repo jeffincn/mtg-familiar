@@ -80,10 +80,15 @@
 			<LinearLayout android:layout_width="fill_parent"
 				android:layout_height="wrap_content" android:id="@+id/randomCard"
 				android:gravity="center" android:orientation="horizontal">
-				<ImageView android:layout_width="0dp"
-					android:layout_height="wrap_content" android:src="@drawable/card_search_icon"
-					android:scaleType="center" android:layout_weight="1"
-					android:layout_marginTop="8dip" android:layout_marginBottom="8dip" />
+
+				<ImageView
+				    android:layout_width="0dp"
+				    android:layout_height="wrap_content"
+				    android:layout_marginBottom="8dip"
+				    android:layout_marginTop="8dip"
+				    android:layout_weight="1"
+				    android:scaleType="center"
+				    android:src="@drawable/mojhosto_icon" />
 
 				<TextView
 				    style="@style/text"
@@ -91,7 +96,7 @@
 				    android:layout_height="wrap_content"
 				    android:layout_marginLeft="12dip"
 				    android:layout_weight="3"
-				    android:text="@string/randomCard"
+				    android:text="@string/mojhosto_label"
 				    android:textSize="30dip" />
 
 			</LinearLayout>

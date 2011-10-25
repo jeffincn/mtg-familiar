@@ -28,6 +28,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.database.MergeCursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
@@ -67,16 +68,30 @@ public class ResultListActivity extends ListActivity {
 		String[] returnTypes = new String[] { CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_SET, CardDbAdapter.KEY_RARITY,
 				CardDbAdapter.KEY_MANACOST, CardDbAdapter.KEY_TYPE, CardDbAdapter.KEY_ABILITY, CardDbAdapter.KEY_POWER, CardDbAdapter.KEY_TOUGHNESS, CardDbAdapter.KEY_LOYALTY };
 		
+		long id;
+		
 		Intent intent = getIntent();
+
+		Bundle extras = intent.getExtras();
+
 		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
 			String query = intent.getStringExtra(SearchManager.QUERY);
 			c = mDbHelper.Search(query, null, null, "wubrgl", 0, null,
 					CardDbAdapter.NOONECARES, null, CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, true, returnTypes);
 		}
+		else if((id = extras.getLong("id")) != 0L){
+			c = mDbHelper.fetchCard(id);
+		}
+		else if((id = extras.getLong("id0")) != 0L){
+			long id1 = extras.getLong("id1");
+			long id2 = extras.getLong("id2");
+			Cursor cs[] = new Cursor[3];
+			cs[0] = mDbHelper.fetchCard(id);
+			cs[1] = mDbHelper.fetchCard(id1);
+			cs[2] = mDbHelper.fetchCard(id2);
+			c = new MergeCursor(cs);
+		}
 		else {
-
-			Bundle extras = intent.getExtras();
-
 			c = mDbHelper.Search(extras.getString(CardDbAdapter.KEY_NAME),
 					extras.getString(SearchActivity.TEXT), extras.getString(SearchActivity.TYPE),
 					extras.getString(SearchActivity.COLOR), extras.getInt(SearchActivity.COLORLOGIC),
@@ -110,7 +125,7 @@ public class ResultListActivity extends ListActivity {
 				isSingle = true;
 				Intent i = new Intent(mCtx, CardViewActivity.class);
 				c.moveToFirst();
-				long id = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_ID));
+				id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
 				i.putExtra("id", id);
 				startActivityForResult(i, 0);
 			}

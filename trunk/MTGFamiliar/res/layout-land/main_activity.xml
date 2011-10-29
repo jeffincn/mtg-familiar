@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2011 Adam Feinstein, Michael Shick This file is part of MTG 
+	Familiar. MTG Familiar is free software: you can redistribute it and/or modify 
+	it under the terms of the GNU General Public License as published by the 
+	Free Software Foundation, either version 3 of the License, or (at your option) 
+	any later version. MTG Familiar is distributed in the hope that it will be 
+	useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+	or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for 
+	more details. You should have received a copy of the GNU General Public License 
+	along with MTG Familiar. If not, see <http://www.gnu.org/licenses/>. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="fill_parent" android:id="@+id/linearLayout1"
+	android:layout_width="fill_parent" android:orientation="vertical">
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/linearLayout2" android:layout_width="fill_parent"
+		android:orientation="horizontal" android:layout_height="wrap_content" android:layout_marginBottom="6dip">
+		<ImageView android:id="@+id/imageView1"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:layout_gravity="center" android:src="@drawable/icon" />
+		<TextView android:textAppearance="?android:attr/textAppearanceLarge"
+			android:layout_width="fill_parent" android:layout_height="fill_parent"
+			android:text="@string/app_name" android:gravity="center"
+			android:id="@+id/title" android:textSize="40dip"/>
+	</LinearLayout>
+	<ScrollView android:layout_width="fill_parent"
+		android:layout_height="0dp" android:layout_weight="5">
+		<LinearLayout android:layout_width="fill_parent"
+			android:layout_height="fill_parent" android:gravity="center"
+			android:orientation="vertical">
+			<LinearLayout android:id="@+id/linearLayout3"
+				android:layout_height="wrap_content" android:layout_width="match_parent"
+				android:orientation="horizontal" android:layout_marginBottom="3dip">
+				<LinearLayout android:id="@+id/cardsearch"
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content" android:orientation="vertical" android:layout_weight="1">
+					<ImageView android:src="@drawable/card_search_icon" android:layout_height="wrap_content"
+						android:layout_width="wrap_content" android:layout_gravity="center_horizontal"></ImageView>
+					<TextView android:text="@string/cardsearch"
+						android:layout_height="wrap_content" android:textSize="30dip"
+						style="@style/text"
+						android:layout_width="wrap_content" android:layout_gravity="center_horizontal"/>
+				</LinearLayout>
+				<LinearLayout android:id="@+id/lifecounter"
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content" android:orientation="vertical" android:layout_weight="1">
+					<ImageView android:src="@drawable/life_counter_icon"
+						android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="center_horizontal"></ImageView>
+					<TextView android:text="@string/lifecounter"
+						android:layout_height="wrap_content" android:textSize="30dip"
+						style="@style/text"
+						android:layout_width="wrap_content" android:layout_gravity="center_horizontal"/>
+				</LinearLayout>
+				<LinearLayout android:id="@+id/manapool"
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content" android:orientation="vertical" android:layout_weight="1">
+					<ImageView android:src="@drawable/mana_pool_icon"
+						android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="center_horizontal"></ImageView>
+					<TextView android:text="@string/manapool"
+						android:layout_height="wrap_content" android:textSize="30dip"
+						style="@style/text"
+						android:layout_width="wrap_content" android:layout_gravity="center_horizontal"></TextView>
+				</LinearLayout>
+			</LinearLayout>
+			<LinearLayout android:id="@+id/linearLayout4"
+				android:layout_height="wrap_content" android:layout_width="match_parent">
+				<LinearLayout android:id="@+id/rng" android:layout_height="wrap_content" android:layout_width="wrap_content" android:orientation="vertical" android:layout_weight="1">
+					<ImageView android:src="@drawable/dice_icon"
+						android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="center_horizontal"></ImageView>
+					<TextView android:text="@string/random"
+						android:layout_height="wrap_content" android:textSize="30dip" style="@style/text" android:layout_width="wrap_content" android:layout_gravity="center_horizontal"></TextView>
+				</LinearLayout>
+				<LinearLayout android:id="@+id/randomCard" android:layout_height="wrap_content" android:layout_width="wrap_content" android:orientation="vertical" android:layout_weight="1">
+					<ImageView android:src="@drawable/mojhosto_icon"
+						android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="center_horizontal"></ImageView>
+					<TextView android:text="@string/mojhosto_label"
+						android:layout_height="wrap_content" android:textSize="30dip" style="@style/text" android:layout_gravity="center_horizontal" android:layout_width="wrap_content"></TextView>
+				</LinearLayout>
+			</LinearLayout>
+			<Button android:text="@string/deckmanagement" android:layout_weight="1" android:id="@+id/deckmanager" android:layout_height="wrap_content" android:layout_width="wrap_content" android:textSize="30dip"></Button>
+		</LinearLayout>
+	</ScrollView>
+</LinearLayout>

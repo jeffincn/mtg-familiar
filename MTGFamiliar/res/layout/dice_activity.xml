@@ -11,10 +11,10 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent" android:layout_height="fill_parent">
 	<LinearLayout android:layout_width="fill_parent"
-		android:layout_height="fill_parent" android:orientation="vertical">
+		android:orientation="vertical" android:layout_height="fill_parent">
 		<!-- Roll output -->
 		<LinearLayout android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:orientation="horizontal">
+			android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="10dip" android:layout_marginBottom="20dip">
 			<View android:layout_width="0dp" android:layout_height="fill_parent"
 				android:layout_weight="1" />
 			<TextView android:id="@+id/die_output" android:layout_width="0dp"
@@ -26,57 +26,34 @@
 				android:layout_weight="1" />
 		</LinearLayout>
 		<!-- First die row -->
-		<LinearLayout android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:orientation="horizontal"
-			android:gravity="center" android:paddingTop="10dp">
-			<View android:layout_width="0dp" android:layout_height="fill_parent"
-				android:layout_weight="1" />
-			<ImageView android:id="@+id/d2" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:src="@drawable/d2" />
-			<View android:layout_width="0dp" android:layout_height="fill_parent"
-				android:layout_weight="1" />
-			<ImageView android:id="@+id/d4" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:src="@drawable/d4" />
-			<View android:layout_width="0dp" android:layout_height="fill_parent"
-				android:layout_weight="1" />
-			<ImageView android:id="@+id/d6" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:src="@drawable/d6" />
-			<View android:layout_width="0dp" android:layout_height="fill_parent"
-				android:layout_weight="1" />
-		</LinearLayout>
 		<!-- Second die row -->
-		<LinearLayout android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:orientation="horizontal"
-			android:gravity="center">
-			<View android:layout_width="0dp" android:layout_height="fill_parent"
-				android:layout_weight="1" />
-			<ImageView android:id="@+id/d8" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:src="@drawable/d8" />
-			<View android:layout_width="0dp" android:layout_height="fill_parent"
-				android:layout_weight="1" />
-			<ImageView android:id="@+id/d10" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:src="@drawable/d10" />
-			<View android:layout_width="0dp" android:layout_height="fill_parent"
-				android:layout_weight="1" />
-			<ImageView android:id="@+id/d12" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:src="@drawable/d12" />
-			<View android:layout_width="0dp" android:layout_height="fill_parent"
-				android:layout_weight="1" />
-		</LinearLayout>
 		<!-- Third die row -->
-		<LinearLayout android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:orientation="horizontal"
-			android:gravity="center">
-			<View android:layout_width="0dp" android:layout_height="fill_parent"
-				android:layout_weight="1" />
-			<ImageView android:id="@+id/d20" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:src="@drawable/d20" />
-			<View android:layout_width="0dp" android:layout_height="fill_parent"
-				android:layout_weight="1" />
-			<ImageView android:id="@+id/d100" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:src="@drawable/d100" />
-			<View android:layout_width="0dp" android:layout_height="fill_parent"
-				android:layout_weight="1" />
+		<LinearLayout android:id="@+id/linearLayout1" android:layout_width="match_parent" android:orientation="vertical" android:layout_height="fill_parent" android:layout_gravity="center_vertical">
+			<LinearLayout android:orientation="horizontal" android:gravity="center" android:layout_height="wrap_content" android:layout_width="fill_parent">
+				<View android:layout_weight="1" android:layout_height="fill_parent" android:layout_width="0dp"></View>
+				<ImageView android:layout_weight="1" android:id="@+id/d2" android:src="@drawable/d2" android:layout_height="wrap_content" android:layout_width="wrap_content"></ImageView>
+				<View android:layout_weight="1" android:layout_height="fill_parent" android:layout_width="0dp"></View>
+				<ImageView android:layout_weight="1" android:id="@+id/d4" android:src="@drawable/d4" android:layout_height="wrap_content" android:layout_width="wrap_content"></ImageView>
+				<View android:layout_weight="1" android:layout_height="fill_parent" android:layout_width="0dp"></View>
+				<ImageView android:layout_weight="1" android:id="@+id/d6" android:src="@drawable/d6" android:layout_height="wrap_content" android:layout_width="wrap_content"></ImageView>
+				<View android:layout_weight="1" android:layout_height="fill_parent" android:layout_width="0dp"></View>
+			</LinearLayout>
+			<LinearLayout android:orientation="horizontal" android:gravity="center" android:layout_height="wrap_content" android:layout_width="fill_parent">
+				<View android:layout_weight="1" android:layout_height="fill_parent" android:layout_width="0dp"></View>
+				<ImageView android:layout_weight="1" android:id="@+id/d8" android:src="@drawable/d8" android:layout_height="wrap_content" android:layout_width="wrap_content"></ImageView>
+				<View android:layout_weight="1" android:layout_height="fill_parent" android:layout_width="0dp"></View>
+				<ImageView android:layout_weight="1" android:id="@+id/d10" android:src="@drawable/d10" android:layout_height="wrap_content" android:layout_width="wrap_content"></ImageView>
+				<View android:layout_weight="1" android:layout_height="fill_parent" android:layout_width="0dp"></View>
+				<ImageView android:layout_weight="1" android:id="@+id/d12" android:src="@drawable/d12" android:layout_height="wrap_content" android:layout_width="wrap_content"></ImageView>
+				<View android:layout_weight="1" android:layout_height="fill_parent" android:layout_width="0dp"></View>
+			</LinearLayout>
+			<LinearLayout android:orientation="horizontal" android:gravity="center" android:layout_height="wrap_content" android:layout_width="fill_parent">
+				<View android:layout_weight="1" android:layout_height="fill_parent" android:layout_width="0dp"></View>
+				<ImageView android:layout_weight="1" android:id="@+id/d20" android:src="@drawable/d20" android:layout_height="wrap_content" android:layout_width="wrap_content"></ImageView>
+				<View android:layout_weight="1" android:layout_height="fill_parent" android:layout_width="0dp"></View>
+				<ImageView android:layout_weight="1" android:id="@+id/d100" android:src="@drawable/d100" android:layout_height="wrap_content" android:layout_width="wrap_content"></ImageView>
+				<View android:layout_weight="1" android:layout_height="fill_parent" android:layout_width="0dp"></View>
+			</LinearLayout>
 		</LinearLayout>
 	</LinearLayout>
 </ScrollView>

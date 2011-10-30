@@ -25,49 +25,30 @@
 			android:hint="@string/text" android:layout_weight="1"
 			android:layout_height="wrap_content" android:imeOptions="actionSearch"
 			android:singleLine="true" android:inputType="text" />
-		<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-			android:orientation="horizontal" android:layout_width="fill_parent"
+		<LinearLayout android:orientation="horizontal" android:layout_width="fill_parent"
 			android:layout_height="wrap_content" android:layout_weight="1">
-			<CheckBox android:id="@+id/checkBoxW" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" />
-			<ImageView android:src="@drawable/w" android:id="@+id/imageView1"
-				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:layout_gravity="center" android:layout_weight="1" />
-			<CheckBox android:id="@+id/checkBoxU" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" />
-			<ImageView android:src="@drawable/u" android:id="@+id/imageView2"
-				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:layout_gravity="center" android:layout_weight="1" />
-			<CheckBox android:id="@+id/checkBoxB" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" />
-			<ImageView android:src="@drawable/b" android:layout_height="wrap_content"
-				android:id="@+id/imageView3" android:layout_width="wrap_content"
-				android:layout_gravity="center" android:layout_weight="1" />
+			<LinearLayout android:id="@+id/linearLayout5" android:layout_height="match_parent" android:layout_width="wrap_content" android:layout_weight="1" android:gravity="center_horizontal">
+				<CheckBox android:id="@+id/checkBoxW" android:background="@drawable/wcheck" android:layout_height="wrap_content" android:layout_width="wrap_content"></CheckBox>
+			</LinearLayout>
+			<LinearLayout android:id="@+id/linearLayout6" android:layout_height="match_parent" android:layout_width="wrap_content" android:layout_weight="1" android:gravity="center_horizontal">
+				<CheckBox android:id="@+id/checkBoxU" android:background="@drawable/ucheck" android:layout_height="wrap_content" android:layout_width="wrap_content"></CheckBox>
+			</LinearLayout>
+			<LinearLayout android:id="@+id/linearLayout7" android:layout_height="match_parent" android:layout_width="wrap_content" android:layout_weight="1" android:gravity="center_horizontal">
+				<CheckBox android:id="@+id/checkBoxB" android:background="@drawable/bcheck" android:layout_height="wrap_content" android:layout_width="wrap_content"></CheckBox>
+			</LinearLayout>
+			<LinearLayout android:id="@+id/linearLayout8" android:layout_height="match_parent" android:layout_width="wrap_content" android:layout_weight="1" android:gravity="center_horizontal">
+				<CheckBox android:id="@+id/checkBoxR" android:background="@drawable/rcheck" android:layout_height="wrap_content" android:layout_width="wrap_content"></CheckBox>
+			</LinearLayout>
+			<LinearLayout android:id="@+id/linearLayout9" android:layout_height="match_parent" android:layout_width="wrap_content" android:layout_weight="1" android:gravity="center_horizontal">
+				<CheckBox android:id="@+id/checkBoxG" android:background="@drawable/gcheck" android:layout_height="wrap_content" android:layout_width="wrap_content"></CheckBox>
+			</LinearLayout>
+			<LinearLayout android:id="@+id/linearLayout10" android:layout_height="match_parent" android:layout_width="wrap_content" android:layout_weight="1" android:gravity="center_horizontal">
+				<CheckBox android:id="@+id/checkBoxL" android:background="@drawable/xcheck" android:layout_height="wrap_content" android:layout_width="wrap_content"></CheckBox>
+			</LinearLayout>
 
 
 		</LinearLayout>
-		<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-			android:orientation="horizontal" android:layout_width="fill_parent"
-			android:layout_weight="1" android:layout_height="wrap_content">
-
-			<CheckBox android:id="@+id/checkBoxR" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" />
-			<ImageView android:src="@drawable/r" android:layout_height="wrap_content"
-				android:id="@+id/imageView4" android:layout_width="wrap_content"
-				android:layout_gravity="center" android:layout_weight="1" />
-			<CheckBox android:id="@+id/checkBoxG" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" />
-			<ImageView android:src="@drawable/g" android:layout_height="wrap_content"
-				android:id="@+id/imageView5" android:layout_width="wrap_content"
-				android:layout_gravity="center" android:layout_weight="1" />
-			<CheckBox android:id="@+id/checkBoxL" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" />
-			<ImageView android:src="@drawable/x" android:layout_height="wrap_content"
-				android:id="@+id/imageView6" android:layout_width="wrap_content"
-				android:layout_gravity="center" android:layout_weight="1" />
-		</LinearLayout>
-		<Spinner android:id="@+id/colorlogic" android:layout_width="fill_parent"
-			android:layout_weight="1" android:layout_height="wrap_content" />
+		<Spinner android:id="@+id/colorlogic" android:layout_weight="1" android:layout_height="wrap_content" android:layout_width="fill_parent"></Spinner>
 		<LinearLayout android:layout_width="fill_parent"
 			android:id="@+id/linearLayout2" android:layout_weight="1"
 			android:layout_height="wrap_content">
@@ -119,14 +100,11 @@
 				android:layout_height="wrap_content" android:layout_weight="1"
 				android:id="@+id/raritysearch" android:text="@string/searchrarity" />
 		</LinearLayout>
-		<EditText android:layout_width="fill_parent" android:id="@+id/flavorsearch"
-			android:hint="@string/flavor_text" android:layout_weight="1"
-			android:layout_height="wrap_content" android:imeOptions="actionSearch"
-			android:singleLine="true" android:inputType="text" />
-		<EditText android:layout_width="fill_parent" android:id="@+id/artistsearch"
-			android:hint="@string/artist" android:layout_weight="1"
-			android:layout_height="wrap_content" android:imeOptions="actionSearch"
-			android:singleLine="true" android:inputType="text" />
+		<LinearLayout android:id="@+id/linearLayout1" android:layout_height="wrap_content" android:layout_width="match_parent" android:layout_weight="1">
+			<EditText android:imeOptions="actionSearch" android:layout_weight="1" android:layout_height="wrap_content" android:hint="@string/flavor_text" android:layout_width="fill_parent" android:id="@+id/flavorsearch" android:inputType="text" android:maxLines="1">
+			</EditText>
+			<EditText android:imeOptions="actionSearch" android:layout_weight="1" android:layout_height="wrap_content" android:hint="@string/artist" android:layout_width="fill_parent" android:id="@+id/artistsearch" android:inputType="text" android:maxLines="1"></EditText>
+		</LinearLayout>
 		<Button android:id="@+id/searchbutton" android:layout_width="fill_parent"
 			android:layout_weight="1" android:layout_height="wrap_content"
 			android:text="@string/searchButton" />

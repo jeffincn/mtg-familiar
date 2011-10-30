@@ -86,8 +86,8 @@ public class MainActivity extends Activity implements Runnable {
 	private SharedPreferences		preferences;
 	private String							stacktrace;
 	private Button							deckmanagement;
-	private PackageInfo	pInfo;
-	private LinearLayout randomCard;
+	private PackageInfo					pInfo;
+	private LinearLayout				randomCard;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -137,7 +137,7 @@ public class MainActivity extends Activity implements Runnable {
 				startActivity(i);
 			}
 		});
-		
+
 		randomCard.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent(mCtx, RandomCardActivity.class);
@@ -163,7 +163,7 @@ public class MainActivity extends Activity implements Runnable {
 				startThread(OTAPATCH);
 			}
 		}
-		
+
 		try {
 			pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
 		}
@@ -172,7 +172,7 @@ public class MainActivity extends Activity implements Runnable {
 		}
 
 		int lastVersion = preferences.getInt("lastVersion", 0);
-		if(pInfo.versionCode != lastVersion){
+		if (pInfo.versionCode != lastVersion) {
 			showDialog(CHANGELOGDIALOG);
 			SharedPreferences.Editor editor = preferences.edit();
 			editor.putInt("lastVersion", pInfo.versionCode);
@@ -215,7 +215,7 @@ public class MainActivity extends Activity implements Runnable {
 		if (id == ABOUTDIALOG) {
 			// You have to catch the exception because the package stuff is all
 			// run-time
-			if(pInfo != null){
+			if (pInfo != null) {
 				builder.setTitle("About " + getString(R.string.app_name) + " " + pInfo.versionName);
 			}
 			else {
@@ -238,7 +238,7 @@ public class MainActivity extends Activity implements Runnable {
 			builder.setView(dialoglayout);
 		}
 		else if (id == CHANGELOGDIALOG) {
-			if(pInfo != null){
+			if (pInfo != null) {
 				builder.setTitle("What's New in Version " + pInfo.versionName);
 			}
 			else {
@@ -268,8 +268,8 @@ public class MainActivity extends Activity implements Runnable {
 		// Handle item selection
 		switch (item.getItemId()) {
 
-			//case R.id.buildWebDB: startThread(DBFROMWEB); return true;
-			//case R.id.refreshDB: startThread(DBFROMAPK); return true;
+			// case R.id.buildWebDB: startThread(DBFROMWEB); return true;
+			// case R.id.refreshDB: startThread(DBFROMAPK); return true;
 
 			case R.id.checkUpdate:
 				// Set the last legality update time back to zero on a forced update
@@ -416,12 +416,26 @@ public class MainActivity extends Activity implements Runnable {
 														public void handleMessage(Message msg) {
 															switch (msg.what) {
 																case DBFROMWEB:
-																	dialog.dismiss();
+																	if (dialog != null && dialog.isShowing()) {
+																		try {
+																			dialog.dismiss();
+																		}
+																		catch (Exception e) {
+																			;
+																		}
+																	}
 																	break;
 																case DBFROMAPK:
 																	mDbHelper = new CardDbAdapter(mCtx);
 																	mDbHelper.open();
-																	dialog.dismiss();
+																	if (dialog != null && dialog.isShowing()) {
+																		try {
+																			dialog.dismiss();
+																		}
+																		catch (Exception e) {
+																			;
+																		}
+																	}
 																	startThread(OTAPATCH);
 																	break;
 																case OTAPATCH:
@@ -434,12 +448,26 @@ public class MainActivity extends Activity implements Runnable {
 																	editor.putInt("lastLegalityUpdate", curTime);
 																	editor.commit();
 
-																	dialog.dismiss();
+																	if (dialog != null && dialog.isShowing()) {
+																		try {
+																			dialog.dismiss();
+																		}
+																		catch (Exception e) {
+																			;
+																		}
+																	}
 																	break;
 																case APPLYINGPATCH:
 																	numCardsAdded = 0;
 
-																	dialog.dismiss();
+																	if (dialog != null && dialog.isShowing()) {
+																		try {
+																			dialog.dismiss();
+																		}
+																		catch (Exception e) {
+																			;
+																		}
+																	}
 																	dialog = new ProgressDialog(MainActivity.this);
 																	dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 																	dialog.setMessage("Adding " + patchname + ". Please wait...");
@@ -449,7 +477,14 @@ public class MainActivity extends Activity implements Runnable {
 																	dialogReady = true;
 																	break;
 																case EXCEPTION:
-																	dialog.dismiss();
+																	if (dialog != null && dialog.isShowing()) {
+																		try {
+																			dialog.dismiss();
+																		}
+																		catch (Exception e) {
+																			;
+																		}
+																	}
 
 																	AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
 																	builder.setMessage(stacktrace).setCancelable(true);

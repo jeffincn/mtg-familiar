@@ -42,7 +42,6 @@ import android.widget.TextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 public class SearchActivity extends Activity {
 	protected static final String	NAME				= "name";
@@ -656,7 +655,7 @@ public class SearchActivity extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == 0) {
 			if (resultCode == ResultListActivity.NO_RESULT) {
-				Toast.makeText(this, getString(R.string.toast_no_result), Toast.LENGTH_SHORT).show();
+				;
 			}
 		}
 	}

@@ -57,7 +57,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -85,7 +84,7 @@ public class MainActivity extends Activity implements Runnable {
 	private boolean							dialogReady;
 	private SharedPreferences		preferences;
 	private String							stacktrace;
-	private Button							deckmanagement;
+	private LinearLayout				deckmanagement;
 	private PackageInfo					pInfo;
 	private LinearLayout				randomCard;
 
@@ -101,7 +100,7 @@ public class MainActivity extends Activity implements Runnable {
 		rng = (LinearLayout) findViewById(R.id.rng);
 		manapool = (LinearLayout) findViewById(R.id.manapool);
 		randomCard = (LinearLayout) findViewById(R.id.randomCard);
-		deckmanagement = (Button) findViewById(R.id.deckmanager);
+		deckmanagement = (LinearLayout) findViewById(R.id.deckManagement);
 
 		search.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {

@@ -36,6 +36,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
@@ -106,6 +107,7 @@ public class ResultListActivity extends ListActivity {
 		if (c == null || c.getCount() == 0) {
 			Intent i = new Intent();
 			setResult(NO_RESULT, i);
+			Toast.makeText(this, getString(R.string.toast_no_result), Toast.LENGTH_SHORT).show();
 			finish();
 		}
 		else {

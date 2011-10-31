@@ -26,26 +26,25 @@
 			android:layout_height="wrap_content" android:imeOptions="actionSearch"
 			android:singleLine="true" android:inputType="text" />
 		<LinearLayout android:orientation="horizontal" android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:layout_weight="1">
-			<LinearLayout android:id="@+id/linearLayout5" android:layout_height="match_parent" android:layout_width="wrap_content" android:layout_weight="1" android:gravity="center_horizontal">
-				<CheckBox android:id="@+id/checkBoxW" android:background="@drawable/wcheck" android:layout_height="wrap_content" android:layout_width="wrap_content"></CheckBox>
+			android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginTop="3dip" android:layout_marginBottom="3dip">
+			<LinearLayout android:id="@+id/linearLayout5" android:layout_height="match_parent" android:layout_width="wrap_content" android:layout_weight="1" android:gravity="center">
+				<CheckBox android:id="@+id/checkBoxW" android:layout_height="wrap_content" android:layout_width="wrap_content" android:button="@drawable/wcheck_selector"></CheckBox>
 			</LinearLayout>
 			<LinearLayout android:id="@+id/linearLayout6" android:layout_height="match_parent" android:layout_width="wrap_content" android:layout_weight="1" android:gravity="center_horizontal">
-				<CheckBox android:id="@+id/checkBoxU" android:background="@drawable/ucheck" android:layout_height="wrap_content" android:layout_width="wrap_content"></CheckBox>
+				<CheckBox android:id="@+id/checkBoxU" android:layout_height="wrap_content" android:layout_width="wrap_content" android:button="@drawable/ucheck_selector"></CheckBox>
 			</LinearLayout>
 			<LinearLayout android:id="@+id/linearLayout7" android:layout_height="match_parent" android:layout_width="wrap_content" android:layout_weight="1" android:gravity="center_horizontal">
-				<CheckBox android:id="@+id/checkBoxB" android:background="@drawable/bcheck" android:layout_height="wrap_content" android:layout_width="wrap_content"></CheckBox>
+				<CheckBox android:id="@+id/checkBoxB" android:layout_height="wrap_content" android:layout_width="wrap_content" android:button="@drawable/bcheck_selector"></CheckBox>
 			</LinearLayout>
 			<LinearLayout android:id="@+id/linearLayout8" android:layout_height="match_parent" android:layout_width="wrap_content" android:layout_weight="1" android:gravity="center_horizontal">
-				<CheckBox android:id="@+id/checkBoxR" android:background="@drawable/rcheck" android:layout_height="wrap_content" android:layout_width="wrap_content"></CheckBox>
+				<CheckBox android:id="@+id/checkBoxR" android:layout_height="wrap_content" android:layout_width="wrap_content" android:button="@drawable/rcheck_selector"></CheckBox>
 			</LinearLayout>
 			<LinearLayout android:id="@+id/linearLayout9" android:layout_height="match_parent" android:layout_width="wrap_content" android:layout_weight="1" android:gravity="center_horizontal">
-				<CheckBox android:id="@+id/checkBoxG" android:background="@drawable/gcheck" android:layout_height="wrap_content" android:layout_width="wrap_content"></CheckBox>
+				<CheckBox android:id="@+id/checkBoxG" android:layout_height="wrap_content" android:layout_width="wrap_content" android:button="@drawable/gcheck_selector"></CheckBox>
 			</LinearLayout>
 			<LinearLayout android:id="@+id/linearLayout10" android:layout_height="match_parent" android:layout_width="wrap_content" android:layout_weight="1" android:gravity="center_horizontal">
-				<CheckBox android:id="@+id/checkBoxL" android:background="@drawable/xcheck" android:layout_height="wrap_content" android:layout_width="wrap_content"></CheckBox>
+				<CheckBox android:id="@+id/checkBoxL" android:layout_height="wrap_content" android:layout_width="wrap_content" android:button="@drawable/xcheck_selector"></CheckBox>
 			</LinearLayout>
-
 
 		</LinearLayout>
 		<Spinner android:id="@+id/colorlogic" android:layout_weight="1" android:layout_height="wrap_content" android:layout_width="fill_parent"></Spinner>

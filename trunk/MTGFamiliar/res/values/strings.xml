@@ -143,7 +143,8 @@
 	<string name="refreshDB">Refresh DB from APK</string>
 
 	<string name="searchButton">Search!</string>
-
+	<string name="randomButton">Randomize!</string>
+	    
 	<string name="deckmanagement">Deck Management</string>
 
 	<string name="defaultdeckpath">/Android/data/com.gelakinetic.mtgfam/</string>
@@ -255,4 +256,7 @@ Media licenced under under the &lt;a href=&quot;http://creativecommons.org/licen
 <string name="stonehewer_label">CMC ≤</string>
 <string name="mojhosto_label">MoJhoSto Basic</string>
 
+<string name="randomleft">&lt;</string>
+<string name="randomright">&gt;</string>
+    
 </resources>

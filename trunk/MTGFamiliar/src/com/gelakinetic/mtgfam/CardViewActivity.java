@@ -70,7 +70,12 @@ public class CardViewActivity extends Activity implements Runnable {
 
 	private static final int			PICLOAD				= 0;
 	private static final int			PRICELOAD			= 1;
-	protected static final int		TRANSFORM			= 7;
+
+	// Dont use 0, thats the default when the back key is pressed
+	protected static final int		TRANSFORM			= 1;
+	protected static final int		RANDOMLEFT		= 2;
+	protected static final int		RANDOMRIGHT		= 3;
+
 	protected static final String	NUMBER				= "number";
 	protected static final String	SET						= "set";
 	protected static final String	ISSINGLE			= "isSingle";
@@ -115,6 +120,8 @@ public class CardViewActivity extends Activity implements Runnable {
 	private ImageView							cardpic;
 	private int										loadTo;
 	private boolean								failedLoad		= false;
+	private Button								leftRandom;
+	private Button								rightRandom;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -190,6 +197,8 @@ public class CardViewActivity extends Activity implements Runnable {
 		artist = (TextView) findViewById(R.id.artist);
 		pt = (TextView) findViewById(R.id.pt);
 		transform = (Button) findViewById(R.id.transformbutton);
+		leftRandom = (Button) findViewById(R.id.randomLeft);
+		rightRandom = (Button) findViewById(R.id.randomRight);
 
 		switch ((char) c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY))) {
 			case 'C':
@@ -303,6 +312,29 @@ public class CardViewActivity extends Activity implements Runnable {
 			transform.setVisibility(View.GONE);
 		}
 
+		if (extras.getBoolean(SearchActivity.RANDOM)) {
+			leftRandom.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					Intent i = new Intent();
+					setResult(RANDOMLEFT, i);
+					finish();
+				}
+			});
+			rightRandom.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					Intent i = new Intent();
+					setResult(RANDOMRIGHT, i);
+					finish();
+				}
+			});
+			leftRandom.setVisibility(View.VISIBLE);
+			rightRandom.setVisibility(View.VISIBLE);
+		}
+		else {
+			leftRandom.setVisibility(View.GONE);
+			rightRandom.setVisibility(View.GONE);
+		}
+
 		registerForContextMenu(name);
 		registerForContextMenu(cost);
 		registerForContextMenu(type);
@@ -328,8 +360,8 @@ public class CardViewActivity extends Activity implements Runnable {
 			pt.setVisibility(View.GONE);
 			flavor.setVisibility(View.GONE);
 			artist.setVisibility(View.GONE);
-			
-			((FrameLayout)findViewById(R.id.frameLayout1)).setVisibility(View.GONE);
+
+			((FrameLayout) findViewById(R.id.frameLayout1)).setVisibility(View.GONE);
 		}
 		else {
 			((ImageView) findViewById(R.id.cardpic)).setVisibility(View.GONE);

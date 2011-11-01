@@ -20,6 +20,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 package com.gelakinetic.mtgfam;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import android.app.ListActivity;
 import android.app.SearchManager;
@@ -42,15 +43,19 @@ import android.widget.ListView;
 
 public class ResultListActivity extends ListActivity {
 
-	static final int					NO_RESULT	= 1;
-	static int						cursorPosition = 0;
-	static int						cursorPositionOffset = 0;
+	static final int					NO_RESULT							= 1;
+	static int								cursorPosition				= 0;
+	static int								cursorPositionOffset	= 0;
 	private CardDbAdapter			mDbHelper;
 	private ListView					lv;
 	private Context						mCtx;
 	private Cursor						c;
-	private boolean						isSingle	= false;
+	private boolean						isSingle							= false;
 	private SharedPreferences	preferences;
+	private boolean						isRandom							= false;
+	private int[]							randomSequence;
+	private int								randomIndex						= 0;
+	private int								numChoices;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -58,7 +63,7 @@ public class ResultListActivity extends ListActivity {
 		// After a search, make sure the position is on top
 		cursorPosition = 0;
 		cursorPositionOffset = 0;
-		
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.result_list_activity);
 
@@ -66,24 +71,25 @@ public class ResultListActivity extends ListActivity {
 		mDbHelper.open();
 		mCtx = this;
 
-		String[] returnTypes = new String[] { CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_SET, CardDbAdapter.KEY_RARITY,
-				CardDbAdapter.KEY_MANACOST, CardDbAdapter.KEY_TYPE, CardDbAdapter.KEY_ABILITY, CardDbAdapter.KEY_POWER, CardDbAdapter.KEY_TOUGHNESS, CardDbAdapter.KEY_LOYALTY };
-		
+		String[] returnTypes = new String[] { CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_SET,
+				CardDbAdapter.KEY_RARITY, CardDbAdapter.KEY_MANACOST, CardDbAdapter.KEY_TYPE, CardDbAdapter.KEY_ABILITY,
+				CardDbAdapter.KEY_POWER, CardDbAdapter.KEY_TOUGHNESS, CardDbAdapter.KEY_LOYALTY };
+
 		long id;
-		
+
 		Intent intent = getIntent();
 
 		Bundle extras = intent.getExtras();
 
 		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
 			String query = intent.getStringExtra(SearchManager.QUERY);
-			c = mDbHelper.Search(query, null, null, "wubrgl", 0, null,
-					CardDbAdapter.NOONECARES, null, CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, true, returnTypes);
+			c = mDbHelper.Search(query, null, null, "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
+					CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, true, returnTypes);
 		}
-		else if((id = extras.getLong("id")) != 0L){
+		else if ((id = extras.getLong("id")) != 0L) {
 			c = mDbHelper.fetchCard(id);
 		}
-		else if((id = extras.getLong("id0")) != 0L){
+		else if ((id = extras.getLong("id0")) != 0L) {
 			long id1 = extras.getLong("id1");
 			long id2 = extras.getLong("id2");
 			Cursor cs[] = new Cursor[3];
@@ -93,15 +99,14 @@ public class ResultListActivity extends ListActivity {
 			c = new MergeCursor(cs);
 		}
 		else {
-			c = mDbHelper.Search(extras.getString(CardDbAdapter.KEY_NAME),
-					extras.getString(SearchActivity.TEXT), extras.getString(SearchActivity.TYPE),
-					extras.getString(SearchActivity.COLOR), extras.getInt(SearchActivity.COLORLOGIC),
-					extras.getString(SearchActivity.SET), extras.getFloat(SearchActivity.POW_CHOICE),
-					extras.getString(SearchActivity.POW_LOGIC), extras.getFloat(SearchActivity.TOU_CHOICE),
-					extras.getString(SearchActivity.TOU_LOGIC), extras.getInt(SearchActivity.CMC),
-					extras.getString(SearchActivity.CMC_LOGIC), extras.getString(SearchActivity.FORMAT),
-					extras.getString(SearchActivity.RARITY), extras.getString(SearchActivity.FLAVOR),
-					extras.getString(SearchActivity.ARTIST), true, returnTypes);
+			c = mDbHelper.Search(extras.getString(CardDbAdapter.KEY_NAME), extras.getString(SearchActivity.TEXT),
+					extras.getString(SearchActivity.TYPE), extras.getString(SearchActivity.COLOR),
+					extras.getInt(SearchActivity.COLORLOGIC), extras.getString(SearchActivity.SET),
+					extras.getFloat(SearchActivity.POW_CHOICE), extras.getString(SearchActivity.POW_LOGIC),
+					extras.getFloat(SearchActivity.TOU_CHOICE), extras.getString(SearchActivity.TOU_LOGIC),
+					extras.getInt(SearchActivity.CMC), extras.getString(SearchActivity.CMC_LOGIC),
+					extras.getString(SearchActivity.FORMAT), extras.getString(SearchActivity.RARITY),
+					extras.getString(SearchActivity.FLAVOR), extras.getString(SearchActivity.ARTIST), true, returnTypes);
 		}
 
 		if (c == null || c.getCount() == 0) {
@@ -111,25 +116,54 @@ public class ResultListActivity extends ListActivity {
 			finish();
 		}
 		else {
-			lv = getListView();
 
+			lv = getListView();
 			registerForContextMenu(lv);
 
-			lv.setOnItemClickListener(new OnItemClickListener() {
-				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					Intent i = new Intent(mCtx, CardViewActivity.class);
-					i.putExtra("id", id);
-					startActivityForResult(i, 0);
-				}
-			});
+			if (extras.getBoolean(SearchActivity.RANDOM)) {
+				isRandom = true;
 
-			if (c.getCount() == 1) {
-				isSingle = true;
+				// implements http://en.wikipedia.org/wiki/Fisher-Yates_shuffle
+				numChoices = c.getCount();
+				Random rand = new Random(System.currentTimeMillis());
+				randomSequence = new int[numChoices];
+				int temp, k, j;
+				for (k = 0; k < numChoices; k++) {
+					randomSequence[k] = k;
+				}
+				for (k = numChoices - 1; k > 0; k--) {
+					j = rand.nextInt(k + 1);// j = random integer with 0 <= j <= i
+					temp = randomSequence[j];
+					randomSequence[j] = randomSequence[k];
+					randomSequence[k] = temp;
+				}
+
 				Intent i = new Intent(mCtx, CardViewActivity.class);
-				c.moveToFirst();
+				c.moveToPosition(randomSequence[randomIndex]);
 				id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
 				i.putExtra("id", id);
+				i.putExtra(SearchActivity.RANDOM, isRandom);
 				startActivityForResult(i, 0);
+			}
+			else {
+				lv.setOnItemClickListener(new OnItemClickListener() {
+					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+						Intent i = new Intent(mCtx, CardViewActivity.class);
+						i.putExtra("id", id);
+						i.putExtra(SearchActivity.RANDOM, isRandom);
+						startActivityForResult(i, 0);
+					}
+				});
+
+				if (c.getCount() == 1) {
+					isSingle = true;
+					Intent i = new Intent(mCtx, CardViewActivity.class);
+					c.moveToFirst();
+					id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
+					i.putExtra("id", id);
+					i.putExtra(SearchActivity.RANDOM, isRandom);
+					startActivityForResult(i, 0);
+				}
 			}
 		}
 	}
@@ -212,28 +246,59 @@ public class ResultListActivity extends ListActivity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		Intent i;
 		if (requestCode == 0) {
-			if (resultCode == CardViewActivity.TRANSFORM) {
-				String number = data.getStringExtra(CardViewActivity.NUMBER);
-				String set = data.getStringExtra(CardViewActivity.SET);
-				if (number.contains("a")) {
-					number = number.replace("a", "b");
-				}
-				else if (number.contains("b")) {
-					number = number.replace("b", "a");
-				}
 
-				long id = mDbHelper.getTransform(set, number);
-				if (id != -1) {
-					Intent i = new Intent(mCtx, CardViewActivity.class);
+			switch (resultCode) {
+				case CardViewActivity.TRANSFORM:
+					String number = data.getStringExtra(CardViewActivity.NUMBER);
+					String set = data.getStringExtra(CardViewActivity.SET);
+					if (number.contains("a")) {
+						number = number.replace("a", "b");
+					}
+					else if (number.contains("b")) {
+						number = number.replace("b", "a");
+					}
+
+					long id = mDbHelper.getTransform(set, number);
+					if (id != -1) {
+						i = new Intent(mCtx, CardViewActivity.class);
+						i.putExtra("id", id);
+						i.putExtra(SearchActivity.RANDOM, isRandom);
+						// Froyo+ only, disabled animations
+						// i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+						startActivityForResult(i, 0);
+					}
+					break;
+				case CardViewActivity.RANDOMLEFT:
+					randomIndex--;
+					if (randomIndex < 0) {
+						randomIndex += numChoices;
+					}
+					i = new Intent(mCtx, CardViewActivity.class);
+					c.moveToPosition(randomSequence[randomIndex]);
+					id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
 					i.putExtra("id", id);
-					// Froyo+ only, disabled animations
-					// i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+					i.putExtra(SearchActivity.RANDOM, isRandom);
 					startActivityForResult(i, 0);
-				}
-			}
-			else if (isSingle) {
-				this.finish();
+					break;
+				case CardViewActivity.RANDOMRIGHT:
+					randomIndex++;
+					if (randomIndex >= numChoices) {
+						randomIndex -= numChoices;
+					}
+					i = new Intent(mCtx, CardViewActivity.class);
+					c.moveToPosition(randomSequence[randomIndex]);
+					id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
+					i.putExtra("id", id);
+					i.putExtra(SearchActivity.RANDOM, isRandom);
+					startActivityForResult(i, 0);
+					break;
+				default:
+					if (isSingle || isRandom) {
+						this.finish();
+					}
+					break;
 			}
 		}
 	}

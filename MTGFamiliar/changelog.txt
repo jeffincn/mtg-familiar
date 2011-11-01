@@ -1,4 +1,9 @@
-Version 1.1:
+Version 1.2 (Gray Ogre):
+ - Adds random card feature, including MoJhoSto Basic
+ - Major cleanup of card search interface for smaller phones
+ - Lots of little tweaks and bug fixes
+ 
+Version 1.1 (Grizzly Bears):
  - Supports Move to SD functionality
  - Supports rotation in all views
  - Can copy text in card view

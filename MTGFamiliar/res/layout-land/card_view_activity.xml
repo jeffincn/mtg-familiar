@@ -156,7 +156,6 @@
                     android:gravity="right"
                     android:text="*/1+*" />
             </LinearLayout>
-        </LinearLayout>
 
         <ImageView
             android:id="@+id/cardpic"
@@ -172,6 +171,30 @@
             android:text="@string/transform"
             android:textSize="22dip" />
         
+            <LinearLayout
+                android:id="@+id/linearLayout7"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal" >
+
+                <Button
+                    android:id="@+id/randomLeft"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/randomleft"
+                    android:textSize="22dip" />
+
+                <Button
+                    android:id="@+id/randomRight"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/randomright"
+                    android:textSize="22dip" />
+            </LinearLayout>
         </LinearLayout>
+    </LinearLayout>
 
 </ScrollView>

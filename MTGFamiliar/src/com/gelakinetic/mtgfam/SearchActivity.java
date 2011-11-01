@@ -60,6 +60,7 @@ public class SearchActivity extends Activity {
 	protected static final String	RARITY			= "rarity";
 	protected static final String	ARTIST			= "artist";
 	protected static final String	FLAVOR			= "flavor";
+	protected static final String	RANDOM			= "random";
 
 	protected static final int		SETLIST			= 0;
 	protected static final int		FORMATLIST	= 1;
@@ -99,6 +100,7 @@ public class SearchActivity extends Activity {
 	private Dialog								rarityDialog;
 	private EditText							flavorfield;
 	private EditText							artistfield;
+	private Button								randombutton;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -115,8 +117,8 @@ public class SearchActivity extends Activity {
 		flavorfield = (EditText) findViewById(R.id.flavorsearch);
 		artistfield = (EditText) findViewById(R.id.artistsearch);
 
+		// So pressing ender does the search
 		namefield.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
-
 		namefield.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
 				if (arg1 == EditorInfo.IME_ACTION_SEARCH) {
@@ -168,6 +170,7 @@ public class SearchActivity extends Activity {
 		});
 
 		searchbutton = (Button) findViewById(R.id.searchbutton);
+		randombutton = (Button) findViewById(R.id.randombutton);
 
 		checkboxW = (CheckBox) findViewById(R.id.checkBoxW);
 		checkboxU = (CheckBox) findViewById(R.id.checkBoxU);
@@ -246,7 +249,13 @@ public class SearchActivity extends Activity {
 
 		searchbutton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-                doSearch();
+				doSearch(false);
+			}
+		});
+
+		randombutton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				doSearch(true);
 			}
 		});
 
@@ -331,192 +340,191 @@ public class SearchActivity extends Activity {
 		});
 	}
 
-    private void doSearch()
-    {
-        String name = namefield.getText().toString();
-        String text = textfield.getText().toString();
-        String type = typefield.getText().toString();
-        String flavor = flavorfield.getText().toString();
-        String artist = artistfield.getText().toString();
+	private void doSearch(boolean isRandom) {
+		String name = namefield.getText().toString();
+		String text = textfield.getText().toString();
+		String type = typefield.getText().toString();
+		String flavor = flavorfield.getText().toString();
+		String artist = artistfield.getText().toString();
 
-        if (name.length() == 0) {
-            name = null;
-        }
-        if (text.length() == 0) {
-            text = null;
-        }
-        if (type.length() == 0) {
-            type = null;
-        }
-        if (flavor.length() == 0) {
-            flavor = null;
-        }
-        if (artist.length() == 0) {
-            artist = null;
-        }
+		if (name.length() == 0) {
+			name = null;
+		}
+		if (text.length() == 0) {
+			text = null;
+		}
+		if (type.length() == 0) {
+			type = null;
+		}
+		if (flavor.length() == 0) {
+			flavor = null;
+		}
+		if (artist.length() == 0) {
+			artist = null;
+		}
 
-        String color = null;
+		String color = null;
 
-        if (checkboxW.isChecked()) {
-            color = "W";
-        }
-        else {
-            color = "w";
-        }
+		if (checkboxW.isChecked()) {
+			color = "W";
+		}
+		else {
+			color = "w";
+		}
 
-        if (checkboxU.isChecked()) {
-            color += "U";
-        }
-        else {
-            color += "u";
-        }
-        if (checkboxB.isChecked()) {
-            color += "B";
-        }
-        else {
-            color += "b";
-        }
-        if (checkboxR.isChecked()) {
-            color += "R";
-        }
-        else {
-            color += "r";
-        }
-        if (checkboxG.isChecked()) {
-            color += "G";
-        }
-        else {
-            color += "g";
-        }
-        if (checkboxL.isChecked()) {
-            color += "L";
-        }
-        else {
-            color += "l";
-        }
+		if (checkboxU.isChecked()) {
+			color += "U";
+		}
+		else {
+			color += "u";
+		}
+		if (checkboxB.isChecked()) {
+			color += "B";
+		}
+		else {
+			color += "b";
+		}
+		if (checkboxR.isChecked()) {
+			color += "R";
+		}
+		else {
+			color += "r";
+		}
+		if (checkboxG.isChecked()) {
+			color += "G";
+		}
+		else {
+			color += "g";
+		}
+		if (checkboxL.isChecked()) {
+			color += "L";
+		}
+		else {
+			color += "l";
+		}
 
-        String sets = null;
+		String sets = null;
 
-        for (int i = 0; i < setChecked.length; i++) {
-            if (setChecked[i]) {
-                if (sets == null) {
-                    sets = setSymbols[i];
-                }
-                else {
-                    sets += "-" + setSymbols[i];
-                }
-            }
-        }
+		for (int i = 0; i < setChecked.length; i++) {
+			if (setChecked[i]) {
+				if (sets == null) {
+					sets = setSymbols[i];
+				}
+				else {
+					sets += "-" + setSymbols[i];
+				}
+			}
+		}
 
-        String fmt = null;
-        for (int i = 0; i < formatChecked.length; i++) {
-            if (formatChecked[i]) {
-                if (fmt == null) {
-                    fmt = formatNames[i];
-                }
-                else {
-                    fmt += "-" + formatNames[i];
-                }
-            }
-        }
+		String fmt = null;
+		for (int i = 0; i < formatChecked.length; i++) {
+			if (formatChecked[i]) {
+				if (fmt == null) {
+					fmt = formatNames[i];
+				}
+				else {
+					fmt += "-" + formatNames[i];
+				}
+			}
+		}
 
-        String rarity = null;
-        for (int i = 0; i < rarityChecked.length; i++) {
-            if (rarityChecked[i]) {
-                if (rarity == null) {
-                    rarity = rarityNames[i].charAt(0) + "";
-                }
-                else {
-                    rarity += rarityNames[i].charAt(0);
-                }
-            }
-        }
+		String rarity = null;
+		for (int i = 0; i < rarityChecked.length; i++) {
+			if (rarityChecked[i]) {
+				if (rarity == null) {
+					rarity = rarityNames[i].charAt(0) + "";
+				}
+				else {
+					rarity += rarityNames[i].charAt(0);
+				}
+			}
+		}
 
-        String[] logicChoices = getResources().getStringArray(R.array.logic_spinner);
-        String power = getResources().getStringArray(R.array.pt_spinner)[powChoice.getSelectedItemPosition()];
-        String toughness = getResources().getStringArray(R.array.pt_spinner)[touChoice.getSelectedItemPosition()];
+		String[] logicChoices = getResources().getStringArray(R.array.logic_spinner);
+		String power = getResources().getStringArray(R.array.pt_spinner)[powChoice.getSelectedItemPosition()];
+		String toughness = getResources().getStringArray(R.array.pt_spinner)[touChoice.getSelectedItemPosition()];
 
-        float pow = CardDbAdapter.NOONECARES;
-        try {
-            pow = Float.parseFloat(power);
-        }
-        catch (NumberFormatException e) {
-            if (power.equals("*")) {
-                pow = CardDbAdapter.STAR;
-            }
-            else if (power.equals("1+*")) {
-                pow = CardDbAdapter.ONEPLUSSTAR;
-            }
-            else if (power.equals("2+*")) {
-                pow = CardDbAdapter.TWOPLUSSTAR;
-            }
-            else if (power.equals("7-*")) {
-                pow = CardDbAdapter.SEVENMINUSSTAR;
-            }
-            else if (power.equals("*^2")) {
-                pow = CardDbAdapter.STARSQUARED;
-            }
-        }
+		float pow = CardDbAdapter.NOONECARES;
+		try {
+			pow = Float.parseFloat(power);
+		}
+		catch (NumberFormatException e) {
+			if (power.equals("*")) {
+				pow = CardDbAdapter.STAR;
+			}
+			else if (power.equals("1+*")) {
+				pow = CardDbAdapter.ONEPLUSSTAR;
+			}
+			else if (power.equals("2+*")) {
+				pow = CardDbAdapter.TWOPLUSSTAR;
+			}
+			else if (power.equals("7-*")) {
+				pow = CardDbAdapter.SEVENMINUSSTAR;
+			}
+			else if (power.equals("*^2")) {
+				pow = CardDbAdapter.STARSQUARED;
+			}
+		}
 
-        float tou = CardDbAdapter.NOONECARES;
-        try {
-            tou = Float.parseFloat(toughness);
-        }
-        catch (NumberFormatException e) {
-            if (toughness.equals("*")) {
-                tou = CardDbAdapter.STAR;
-            }
-            else if (toughness.equals("1+*")) {
-                tou = CardDbAdapter.ONEPLUSSTAR;
-            }
-            else if (toughness.equals("2+*")) {
-                tou = CardDbAdapter.TWOPLUSSTAR;
-            }
-            else if (toughness.equals("7-*")) {
-                tou = CardDbAdapter.SEVENMINUSSTAR;
-            }
-            else if (toughness.equals("*^2")) {
-                tou = CardDbAdapter.STARSQUARED;
-            }
-        }
+		float tou = CardDbAdapter.NOONECARES;
+		try {
+			tou = Float.parseFloat(toughness);
+		}
+		catch (NumberFormatException e) {
+			if (toughness.equals("*")) {
+				tou = CardDbAdapter.STAR;
+			}
+			else if (toughness.equals("1+*")) {
+				tou = CardDbAdapter.ONEPLUSSTAR;
+			}
+			else if (toughness.equals("2+*")) {
+				tou = CardDbAdapter.TWOPLUSSTAR;
+			}
+			else if (toughness.equals("7-*")) {
+				tou = CardDbAdapter.SEVENMINUSSTAR;
+			}
+			else if (toughness.equals("*^2")) {
+				tou = CardDbAdapter.STARSQUARED;
+			}
+		}
 
-        String[] cmcChoices = getResources().getStringArray(R.array.cmc_spinner);
-        int cmc;
-        try {
-            cmc = Integer.parseInt(cmcChoices[cmcChoice.getSelectedItemPosition()]);
-        }
-        catch (NumberFormatException e) {
-            cmc = -1;
-        }
-        Intent i = new Intent(mCtx, ResultListActivity.class);
-        i.putExtra(NAME, name);
-        i.putExtra(TEXT, text);
-        i.putExtra(TYPE, type);
-        i.putExtra(COLOR, color);
-        i.putExtra(COLORLOGIC, colorspinner.getSelectedItemPosition());// logicbutton.isChecked());
-        i.putExtra(SET, sets);
-        i.putExtra(FORMAT, fmt);
-        i.putExtra(POW_CHOICE, pow);
-        i.putExtra(POW_LOGIC, logicChoices[powLogic.getSelectedItemPosition()]);
-        i.putExtra(TOU_CHOICE, tou);
-        i.putExtra(TOU_LOGIC, logicChoices[touLogic.getSelectedItemPosition()]);
-        i.putExtra(CMC, cmc);
-        i.putExtra(CMC_LOGIC, logicChoices[cmcLogic.getSelectedItemPosition()]);
-        i.putExtra(RARITY, rarity);
-        i.putExtra(ARTIST, artist);
-        i.putExtra(FLAVOR, flavor);
-        startActivityForResult(i, 0);
-    }
+		String[] cmcChoices = getResources().getStringArray(R.array.cmc_spinner);
+		int cmc;
+		try {
+			cmc = Integer.parseInt(cmcChoices[cmcChoice.getSelectedItemPosition()]);
+		}
+		catch (NumberFormatException e) {
+			cmc = -1;
+		}
+		Intent i = new Intent(mCtx, ResultListActivity.class);
+		i.putExtra(NAME, name);
+		i.putExtra(TEXT, text);
+		i.putExtra(TYPE, type);
+		i.putExtra(COLOR, color);
+		i.putExtra(COLORLOGIC, colorspinner.getSelectedItemPosition());// logicbutton.isChecked());
+		i.putExtra(SET, sets);
+		i.putExtra(FORMAT, fmt);
+		i.putExtra(POW_CHOICE, pow);
+		i.putExtra(POW_LOGIC, logicChoices[powLogic.getSelectedItemPosition()]);
+		i.putExtra(TOU_CHOICE, tou);
+		i.putExtra(TOU_LOGIC, logicChoices[touLogic.getSelectedItemPosition()]);
+		i.putExtra(CMC, cmc);
+		i.putExtra(CMC_LOGIC, logicChoices[cmcLogic.getSelectedItemPosition()]);
+		i.putExtra(RARITY, rarity);
+		i.putExtra(ARTIST, artist);
+		i.putExtra(FLAVOR, flavor);
+		i.putExtra(RANDOM, isRandom);
+		startActivityForResult(i, 0);
+	}
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode == KeyEvent.KEYCODE_SEARCH)
-        {
-            doSearch();
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_SEARCH) {
+			doSearch(false);
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
+	}
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
@@ -559,10 +567,10 @@ public class SearchActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-		case R.id.search_menu_search:
-			doSearch();
-			return true;
-			
+			case R.id.search_menu_search:
+				doSearch(false);
+				return true;
+
 			case R.id.search_menu_clear:
 				namefield.setText("");
 				typefield.setText("");

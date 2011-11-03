@@ -199,9 +199,13 @@ Media licenced under under the &lt;a href=&quot;http://creativecommons.org/licen
 - UI tweaks all over the place&lt;br /&gt;
 - General bugfixes
  -->
- <!-- 1.1.1 -->
+ <!-- 1.1.1
  - Fixed issue where result list would reset position
- 	</string>    
+ -->
+ <!-- 1.2 -->
+ - Added random card feature in Card Search&lt;br /&gt;
+ - Added MoJhoSto Basic randomizer
+  	</string>    
 	    
 	<string name="gatherer">Gatherer Page</string>
 
@@ -258,5 +262,18 @@ Media licenced under under the &lt;a href=&quot;http://creativecommons.org/licen
 
 <string name="randomleft">&lt;</string>
 <string name="randomright">&gt;</string>
-    
+<string name="random_rules">MoJhoSto Basic Rules</string>
+
+<string name="mojhostorules">
+    MoJhoSto is a casual Vanguard format from Magic Online.&lt;br /&gt;&lt;br /&gt;
+    To play, each player must have a deck which consists of only 60 basic lands.&lt;br /&gt;&lt;br /&gt;
+    Each player starts the game with three Vanguards: Momir Vig, Jhoira, and Stonehewer Giant.&lt;br /&gt;&lt;br /&gt;
+    These Vanguards adjust each player\'s starting and maximum hand size (9) and starting life total (19).&lt;br /&gt;&lt;br /&gt;
+    Any abilities printed on a Vanguard card are played exactly like those of an in-play Magic card.&lt;br /&gt;&lt;br /&gt;
+    However, these abilities have no color and damage from them isn\'t damage from a permanent of any type or a source of any color.&lt;br /&gt;&lt;br /&gt;
+    A Vanguard card isn\'t a Magic card, so it can\'t be affected by spells or abilities.&lt;br /&gt;&lt;br /&gt;
+    You can tap each picture to see the full Vanguard card.&lt;br /&gt;&lt;br /&gt;
+    You can read the rules at any time from the menu.&lt;br /&gt;&lt;br /&gt;
+    Pen and paper might be useful for tracking the game state. Sadly, MTG Familiar cannot spawn actual cards.&lt;br /&gt;&lt;br /&gt;
+    Good luck, and have fun!</string>
 </resources>

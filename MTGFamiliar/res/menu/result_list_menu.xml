@@ -19,4 +19,5 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:title="@string/preferences" android:id="@+id/preferences" android:icon="@drawable/ic_menu_preferences"/>
+    <item android:icon="@drawable/ic_menu_chat_dashboard" android:id="@+id/search_menu_random_search" android:title="@string/randomButton"></item>
  </menu>

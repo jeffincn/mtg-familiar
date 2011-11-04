@@ -100,7 +100,7 @@ public class SearchActivity extends Activity {
 	private Dialog								rarityDialog;
 	private EditText							flavorfield;
 	private EditText							artistfield;
-	private Button								randombutton;
+	// private Button								randombutton;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -170,7 +170,7 @@ public class SearchActivity extends Activity {
 		});
 
 		searchbutton = (Button) findViewById(R.id.searchbutton);
-		randombutton = (Button) findViewById(R.id.randombutton);
+		// randombutton = (Button) findViewById(R.id.s);
 
 		checkboxW = (CheckBox) findViewById(R.id.checkBoxW);
 		checkboxU = (CheckBox) findViewById(R.id.checkBoxU);
@@ -253,11 +253,11 @@ public class SearchActivity extends Activity {
 			}
 		});
 
-		randombutton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				doSearch(true);
-			}
-		});
+//		randombutton.setOnClickListener(new View.OnClickListener() {
+//			public void onClick(View v) {
+//				doSearch(true);
+//			}
+//		});
 
 		Cursor setCursor = mDbHelper.fetchAllSets();
 		setCursor.moveToFirst();

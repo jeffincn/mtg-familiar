@@ -157,20 +157,20 @@
                     android:text="*/1+*" />
             </LinearLayout>
 
-        <ImageView
-            android:id="@+id/cardpic"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|center"
-            android:src="@drawable/loading" />
-    
-        <Button
-            android:id="@+id/transformbutton"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/transform"
-            android:textSize="22dip" />
-        
+            <ImageView
+                android:id="@+id/cardpic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|center"
+                android:src="@drawable/loading" />
+
+            <Button
+                android:id="@+id/transformbutton"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/transform"
+                android:textSize="22dip" />
+
             <LinearLayout
                 android:id="@+id/linearLayout7"
                 android:layout_width="fill_parent"

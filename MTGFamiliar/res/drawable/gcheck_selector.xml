@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-	<item android:state_checked="true" android:drawable="@drawable/gchecked" />
-	<item android:state_checked="false" android:drawable="@drawable/gcheck" />
+
+    <item android:drawable="@drawable/gchecked" android:state_checked="true"/>
+    <item android:drawable="@drawable/gcheck" android:state_checked="false"/>
+
 </selector>

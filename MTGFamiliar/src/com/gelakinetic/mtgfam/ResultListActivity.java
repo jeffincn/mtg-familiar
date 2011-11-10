@@ -56,6 +56,7 @@ public class ResultListActivity extends ListActivity {
 	private int[]							randomSequence;
 	private int								randomIndex						= 0;
 	private int								numChoices;
+	private boolean						randomFromMenu				= false;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -121,29 +122,7 @@ public class ResultListActivity extends ListActivity {
 			registerForContextMenu(lv);
 
 			if (extras.getBoolean(SearchActivity.RANDOM)) {
-				isRandom = true;
-
-				// implements http://en.wikipedia.org/wiki/Fisher-Yates_shuffle
-				numChoices = c.getCount();
-				Random rand = new Random(System.currentTimeMillis());
-				randomSequence = new int[numChoices];
-				int temp, k, j;
-				for (k = 0; k < numChoices; k++) {
-					randomSequence[k] = k;
-				}
-				for (k = numChoices - 1; k > 0; k--) {
-					j = rand.nextInt(k + 1);// j = random integer with 0 <= j <= i
-					temp = randomSequence[j];
-					randomSequence[j] = randomSequence[k];
-					randomSequence[k] = temp;
-				}
-
-				Intent i = new Intent(mCtx, CardViewActivity.class);
-				c.moveToPosition(randomSequence[randomIndex]);
-				id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
-				i.putExtra("id", id);
-				i.putExtra(SearchActivity.RANDOM, isRandom);
-				startActivityForResult(i, 0);
+				startRandom();
 			}
 			else {
 				lv.setOnItemClickListener(new OnItemClickListener() {
@@ -295,8 +274,11 @@ public class ResultListActivity extends ListActivity {
 					startActivityForResult(i, 0);
 					break;
 				default:
-					if (isSingle || isRandom) {
+					if (isSingle || isRandom && !randomFromMenu) {
 						this.finish();
+					}
+					if (randomFromMenu) {
+						randomFromMenu = false;
 					}
 					break;
 			}
@@ -321,11 +303,41 @@ public class ResultListActivity extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
+			case R.id.search_menu_random_search:
+				randomFromMenu = true;
+				startRandom();
+				return true;
 			case R.id.preferences:
 				startActivity(new Intent().setClass(this, PreferencesActivity.class));
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
+	}
+
+	private void startRandom() {
+		isRandom = true;
+
+		// implements http://en.wikipedia.org/wiki/Fisher-Yates_shuffle
+		numChoices = c.getCount();
+		Random rand = new Random(System.currentTimeMillis());
+		randomSequence = new int[numChoices];
+		int temp, k, j;
+		for (k = 0; k < numChoices; k++) {
+			randomSequence[k] = k;
+		}
+		for (k = numChoices - 1; k > 0; k--) {
+			j = rand.nextInt(k + 1);// j = random integer with 0 <= j <= i
+			temp = randomSequence[j];
+			randomSequence[j] = randomSequence[k];
+			randomSequence[k] = temp;
+		}
+
+		Intent i = new Intent(mCtx, CardViewActivity.class);
+		c.moveToPosition(randomSequence[randomIndex]);
+		long id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
+		i.putExtra("id", id);
+		i.putExtra(SearchActivity.RANDOM, isRandom);
+		startActivityForResult(i, 0);
 	}
 }

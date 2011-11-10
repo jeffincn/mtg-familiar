@@ -17,11 +17,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 -->
-    <resources>
-        <color name="textcolor">#00FF00</color>
-        <color name="common">#FFFFFF</color>
-        <color name="rare">#FDD017</color>
-        <color name="uncommon">#C0C0C0</color>
-        <color name="mythic">#FFA500</color>
-        <color name="black">#000000</color>
-    </resources>
+<resources>
+
+    <color name="textcolor">#00FF00</color>
+    <color name="common">#FFFFFF</color>
+    <color name="rare">#FDD017</color>
+    <color name="uncommon">#C0C0C0</color>
+    <color name="mythic">#FFA500</color>
+    <color name="black">#000000</color>
+
+</resources>

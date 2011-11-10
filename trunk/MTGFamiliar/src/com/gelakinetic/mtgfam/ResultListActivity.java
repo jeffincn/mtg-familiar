@@ -259,6 +259,7 @@ public class ResultListActivity extends ListActivity {
 					id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
 					i.putExtra("id", id);
 					i.putExtra(SearchActivity.RANDOM, isRandom);
+					i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 					startActivityForResult(i, 0);
 					break;
 				case CardViewActivity.RANDOMRIGHT:

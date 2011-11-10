@@ -280,7 +280,7 @@ public class JsonParser {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mMain);
 
 		try {
-			update = new URL("http://members.cox.net/aefeinstein/patches.json");
+			update = new URL("https://sites.google.com/site/mtgfamiliar/manifests/patches.json");
 			InputStreamReader isr = new InputStreamReader(update.openStream(), "ISO-8859-1");
 			JsonReader reader = new JsonReader(isr);
 
@@ -430,7 +430,7 @@ public class JsonParser {
 		String name = null, code = null;
 		
 		try {
-			update = new URL("http://members.cox.net/aefeinstein/TCGnames.json");
+			update = new URL("https://sites.google.com/site/mtgfamiliar/manifests/TCGnames.json");
 			InputStreamReader isr = new InputStreamReader(update.openStream(), "ISO-8859-1");
 			JsonReader reader = new JsonReader(isr);
 

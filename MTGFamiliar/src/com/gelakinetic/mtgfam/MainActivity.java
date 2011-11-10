@@ -350,7 +350,7 @@ public class MainActivity extends Activity implements Runnable {
 
 				if (patchInfo != null) {
 					try {
-						parseLegality(new URL("http://members.cox.net/aefeinstein/legality.json"));
+						parseLegality(new URL("https://sites.google.com/site/mtgfamiliar/manifests/legality.json"));
 					}
 					catch (MalformedURLException e1) {
 					}
@@ -389,8 +389,8 @@ public class MainActivity extends Activity implements Runnable {
 					editor.putString("date", "");
 					editor.commit();
 
-					parseJSON(new URL("http://members.cox.net/aefeinstein/uptoISD.json.gzip"));
-					parseLegality(new URL("http://members.cox.net/aefeinstein/legality.json"));
+					parseJSON(new URL("https://sites.google.com/site/mtgfamiliar/patches/uptoISD.json.gzip"));
+					parseLegality(new URL("https://sites.google.com/site/mtgfamiliar/manifests/legality.json"));
 					parseTCGNames();
 				}
 				catch (MalformedURLException e) {

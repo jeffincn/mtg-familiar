@@ -567,6 +567,9 @@ public class SearchActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
+			case R.id.search_menu_random_search:
+				doSearch(true);
+				return true;
 			case R.id.search_menu_search:
 				doSearch(false);
 				return true;

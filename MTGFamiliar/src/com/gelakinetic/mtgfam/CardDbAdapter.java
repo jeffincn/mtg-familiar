@@ -939,13 +939,9 @@ public class CardDbAdapter {
       SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
       builder.setTables(DATABASE_TABLE_CARDS);
       builder.setProjectionMap(mColumnMap);
-/*
-      selection = selection.replace("?", "'" + selectionArgs[0] + "%'");
-      selection = selection.replace("MATCH", "LIKE");
-      selectionArgs = null;
-  */    
+
       Cursor cursor = builder.query(mDb,
-              columns, selection, selectionArgs, null, null, null);
+              columns, selection, selectionArgs, null, null, KEY_NAME);
 
       try{
 	      if (cursor == null) {
@@ -955,7 +951,7 @@ public class CardDbAdapter {
 	          return null;
 	      }
       }catch(Exception e){
-      	System.out.println(e); // SQL logic error or missing database
+      	System.out.println(e);
       }
       return cursor;
   }
@@ -986,10 +982,6 @@ public class CardDbAdapter {
    * @return Cursor over all words that match, or null if none found.
    */
   public Cursor getWordMatches(String query, String[] columns) {
-/*
-  		String selection = KEY_NAME + " MATCH ?";
-      String[] selectionArgs = new String[] {query+"*"};
-*/
   	String selection = KEY_NAME + " LIKE '" + query + "%'";
   	String[] selectionArgs = null;
   	

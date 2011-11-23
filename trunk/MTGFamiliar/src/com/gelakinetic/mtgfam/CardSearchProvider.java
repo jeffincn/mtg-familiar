@@ -105,30 +105,12 @@ public class CardSearchProvider extends ContentProvider {
 				throw new IllegalArgumentException("Unknown Uri: " + uri);
 		}
 	}
-
-	/*
-	private Cursor getSuggestions(String query) {
-		String[] columns = new String[] { BaseColumns._ID, CardDbAdapter.KEY_NAME };
-
-		return mDbAdapter.Search(query, null, null, "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-				CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, true, columns, true);
-	}
-
-	private Cursor search(String query) {
-		String[] columns = new String[] { BaseColumns._ID, CardDbAdapter.KEY_NAME };
-
-		return mDbAdapter.Search(query, null, null, "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-				CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, true, columns, true);
-	}
-*/
 	
   private Cursor getSuggestions(String query) {
     query = query.toLowerCase();
     String[] columns = new String[] {
         BaseColumns._ID,
         CardDbAdapter.KEY_NAME,
-     /* SearchManager.SUGGEST_COLUMN_SHORTCUT_ID,
-                      (only if you want to refresh shortcuts) */
         SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID};
 
     return mDbAdapter.getWordMatches(query, columns);
@@ -142,18 +124,7 @@ public class CardSearchProvider extends ContentProvider {
 
     return mDbAdapter.getWordMatches(query, columns);
   }
-	/*
-	private Cursor getWord(Uri uri) {
-		String rowId = uri.getLastPathSegment();
-		String[] columns = new String[] { CardDbAdapter.KEY_NAME
-		// DictionaryDatabase.KEY_WORD,
-		// DictionaryDatabase.KEY_DEFINITION
-		};
 
-		return mDbAdapter.fetchCard(Long.parseLong(rowId), columns);// mDictionary.getWord(rowId,
-																																// columns);
-	}
-*/
   private Cursor getWord(Uri uri) {
     String rowId = uri.getLastPathSegment();
     String[] columns = new String[] {
@@ -161,29 +132,6 @@ public class CardSearchProvider extends ContentProvider {
 
     return mDbAdapter.getWord(rowId, columns);
   }
-	
-  /*
-	 * This won't be called with the current implementation, but if we include
-	 * {@link SearchManager#SUGGEST_COLUMN_SHORTCUT_ID} as a column in our
-	 * suggestions table, we could expect to receive refresh queries when a
-	 * shortcutted suggestion is displayed in Quick Search Box. In which case,
-	 * this method will query the table for the specific word, using the given
-	 * item Uri and provide all the columns originally provided with the
-	 * suggestion query.
-	 */
-
-  /*
-	private Cursor refreshShortcut(Uri uri) {
-		String rowId = uri.getLastPathSegment();
-		String[] columns = new String[] { BaseColumns._ID,
-				// DictionaryDatabase.KEY_WORD,
-				// DictionaryDatabase.KEY_DEFINITION,
-				CardDbAdapter.KEY_NAME, SearchManager.SUGGEST_COLUMN_SHORTCUT_ID, SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID };
-
-		// return mDictionary.getWord(rowId, columns);
-		return mDbAdapter.fetchCard(Long.parseLong(rowId), columns);
-	}
-*/
 
 private Cursor refreshShortcut(Uri uri) {
   /* This won't be called with the current implementation, but if we include
@@ -239,5 +187,4 @@ private Cursor refreshShortcut(Uri uri) {
 	public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
 		throw new UnsupportedOperationException();
 	}
-
 }

@@ -30,6 +30,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.MergeCursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
@@ -61,12 +62,12 @@ public class ResultListActivity extends ListActivity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.result_list_activity);
+
 		// After a search, make sure the position is on top
 		cursorPosition = 0;
 		cursorPositionOffset = 0;
-
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.result_list_activity);
 
 		mDbHelper = new CardDbAdapter(this);
 		mDbHelper.open();
@@ -82,21 +83,27 @@ public class ResultListActivity extends ListActivity {
 
 		Bundle extras = intent.getExtras();
 
-		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+		if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+			// handles a click on a search suggestion; launches activity to show word
+			Uri u = intent.getData();
+			id = Long.parseLong(u.getLastPathSegment());
+			c = mDbHelper.fetchCard(id, null);
+		}
+		else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
 			String query = intent.getStringExtra(SearchManager.QUERY);
 			c = mDbHelper.Search(query, null, null, "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-					CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, true, returnTypes);
+					CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, true, returnTypes, false);
 		}
 		else if ((id = extras.getLong("id")) != 0L) {
-			c = mDbHelper.fetchCard(id);
+			c = mDbHelper.fetchCard(id, null);
 		}
 		else if ((id = extras.getLong("id0")) != 0L) {
 			long id1 = extras.getLong("id1");
 			long id2 = extras.getLong("id2");
 			Cursor cs[] = new Cursor[3];
-			cs[0] = mDbHelper.fetchCard(id);
-			cs[1] = mDbHelper.fetchCard(id1);
-			cs[2] = mDbHelper.fetchCard(id2);
+			cs[0] = mDbHelper.fetchCard(id, null);
+			cs[1] = mDbHelper.fetchCard(id1, null);
+			cs[2] = mDbHelper.fetchCard(id2, null);
 			c = new MergeCursor(cs);
 		}
 		else {
@@ -107,7 +114,7 @@ public class ResultListActivity extends ListActivity {
 					extras.getFloat(SearchActivity.TOU_CHOICE), extras.getString(SearchActivity.TOU_LOGIC),
 					extras.getInt(SearchActivity.CMC), extras.getString(SearchActivity.CMC_LOGIC),
 					extras.getString(SearchActivity.FORMAT), extras.getString(SearchActivity.RARITY),
-					extras.getString(SearchActivity.FLAVOR), extras.getString(SearchActivity.ARTIST), true, returnTypes);
+					extras.getString(SearchActivity.FLAVOR), extras.getString(SearchActivity.ARTIST), true, returnTypes, false);
 		}
 
 		if (c == null || c.getCount() == 0) {

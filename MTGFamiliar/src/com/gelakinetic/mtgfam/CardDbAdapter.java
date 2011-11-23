@@ -19,6 +19,9 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam;
 
+import java.util.HashMap;
+
+import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -26,6 +29,8 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQueryBuilder;
+import android.provider.BaseColumns;
 
 /**
  * Simple Cards database access helper class. Defines the basic CRUD operations
@@ -44,15 +49,15 @@ public class CardDbAdapter {
 	public static final int			AND											= 0;
 	public static final int			OR											= 1;
 
-	private static final String	DATABASE_NAME						= "data";
-	private static final String	DATABASE_TABLE_CARDS		= "cards";
-	private static final String	DATABASE_TABLE_FORMATS	= "formats";
-	private static final String	DATABASE_TABLE_SETS			= "sets";
+	public static final String	DATABASE_NAME						= "data";
+	public static final String	DATABASE_TABLE_CARDS		= "cards";
+	public static final String	DATABASE_TABLE_FORMATS	= "formats";
+	public static final String	DATABASE_TABLE_SETS			= "sets";
 
-	private static final int		DATABASE_VERSION				= 11;
+	public static final int		DATABASE_VERSION				= 12;
 
 	public static final String	KEY_ID									= "_id";
-	public static final String	KEY_NAME								= "name";
+	public static final String	KEY_NAME								= SearchManager.SUGGEST_COLUMN_TEXT_1;//"name";
 	public static final String	KEY_SET									= "expansion";
 	public static final String	KEY_TYPE								= "type";
 	public static final String	KEY_ABILITY							= "cardtext";
@@ -311,11 +316,14 @@ public class CardDbAdapter {
 	 * @throws SQLException
 	 *           if Card could not be found/retrieved
 	 */
-	public Cursor fetchCard(long id) throws SQLException {
+	public Cursor fetchCard(long id, String[] columns) throws SQLException {
 
-		Cursor mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID, KEY_NAME, KEY_SET, KEY_TYPE, KEY_RARITY,
-				KEY_MANACOST, KEY_CMC, KEY_POWER, KEY_TOUGHNESS, KEY_LOYALTY, KEY_ABILITY, KEY_FLAVOR, KEY_ARTIST, KEY_NUMBER,
-				KEY_COLOR, KEY_MULTIVERSEID }, KEY_ID + "=" + id, null, null, null, KEY_NAME, null);
+		if (columns == null) {
+			columns = new String[] { KEY_ID, KEY_NAME, KEY_SET, KEY_TYPE, KEY_RARITY, KEY_MANACOST, KEY_CMC, KEY_POWER,
+					KEY_TOUGHNESS, KEY_LOYALTY, KEY_ABILITY, KEY_FLAVOR, KEY_ARTIST, KEY_NUMBER, KEY_COLOR, KEY_MULTIVERSEID };
+		}
+		Cursor mCursor = mDb
+				.query(true, DATABASE_TABLE_CARDS, columns, KEY_ID + "=" + id, null, null, null, KEY_NAME, null);
 		if (mCursor != null) {
 			mCursor.moveToFirst();
 		}
@@ -395,24 +403,29 @@ public class CardDbAdapter {
 
 	public Cursor Search(String cardname, String cardtext, String cardtype, String color, int colorlogic, String sets,
 			float pow_choice, String pow_logic, float tou_choice, String tou_logic, int cmc, String cmcLogic, String formats,
-			String rarity, String flavor, String artist, boolean backface, String[] returnTypes) {
+			String rarity, String flavor, String artist, boolean backface, String[] returnTypes, boolean autocomplete) {
 		Cursor mCursor = null;
 
 		if (cardname != null)
-			cardname = cardname.replace("'", "''");
+			cardname = cardname.replace("'", "''").trim();
 		if (cardtext != null)
-			cardtext = cardtext.replace("'", "''");
+			cardtext = cardtext.replace("'", "''").trim();
 		if (cardtype != null)
-			cardtype = cardtype.replace("'", "''");
+			cardtype = cardtype.replace("'", "''").trim();
 		if (flavor != null)
-			flavor = flavor.replace("'", "''");
+			flavor = flavor.replace("'", "''").trim();
 		if (artist != null)
-			artist = artist.replace("'", "''");
+			artist = artist.replace("'", "''").trim();
 
 		String statement = null;
 
 		if (cardname != null) {
-			statement = "(" + KEY_NAME + " LIKE '%" + cardname + "%')";
+			if (autocomplete) {
+				statement = "(" + KEY_NAME + " LIKE '" + cardname + "%')";
+			}
+			else {
+				statement = "(" + KEY_NAME + " LIKE '%" + cardname + "%')";
+			}
 		}
 
 		if (cardtext != null) {
@@ -686,7 +699,7 @@ public class CardDbAdapter {
 			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, returnTypes, statement, null, null, null, KEY_NAME, null);
 		}
 		catch (SQLiteException e) {
-			// Log.v("tag", e.toString());
+			return null;
 		}
 		if (mCursor != null) {
 			mCursor.moveToFirst();
@@ -881,4 +894,119 @@ public class CardDbAdapter {
 		}
 		return name;
 	}
+
+	public Cursor getAllNames() {
+		return mDb.query(true, DATABASE_TABLE_CARDS, new String[] { /* KEY_ID, */KEY_NAME }, null, null, null, null,
+				KEY_NAME, null);
+	}
+
+	public SQLiteDatabase getReadableDatabase() {
+		// TODO Auto-generated method stub
+		return mDb;
+	}
+	
+  private static final HashMap<String,String> mColumnMap = buildColumnMap();
+  /**
+   * Builds a map for all columns that may be requested, which will be given to the 
+   * SQLiteQueryBuilder. This is a good way to define aliases for column names, but must include 
+   * all columns, even if the value is the key. This allows the ContentProvider to request
+   * columns w/o the need to know real column names and create the alias itself.
+   */
+  private static HashMap<String,String> buildColumnMap() {
+      HashMap<String,String> map = new HashMap<String,String>();
+      map.put(KEY_NAME, KEY_NAME);
+      map.put(BaseColumns._ID, "rowid AS " +
+              BaseColumns._ID);
+      map.put(SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID, "rowid AS " +
+              SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID);
+      map.put(SearchManager.SUGGEST_COLUMN_SHORTCUT_ID, "rowid AS " +
+              SearchManager.SUGGEST_COLUMN_SHORTCUT_ID);
+      return map;
+  }
+  
+  /**
+   * Performs a database query.
+   * @param selection The selection clause
+   * @param selectionArgs Selection arguments for "?" components in the selection
+   * @param columns The columns to return
+   * @return A Cursor over all rows matching the query
+   */
+  private Cursor query(String selection, String[] selectionArgs, String[] columns) {
+      /* The SQLiteBuilder provides a map for all possible columns requested to
+       * actual columns in the database, creating a simple column alias mechanism
+       * by which the ContentProvider does not need to know the real column names
+       */
+      SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
+      builder.setTables(DATABASE_TABLE_CARDS);
+      builder.setProjectionMap(mColumnMap);
+/*
+      selection = selection.replace("?", "'" + selectionArgs[0] + "%'");
+      selection = selection.replace("MATCH", "LIKE");
+      selectionArgs = null;
+  */    
+      Cursor cursor = builder.query(mDb,
+              columns, selection, selectionArgs, null, null, null);
+
+      try{
+	      if (cursor == null) {
+	          return null;
+	      } else if (!cursor.moveToFirst()) {
+	          cursor.close();
+	          return null;
+	      }
+      }catch(Exception e){
+      	System.out.println(e); // SQL logic error or missing database
+      }
+      return cursor;
+  }
+
+  /**
+   * Returns a Cursor positioned at the word specified by rowId
+   *
+   * @param rowId id of word to retrieve
+   * @param columns The columns to include, if null then all are included
+   * @return Cursor positioned to matching word, or null if not found.
+   */
+  public Cursor getWord(String rowId, String[] columns) {
+      String selection = "rowid = ?";
+      String[] selectionArgs = new String[] {rowId};
+
+      return query(selection, selectionArgs, columns);
+
+      /* This builds a query that looks like:
+       *     SELECT <columns> FROM <table> WHERE rowid = <rowId>
+       */
+  }
+  
+  /**
+   * Returns a Cursor over all words that match the given query
+   *
+   * @param query The string to search for
+   * @param columns The columns to include, if null then all are included
+   * @return Cursor over all words that match, or null if none found.
+   */
+  public Cursor getWordMatches(String query, String[] columns) {
+/*
+  		String selection = KEY_NAME + " MATCH ?";
+      String[] selectionArgs = new String[] {query+"*"};
+*/
+  	String selection = KEY_NAME + " LIKE '" + query + "%'";
+  	String[] selectionArgs = null;
+  	
+      return query(selection, selectionArgs, columns);
+
+      /* This builds a query that looks like:
+       *     SELECT <columns> FROM <table> WHERE <KEY_WORD> MATCH 'query*'
+       * which is an FTS3 search for the query text (plus a wildcard) inside the word column.
+       *
+       * - "rowid" is the unique id for all rows but we need this value for the "_id" column in
+       *    order for the Adapters to work, so the columns need to make "_id" an alias for "rowid"
+       * - "rowid" also needs to be used by the SUGGEST_COLUMN_INTENT_DATA alias in order
+       *   for suggestions to carry the proper intent data.
+       *   These aliases are defined in the DictionaryProvider when queries are made.
+       * - This can be revised to also search the definition text with FTS3 by changing
+       *   the selection clause to use FTS_VIRTUAL_TABLE instead of KEY_WORD (to search across
+       *   the entire table, but sorting the relevance could be difficult.
+       */
+  }
 }

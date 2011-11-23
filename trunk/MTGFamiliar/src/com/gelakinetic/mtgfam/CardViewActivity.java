@@ -136,7 +136,7 @@ public class CardViewActivity extends Activity implements Runnable {
 		mDbHelper = new CardDbAdapter(this);
 		mDbHelper.open();
 
-		c = mDbHelper.fetchCard(cardID);
+		c = mDbHelper.fetchCard(cardID, null);
 		c.moveToFirst();
 
 		// http://magiccards.info/scans/en/mt/55.jpg

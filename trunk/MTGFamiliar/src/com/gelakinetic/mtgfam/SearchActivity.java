@@ -37,6 +37,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Button;
@@ -68,7 +69,7 @@ public class SearchActivity extends Activity {
 
 	private CardDbAdapter					mDbHelper;
 	private Button								searchbutton;
-	private EditText							namefield;
+	private AutoCompleteTextView	namefield;
 	private EditText							textfield;
 	private EditText							typefield;
 	private CheckBox							checkboxW;
@@ -100,7 +101,6 @@ public class SearchActivity extends Activity {
 	private Dialog								rarityDialog;
 	private EditText							flavorfield;
 	private EditText							artistfield;
-	// private Button								randombutton;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -108,15 +108,19 @@ public class SearchActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.search_activity);
 
+		mCtx = this;
+
 		mDbHelper = new CardDbAdapter(this);
 		mDbHelper.open();
 
-		namefield = (EditText) findViewById(R.id.namesearch);
+		namefield = (AutoCompleteTextView) findViewById(R.id.namesearch);
+		namefield.setAdapter(new AutocompleteCursorAdapter(mCtx, null));
 		textfield = (EditText) findViewById(R.id.textsearch);
 		typefield = (EditText) findViewById(R.id.typesearch);
 		flavorfield = (EditText) findViewById(R.id.flavorsearch);
 		artistfield = (EditText) findViewById(R.id.artistsearch);
-
+		
+		
 		// So pressing ender does the search
 		namefield.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
 		namefield.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -245,19 +249,11 @@ public class SearchActivity extends Activity {
 			}
 		});
 
-		mCtx = this;
-
 		searchbutton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				doSearch(false);
 			}
 		});
-
-//		randombutton.setOnClickListener(new View.OnClickListener() {
-//			public void onClick(View v) {
-//				doSearch(true);
-//			}
-//		});
 
 		Cursor setCursor = mDbHelper.fetchAllSets();
 		setCursor.moveToFirst();

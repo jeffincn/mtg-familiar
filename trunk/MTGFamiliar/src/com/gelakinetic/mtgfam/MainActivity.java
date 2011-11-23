@@ -67,7 +67,7 @@ public class MainActivity extends Activity implements Runnable {
 	private static final int		OTAPATCH					= 1;
 	private static final int		APPLYINGPATCH			= 3;
 	private static final int		DBFROMWEB					= 4;
-	private static final int		DATABASE_VERSION	= 6;
+//	private static final int		DATABASE_VERSION	= ;
 	private static final int		EXCEPTION					= 99;
 	private static final int		ABOUTDIALOG				= 0;
 	private static final int		CHANGELOGDIALOG		= 1;
@@ -151,7 +151,7 @@ public class MainActivity extends Activity implements Runnable {
 
 		File f = new File(DB_PATH, DB_NAME);
 		int dbVersion = preferences.getInt("databaseVersion", -1);
-		if (!f.exists() || dbVersion != DATABASE_VERSION) {
+		if (!f.exists() || dbVersion != CardDbAdapter.DATABASE_VERSION) {
 			startThread(DBFROMAPK);
 		}
 		else {
@@ -267,8 +267,8 @@ public class MainActivity extends Activity implements Runnable {
 		// Handle item selection
 		switch (item.getItemId()) {
 
-			// case R.id.buildWebDB: startThread(DBFROMWEB); return true;
-			// case R.id.refreshDB: startThread(DBFROMAPK); return true;
+			 case R.id.buildWebDB: startThread(DBFROMWEB); return true;
+			 case R.id.refreshDB: startThread(DBFROMAPK); return true;
 
 			case R.id.checkUpdate:
 				// Set the last legality update time back to zero on a forced update
@@ -323,7 +323,7 @@ public class MainActivity extends Activity implements Runnable {
 		else if (type == DBFROMWEB) {
 			dialog = new ProgressDialog(MainActivity.this);
 			dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-			dialog.setMessage("Downloading and parsing an update. Please wait...");
+			dialog.setMessage("Downloading and db from web. Please wait...");
 			dialog.setCancelable(false);
 			dialog.show();
 
@@ -554,7 +554,7 @@ public class MainActivity extends Activity implements Runnable {
 					fos.write(buffer, 0, length);
 				}
 
-				editor.putInt("databaseVersion", DATABASE_VERSION);
+				editor.putInt("databaseVersion", CardDbAdapter.DATABASE_VERSION);
 				editor.commit();
 
 				// Close the streams

@@ -403,7 +403,7 @@ public class CardDbAdapter {
 
 	public Cursor Search(String cardname, String cardtext, String cardtype, String color, int colorlogic, String sets,
 			float pow_choice, String pow_logic, float tou_choice, String tou_logic, int cmc, String cmcLogic, String formats,
-			String rarity, String flavor, String artist, boolean backface, String[] returnTypes, boolean autocomplete) {
+			String rarity, String flavor, String artist, boolean backface, String[] returnTypes, boolean autocomplete, String groupBy) {
 		Cursor mCursor = null;
 
 		if (cardname != null)
@@ -696,7 +696,7 @@ public class CardDbAdapter {
 		}
 
 		try {
-			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, returnTypes, statement, null, null, null, KEY_NAME, null);
+			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, returnTypes, statement, null, groupBy, null, KEY_NAME, null);
 		}
 		catch (SQLiteException e) {
 			return null;
@@ -941,7 +941,7 @@ public class CardDbAdapter {
       builder.setProjectionMap(mColumnMap);
 
       Cursor cursor = builder.query(mDb,
-              columns, selection, selectionArgs, null, null, KEY_NAME);
+              columns, selection, selectionArgs, KEY_NAME, null, KEY_NAME);
 
       try{
 	      if (cursor == null) {

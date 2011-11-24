@@ -109,7 +109,7 @@ public class RandomCardActivity extends Activity {
 				String[] returnTypes = new String[] { CardDbAdapter.KEY_NAME };
 
 				Cursor doods = mDbAdapter.Search(null, null, "Creature", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-						CardDbAdapter.NOONECARES, null, cmc, "=", null, null, null, null, false, returnTypes, false);
+						CardDbAdapter.NOONECARES, null, cmc, "=", null, null, null, null, false, returnTypes, false, CardDbAdapter.KEY_NAME);
 
 				int pos = rand.nextInt(doods.getCount());
 				doods.moveToPosition(pos);
@@ -135,7 +135,7 @@ public class RandomCardActivity extends Activity {
 				String[] returnTypes = new String[] { CardDbAdapter.KEY_NAME };
 
 				Cursor equipment = mDbAdapter.Search(null, null, "Equipment", "wubrgl", 0, null, CardDbAdapter.NOONECARES,
-						null, CardDbAdapter.NOONECARES, null, cmc + 1, "<", null, null, null, null, false, returnTypes, false);
+						null, CardDbAdapter.NOONECARES, null, cmc + 1, "<", null, null, null, null, false, returnTypes, false, CardDbAdapter.KEY_NAME);
 
 				int pos = rand.nextInt(equipment.getCount());
 				equipment.moveToPosition(pos);
@@ -154,7 +154,7 @@ public class RandomCardActivity extends Activity {
 				String[] returnTypes = new String[] { CardDbAdapter.KEY_NAME };
 
 				Cursor instants = mDbAdapter.Search(null, null, "instant", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-						CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, false, returnTypes, false);
+						CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, false, returnTypes, false, CardDbAdapter.KEY_NAME);
 
 				// Get 3 random, distinct numbers
 				int pos[] = new int[3];
@@ -187,7 +187,7 @@ public class RandomCardActivity extends Activity {
 				String[] returnTypes = new String[] { CardDbAdapter.KEY_NAME };
 
 				Cursor sorceries = mDbAdapter.Search(null, null, "sorcery", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-						CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, false, returnTypes, false);
+						CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, false, returnTypes, false, CardDbAdapter.KEY_NAME);
 
 				// Get 3 random, distinct numbers
 				int pos[] = new int[3];

@@ -120,6 +120,15 @@
                 android:name="android.app.default_searchable"
                 android:value=".ResultListActivity" />
         </activity>
+        <activity
+            android:label="@string/app_name"
+            android:name="com.gelakinetic.mtgfam.NPlayerLifeActivity" >
+
+            <!-- enable the search dialog to send searches to SearchableActivity -->
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".ResultListActivity" />
+        </activity>
 
             <!-- Provides search suggestions for words and their definitions. -->
         <provider android:name=".CardSearchProvider"

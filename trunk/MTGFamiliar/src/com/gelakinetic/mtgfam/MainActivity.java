@@ -87,6 +87,7 @@ public class MainActivity extends Activity implements Runnable {
 	private LinearLayout				deckmanagement;
 	private PackageInfo					pInfo;
 	private LinearLayout				randomCard;
+	private LinearLayout nbplayerbutton;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -101,7 +102,17 @@ public class MainActivity extends Activity implements Runnable {
 		manapool = (LinearLayout) findViewById(R.id.manapool);
 		randomCard = (LinearLayout) findViewById(R.id.randomCard);
 		deckmanagement = (LinearLayout) findViewById(R.id.deckManagement);
+		nbplayerbutton = (LinearLayout)findViewById(R.id.Nplayerlifecounter);
+		
+		nbplayerbutton .setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Intent i = new Intent(mCtx, NPlayerLifeActivity.class);
+				startActivity(i);
+			}
+		});
 
+		
+		
 		search.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent(mCtx, SearchActivity.class);
@@ -267,8 +278,8 @@ public class MainActivity extends Activity implements Runnable {
 		// Handle item selection
 		switch (item.getItemId()) {
 
-			 case R.id.buildWebDB: startThread(DBFROMWEB); return true;
-			 case R.id.refreshDB: startThread(DBFROMAPK); return true;
+//			 case R.id.buildWebDB: startThread(DBFROMWEB); return true;
+//			 case R.id.refreshDB: startThread(DBFROMAPK); return true;
 
 			case R.id.checkUpdate:
 				// Set the last legality update time back to zero on a forced update

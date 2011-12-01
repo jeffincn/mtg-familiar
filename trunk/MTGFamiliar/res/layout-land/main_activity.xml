@@ -140,6 +140,10 @@
                 android:id="@+id/linearLayout4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" >
+                <LinearLayout android:layout_weight="1" android:id="@+id/Nplayerlifecounter" android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="vertical">
+                    <ImageView android:scaleType="center" android:layout_height="wrap_content" android:src="@drawable/life_counter_icon" android:layout_gravity="center_horizontal" android:layout_width="wrap_content"></ImageView>
+                    <TextView android:textSize="30dip" style="@style/text" android:text="N Player Life Counter" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_width="wrap_content"></TextView>
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/rng"

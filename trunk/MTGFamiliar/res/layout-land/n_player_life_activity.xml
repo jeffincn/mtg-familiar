@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_alignParentLeft="true" android:layout_alignParentTop="true" android:layout_toLeftOf="@+id/divider" android:layout_height="fill_parent" android:layout_width="wrap_content"/>
+
+    <View
+        android:id="@+id/divider"
+        android:background="#FFAAAAAA" android:layout_width="1dip" android:layout_height="fill_parent" android:layout_alignParentTop="true" android:layout_toLeftOf="@+id/linearLayout2"/>
+
+    <!-- Command bar: reset, poison, etc. -->
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:orientation="vertical" android:layout_toLeftOf="@+id/linearLayout2" android:layout_width="wrap_content" android:layout_height="fill_parent" android:layout_alignParentTop="true" android:layout_alignParentRight="true">
+
+        <ImageView
+            android:id="@+id/poison_button"
+            android:scaleType="center"
+            android:src="@drawable/poison_button" android:layout_width="wrap_content" android:layout_weight="1" android:layout_height="0dp"/>
+
+        <ImageView
+            android:id="@+id/life_button"
+            android:scaleType="center"
+            android:src="@drawable/life_button" android:layout_width="wrap_content" android:layout_height="0dp" android:layout_weight="1"/>
+
+        <ImageView
+            android:id="@+id/die_button"
+            android:scaleType="center"
+            android:src="@drawable/die_button" android:layout_width="wrap_content" android:layout_height="0dp" android:layout_weight="1"/>
+
+        <ImageView
+            android:id="@+id/pool_button"
+            android:scaleType="center"
+            android:src="@drawable/pool_button" android:layout_width="wrap_content" android:layout_height="0dp" android:layout_weight="1"/>
+
+        <ImageView
+            android:id="@+id/reset_button"
+            android:scaleType="center"
+            android:src="@drawable/reset_button" android:layout_width="wrap_content" android:layout_height="0dp" android:layout_weight="1"/>
+    </LinearLayout>
+
+</RelativeLayout>

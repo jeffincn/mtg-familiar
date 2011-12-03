@@ -6,6 +6,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import com.devsmart.android.ui.HorizontalListView;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -13,6 +15,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -25,29 +28,29 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class NPlayerLifeActivity extends ListActivity {
+public class NPlayerLifeActivity extends Activity {
 
-	private ListView lv;
-	private ImageView poisonButton;
-	private ImageView lifeButton;
-	private ImageView dieButton;
-	private ImageView poolButton;
-	private ImageView resetButton;
-	private Activity anchor;
-	public static final int DIALOG_RESET_CONFIRM = 0;
-	private static final int LIFE = 0;
-	private static final int POISON = 1;
+	// private ListView lv;
+	private ImageView												poisonButton;
+	private ImageView												lifeButton;
+	private ImageView												dieButton;
+	private ImageView												poolButton;
+	private ImageView												resetButton;
+	private Activity												anchor;
+	public static final int									DIALOG_RESET_CONFIRM	= 0;
+	private static final int								LIFE									= 0;
+	private static final int								POISON								= 1;
 
-	private int timerTick, timerValue, timerStart;
-	private Object timerLock;
-	private final ScheduledExecutorService scheduler = Executors
-			.newScheduledThreadPool(1);
-	private Handler handler;
-	private int activeType;
-	private MyCustomAdapter rla;
+	private int															timerTick, timerValue, timerStart;
+	private Object													timerLock;
+	private final ScheduledExecutorService	scheduler							= Executors.newScheduledThreadPool(1);
+	private Handler													handler;
+	private int															activeType;
+	private PlayerAdapter									rla;
+	private int															orientation;
 
-	public static final int INITIAL_LIFE = 20, INITIAL_POISON = 0,
-			TERMINAL_LIFE = 0, TERMINAL_POISON = 10;
+	public static final int									INITIAL_LIFE					= 20, INITIAL_POISON = 0, TERMINAL_LIFE = 0,
+			TERMINAL_POISON = 10;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -55,18 +58,34 @@ public class NPlayerLifeActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.n_player_life_activity);
 
-		lv = getListView();
-		registerForContextMenu(lv);
-
 		Player[] players = new Player[3];
 
-		rla = new MyCustomAdapter(this, R.layout.life_counter_player_row, players);
 
-		rla.players[0] = new Player("Adam", INITIAL_LIFE, INITIAL_POISON, (Context) this);
-		rla.players[1] = new Player("Mike", INITIAL_LIFE, INITIAL_POISON, (Context) this);
-		rla.players[2] = new Player("April", INITIAL_LIFE, INITIAL_POISON, (Context) this);
+		orientation = getResources().getConfiguration().orientation;
+		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			rla = new PlayerAdapter(this, R.layout.life_counter_player_col, players);
 
-		setListAdapter(rla);
+			rla.players[0] = new Player("Adam", INITIAL_LIFE, INITIAL_POISON, (Context) this);
+			rla.players[1] = new Player("Mike", INITIAL_LIFE, INITIAL_POISON, (Context) this);
+			rla.players[2] = new Player("April", INITIAL_LIFE, INITIAL_POISON, (Context) this);
+
+			HorizontalListView lv = (HorizontalListView) findViewById(R.id.h_list);
+			registerForContextMenu(lv);
+			lv.setAdapter(rla);
+		}
+		else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+			rla = new PlayerAdapter(this, R.layout.life_counter_player_row, players);
+
+			rla.players[0] = new Player("Adam", INITIAL_LIFE, INITIAL_POISON, (Context) this);
+			rla.players[1] = new Player("Mike", INITIAL_LIFE, INITIAL_POISON, (Context) this);
+			rla.players[2] = new Player("April", INITIAL_LIFE, INITIAL_POISON, (Context) this);
+
+			ListView lv = (ListView) findViewById(R.id.v_list);
+			registerForContextMenu(lv);
+			lv.setAdapter(rla);
+		}
+
+		// setListAdapter(rla);
 
 		poisonButton = (ImageView) findViewById(R.id.poison_button);
 		lifeButton = (ImageView) findViewById(R.id.life_button);
@@ -162,22 +181,22 @@ public class NPlayerLifeActivity extends ListActivity {
 
 	private void update() {
 		switch (activeType) {
-		case LIFE:
-			for (Player p : rla.players) {
-				if (p.TVlife != null) {
-					p.TVlife.setTextColor(0xFFFFFFFF);
-					p.TVlife.setText("" + p.life);
+			case LIFE:
+				for (Player p : rla.players) {
+					if (p.TVlife != null) {
+						p.TVlife.setTextColor(0xFFFFFFFF);
+						p.TVlife.setText("" + p.life);
+					}
 				}
-			}
-			break;
-		case POISON:
-			for (Player p : rla.players) {
-				if (p.TVlife != null) {
-					p.TVlife.setTextColor(0xFF009000);
-					p.TVlife.setText("" + p.poison);
+				break;
+			case POISON:
+				for (Player p : rla.players) {
+					if (p.TVlife != null) {
+						p.TVlife.setTextColor(0xFF009000);
+						p.TVlife.setText("" + p.poison);
+					}
 				}
-			}
-			break;
+				break;
 		}
 	}
 
@@ -185,33 +204,33 @@ public class NPlayerLifeActivity extends ListActivity {
 		activeType = type;
 
 		switch (activeType) {
-		case LIFE:
-			lifeButton.setImageResource(R.drawable.life_button_highlighted);
-			poisonButton.setImageResource(R.drawable.poison_button);
-			for (Player p : rla.players) {
-				if (p.history != null) {
-					p.history.setAdapter(p.lifeAdapter);
+			case LIFE:
+				lifeButton.setImageResource(R.drawable.life_button_highlighted);
+				poisonButton.setImageResource(R.drawable.poison_button);
+				for (Player p : rla.players) {
+					if (p.history != null) {
+						p.history.setAdapter(p.lifeAdapter);
+					}
 				}
-			}
-			break;
-		case POISON:
-			lifeButton.setImageResource(R.drawable.life_button);
-			poisonButton.setImageResource(R.drawable.poison_button_highlighted);
-			for (Player p : rla.players) {
-				if (p.history != null) {
-					p.history.setAdapter(p.poisonAdapter);
+				break;
+			case POISON:
+				lifeButton.setImageResource(R.drawable.life_button);
+				poisonButton.setImageResource(R.drawable.poison_button_highlighted);
+				for (Player p : rla.players) {
+					if (p.history != null) {
+						p.history.setAdapter(p.poisonAdapter);
+					}
 				}
-			}
-			break;
+				break;
 		}
 	}
 
-	public class MyCustomAdapter extends ArrayAdapter<Player> {
+	public class PlayerAdapter extends ArrayAdapter<Player> {
 
-		public Player[] players;
-		private int textViewResourceId;
+		public Player[]	players;
+		private int			textViewResourceId;
 
-		public MyCustomAdapter(Context context, int textViewResourceId, Player[] ps) {
+		public PlayerAdapter(Context context, int textViewResourceId, Player[] ps) {
 			super(context, textViewResourceId, ps);
 			players = ps;
 			this.textViewResourceId = textViewResourceId;
@@ -222,14 +241,10 @@ public class NPlayerLifeActivity extends ListActivity {
 			LayoutInflater inflater = getLayoutInflater();
 			View row = inflater.inflate(textViewResourceId, parent, false);
 
-			players[position].addOutputViews(
-					(TextView) row.findViewById(R.id.player_name),
-					(TextView) row.findViewById(R.id.player_readout),
-					(ListView) row.findViewById(R.id.player_history));
-			players[position].addButtons(
-					(Button) row.findViewById(R.id.player_minus1),
-					(Button) row.findViewById(R.id.player_plus1),
-					(Button) row.findViewById(R.id.player_minus5),
+			players[position].addOutputViews((TextView) row.findViewById(R.id.player_name),
+					(TextView) row.findViewById(R.id.player_readout), (ListView) row.findViewById(R.id.player_history));
+			players[position].addButtons((Button) row.findViewById(R.id.player_minus1),
+					(Button) row.findViewById(R.id.player_plus1), (Button) row.findViewById(R.id.player_minus5),
 					(Button) row.findViewById(R.id.player_plus5));
 
 			players[position].refreshTextViews();
@@ -243,37 +258,37 @@ public class NPlayerLifeActivity extends ListActivity {
 		final Context context = (Context) this;
 		Dialog dialog;
 		switch (id) {
-		case DIALOG_RESET_CONFIRM:
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage("Reset counters and pool?").setCancelable(true)
-					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int id) {
-							reset();
-							ManaPoolActivity.reset(context);
-							for (Player p : rla.players) {
-								p.refreshTextViews();
+			case DIALOG_RESET_CONFIRM:
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setMessage("Reset counters and pool?").setCancelable(true)
+						.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								reset();
+								ManaPoolActivity.reset(context);
+								for (Player p : rla.players) {
+									p.refreshTextViews();
+								}
 							}
-						}
-					}).setNegativeButton("No", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int id) {
-							dialog.cancel();
-						}
-					});
+						}).setNegativeButton("No", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.cancel();
+							}
+						});
 
-			dialog = builder.create();
-			break;
-		default:
-			dialog = null;
+				dialog = builder.create();
+				break;
+			default:
+				dialog = null;
 		}
 		return dialog;
 	}
 
 	private class HistoryAdapter extends BaseAdapter {
-		private int count, initialValue, delta;
-		private ArrayList<Vector<Integer>> list;
-		private Context context;
+		private int													count, initialValue, delta;
+		private ArrayList<Vector<Integer>>	list;
+		private Context											context;
 
-		public static final int ABSOLUTE = 0, RELATIVE = 1;
+		public static final int							ABSOLUTE	= 0, RELATIVE = 1;
 
 		public HistoryAdapter(Context context, int initialValue) {
 			this.context = context;
@@ -324,8 +339,7 @@ public class NPlayerLifeActivity extends ListActivity {
 
 		public View getView(int position, View convertView, ViewGroup parent) {
 			TextView relative, absolute;
-			LayoutInflater vi = (LayoutInflater) context
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			View v = vi.inflate(R.layout.history_adapter_row, null);
 			Vector<Integer> row = list.get(position);
 			absolute = (TextView) v.findViewById(R.id.absolute);
@@ -351,23 +365,22 @@ public class NPlayerLifeActivity extends ListActivity {
 
 	public class Player {
 
-		public String name;
-		public int life;
-		public int poison;
-		public Player me;
+		public String			name;
+		public int				life;
+		public int				poison;
+		public Player			me;
 
-		public TextView TVname;
-		public TextView TVlife;
+		public TextView		TVname;
+		public TextView		TVlife;
 
-		public Button minusButton1;
-		public Button plusButton1;
-		private Button minusButton5;
-		private Button plusButton5;
-		private ListView history;
-		public HistoryAdapter lifeAdapter, poisonAdapter;
+		public Button			minusButton1;
+		public Button			plusButton1;
+		private Button		minusButton5;
+		private Button		plusButton5;
+		private ListView	history;
+		public HistoryAdapter	lifeAdapter, poisonAdapter;
 
-		public static final int CONSTRAINT_POISON = 0,
-				CONSTRAINT_LIFE = Integer.MAX_VALUE - 1;
+		public static final int	CONSTRAINT_POISON	= 0, CONSTRAINT_LIFE = Integer.MAX_VALUE - 1;
 
 		public Player(String n, int l, int p, Context context) {
 			name = n;
@@ -391,7 +404,8 @@ public class NPlayerLifeActivity extends ListActivity {
 			if (activeType == LIFE) {
 				TVlife.setText("" + life);
 				TVlife.setTextColor(0xFFFFFFFF);
-			} else if (activeType == POISON) {
+			}
+			else if (activeType == POISON) {
 				TVlife.setText("" + poison);
 				TVlife.setTextColor(0xFF009000);
 			}
@@ -399,43 +413,42 @@ public class NPlayerLifeActivity extends ListActivity {
 
 		private void setValue(int type, int value) {
 			switch (type) {
-			case LIFE:
-				if (value > CONSTRAINT_LIFE) {
-					value = CONSTRAINT_LIFE;
-				}
-				life = value;
-				break;
-			case POISON:
-				if (value < CONSTRAINT_POISON) {
-					value = CONSTRAINT_POISON;
-				}
-				poison = value;
+				case LIFE:
+					if (value > CONSTRAINT_LIFE) {
+						value = CONSTRAINT_LIFE;
+					}
+					life = value;
+					break;
+				case POISON:
+					if (value < CONSTRAINT_POISON) {
+						value = CONSTRAINT_POISON;
+					}
+					poison = value;
 			}
 		}
 
 		private void incrementValue(int type, int delta) {
 			int value = 0;
 			switch (type) {
-			case LIFE:
-				value = life;
-				if (value + delta > CONSTRAINT_LIFE) {
-					delta = CONSTRAINT_LIFE - value;
-				}
-				lifeAdapter.update(delta);
-				break;
-			case POISON:
-				value = poison;
-				if (value + delta < CONSTRAINT_POISON) {
-					delta = CONSTRAINT_POISON - value;
-				}
-				poisonAdapter.update(delta);
-				break;
+				case LIFE:
+					value = life;
+					if (value + delta > CONSTRAINT_LIFE) {
+						delta = CONSTRAINT_LIFE - value;
+					}
+					lifeAdapter.update(delta);
+					break;
+				case POISON:
+					value = poison;
+					if (value + delta < CONSTRAINT_POISON) {
+						delta = CONSTRAINT_POISON - value;
+					}
+					poisonAdapter.update(delta);
+					break;
 			}
 			setValue(type, value + delta);
 		}
 
-		public void addButtons(Button minus1, Button plus1, Button minus5,
-				Button plus5) {
+		public void addButtons(Button minus1, Button plus1, Button minus5, Button plus5) {
 			minusButton1 = minus1;
 			plusButton1 = plus1;
 			minusButton5 = minus5;

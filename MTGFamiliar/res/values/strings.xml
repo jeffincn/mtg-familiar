@@ -244,5 +244,7 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     You can read the rules at any time from the menu.&lt;br />&lt;br />
     Pen and paper might be useful for tracking the game state. Sadly, MTG Familiar cannot spawn actual cards.&lt;br />&lt;br />
     Good luck, and have fun!</string>
+    <string name="addplayer">Add a Player</string>
+    <string name="removeplayer">Remove a Player</string>
 
 </resources>

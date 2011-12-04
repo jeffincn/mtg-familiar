@@ -1,3 +1,6 @@
+//TODO EDH
+//TODO name editing (maybe a dialog?)
+
 package com.gelakinetic.mtgfam;
 
 import java.util.ArrayList;
@@ -7,18 +10,24 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.devsmart.android.ui.HorizontalListView;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -38,6 +47,7 @@ public class NPlayerLifeActivity extends Activity {
 	private ImageView												resetButton;
 	private Activity												anchor;
 	public static final int									DIALOG_RESET_CONFIRM	= 0;
+	private static final int								DIALOG_REMOVE_PLAYER	= 1;
 	private static final int								LIFE									= 0;
 	private static final int								POISON								= 1;
 
@@ -46,11 +56,22 @@ public class NPlayerLifeActivity extends Activity {
 	private final ScheduledExecutorService	scheduler							= Executors.newScheduledThreadPool(1);
 	private Handler													handler;
 	private int															activeType;
-	private PlayerAdapter									rla;
+	private PlayerAdapter										rla;
 	private int															orientation;
+	private ArrayList<Player>								players;
+	private boolean													resetting							= false;
+	private SharedPreferences								preferences;
+	private boolean													canGetLock;
+	private PowerManager										pm;
+	private WakeLock												wl;
+	private Editor													editor;
+	private int															numPlayers						= 0;
 
 	public static final int									INITIAL_LIFE					= 20, INITIAL_POISON = 0, TERMINAL_LIFE = 0,
 			TERMINAL_POISON = 10;
+	private static final String							PLAYER_DATA						= "player_data";
+	protected static final int							EVERYTHING						= 0;
+	protected static final int							JUST_TOTALS						= 1;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -58,34 +79,9 @@ public class NPlayerLifeActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.n_player_life_activity);
 
-		Player[] players = new Player[3];
-
-
-		orientation = getResources().getConfiguration().orientation;
-		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			rla = new PlayerAdapter(this, R.layout.life_counter_player_col, players);
-
-			rla.players[0] = new Player("Adam", INITIAL_LIFE, INITIAL_POISON, (Context) this);
-			rla.players[1] = new Player("Mike", INITIAL_LIFE, INITIAL_POISON, (Context) this);
-			rla.players[2] = new Player("April", INITIAL_LIFE, INITIAL_POISON, (Context) this);
-
-			HorizontalListView lv = (HorizontalListView) findViewById(R.id.h_list);
-			registerForContextMenu(lv);
-			lv.setAdapter(rla);
-		}
-		else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-			rla = new PlayerAdapter(this, R.layout.life_counter_player_row, players);
-
-			rla.players[0] = new Player("Adam", INITIAL_LIFE, INITIAL_POISON, (Context) this);
-			rla.players[1] = new Player("Mike", INITIAL_LIFE, INITIAL_POISON, (Context) this);
-			rla.players[2] = new Player("April", INITIAL_LIFE, INITIAL_POISON, (Context) this);
-
-			ListView lv = (ListView) findViewById(R.id.v_list);
-			registerForContextMenu(lv);
-			lv.setAdapter(rla);
-		}
-
-		// setListAdapter(rla);
+		preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		canGetLock = preferences.getBoolean("wakelock", true);
+		editor = preferences.edit();
 
 		poisonButton = (ImageView) findViewById(R.id.poison_button);
 		lifeButton = (ImageView) findViewById(R.id.life_button);
@@ -95,7 +91,7 @@ public class NPlayerLifeActivity extends Activity {
 
 		anchor = this;
 
-		setType(LIFE);
+		activeType = LIFE;
 
 		poisonButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
@@ -167,16 +163,161 @@ public class NPlayerLifeActivity extends Activity {
 		}, timerTick, timerTick, TimeUnit.MILLISECONDS);
 	}
 
-	private void reset() {
+	@Override
+	public void onPause() {
+		super.onPause();
+
+		if (canGetLock) {
+			wl.release();
+		}
+
+		if (!resetting) {
+			String playerData = "";
+
+			for (Player p : rla.players) {
+				playerData += p.toString();
+			}
+			editor.putString(PLAYER_DATA, playerData);
+			editor.commit();
+		}
+		resetting = false;
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		if (canGetLock) {
+			pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+			wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
+			wl.acquire();
+		}
+
+		orientation = getResources().getConfiguration().orientation;
+
+		String lifeData = preferences.getString(PLAYER_DATA, null);
+
+		players = new ArrayList<Player>(2);
+
+		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			rla = new PlayerAdapter(this, R.layout.life_counter_player_col, players);
+		}
+		else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+			rla = new PlayerAdapter(this, R.layout.life_counter_player_row, players);
+		}
+
+		if (lifeData == null || lifeData.length() == 0) {
+			rla.players.add(new Player("Player 1", INITIAL_LIFE, INITIAL_POISON, (Context) this));
+			rla.players.add(new Player("Player 2", INITIAL_LIFE, INITIAL_POISON, (Context) this));
+			numPlayers = 2;
+		}
+		else {
+			numPlayers = 0;
+			String[] playerLines = lifeData.split("\n");
+			for (String line : playerLines) {
+				String[] data = line.split(";");
+				String[] lifehist = data[2].split(",");
+				int[] lhist = new int[lifehist.length];
+				try {
+					for (int i = 0; i < lifehist.length; i++) {
+						lhist[i] = Integer.parseInt(lifehist[i]);
+					}
+				}
+				catch (NumberFormatException e) {
+					lhist = null;
+				}
+
+				int[] phist;
+				try {
+					String[] poisonhist = data[4].split(",");
+					phist = new int[poisonhist.length];
+					for (int i = 0; i < poisonhist.length; i++) {
+						phist[i] = Integer.parseInt(poisonhist[i]);
+					}
+				}
+				catch (NumberFormatException e) {
+					phist = null;
+				}
+				catch (ArrayIndexOutOfBoundsException e) {
+					phist = null;
+				}
+
+				rla.players.add(new Player(data[0], Integer.parseInt(data[1]), Integer.parseInt(data[3]), lhist, phist,
+						(Context) this));
+				numPlayers++;
+			}
+			String lastName = rla.players.get(rla.players.size()-1).name;
+			try{
+				numPlayers = Integer.parseInt(""+lastName.charAt(lastName.length()-1));
+			}
+			catch(NumberFormatException e){
+				
+			}
+		}
+
+		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			HorizontalListView lv = (HorizontalListView) findViewById(R.id.h_list);
+			registerForContextMenu(lv);
+			lv.setAdapter(rla);
+		}
+		else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+			ListView lv = (ListView) findViewById(R.id.v_list);
+			registerForContextMenu(lv);
+			lv.setAdapter(rla);
+		}
+
+		setType(activeType);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.life_counter_menu, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+
+			case R.id.add_player:
+				numPlayers++;
+				rla.players.add(new Player("Player " + numPlayers, INITIAL_LIFE, INITIAL_POISON, (Context) this));
+				rla.notifyDataSetChanged();
+				return true;
+			case R.id.remove_player:
+				showDialog(DIALOG_REMOVE_PLAYER);
+				// TODO remove a player from the list, refresh everything
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	private void reset(int type) {
+		resetting = true;
 		setType(LIFE);
 
-		for (Player p : rla.players) {
-			p.setValue(LIFE, INITIAL_LIFE);
-			p.setValue(POISON, INITIAL_POISON);
-			p.lifeAdapter = new HistoryAdapter(this, INITIAL_LIFE);
-			p.poisonAdapter = new HistoryAdapter(this, INITIAL_POISON);
-			p.history.setAdapter(p.lifeAdapter);
+		if (type == EVERYTHING) {
+			editor.putString(PLAYER_DATA, null);
 		}
+		else if (type == JUST_TOTALS) {
+			String data = "";
+			for (Player p : rla.players) {
+				data += p.toFreshString();
+			}
+			editor.putString(PLAYER_DATA, data);
+		}
+		editor.commit();
+
+		Intent intent = getIntent();
+		overridePendingTransition(0, 0);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+		finish();
+
+		overridePendingTransition(0, 0);
+		startActivity(intent);
 	}
 
 	private void update() {
@@ -207,18 +348,22 @@ public class NPlayerLifeActivity extends Activity {
 			case LIFE:
 				lifeButton.setImageResource(R.drawable.life_button_highlighted);
 				poisonButton.setImageResource(R.drawable.poison_button);
-				for (Player p : rla.players) {
-					if (p.history != null) {
-						p.history.setAdapter(p.lifeAdapter);
+				if (rla != null && rla.players != null) {
+					for (Player p : rla.players) {
+						if (p.history != null) {
+							p.history.setAdapter(p.lifeAdapter);
+						}
 					}
 				}
 				break;
 			case POISON:
 				lifeButton.setImageResource(R.drawable.life_button);
 				poisonButton.setImageResource(R.drawable.poison_button_highlighted);
-				for (Player p : rla.players) {
-					if (p.history != null) {
-						p.history.setAdapter(p.poisonAdapter);
+				if (rla != null && rla.players != null) {
+					for (Player p : rla.players) {
+						if (p.history != null) {
+							p.history.setAdapter(p.poisonAdapter);
+						}
 					}
 				}
 				break;
@@ -227,10 +372,10 @@ public class NPlayerLifeActivity extends Activity {
 
 	public class PlayerAdapter extends ArrayAdapter<Player> {
 
-		public Player[]	players;
-		private int			textViewResourceId;
+		public ArrayList<Player>	players;
+		private int								textViewResourceId;
 
-		public PlayerAdapter(Context context, int textViewResourceId, Player[] ps) {
+		public PlayerAdapter(Context context, int textViewResourceId, ArrayList<Player> ps) {
 			super(context, textViewResourceId, ps);
 			players = ps;
 			this.textViewResourceId = textViewResourceId;
@@ -241,13 +386,13 @@ public class NPlayerLifeActivity extends Activity {
 			LayoutInflater inflater = getLayoutInflater();
 			View row = inflater.inflate(textViewResourceId, parent, false);
 
-			players[position].addOutputViews((TextView) row.findViewById(R.id.player_name),
+			players.get(position).addOutputViews((TextView) row.findViewById(R.id.player_name),
 					(TextView) row.findViewById(R.id.player_readout), (ListView) row.findViewById(R.id.player_history));
-			players[position].addButtons((Button) row.findViewById(R.id.player_minus1),
+			players.get(position).addButtons((Button) row.findViewById(R.id.player_minus1),
 					(Button) row.findViewById(R.id.player_plus1), (Button) row.findViewById(R.id.player_minus5),
 					(Button) row.findViewById(R.id.player_plus5));
 
-			players[position].refreshTextViews();
+			players.get(position).refreshTextViews();
 
 			return row;
 		}
@@ -261,9 +406,17 @@ public class NPlayerLifeActivity extends Activity {
 			case DIALOG_RESET_CONFIRM:
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setMessage("Reset counters and pool?").setCancelable(true)
-						.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+						.setPositiveButton("Players and Totals", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								reset();
+								reset(EVERYTHING);
+								ManaPoolActivity.reset(context);
+								for (Player p : rla.players) {
+									p.refreshTextViews();
+								}
+							}
+						}).setNeutralButton("Just Totals", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								reset(JUST_TOTALS);
 								ManaPoolActivity.reset(context);
 								for (Player p : rla.players) {
 									p.refreshTextViews();
@@ -275,6 +428,24 @@ public class NPlayerLifeActivity extends Activity {
 							}
 						});
 
+				dialog = builder.create();
+				break;
+			case DIALOG_REMOVE_PLAYER:
+				String[] names = new String[rla.players.size()];
+				for (int i = 0; i < rla.players.size(); i++) {
+					names[i] = rla.players.get(i).name;
+				}
+
+				builder = new AlertDialog.Builder(this);
+				builder.setTitle(getString(R.string.removeplayer));
+				builder.setItems(names, new DialogInterface.OnClickListener() {
+
+					public void onClick(DialogInterface dialog, int item) {
+						rla.players.remove(item);
+						rla.notifyDataSetChanged();
+						removeDialog(DIALOG_REMOVE_PLAYER);
+					}
+				});
 				dialog = builder.create();
 				break;
 			default:
@@ -296,6 +467,28 @@ public class NPlayerLifeActivity extends Activity {
 			count = 0;
 			delta = 0;
 			this.initialValue = initialValue;
+		}
+
+		public void addHistory(int[] hist, int initial_val) {
+			try {
+				for (int i = 0; i < hist.length; i++) {
+					Vector<Integer> vi = new Vector<Integer>();
+					vi.add(hist[i]);
+					try {
+						vi.add(hist[i] - hist[i + 1]);
+					}
+					catch (Exception e) {
+						vi.add(hist[i] - initial_val);
+					}
+					list.add(vi);
+					count++;
+					delta = 0;
+					notifyDataSetChanged();
+				}
+			}
+			catch (NullPointerException e) {
+				return;
+			}
 		}
 
 		public void update(int magnitude) {
@@ -389,6 +582,18 @@ public class NPlayerLifeActivity extends Activity {
 			this.lifeAdapter = new HistoryAdapter(context, life);
 			this.poisonAdapter = new HistoryAdapter(context, poison);
 			me = this;
+		}
+
+		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context) {
+			name = n;
+			life = l;
+			poison = p;
+			this.lifeAdapter = new HistoryAdapter(context, life);
+			this.poisonAdapter = new HistoryAdapter(context, poison);
+			me = this;
+
+			lifeAdapter.addHistory(lhist, INITIAL_LIFE);
+			poisonAdapter.addHistory(phist, INITIAL_POISON);
 		}
 
 		public void addOutputViews(TextView n, TextView l, ListView lv) {
@@ -494,6 +699,49 @@ public class NPlayerLifeActivity extends Activity {
 					refreshTextViews();
 				}
 			});
+		}
+
+		// returns all persistent data associated with a player
+		public String toString() {
+			String data = this.name + ";";
+
+			boolean first = true;
+			data += life + ";";
+			for (Vector<Integer> i : lifeAdapter.list) {
+				if (first) {
+					first = false;
+					data += i.get(0);
+				}
+				else {
+					data += "," + i.get(0);
+				}
+			}
+
+			data += ";";
+
+			first = true;
+			data += poison + ";";
+			for (Vector<Integer> i : poisonAdapter.list) {
+				if (first) {
+					first = false;
+					data += i.get(0);
+				}
+				else {
+					data += "," + i.get(0);
+				}
+			}
+
+			return data + ";\n";
+		}
+
+		public String toFreshString() {
+			String data = this.name + ";";
+
+			data += INITIAL_LIFE + ";";
+			data += ";";
+
+			data += INITIAL_POISON + ";";
+			return data + ";\n";
 		}
 	}
 

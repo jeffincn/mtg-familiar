@@ -1,5 +1,4 @@
 //TODO EDH
-//TODO historyadapter does not properly update in landscape. This is a bug with HorizontalListView. It works fine if changed to ListView
 
 package com.gelakinetic.mtgfam;
 
@@ -31,11 +30,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -78,8 +79,9 @@ public class NPlayerLifeActivity extends Activity {
 	protected static final int							EVERYTHING						= 0;
 	protected static final int							JUST_TOTALS						= 1;
 
-	private Player	playerToHaveNameChanged;
-	private EditText	nameInput;
+	private Player													playerToHaveNameChanged;
+	private EditText												nameInput;
+	private AdapterView<ListAdapter>				lv;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -159,9 +161,11 @@ public class NPlayerLifeActivity extends Activity {
 							for (Player p : rla.players) {
 								synchronized (p.lifeAdapter) {
 									p.lifeAdapter.commit();
+									// p.history.setAdapter(p.lifeAdapter);
 								}
 								synchronized (p.poisonAdapter) {
 									p.poisonAdapter.commit();
+									// p.history.setAdapter(p.poisonAdapter);
 								}
 							}
 						}
@@ -174,10 +178,14 @@ public class NPlayerLifeActivity extends Activity {
 	}
 
 	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		scheduler.shutdown();
+	}
+
+	@Override
 	public void onPause() {
 		super.onPause();
-
-		scheduler.shutdown();
 
 		if (canGetLock) {
 			wl.release();
@@ -195,6 +203,7 @@ public class NPlayerLifeActivity extends Activity {
 		resetting = false;
 	}
 
+	//TODO figure out how the history gets correctly set the first time in landscape, and replicate it elsewhere
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -268,13 +277,13 @@ public class NPlayerLifeActivity extends Activity {
 		}
 
 		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			HorizontalListView lv = (HorizontalListView) findViewById(R.id.h_list);
-			registerForContextMenu(lv);
+			lv = (HorizontalListView) findViewById(R.id.h_list);
+			// registerForContextMenu(lv);
 			lv.setAdapter(rla);
 		}
 		else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-			ListView lv = (ListView) findViewById(R.id.v_list);
-			registerForContextMenu(lv);
+			lv = (ListView) findViewById(R.id.v_list);
+			// registerForContextMenu(lv);
 			lv.setAdapter(rla);
 		}
 
@@ -356,14 +365,13 @@ public class NPlayerLifeActivity extends Activity {
 		activeType = type;
 
 		switch (activeType) {
+			//TODO figure out why p.setAdapter() clears the view in landscape
 			case LIFE:
 				lifeButton.setImageResource(R.drawable.life_button_highlighted);
 				poisonButton.setImageResource(R.drawable.poison_button);
 				if (rla != null && rla.players != null) {
 					for (Player p : rla.players) {
-						if (p.history != null) {
-							p.history.setAdapter(p.lifeAdapter);
-						}
+						p.setAdapter(type);
 					}
 				}
 				break;
@@ -372,9 +380,7 @@ public class NPlayerLifeActivity extends Activity {
 				poisonButton.setImageResource(R.drawable.poison_button_highlighted);
 				if (rla != null && rla.players != null) {
 					for (Player p : rla.players) {
-						if (p.history != null) {
-							p.history.setAdapter(p.poisonAdapter);
-						}
+						p.setAdapter(type);
 					}
 				}
 				break;
@@ -411,14 +417,13 @@ public class NPlayerLifeActivity extends Activity {
 
 	@Override
 	protected void onPrepareDialog(final int id, final Dialog dialog) {
-	  switch (id) {
-	  case DIALOG_SET_NAME:
-	  	nameInput.setText("");
-	    break;
-	  }
+		switch (id) {
+			case DIALOG_SET_NAME:
+				nameInput.setText("");
+				break;
+		}
 	}
 
-	
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		final Context context = (Context) this;
@@ -467,26 +472,22 @@ public class NPlayerLifeActivity extends Activity {
 				dialog = builder.create();
 				break;
 			case DIALOG_SET_NAME:
-			
-				 // This example shows how to add a custom layout to an AlertDialog
-        LayoutInflater factory = LayoutInflater.from(this);
-        final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
-        nameInput = (EditText)textEntryView.findViewById(R.id.editText1);
-        dialog = new AlertDialog.Builder(this)
-            .setTitle("Enter Name")
-            .setView(textEntryView)
-            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                	playerToHaveNameChanged.setName(nameInput.getText().toString());
-                }
-            })
-            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
 
-                    /* User clicked cancel so do some stuff */
-                }
-            })
-            .create();
+				// This example shows how to add a custom layout to an AlertDialog
+				LayoutInflater factory = LayoutInflater.from(this);
+				final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
+				nameInput = (EditText) textEntryView.findViewById(R.id.editText1);
+				dialog = new AlertDialog.Builder(this).setTitle("Enter Name").setView(textEntryView)
+						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) {
+								playerToHaveNameChanged.setName(nameInput.getText().toString());
+							}
+						}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) {
+
+								/* User clicked cancel so do some stuff */
+							}
+						}).create();
 
 				break;
 			default:
@@ -524,12 +525,11 @@ public class NPlayerLifeActivity extends Activity {
 					list.add(vi);
 					count++;
 					delta = 0;
-					notifyDataSetChanged();
 				}
 			}
 			catch (NullPointerException e) {
-				return;
 			}
+			notifyDataSetChanged();
 		}
 
 		public void update(int magnitude) {
@@ -551,6 +551,8 @@ public class NPlayerLifeActivity extends Activity {
 			count++;
 			delta = 0;
 			notifyDataSetChanged();
+			// TODO figure out something which will refresh the history ListView in landscape mode
+			// lv.setAdapter(rla); // sorta works, but doesn't account for poison, and always resets the list to inital position
 		}
 
 		public int getCount() {
@@ -642,11 +644,33 @@ public class NPlayerLifeActivity extends Activity {
 			poisonAdapter.addHistory(phist, INITIAL_POISON);
 		}
 
+		public void setAdapter(int TYPE) {
+			if (history == null) {
+				return;
+			}
+			switch (TYPE) {
+				case LIFE:
+					history.setAdapter(this.lifeAdapter);
+					break;
+				case POISON:
+					history.setAdapter(this.poisonAdapter);
+					break;
+			}
+			history.invalidate();
+		}
+
 		public void addOutputViews(TextView n, TextView l, ListView lv) {
 			TVname = n;
 			TVlife = l;
 			history = lv;
-			history.setAdapter(this.lifeAdapter);
+			switch(activeType){
+				case LIFE:
+					history.setAdapter(this.lifeAdapter); // TODO figure out why this works in Portrait and why the code in setAdapter() doesnt
+					break;
+				case POISON:
+					history.setAdapter(this.poisonAdapter);
+					break;
+			}
 			refreshTextViews();
 
 			TVname.setOnClickListener(new View.OnClickListener() {

@@ -1,5 +1,5 @@
 //TODO EDH
-//TODO name editing (maybe a dialog?)
+//TODO historyadapter does not properly update in landscape. This is a bug with HorizontalListView. It works fine if changed to ListView
 
 package com.gelakinetic.mtgfam;
 
@@ -10,6 +10,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.devsmart.android.ui.HorizontalListView;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -33,6 +34,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -48,6 +50,7 @@ public class NPlayerLifeActivity extends Activity {
 	private Activity												anchor;
 	public static final int									DIALOG_RESET_CONFIRM	= 0;
 	private static final int								DIALOG_REMOVE_PLAYER	= 1;
+	protected static final int							DIALOG_SET_NAME				= 2;
 	private static final int								LIFE									= 0;
 	private static final int								POISON								= 1;
 
@@ -66,12 +69,17 @@ public class NPlayerLifeActivity extends Activity {
 	private WakeLock												wl;
 	private Editor													editor;
 	private int															numPlayers						= 0;
+	private String[]												names;
+	private Runnable												runnable;
 
 	public static final int									INITIAL_LIFE					= 20, INITIAL_POISON = 0, TERMINAL_LIFE = 0,
 			TERMINAL_POISON = 10;
 	private static final String							PLAYER_DATA						= "player_data";
 	protected static final int							EVERYTHING						= 0;
 	protected static final int							JUST_TOTALS						= 1;
+
+	private Player	playerToHaveNameChanged;
+	private EditText	nameInput;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -129,7 +137,7 @@ public class NPlayerLifeActivity extends Activity {
 		timerLock = new Object();
 		handler = new Handler();
 
-		scheduler.scheduleWithFixedDelay(new Runnable() {
+		runnable = new Runnable() {
 			public void run() {
 				boolean doCommit = false;
 				synchronized (timerLock) {
@@ -160,12 +168,16 @@ public class NPlayerLifeActivity extends Activity {
 					});
 				}
 			}
-		}, timerTick, timerTick, TimeUnit.MILLISECONDS);
+		};
+
+		scheduler.scheduleWithFixedDelay(runnable, timerTick, timerTick, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
+
+		scheduler.shutdown();
 
 		if (canGetLock) {
 			wl.release();
@@ -246,12 +258,12 @@ public class NPlayerLifeActivity extends Activity {
 						(Context) this));
 				numPlayers++;
 			}
-			String lastName = rla.players.get(rla.players.size()-1).name;
-			try{
-				numPlayers = Integer.parseInt(""+lastName.charAt(lastName.length()-1));
+			String lastName = rla.players.get(rla.players.size() - 1).name;
+			try {
+				numPlayers = Integer.parseInt("" + lastName.charAt(lastName.length() - 1));
 			}
-			catch(NumberFormatException e){
-				
+			catch (NumberFormatException e) {
+
 			}
 		}
 
@@ -288,7 +300,6 @@ public class NPlayerLifeActivity extends Activity {
 				return true;
 			case R.id.remove_player:
 				showDialog(DIALOG_REMOVE_PLAYER);
-				// TODO remove a player from the list, refresh everything
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -399,6 +410,16 @@ public class NPlayerLifeActivity extends Activity {
 	}
 
 	@Override
+	protected void onPrepareDialog(final int id, final Dialog dialog) {
+	  switch (id) {
+	  case DIALOG_SET_NAME:
+	  	nameInput.setText("");
+	    break;
+	  }
+	}
+
+	
+	@Override
 	protected Dialog onCreateDialog(int id) {
 		final Context context = (Context) this;
 		Dialog dialog;
@@ -408,19 +429,15 @@ public class NPlayerLifeActivity extends Activity {
 				builder.setMessage("Reset counters and pool?").setCancelable(true)
 						.setPositiveButton("Players and Totals", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								reset(EVERYTHING);
 								ManaPoolActivity.reset(context);
-								for (Player p : rla.players) {
-									p.refreshTextViews();
-								}
+								dialog.cancel();
+								reset(EVERYTHING);
 							}
 						}).setNeutralButton("Just Totals", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								reset(JUST_TOTALS);
 								ManaPoolActivity.reset(context);
-								for (Player p : rla.players) {
-									p.refreshTextViews();
-								}
+								dialog.cancel();
+								reset(JUST_TOTALS);
 							}
 						}).setNegativeButton("No", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
@@ -431,22 +448,46 @@ public class NPlayerLifeActivity extends Activity {
 				dialog = builder.create();
 				break;
 			case DIALOG_REMOVE_PLAYER:
-				String[] names = new String[rla.players.size()];
+				names = new String[rla.players.size()];
 				for (int i = 0; i < rla.players.size(); i++) {
 					names[i] = rla.players.get(i).name;
 				}
 
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle(getString(R.string.removeplayer));
-				builder.setItems(names, new DialogInterface.OnClickListener() {
 
+				builder.setItems(names, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
 						rla.players.remove(item);
 						rla.notifyDataSetChanged();
 						removeDialog(DIALOG_REMOVE_PLAYER);
 					}
 				});
+
 				dialog = builder.create();
+				break;
+			case DIALOG_SET_NAME:
+			
+				 // This example shows how to add a custom layout to an AlertDialog
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
+        nameInput = (EditText)textEntryView.findViewById(R.id.editText1);
+        dialog = new AlertDialog.Builder(this)
+            .setTitle("Enter Name")
+            .setView(textEntryView)
+            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                	playerToHaveNameChanged.setName(nameInput.getText().toString());
+                }
+            })
+            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+
+                    /* User clicked cancel so do some stuff */
+                }
+            })
+            .create();
+
 				break;
 			default:
 				dialog = null;
@@ -584,6 +625,11 @@ public class NPlayerLifeActivity extends Activity {
 			me = this;
 		}
 
+		public void setName(String text) {
+			name = text;
+			TVname.setText(text);
+		}
+
 		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context) {
 			name = n;
 			life = l;
@@ -602,6 +648,15 @@ public class NPlayerLifeActivity extends Activity {
 			history = lv;
 			history.setAdapter(this.lifeAdapter);
 			refreshTextViews();
+
+			TVname.setOnClickListener(new View.OnClickListener() {
+
+				public void onClick(View v) {
+					playerToHaveNameChanged = me;
+					showDialog(DIALOG_SET_NAME);
+				}
+
+			});
 		}
 
 		public void refreshTextViews() {

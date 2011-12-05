@@ -1,21 +1,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="horizontal"
-    android:padding="5dp" >
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingBottom="5dip"
+    android:paddingTop="5dip"
+    android:paddingLeft="15dip"
+    android:paddingRight="15dip"
+    android:orientation="horizontal" >
 
     <!-- Health and +/- buttons -->
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:orientation="vertical"
         android:paddingRight="5dp" >
 
         <TextView
             android:id="@+id/player_name"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Large Text"
             android:textAppearance="?android:attr/textAppearanceLarge" />
@@ -29,17 +31,15 @@
 
             <Button
                 android:id="@+id/player_plus1"
-                android:layout_width="0dp"
+                android:layout_width="50dip"
                 android:layout_height="fill_parent"
-                android:layout_weight="1"
                 android:text="+1"
                 android:textSize="20sp" />
 
             <Button
                 android:id="@+id/player_plus5"
-                android:layout_width="0dp"
+                android:layout_width="50dip"
                 android:layout_height="fill_parent"
-                android:layout_weight="1"
                 android:text="+5"
                 android:textSize="20sp" />
         </LinearLayout>
@@ -53,17 +53,15 @@
 
             <Button
                 android:id="@+id/player_minus1"
-                android:layout_width="0dp"
+                android:layout_width="50dip"
                 android:layout_height="fill_parent"
-                android:layout_weight="1"
                 android:text="-1"
                 android:textSize="20sp" />
 
             <Button
                 android:id="@+id/player_minus5"
-                android:layout_width="0dp"
+                android:layout_width="50dip"
                 android:layout_height="fill_parent"
-                android:layout_weight="1"
                 android:text="-5"
                 android:textSize="20sp" />
         </LinearLayout>
@@ -72,7 +70,7 @@
 
         <TextView
             android:id="@+id/player_readout"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="20"

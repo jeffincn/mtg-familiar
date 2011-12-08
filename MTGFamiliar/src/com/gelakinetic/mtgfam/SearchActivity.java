@@ -220,6 +220,7 @@ public class SearchActivity extends Activity {
 				android.R.layout.simple_spinner_item);
 		adapter4.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		cmcLogic.setAdapter(adapter4);
+		cmcLogic.setSelection(1); // CMC should default to <
 
 		ArrayAdapter<CharSequence> adapter5 = ArrayAdapter.createFromResource(this, R.array.cmc_spinner,
 				android.R.layout.simple_spinner_item);

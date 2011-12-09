@@ -459,7 +459,7 @@ public class CardViewActivity extends Activity implements Runnable {
 			formats = mDbHelper.fetchAllFormats();
 
 			LegalListAdapter lla = new LegalListAdapter(this, R.layout.legal_row, formats, new String[] {
-					CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_NAME }, new int[] { R.id.format, R.id.status }, cardID, mDbHelper,
+					CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_NAME }, new int[] { R.id.format, R.id.status }, cardName, mDbHelper,
 					setCode);
 			ListView lv = (ListView) dialog.findViewById(R.id.legallist);
 			lv.setAdapter(lla);

@@ -359,13 +359,11 @@ public class JsonParser {
 				// compare date, maybe return, update sharedprefs
 				String spDate = settings.getString("date", null);
 				if (spDate != null && spDate.equals(date)) {
-					// TODO this always refreshes, shouldn't when checking OTA
-					// return; // dates match, nothing new here.
+					return; // dates match, nothing new here.
 				}
 
-				// refresh everything!
-				mDbHelper.dropFormatTable();
-				mDbHelper.createFormatTable();
+				mDbHelper.dropLegalTables();
+				mDbHelper.createLegalTables();
 			}
 			else if (jsonTopLevelName.equalsIgnoreCase("Formats")) {
 
@@ -374,9 +372,6 @@ public class JsonParser {
 					formatName = reader.nextName();
 
 					mDbHelper.createFormat(formatName);
-					mDbHelper.createFormatSetTable(formatName);
-					mDbHelper.createFormatBanTable(formatName);
-					mDbHelper.createFormatRestrictedTable(formatName);
 
 					reader.beginObject();
 					while (reader.hasNext()) {
@@ -386,7 +381,7 @@ public class JsonParser {
 							reader.beginArray();
 							while (reader.hasNext()) {
 								legalSet = reader.nextString();
-								mDbHelper.createFormatSet(formatName, legalSet);
+								mDbHelper.addLegalSet(legalSet, formatName);
 							}
 							reader.endArray();
 						}
@@ -394,7 +389,7 @@ public class JsonParser {
 							reader.beginArray();
 							while (reader.hasNext()) {
 								bannedCard = reader.nextString();
-								mDbHelper.createFormatBan(formatName, bannedCard);
+								mDbHelper.addLegalCard(bannedCard, formatName, CardDbAdapter.BANNED);
 							}
 							reader.endArray();
 						}
@@ -402,7 +397,7 @@ public class JsonParser {
 							reader.beginArray();
 							while (reader.hasNext()) {
 								restrictedCard = reader.nextString();
-								mDbHelper.createFormatRestricted(formatName, restrictedCard);
+								mDbHelper.addLegalCard(restrictedCard, formatName, CardDbAdapter.RESTRICTED);
 							}
 							reader.endArray();
 						}

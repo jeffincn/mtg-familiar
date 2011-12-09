@@ -31,17 +31,17 @@ public class LegalListAdapter extends SimpleCursorAdapter {
 
 	private int						layout;
 
-	private long					mCardID;
+	private String					mCardName;
 
 	private CardDbAdapter	mDbHelper;
 
 	private String				setCode;
 
-	public LegalListAdapter(Context context, int layout, Cursor c, String[] from, int[] to, long cardID,
+	public LegalListAdapter(Context context, int layout, Cursor c, String[] from, int[] to, String cardName,
 			CardDbAdapter cda, String sc) {
 		super(context, layout, c, from, to);
 		this.layout = layout;
-		mCardID = cardID;
+		mCardName = cardName;
 		mDbHelper = cda;
 		setCode = sc;
 	}
@@ -75,25 +75,25 @@ public class LegalListAdapter extends SimpleCursorAdapter {
 		TextView status_text = (TextView) v.findViewById(R.id.status);
 		TextView name_text = (TextView) v.findViewById(R.id.format);
 		int nameCol = c.getColumnIndex(CardDbAdapter.KEY_NAME);
-		String name = c.getString(nameCol);
+		String format = c.getString(nameCol);
 
 		if (setCode.equalsIgnoreCase("PCP") || setCode.equalsIgnoreCase("ARS") || setCode.equalsIgnoreCase("UG")
 				|| setCode.equalsIgnoreCase("UNH")) {
 			if (name_text != null) {
-				name_text.setText(name + ":");
+				name_text.setText(format + ":");
 			}
 			if (status_text != null) {
 				status_text.setText("Banned");
 			}
 		}
 		else {
-			int legality = mDbHelper.checkLegality(mCardID, name);
+			int legality = mDbHelper.checkLegality(mCardName, format);
 
 			/**
 			 * Next set the name of the entry.
 			 */
 			if (name_text != null) {
-				name_text.setText(name + ":");
+				name_text.setText(format + ":");
 			}
 
 			if (status_text != null) {

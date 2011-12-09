@@ -19,6 +19,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.app.SearchManager;
@@ -39,71 +40,84 @@ import android.provider.BaseColumns;
  */
 public class CardDbAdapter {
 
-	public static final int			STAR										= -1000;
-	public static final int			ONEPLUSSTAR							= -1001;
-	public static final int			TWOPLUSSTAR							= -1002;
-	public static final int			SEVENMINUSSTAR					= -1003;
-	public static final int			STARSQUARED							= -1004;
-	public static final int			NOONECARES							= -1005;
+	public static final int			STAR													= -1000;
+	public static final int			ONEPLUSSTAR										= -1001;
+	public static final int			TWOPLUSSTAR										= -1002;
+	public static final int			SEVENMINUSSTAR								= -1003;
+	public static final int			STARSQUARED										= -1004;
+	public static final int			NOONECARES										= -1005;
 
-	public static final int			AND											= 0;
-	public static final int			OR											= 1;
+	public static final int			AND														= 0;
+	public static final int			OR														= 1;
 
-	public static final String	DATABASE_NAME						= "data";
-	public static final String	DATABASE_TABLE_CARDS		= "cards";
-	public static final String	DATABASE_TABLE_FORMATS	= "formats";
-	public static final String	DATABASE_TABLE_SETS			= "sets";
+	public static final String	DATABASE_NAME									= "data";
+	public static final String	DATABASE_TABLE_CARDS					= "cards";
+	public static final String	DATABASE_TABLE_SETS						= "sets";
+	public static final String	DATABASE_TABLE_FORMATS				= "formats";
+	private static final String	DATABASE_TABLE_LEGAL_SETS			= "legal_sets";
+	private static final String	DATABASE_TABLE_BANNED_CARDS		= "banned_cards";
 
-	public static final int		DATABASE_VERSION				= 12;
+	public static final int			DATABASE_VERSION							= 13;
 
-	public static final String	KEY_ID									= "_id";
-	public static final String	KEY_NAME								= SearchManager.SUGGEST_COLUMN_TEXT_1;//"name";
-	public static final String	KEY_SET									= "expansion";
-	public static final String	KEY_TYPE								= "type";
-	public static final String	KEY_ABILITY							= "cardtext";
-	public static final String	KEY_COLOR								= "color";
-	public static final String	KEY_MANACOST						= "manacost";
-	public static final String	KEY_CMC									= "cmc";
-	public static final String	KEY_POWER								= "power";
-	public static final String	KEY_TOUGHNESS						= "toughness";
-	public static final String	KEY_RARITY							= "rarity";
-	public static final String	KEY_LOYALTY							= "loyalty";
-	public static final String	KEY_FLAVOR							= "flavor";
-	public static final String	KEY_ARTIST							= "artist";
-	public static final String	KEY_NUMBER							= "number";
-	public static final String	KEY_MULTIVERSEID				= "multiverseID";
+	public static final String	KEY_ID												= "_id";
+	public static final String	KEY_NAME											= SearchManager.SUGGEST_COLUMN_TEXT_1;											// "name";
+	public static final String	KEY_SET												= "expansion";
+	public static final String	KEY_TYPE											= "type";
+	public static final String	KEY_ABILITY										= "cardtext";
+	public static final String	KEY_COLOR											= "color";
+	public static final String	KEY_MANACOST									= "manacost";
+	public static final String	KEY_CMC												= "cmc";
+	public static final String	KEY_POWER											= "power";
+	public static final String	KEY_TOUGHNESS									= "toughness";
+	public static final String	KEY_RARITY										= "rarity";
+	public static final String	KEY_LOYALTY										= "loyalty";
+	public static final String	KEY_FLAVOR										= "flavor";
+	public static final String	KEY_ARTIST										= "artist";
+	public static final String	KEY_NUMBER										= "number";
+	public static final String	KEY_MULTIVERSEID							= "multiverseID";
 
-	public static final String	KEY_CODE								= "code";
-	public static final String	KEY_CODE_MTGI						= "code_mtgi";
-	public static final String	KEY_NAME_TCGPLAYER			= "name_tcgplayer";
+	public static final String	KEY_CODE											= "code";
+	public static final String	KEY_CODE_MTGI									= "code_mtgi";
+	public static final String	KEY_NAME_TCGPLAYER						= "name_tcgplayer";
 
-	private static final String	SET_POSTIFX							= "_SET";
-	private static final String	BAN_POSTIFX							= "_BAN";
-	private static final String	RESTRICT_POSTIFX				= "_RESTRICT";
+	public static final String	KEY_FORMAT										= "format";
+	public static final String	KEY_LEGALITY									= "legality";
 
 	private DatabaseHelper			mDbHelper;
 	private SQLiteDatabase			mDb;
 
-	private static final String	DATABASE_CREATE_CARDS		= "create table " + DATABASE_TABLE_CARDS + "(" + KEY_ID
-																													+ " integer primary key autoincrement, " + KEY_NAME
-																													+ " text not null, " + KEY_SET + " text not null, "
-																													+ KEY_TYPE + " text not null, " + KEY_RARITY + " integer, "
-																													+ KEY_MANACOST + " text, " + KEY_CMC + " integer not null, "
-																													+ KEY_POWER + " real, " + KEY_TOUGHNESS + " real, "
-																													+ KEY_LOYALTY + " integer, " + KEY_ABILITY + " text, "
-																													+ KEY_FLAVOR + " text, " + KEY_ARTIST + " text, "
-																													+ KEY_NUMBER + " text, " + KEY_MULTIVERSEID
-																													+ " integer not null, " + KEY_COLOR + " text not null);";
+	private static final String	DATABASE_CREATE_CARDS					= "create table " + DATABASE_TABLE_CARDS + "(" + KEY_ID
+																																+ " integer primary key autoincrement, " + KEY_NAME
+																																+ " text not null, " + KEY_SET + " text not null, "
+																																+ KEY_TYPE + " text not null, " + KEY_RARITY
+																																+ " integer, " + KEY_MANACOST + " text, " + KEY_CMC
+																																+ " integer not null, " + KEY_POWER + " real, "
+																																+ KEY_TOUGHNESS + " real, " + KEY_LOYALTY
+																																+ " integer, " + KEY_ABILITY + " text, " + KEY_FLAVOR
+																																+ " text, " + KEY_ARTIST + " text, " + KEY_NUMBER
+																																+ " text, " + KEY_MULTIVERSEID + " integer not null, "
+																																+ KEY_COLOR + " text not null);";
 
-	private static final String	DATABASE_CREATE_SETS		= "create table " + DATABASE_TABLE_SETS + "(" + KEY_ID
-																													+ " integer primary key autoincrement, " + KEY_NAME
-																													+ " text not null, " + KEY_CODE + " text not null unique, "
-																													+ KEY_CODE_MTGI + " text not null, " + KEY_NAME_TCGPLAYER
-																													+ " text);";
+	private static final String	DATABASE_CREATE_SETS					= "create table " + DATABASE_TABLE_SETS + "(" + KEY_ID
+																																+ " integer primary key autoincrement, " + KEY_NAME
+																																+ " text not null, " + KEY_CODE
+																																+ " text not null unique, " + KEY_CODE_MTGI
+																																+ " text not null, " + KEY_NAME_TCGPLAYER + " text);";
 
-	private static final String	DATABASE_CREATE_FORMATS	= "create table " + DATABASE_TABLE_FORMATS + "(" + KEY_ID
-																													+ " integer primary key autoincrement, " + KEY_NAME
-																													+ " text not null);";
+	private static final String	DATABASE_CREATE_FORMATS				= "create table " + DATABASE_TABLE_FORMATS + "(" + KEY_ID
+																																+ " integer primary key autoincrement, " + KEY_NAME
+																																+ " text not null);";
+
+	private static final String	DATABASE_CREATE_LEGAL_SETS		= "create table " + DATABASE_TABLE_LEGAL_SETS + "("
+																																+ KEY_ID + " integer primary key autoincrement, "
+																																+ KEY_SET + " text not null, " + KEY_FORMAT
+																																+ " text not null);";
+
+	private static final String	DATABASE_CREATE_BANNED_CARDS	= "create table " + DATABASE_TABLE_BANNED_CARDS + "("
+																																+ KEY_ID + " integer primary key autoincrement, "
+																																+ KEY_NAME + " text not null, " + KEY_LEGALITY
+																																+ " integer not null, " + KEY_FORMAT
+																																+ " text not null);";
 
 	private final Context				mCtx;
 
@@ -403,7 +417,8 @@ public class CardDbAdapter {
 
 	public Cursor Search(String cardname, String cardtext, String cardtype, String color, int colorlogic, String sets,
 			float pow_choice, String pow_logic, float tou_choice, String tou_logic, int cmc, String cmcLogic, String formats,
-			String rarity, String flavor, String artist, boolean backface, String[] returnTypes, boolean autocomplete, String groupBy) {
+			String rarity, String flavor, String artist, boolean backface, String[] returnTypes, boolean autocomplete,
+			String groupBy) {
 		Cursor mCursor = null;
 
 		if (cardname != null)
@@ -658,20 +673,20 @@ public class CardDbAdapter {
 					}
 
 					// get all sets in the format
-					Cursor cSets = mDb.query(formatNames[i] + SET_POSTIFX, new String[] { KEY_ID, KEY_NAME, }, null, null, null,
-							null, KEY_NAME);
+					Cursor cSets = mDb.query(DATABASE_TABLE_LEGAL_SETS, new String[] { KEY_ID, KEY_SET }, KEY_FORMAT + " = '"
+							+ formatNames[i] + "'", null, null, null, null);
 
 					if (cSets.getCount() != 0) {
-						statement += "EXISTS (SELECT * FROM " + formatNames[i] + SET_POSTIFX + " WHERE " + DATABASE_TABLE_CARDS
-								+ "." + KEY_SET + " = " + formatNames[i] + SET_POSTIFX + "." + KEY_NAME + ")";
+						statement += "EXISTS (SELECT * FROM " + DATABASE_TABLE_LEGAL_SETS + " WHERE " + DATABASE_TABLE_CARDS + "."
+								+ KEY_SET + " = " + DATABASE_TABLE_LEGAL_SETS + "." + KEY_SET + " AND " + DATABASE_TABLE_LEGAL_SETS
+								+ "." + KEY_FORMAT + " = '" + formatNames[i] + "')";
 
-						statement += " AND NOT EXISTS (SELECT * FROM " + formatNames[i] + BAN_POSTIFX + " WHERE "
-								+ DATABASE_TABLE_CARDS + "." + KEY_NAME + " = " + formatNames[i] + BAN_POSTIFX + "." + KEY_NAME + ")";
+						statement += " AND ";
 					}
-					else {
-						statement += "NOT EXISTS (SELECT * FROM " + formatNames[i] + BAN_POSTIFX + " WHERE " + DATABASE_TABLE_CARDS
-								+ "." + KEY_NAME + " = " + formatNames[i] + BAN_POSTIFX + "." + KEY_NAME + ")";
-					}
+					statement += "NOT EXISTS (SELECT * FROM " + DATABASE_TABLE_BANNED_CARDS + " WHERE " + DATABASE_TABLE_CARDS
+							+ "." + KEY_NAME + " = " + DATABASE_TABLE_BANNED_CARDS + "." + KEY_NAME + " AND "
+							+ DATABASE_TABLE_BANNED_CARDS + "." + KEY_FORMAT + " = '" + formatNames[i] + "' AND "+
+							DATABASE_TABLE_BANNED_CARDS + "." + KEY_LEGALITY + " = " + BANNED +")";
 
 					if (cSets != null) {
 						cSets.deactivate();
@@ -739,41 +754,16 @@ public class CardDbAdapter {
 		return name;
 	}
 
-	public void createFormatTable() {
+	public void createLegalTables() {
 		mDb.execSQL(DATABASE_CREATE_FORMATS);
+		mDb.execSQL(DATABASE_CREATE_LEGAL_SETS);
+		mDb.execSQL(DATABASE_CREATE_BANNED_CARDS);
 	}
 
-	public void createFormatSetTable(String format) {
-		mDb.execSQL("create table " + format + SET_POSTIFX + "(" + KEY_ID + " integer primary key autoincrement, "
-				+ KEY_NAME + " text not null);");
-	}
-
-	public void createFormatBanTable(String format) {
-		mDb.execSQL("create table " + format + BAN_POSTIFX + "(" + KEY_ID + " integer primary key autoincrement, "
-				+ KEY_NAME + " text not null);");
-	}
-
-	public void createFormatRestrictedTable(String format) {
-		mDb.execSQL("create table " + format + RESTRICT_POSTIFX + "(" + KEY_ID + " integer primary key autoincrement, "
-				+ KEY_NAME + " text not null);");
-	}
-
-	public void dropFormatTable() {
-		String format;
-		Cursor c = fetchAllFormats();
-		if (c != null) {
-			c.moveToFirst();
-			for (int i = 0; i < c.getCount(); i++) {
-				format = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
-				mDb.execSQL("DROP TABLE IF EXISTS " + format + "" + SET_POSTIFX);
-				mDb.execSQL("DROP TABLE IF EXISTS " + format + "" + BAN_POSTIFX);
-				mDb.execSQL("DROP TABLE IF EXISTS " + format + "" + RESTRICT_POSTIFX);
-				c.moveToNext();
-			}
-			c.deactivate();
-			c.close();
-		}
+	public void dropLegalTables() {
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_FORMATS);
+		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_LEGAL_SETS);
+		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_BANNED_CARDS);
 	}
 
 	public long createFormat(String name) {
@@ -782,22 +772,19 @@ public class CardDbAdapter {
 		return mDb.insert(DATABASE_TABLE_FORMATS, null, initialValues);
 	}
 
-	public long createFormatSet(String format, String set) {
+	public long addLegalSet(String set, String format) {
 		ContentValues initialValues = new ContentValues();
-		initialValues.put(KEY_NAME, set);
-		return mDb.insert(format + SET_POSTIFX, null, initialValues);
+		initialValues.put(KEY_SET, set);
+		initialValues.put(KEY_FORMAT, format);
+		return mDb.insert(DATABASE_TABLE_LEGAL_SETS, null, initialValues);
 	}
 
-	public long createFormatBan(String format, String set) {
+	public long addLegalCard(String card, String format, int status) {
 		ContentValues initialValues = new ContentValues();
-		initialValues.put(KEY_NAME, set);
-		return mDb.insert(format + BAN_POSTIFX, null, initialValues);
-	}
-
-	public long createFormatRestricted(String format, String set) {
-		ContentValues initialValues = new ContentValues();
-		initialValues.put(KEY_NAME, set);
-		return mDb.insert(format + RESTRICT_POSTIFX, null, initialValues);
+		initialValues.put(KEY_NAME, card);
+		initialValues.put(KEY_LEGALITY, status);
+		initialValues.put(KEY_FORMAT, format);
+		return mDb.insert(DATABASE_TABLE_BANNED_CARDS, null, initialValues);
 	}
 
 	public Cursor fetchAllFormats() {
@@ -813,69 +800,69 @@ public class CardDbAdapter {
 	public static final int	BANNED			= 1;
 	public static final int	RESTRICTED	= 2;
 
-	public int checkLegality(long mCardID, String name) {
+	public int checkLegality(String mCardName, String format) {
+		mCardName = mCardName.replace("'", "''");
+		try {
+			// Get all legal sets in this format
+			ArrayList<String> sets = new ArrayList<String>();
+			Cursor c = mDb.query(DATABASE_TABLE_LEGAL_SETS, new String[] { KEY_ID, KEY_SET }, KEY_FORMAT + " = '" + format
+					+ "'", null, null, null, null);
+			c.moveToFirst();
+			for (int i = 0; i < c.getCount(); i++) {
+				sets.add(c.getString(c.getColumnIndex(KEY_SET)));
+				c.moveToNext();
+			}
+			c.close();
 
-		if (name != null)
-			name = name.replace("'", "''");
-		// get all sets in the format
-		Cursor cSets = mDb.query(name + SET_POSTIFX, new String[] { KEY_ID, KEY_NAME, }, null, null, null, null, KEY_NAME);
-
-		String banStatement = "(" + KEY_ID + "=" + mCardID + ")";
-		String restrictStatement = "(" + KEY_ID + "=" + mCardID + ")";
-
-		if (cSets.getCount() != 0) {
-			banStatement += "AND EXISTS (SELECT * FROM " + name + SET_POSTIFX + " WHERE " + DATABASE_TABLE_CARDS + "."
-					+ KEY_SET + " = " + name + SET_POSTIFX + "." + KEY_NAME + ")";
-
-			banStatement += " AND NOT EXISTS (SELECT * FROM " + name + BAN_POSTIFX + " WHERE " + DATABASE_TABLE_CARDS + "."
-					+ KEY_NAME + " = " + name + BAN_POSTIFX + "." + KEY_NAME + ")";
-
-			restrictStatement += "AND EXISTS (SELECT * FROM " + name + SET_POSTIFX + " WHERE " + DATABASE_TABLE_CARDS + "."
-					+ KEY_SET + " = " + name + SET_POSTIFX + "." + KEY_NAME + ")";
-
-			restrictStatement += " AND NOT EXISTS (SELECT * FROM " + name + RESTRICT_POSTIFX + " WHERE "
-					+ DATABASE_TABLE_CARDS + "." + KEY_NAME + " = " + name + RESTRICT_POSTIFX + "." + KEY_NAME + ")";
-		}
-		else {
-			banStatement += "AND NOT EXISTS (SELECT * FROM " + name + BAN_POSTIFX + " WHERE " + DATABASE_TABLE_CARDS + "."
-					+ KEY_NAME + " = " + name + BAN_POSTIFX + "." + KEY_NAME + ")";
-
-			restrictStatement += "AND NOT EXISTS (SELECT * FROM " + name + RESTRICT_POSTIFX + " WHERE "
-					+ DATABASE_TABLE_CARDS + "." + KEY_NAME + " = " + name + RESTRICT_POSTIFX + "." + KEY_NAME + ")";
-		}
-
-		Cursor banCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID, }, banStatement, null, null, null,
-				KEY_ID, null);
-
-		Cursor restrictCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID, }, restrictStatement, null,
-				null, null, KEY_ID, null);
-
-		if (banCursor.getCount() >= 1) {
-			if (restrictCursor.getCount() >= 1) {
-				cSets.deactivate();
-				cSets.close();
-				banCursor.deactivate();
-				banCursor.close();
-				restrictCursor.deactivate();
-				restrictCursor.close();
-				return LEGAL;
+			String subtable;
+			if (sets.size() == 0) {
+				subtable = DATABASE_TABLE_CARDS;
 			}
 			else {
-				cSets.deactivate();
-				cSets.close();
-				banCursor.deactivate();
-				banCursor.close();
-				restrictCursor.deactivate();
-				restrictCursor.close();
-				return RESTRICTED;
+				// Use these sets to construct a table of all cardnames in those sets
+				boolean first = true;
+				String statement = "(";
+				for (String s : sets) {
+					if (first) {
+						first = false;
+						statement += "(" + KEY_SET + " = '" + s + "')";
+					}
+					else {
+						statement += " OR (" + KEY_SET + " = '" + s + "')";
+					}
+				}
+				statement += ")";
+
+				// (SELECT _id,suggest_text_1 FROM cards WHERE ((expansion LIKE 'ISD'))
+				// GROUP BY suggest_text_1)
+				subtable = "(SELECT " + KEY_ID + "," + KEY_NAME + " FROM " + DATABASE_TABLE_CARDS + " WHERE " + statement
+						+ " GROUP BY " + KEY_NAME + ")";
+			}
+
+			// Search the table of all legal cardnames for the given cardname.
+			c = mDb.query(true, subtable, new String[] { KEY_ID, KEY_NAME }, KEY_NAME + " LIKE '" + mCardName + "'", null,
+					null, null, KEY_NAME, null);
+			int numResults = c.getCount();
+			c.close();
+
+			// If it exists, check if the card is banned or restricted
+			if (numResults > 0) {
+				c = mDb.query(DATABASE_TABLE_BANNED_CARDS, new String[] { KEY_ID, KEY_NAME, KEY_LEGALITY }, KEY_NAME + " = '"
+						+ mCardName + "' AND " + KEY_FORMAT + " = '" + format + "'", null, null, null, null);
+				numResults = c.getCount();
+				if (numResults == 0) {
+					c.close();
+					return LEGAL;
+				}
+				c.moveToFirst();
+				int legality = c.getInt(c.getColumnIndex(KEY_LEGALITY));
+				c.close();
+				return legality;
 			}
 		}
-		cSets.deactivate();
-		cSets.close();
-		banCursor.deactivate();
-		banCursor.close();
-		restrictCursor.deactivate();
-		restrictCursor.close();
+		catch (SQLiteException e) {
+			System.out.println(e);
+		}
 		return BANNED;
 	}
 
@@ -901,104 +888,115 @@ public class CardDbAdapter {
 	}
 
 	public SQLiteDatabase getReadableDatabase() {
-		// TODO Auto-generated method stub
 		return mDb;
 	}
-	
-  private static final HashMap<String,String> mColumnMap = buildColumnMap();
-  /**
-   * Builds a map for all columns that may be requested, which will be given to the 
-   * SQLiteQueryBuilder. This is a good way to define aliases for column names, but must include 
-   * all columns, even if the value is the key. This allows the ContentProvider to request
-   * columns w/o the need to know real column names and create the alias itself.
-   */
-  private static HashMap<String,String> buildColumnMap() {
-      HashMap<String,String> map = new HashMap<String,String>();
-      map.put(KEY_NAME, KEY_NAME);
-      map.put(BaseColumns._ID, "rowid AS " +
-              BaseColumns._ID);
-      map.put(SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID, "rowid AS " +
-              SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID);
-      map.put(SearchManager.SUGGEST_COLUMN_SHORTCUT_ID, "rowid AS " +
-              SearchManager.SUGGEST_COLUMN_SHORTCUT_ID);
-      return map;
-  }
-  
-  /**
-   * Performs a database query.
-   * @param selection The selection clause
-   * @param selectionArgs Selection arguments for "?" components in the selection
-   * @param columns The columns to return
-   * @return A Cursor over all rows matching the query
-   */
-  private Cursor query(String selection, String[] selectionArgs, String[] columns) {
-      /* The SQLiteBuilder provides a map for all possible columns requested to
-       * actual columns in the database, creating a simple column alias mechanism
-       * by which the ContentProvider does not need to know the real column names
-       */
-      SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
-      builder.setTables(DATABASE_TABLE_CARDS);
-      builder.setProjectionMap(mColumnMap);
 
-      Cursor cursor = builder.query(mDb,
-              columns, selection, selectionArgs, KEY_NAME, null, KEY_NAME);
+	private static final HashMap<String, String>	mColumnMap	= buildColumnMap();
 
-      try{
-	      if (cursor == null) {
-	          return null;
-	      } else if (!cursor.moveToFirst()) {
-	          cursor.close();
-	          return null;
-	      }
-      }catch(Exception e){
-      	System.out.println(e);
-      }
-      return cursor;
-  }
+	/**
+	 * Builds a map for all columns that may be requested, which will be given to
+	 * the SQLiteQueryBuilder. This is a good way to define aliases for column
+	 * names, but must include all columns, even if the value is the key. This
+	 * allows the ContentProvider to request columns w/o the need to know real
+	 * column names and create the alias itself.
+	 */
+	private static HashMap<String, String> buildColumnMap() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put(KEY_NAME, KEY_NAME);
+		map.put(BaseColumns._ID, "rowid AS " + BaseColumns._ID);
+		map.put(SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID, "rowid AS " + SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID);
+		map.put(SearchManager.SUGGEST_COLUMN_SHORTCUT_ID, "rowid AS " + SearchManager.SUGGEST_COLUMN_SHORTCUT_ID);
+		return map;
+	}
 
-  /**
-   * Returns a Cursor positioned at the word specified by rowId
-   *
-   * @param rowId id of word to retrieve
-   * @param columns The columns to include, if null then all are included
-   * @return Cursor positioned to matching word, or null if not found.
-   */
-  public Cursor getWord(String rowId, String[] columns) {
-      String selection = "rowid = ?";
-      String[] selectionArgs = new String[] {rowId};
+	/**
+	 * Performs a database query.
+	 * 
+	 * @param selection
+	 *          The selection clause
+	 * @param selectionArgs
+	 *          Selection arguments for "?" components in the selection
+	 * @param columns
+	 *          The columns to return
+	 * @return A Cursor over all rows matching the query
+	 */
+	private Cursor query(String selection, String[] selectionArgs, String[] columns) {
+		/*
+		 * The SQLiteBuilder provides a map for all possible columns requested to
+		 * actual columns in the database, creating a simple column alias mechanism
+		 * by which the ContentProvider does not need to know the real column names
+		 */
+		SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
+		builder.setTables(DATABASE_TABLE_CARDS);
+		builder.setProjectionMap(mColumnMap);
 
-      return query(selection, selectionArgs, columns);
+		Cursor cursor = builder.query(mDb, columns, selection, selectionArgs, KEY_NAME, null, KEY_NAME);
 
-      /* This builds a query that looks like:
-       *     SELECT <columns> FROM <table> WHERE rowid = <rowId>
-       */
-  }
-  
-  /**
-   * Returns a Cursor over all words that match the given query
-   *
-   * @param query The string to search for
-   * @param columns The columns to include, if null then all are included
-   * @return Cursor over all words that match, or null if none found.
-   */
-  public Cursor getWordMatches(String query, String[] columns) {
-  	String selection = KEY_NAME + " LIKE '" + query + "%'";
-  	String[] selectionArgs = null;
-  	
-      return query(selection, selectionArgs, columns);
+		try {
+			if (cursor == null) {
+				return null;
+			}
+			else if (!cursor.moveToFirst()) {
+				cursor.close();
+				return null;
+			}
+		}
+		catch (Exception e) {
+			System.out.println(e);
+		}
+		return cursor;
+	}
 
-      /* This builds a query that looks like:
-       *     SELECT <columns> FROM <table> WHERE <KEY_WORD> MATCH 'query*'
-       * which is an FTS3 search for the query text (plus a wildcard) inside the word column.
-       *
-       * - "rowid" is the unique id for all rows but we need this value for the "_id" column in
-       *    order for the Adapters to work, so the columns need to make "_id" an alias for "rowid"
-       * - "rowid" also needs to be used by the SUGGEST_COLUMN_INTENT_DATA alias in order
-       *   for suggestions to carry the proper intent data.
-       *   These aliases are defined in the DictionaryProvider when queries are made.
-       * - This can be revised to also search the definition text with FTS3 by changing
-       *   the selection clause to use FTS_VIRTUAL_TABLE instead of KEY_WORD (to search across
-       *   the entire table, but sorting the relevance could be difficult.
-       */
-  }
+	/**
+	 * Returns a Cursor positioned at the word specified by rowId
+	 * 
+	 * @param rowId
+	 *          id of word to retrieve
+	 * @param columns
+	 *          The columns to include, if null then all are included
+	 * @return Cursor positioned to matching word, or null if not found.
+	 */
+	public Cursor getWord(String rowId, String[] columns) {
+		String selection = "rowid = ?";
+		String[] selectionArgs = new String[] { rowId };
+
+		return query(selection, selectionArgs, columns);
+
+		/*
+		 * This builds a query that looks like: SELECT <columns> FROM <table> WHERE
+		 * rowid = <rowId>
+		 */
+	}
+
+	/**
+	 * Returns a Cursor over all words that match the given query
+	 * 
+	 * @param query
+	 *          The string to search for
+	 * @param columns
+	 *          The columns to include, if null then all are included
+	 * @return Cursor over all words that match, or null if none found.
+	 */
+	public Cursor getWordMatches(String query, String[] columns) {
+		String selection = KEY_NAME + " LIKE '" + query + "%'";
+		String[] selectionArgs = null;
+
+		return query(selection, selectionArgs, columns);
+
+		/*
+		 * This builds a query that looks like: SELECT <columns> FROM <table> WHERE
+		 * <KEY_WORD> MATCH 'query*' which is an FTS3 search for the query text
+		 * (plus a wildcard) inside the word column.
+		 * 
+		 * - "rowid" is the unique id for all rows but we need this value for the
+		 * "_id" column in order for the Adapters to work, so the columns need to
+		 * make "_id" an alias for "rowid" - "rowid" also needs to be used by the
+		 * SUGGEST_COLUMN_INTENT_DATA alias in order for suggestions to carry the
+		 * proper intent data. These aliases are defined in the DictionaryProvider
+		 * when queries are made. - This can be revised to also search the
+		 * definition text with FTS3 by changing the selection clause to use
+		 * FTS_VIRTUAL_TABLE instead of KEY_WORD (to search across the entire table,
+		 * but sorting the relevance could be difficult.
+		 */
+	}
 }

@@ -67,7 +67,6 @@ public class MainActivity extends Activity implements Runnable {
 	private static final int		OTAPATCH					= 1;
 	private static final int		APPLYINGPATCH			= 3;
 	private static final int		DBFROMWEB					= 4;
-//	private static final int		DATABASE_VERSION	= ;
 	private static final int		EXCEPTION					= 99;
 	private static final int		ABOUTDIALOG				= 0;
 	private static final int		CHANGELOGDIALOG		= 1;
@@ -278,8 +277,8 @@ public class MainActivity extends Activity implements Runnable {
 		// Handle item selection
 		switch (item.getItemId()) {
 
-//			 case R.id.buildWebDB: startThread(DBFROMWEB); return true;
-//			 case R.id.refreshDB: startThread(DBFROMAPK); return true;
+			 case R.id.buildWebDB: startThread(DBFROMWEB); return true;
+			 case R.id.refreshDB: startThread(DBFROMAPK); return true;
 
 			case R.id.checkUpdate:
 				// Set the last legality update time back to zero on a forced update
@@ -359,13 +358,15 @@ public class MainActivity extends Activity implements Runnable {
 				}
 				ArrayList<String[]> patchInfo = JsonParser.readUpdateJsonStream(this);
 
-				if (patchInfo != null) {
 					try {
 						parseLegality(new URL("https://sites.google.com/site/mtgfamiliar/manifests/legality.json"));
 					}
 					catch (MalformedURLException e1) {
 					}
-					for (int i = 0; i < patchInfo.size(); i++) {
+					
+					if (patchInfo != null) {
+
+						for (int i = 0; i < patchInfo.size(); i++) {
 						String[] set = patchInfo.get(i);
 						if (!mDbHelper.doesSetExist(set[2])) {
 							try {
@@ -446,7 +447,7 @@ public class MainActivity extends Activity implements Runnable {
 																			;
 																		}
 																	}
-																	startThread(OTAPATCH);
+//																	startThread(OTAPATCH);
 																	break;
 																case OTAPATCH:
 																	// If it successfully updated, update the

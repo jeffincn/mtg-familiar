@@ -265,6 +265,8 @@ public class ManaPoolActivity extends Activity {
 		super.onResume();
 		load();
 		update();
+		MyApp appState = ((MyApp)getApplicationContext());
+		appState.setState(0);
 	}
 
 	@Override

@@ -33,8 +33,8 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:id="@+id/aboutapp"
         android:icon="@drawable/ic_menu_info_details"
         android:title="@string/about"/>
-
+<!-- 
     <item android:title="@string/refreshDB" android:id="@+id/refreshDB"/>
     <item android:title="@string/webDB" android:id="@+id/buildWebDB"></item>
-
+ -->
 </menu>

@@ -87,6 +87,13 @@ public class DeckManagementActivity extends ListActivity {
 			startActivity(i);
 		}
 	}
+	
+	@Override
+	protected void onResume(){
+		super.onResume();
+		MyApp appState = ((MyApp)getApplicationContext());
+		appState.setState(0);
+	}
 
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {

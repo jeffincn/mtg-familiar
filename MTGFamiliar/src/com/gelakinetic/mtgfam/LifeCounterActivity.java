@@ -220,7 +220,6 @@ public class LifeCounterActivity extends Activity {
 			}
 		});
 
-//		reset();
 		setType(Type.LIFE);
 		update();
 
@@ -261,7 +260,10 @@ public class LifeCounterActivity extends Activity {
 
 	@Override
 	protected void onResume(){
-		super.onStart();
+		super.onResume();
+		MyApp appState = ((MyApp)getApplicationContext());
+		appState.setState(0);
+
 		if(canGetLock){
 			pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 			wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");

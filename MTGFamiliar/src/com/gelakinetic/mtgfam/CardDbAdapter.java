@@ -421,7 +421,7 @@ public class CardDbAdapter {
 		Cursor mCursor = null;
 
 		if (cardname != null)
-			cardname = cardname.replace("'", "''").trim().replace(" ", "%");
+			cardname = cardname.replace("'", "''").trim();
 		if (cardtext != null)
 			cardtext = cardtext.replace("'", "''").trim();
 		if (cardtype != null)
@@ -438,7 +438,15 @@ public class CardDbAdapter {
 				statement = "(" + KEY_NAME + " LIKE '" + cardname + "%')";
 			}
 			else {
-				statement = "(" + KEY_NAME + " LIKE '%" + cardname + "%')";
+				String[] nameParts = cardname.split(" ");
+				for(String s : nameParts){
+					if(statement == null){
+						statement = "(" + KEY_NAME + " LIKE '%" + s + "%')";
+					}
+					else{
+						statement += " AND (" + KEY_NAME + " LIKE '%" + s + "%')";						
+					}
+				}
 			}
 		}
 
@@ -803,69 +811,14 @@ public class CardDbAdapter {
 		mCardName = mCardName.replace("'", "''");
 		format = format.replace("'", "''"); //Just to be safe; remember Bobby Tables
 		try {
-			// Get all legal sets in this format
-			/* *** THE OLD WAY (very inefficient, takes ~12 seconds on my Optimus LG) *** - Alex
-			ArrayList<String> sets = new ArrayList<String>();
-			Cursor c = mDb.query(DATABASE_TABLE_LEGAL_SETS, new String[] { KEY_ID, KEY_SET }, KEY_FORMAT + " = '" + format
-					+ "'", null, null, null, null);
-			c.moveToFirst();
-			for (int i = 0; i < c.getCount(); i++) {
-				sets.add(c.getString(c.getColumnIndex(KEY_SET)));
-				c.moveToNext();
-			}
-			c.close();
-
-			String subtable;
-			if (sets.size() == 0) {
-				subtable = DATABASE_TABLE_CARDS;
-			}
-			else {
-				// Use these sets to construct a table of all cardnames in those sets
-				boolean first = true;
-				String statement = "(";
-				for (String s : sets) {
-					if (first) {
-						first = false;
-						statement += "(" + KEY_SET + " = '" + s + "')";
-					}
-					else {
-						statement += " OR (" + KEY_SET + " = '" + s + "')";
-					}
-				}
-				statement += ")";
-
-				// (SELECT _id,suggest_text_1 FROM cards WHERE ((expansion LIKE 'ISD'))
-				// GROUP BY suggest_text_1)
-				subtable = "(SELECT " + KEY_ID + "," + KEY_NAME + " FROM " + DATABASE_TABLE_CARDS + " WHERE " + statement
-						+ " GROUP BY " + KEY_NAME + ")";
-			}
-
-			// Search the table of all legal cardnames for the given cardname.
-			c = mDb.query(true, subtable, new String[] { KEY_ID, KEY_NAME }, KEY_NAME + " LIKE '" + mCardName + "'", null,
-					null, null, KEY_NAME, null);
-			int numResults = c.getCount();
-			c.close();
-
-			// If it exists, check if the card is banned or restricted
-			if (numResults > 0) {
-				c = mDb.query(DATABASE_TABLE_BANNED_CARDS, new String[] { KEY_ID, KEY_NAME, KEY_LEGALITY }, KEY_NAME + " = '"
-						+ mCardName + "' AND " + KEY_FORMAT + " = '" + format + "'", null, null, null, null);
-				numResults = c.getCount();
-				if (numResults == 0) {
-					c.close();
-					return LEGAL;
-				}
-				c.moveToFirst();
-				int legality = c.getInt(c.getColumnIndex(KEY_LEGALITY));
-				c.close();
-				return legality;
-			}
-			*/
 			//The new way (single query per type, should be much faster) - Alex
-			String sql = "SELECT COALESCE(CASE (SELECT 1 FROM cards c INNER JOIN legal_sets ls ON ls.expansion = c.expansion WHERE ls.format = '" +
-					format + "' AND c.suggest_text_1 = '" + mCardName + "') WHEN 1 THEN NULL ELSE CASE WHEN '" + format + "' LIKE 'legacy' " + 
-					"THEN NULL WHEN '" + format + "' LIKE 'vintage' THEN NULL ELSE 1 END END, (SELECT legality from banned_cards WHERE " + 
-					"suggest_text_1 = '" + mCardName + "' AND format LIKE '" + format + "'), 0) AS legality";
+			String sql = "SELECT COALESCE(CASE (SELECT 1 FROM " + DATABASE_TABLE_CARDS + " c INNER JOIN "
+					+ DATABASE_TABLE_LEGAL_SETS + " ls ON ls." + KEY_SET + " = c." + KEY_SET + " WHERE ls." + KEY_FORMAT + " = '"
+					+ format + "' AND c." + KEY_NAME + " = '" + mCardName + "') WHEN 1 THEN NULL ELSE CASE WHEN '" + format
+					+ "' = 'Legacy' " + "THEN NULL WHEN '" + format + "' = 'Vintage' THEN NULL ELSE 1 END END, (SELECT "
+					+ KEY_LEGALITY + " from " + DATABASE_TABLE_BANNED_CARDS + " WHERE " + KEY_NAME + " = '" + mCardName
+					+ "' AND " + KEY_FORMAT + " = '" + format + "'), 0) AS " + KEY_LEGALITY;
+
 			Cursor c = mDb.rawQuery(sql, null);
 			c.moveToFirst();
 			int legality = c.getInt(c.getColumnIndex(KEY_LEGALITY));

@@ -203,10 +203,14 @@ public class NPlayerLifeActivity extends Activity {
 		resetting = false;
 	}
 
-	//TODO figure out how the history gets correctly set the first time in landscape, and replicate it elsewhere
+	// TODO figure out how the history gets correctly set the first time in
+	// landscape, and replicate it elsewhere
 	@Override
 	public void onResume() {
 		super.onResume();
+
+		MyApp appState = ((MyApp) getApplicationContext());
+		appState.setState(0);
 
 		if (canGetLock) {
 			pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -365,7 +369,7 @@ public class NPlayerLifeActivity extends Activity {
 		activeType = type;
 
 		switch (activeType) {
-			//TODO figure out why p.setAdapter() clears the view in landscape
+			// TODO figure out why p.setAdapter() clears the view in landscape
 			case LIFE:
 				lifeButton.setImageResource(R.drawable.life_button_highlighted);
 				poisonButton.setImageResource(R.drawable.poison_button);
@@ -551,8 +555,10 @@ public class NPlayerLifeActivity extends Activity {
 			count++;
 			delta = 0;
 			notifyDataSetChanged();
-			// TODO figure out something which will refresh the history ListView in landscape mode
-			// lv.setAdapter(rla); // sorta works, but doesn't account for poison, and always resets the list to inital position
+			// TODO figure out something which will refresh the history ListView in
+			// landscape mode
+			// lv.setAdapter(rla); // sorta works, but doesn't account for poison, and
+			// always resets the list to inital position
 		}
 
 		public int getCount() {
@@ -663,9 +669,11 @@ public class NPlayerLifeActivity extends Activity {
 			TVname = n;
 			TVlife = l;
 			history = lv;
-			switch(activeType){
+			switch (activeType) {
 				case LIFE:
-					history.setAdapter(this.lifeAdapter); // TODO figure out why this works in Portrait and why the code in setAdapter() doesnt
+					history.setAdapter(this.lifeAdapter); // TODO figure out why this
+																								// works in Portrait and why the
+																								// code in setAdapter() doesnt
 					break;
 				case POISON:
 					history.setAdapter(this.poisonAdapter);

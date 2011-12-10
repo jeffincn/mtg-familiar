@@ -195,8 +195,10 @@ public class MainActivity extends Activity implements Runnable {
 	}
 
 	@Override
-	protected void onResume() {
+	protected void onResume(){
 		super.onResume();
+		MyApp appState = ((MyApp)getApplicationContext());
+		appState.setState(0);
 	}
 
 	@Override
@@ -277,8 +279,8 @@ public class MainActivity extends Activity implements Runnable {
 		// Handle item selection
 		switch (item.getItemId()) {
 
-			 case R.id.buildWebDB: startThread(DBFROMWEB); return true;
-			 case R.id.refreshDB: startThread(DBFROMAPK); return true;
+//			 case R.id.buildWebDB: startThread(DBFROMWEB); return true;
+//			 case R.id.refreshDB: startThread(DBFROMAPK); return true;
 
 			case R.id.checkUpdate:
 				// Set the last legality update time back to zero on a forced update

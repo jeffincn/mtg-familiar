@@ -337,6 +337,13 @@ public class SearchActivity extends Activity {
 		});
 	}
 
+	@Override
+	protected void onResume(){
+		super.onResume();
+		MyApp appState = ((MyApp)getApplicationContext());
+		appState.setState(0);
+	}
+	
 	private void doSearch(boolean isRandom) {
 		String name = namefield.getText().toString();
 		String text = textfield.getText().toString();

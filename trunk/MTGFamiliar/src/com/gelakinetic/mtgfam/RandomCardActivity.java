@@ -244,6 +244,14 @@ public class RandomCardActivity extends Activity {
 	}
 
 	@Override
+	protected void onResume(){
+		super.onResume();
+		MyApp appState = ((MyApp)getApplicationContext());
+		appState.setState(0);
+	}
+
+	
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.random_menu, menu);

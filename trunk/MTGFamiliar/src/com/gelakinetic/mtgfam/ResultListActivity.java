@@ -65,6 +65,12 @@ public class ResultListActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.result_list_activity);
 
+		MyApp appState = ((MyApp)getApplicationContext());
+		if(appState.getState() == CardViewActivity.QUITTOSEARCH){
+			this.finish();
+			return;
+		}
+		
 		// After a search, make sure the position is on top
 		cursorPosition = 0;
 		cursorPositionOffset = 0;
@@ -157,6 +163,11 @@ public class ResultListActivity extends ListActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+			MyApp appState = ((MyApp)getApplicationContext());
+			if(appState.getState() == CardViewActivity.QUITTOSEARCH){
+				this.finish();
+				return;
+			}
 		fillData(c);
 		lv.setSelectionFromTop(cursorPosition, cursorPositionOffset);
 	}

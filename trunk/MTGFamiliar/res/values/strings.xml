@@ -148,6 +148,7 @@ Please send questions, comments, concerns, and praise to &lt;a href="mailto:mtg.
 Join the &lt;a href="http://code.google.com/p/mtg-familiar">open source project&lt;/a> on Google Code.&lt;br />&lt;br />
 Thanks to zagaberoo for beautiful graphics and even more beautiful code.&lt;br />&lt;br />
 Thanks to April King for the massive QA effort, and learning Java. Shh, don\'t tell anyone about that.&lt;br />&lt;br />
+Thanks to Toastdeib for being my SQL guru sitting on top of the mountain.&lt;br />&lt;br />
 Thanks to chaudakh for the wonderful Gatherer Extractor program.&lt;br />&lt;br />
 Thanks to reddit\'s &lt;a href="http://www.reddit.com/r/magicTCG/">/r/magictcg&lt;/a> for testing and feedback.&lt;br />&lt;br />
 Thanks to my brother for the icon.&lt;br />&lt;br />
@@ -178,11 +179,18 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
  1.1.1
  - Fixed issue where result list would reset position
         -->
-        <!-- 1.2 -->
+        <!-- 1.2
 
  - Added random card feature in Card Search. Access it through the menu on the search page or results page&lt;br />
  - Added MoJhoSto Basic randomizer
-  	</string>
+ -->
+ <!--  1.3 -->
+ - Added autocomplete functionality in both the quick and advanced search.
+ - Added the ability to add or remove players to the life counter
+ - Rewrote internal card legality code. It works for reprints now.
+ - UI improvements for artists with long names
+   	</string>
+   	
     <string name="gatherer">Gatherer Page</string>
     <string name="lifetitle">Life Counter</string>
     <string name="wakelocksummary">Force the life counter screen to never go to sleep</string>
@@ -246,5 +254,6 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     Good luck, and have fun!</string>
     <string name="addplayer">Add a Player</string>
     <string name="removeplayer">Remove a Player</string>
+    <string name="quittosearch">Quit To Search</string>
 
 </resources>

@@ -139,6 +139,13 @@ public class DiceActivity extends Activity {
 		}
 	}
 
+	@Override
+	protected void onResume(){
+		super.onResume();
+		MyApp appState = ((MyApp)getApplicationContext());
+		appState.setState(0);
+	}
+
 	public void rollDie(int d) {
 		final int f_d = d;
 		if (dieOutput != null) {

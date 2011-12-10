@@ -22,6 +22,9 @@ package com.gelakinetic.mtgfam;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -42,6 +45,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -64,6 +68,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 public class CardViewActivity extends Activity implements Runnable {
@@ -75,6 +80,7 @@ public class CardViewActivity extends Activity implements Runnable {
 	protected static final int		TRANSFORM			= 1;
 	protected static final int		RANDOMLEFT		= 2;
 	protected static final int		RANDOMRIGHT		= 3;
+	protected static final int		QUITTOSEARCH	= 4;
 
 	protected static final String	NUMBER				= "number";
 	protected static final String	SET						= "set";
@@ -100,7 +106,6 @@ public class CardViewActivity extends Activity implements Runnable {
 	private BitmapDrawable				d;
 	private Bitmap								bmp;
 	private long									cardID;
-	private Cursor								formats				= null;
 	private String								mtgi_code;
 	private URL										priceurl;
 	private String								picurl;
@@ -122,6 +127,8 @@ public class CardViewActivity extends Activity implements Runnable {
 	private boolean								failedLoad		= false;
 	private Button								leftRandom;
 	private Button								rightRandom;
+	private String[]							legalities;
+	private String[]							formats;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -370,6 +377,16 @@ public class CardViewActivity extends Activity implements Runnable {
 	}
 
 	@Override
+	protected void onResume(){
+		super.onResume();
+		MyApp appState = ((MyApp)getApplicationContext());
+		if(appState.getState() == QUITTOSEARCH){
+			this.finish();
+			return;
+		}
+	}
+	
+	@Override
 	protected void onPause() {
 		super.onPause();
 	}
@@ -382,10 +399,6 @@ public class CardViewActivity extends Activity implements Runnable {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		if (formats != null) {
-			formats.deactivate();
-			formats.close();
-		}
 		if (c != null) {
 			c.deactivate();
 			c.close();
@@ -409,6 +422,45 @@ public class CardViewActivity extends Activity implements Runnable {
 		return true;
 	}
 
+	private class FetchLegalityTask extends AsyncTask<String, Integer, Long> {
+
+		@Override
+		protected Long doInBackground(String... params) {
+
+			Cursor cFormats = mDbHelper.fetchAllFormats();
+			formats = new String[cFormats.getCount()];
+			legalities = new String[cFormats.getCount()];
+
+			cFormats.moveToFirst();
+			for (int i = 0; i < cFormats.getCount(); i++) {
+				formats[i] = cFormats.getString(cFormats.getColumnIndex(CardDbAdapter.KEY_NAME));
+				switch (mDbHelper.checkLegality(cardName, formats[i])) {
+					case CardDbAdapter.LEGAL:
+						legalities[i] = "Legal";
+						break;
+					case CardDbAdapter.RESTRICTED:
+						legalities[i] = "Restricted";
+						break;
+					case CardDbAdapter.BANNED:
+						legalities[i] = "Banned";
+						break;
+				}
+				cFormats.moveToNext();
+			}
+
+			cFormats.deactivate();
+			cFormats.close();
+
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Long result) {
+			showDialog(GETLEGALITY);
+		}
+
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
@@ -420,13 +472,18 @@ public class CardViewActivity extends Activity implements Runnable {
 				showDialog(GETPRICE);
 				return true;
 			case R.id.legality:
-				showDialog(GETLEGALITY);
+				new FetchLegalityTask().execute((String[]) null);
 				return true;
 			case R.id.gatherer:
 				String url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid="
 						+ c.getInt(c.getColumnIndex(CardDbAdapter.KEY_MULTIVERSEID));
 				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 				startActivity(browserIntent);
+				return true;
+			case R.id.quittosearch:
+				MyApp appState = ((MyApp)getApplicationContext());
+				appState.setState(QUITTOSEARCH);
+				this.finish();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -456,14 +513,22 @@ public class CardViewActivity extends Activity implements Runnable {
 
 			dialog.setContentView(R.layout.legality_dialog);
 
-			formats = mDbHelper.fetchAllFormats();
+			// create the grid item mapping
+			String[] from = new String[] { "format", "status" };
+			int[] to = new int[] { R.id.format, R.id.status };
 
-			LegalListAdapter lla = new LegalListAdapter(this, R.layout.legal_row, formats, new String[] {
-					CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_NAME }, new int[] { R.id.format, R.id.status }, cardName, mDbHelper,
-					setCode);
+			// prepare the list of all records
+			List<HashMap<String, String>> fillMaps = new ArrayList<HashMap<String, String>>();
+			for (int i = 0; i < formats.length; i++) {
+				HashMap<String, String> map = new HashMap<String, String>();
+				map.put("format", formats[i]);
+				map.put("status", legalities[i]);
+				fillMaps.add(map);
+			}
+
+			SimpleAdapter adapter = new SimpleAdapter(this, fillMaps, R.layout.legal_row, from, to);
 			ListView lv = (ListView) dialog.findViewById(R.id.legallist);
-			lv.setAdapter(lla);
-
+			lv.setAdapter(adapter);
 			return dialog;
 		}
 		else if (id == GETPRICE) { // price

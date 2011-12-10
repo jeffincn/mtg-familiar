@@ -421,7 +421,7 @@ public class CardDbAdapter {
 		Cursor mCursor = null;
 
 		if (cardname != null)
-			cardname = cardname.replace("'", "''").trim();
+			cardname = cardname.replace("'", "''").trim().replace(" ", "%");
 		if (cardtext != null)
 			cardtext = cardtext.replace("'", "''").trim();
 		if (cardtype != null)

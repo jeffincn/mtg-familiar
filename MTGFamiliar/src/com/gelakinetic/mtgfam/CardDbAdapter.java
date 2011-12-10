@@ -19,7 +19,6 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.app.SearchManager;
@@ -802,8 +801,10 @@ public class CardDbAdapter {
 
 	public int checkLegality(String mCardName, String format) {
 		mCardName = mCardName.replace("'", "''");
+		format = format.replace("'", "''"); //Just to be safe; remember Bobby Tables
 		try {
 			// Get all legal sets in this format
+			/* *** THE OLD WAY (very inefficient, takes ~12 seconds on my Optimus LG) *** - Alex
 			ArrayList<String> sets = new ArrayList<String>();
 			Cursor c = mDb.query(DATABASE_TABLE_LEGAL_SETS, new String[] { KEY_ID, KEY_SET }, KEY_FORMAT + " = '" + format
 					+ "'", null, null, null, null);
@@ -859,6 +860,17 @@ public class CardDbAdapter {
 				c.close();
 				return legality;
 			}
+			*/
+			//The new way (single query per type, should be much faster) - Alex
+			String sql = "SELECT COALESCE(CASE (SELECT 1 FROM cards c INNER JOIN legal_sets ls ON ls.expansion = c.expansion WHERE ls.format = '" +
+					format + "' AND c.suggest_text_1 = '" + mCardName + "') WHEN 1 THEN NULL ELSE CASE WHEN '" + format + "' LIKE 'legacy' " + 
+					"THEN NULL WHEN '" + format + "' LIKE 'vintage' THEN NULL ELSE 1 END END, (SELECT legality from banned_cards WHERE " + 
+					"suggest_text_1 = '" + mCardName + "' AND format LIKE '" + format + "'), 0) AS legality";
+			Cursor c = mDb.rawQuery(sql, null);
+			c.moveToFirst();
+			int legality = c.getInt(c.getColumnIndex(KEY_LEGALITY));
+			c.close();
+			return legality;
 		}
 		catch (SQLiteException e) {
 			System.out.println(e);

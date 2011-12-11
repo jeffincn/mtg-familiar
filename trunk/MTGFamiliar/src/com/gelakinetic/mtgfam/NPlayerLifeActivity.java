@@ -19,39 +19,38 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 public class NPlayerLifeActivity extends Activity {
 
-	// private ListView lv;
 	private ImageView												poisonButton;
 	private ImageView												lifeButton;
 	private ImageView												dieButton;
 	private ImageView												poolButton;
 	private ImageView												resetButton;
 	private Activity												anchor;
-	public static final int									DIALOG_RESET_CONFIRM	= 0;
+	private static final int								DIALOG_RESET_CONFIRM	= 0;
 	private static final int								DIALOG_REMOVE_PLAYER	= 1;
-	protected static final int							DIALOG_SET_NAME				= 2;
+	private static final int								DIALOG_SET_NAME				= 2;
 	private static final int								LIFE									= 0;
 	private static final int								POISON								= 1;
 
@@ -59,7 +58,7 @@ public class NPlayerLifeActivity extends Activity {
 	private Object													timerLock;
 	private final ScheduledExecutorService	scheduler							= Executors.newScheduledThreadPool(1);
 	private Handler													handler;
-	private int															activeType;
+	private static int											activeType						= -1;
 	private PlayerAdapter										rla;
 	private int															orientation;
 	private ArrayList<Player>								players;
@@ -73,20 +72,29 @@ public class NPlayerLifeActivity extends Activity {
 	private String[]												names;
 	private Runnable												runnable;
 
-	public static final int									INITIAL_LIFE					= 20, INITIAL_POISON = 0, TERMINAL_LIFE = 0,
-			TERMINAL_POISON = 10;
+	public static final int									INITIAL_LIFE					= 20;
+	public static final int									INITIAL_POISON				= 0;
+	public static final int									TERMINAL_LIFE					= 0;
+	public static final int									TERMINAL_POISON				= 10;
 	private static final String							PLAYER_DATA						= "player_data";
 	protected static final int							EVERYTHING						= 0;
 	protected static final int							JUST_TOTALS						= 1;
 
 	private Player													playerToHaveNameChanged;
 	private EditText												nameInput;
-	private AdapterView<ListAdapter>				lv;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// Android 1.5 (API3) isnt compatable with horizontal listview. just lock it
+		// in portrait
+		int APIlevel = Integer.parseInt(Build.VERSION.SDK);
+		if (APIlevel < 4) {
+			setRequestedOrientation(1);
+		}
+
 		setContentView(R.layout.n_player_life_activity);
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -101,7 +109,9 @@ public class NPlayerLifeActivity extends Activity {
 
 		anchor = this;
 
-		activeType = LIFE;
+		if (activeType == -1) {
+			activeType = LIFE;
+		}
 
 		poisonButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
@@ -146,10 +156,8 @@ public class NPlayerLifeActivity extends Activity {
 					if (timerValue > 0) {
 						timerValue -= timerTick;
 						if (timerValue <= 0) {
-							/*
-							 * This is used instead of having the commit loop here so I don't
-							 * have to think about deadlock
-							 */
+							 // This is used instead of having the commit loop here so I don't
+							 // have to think about deadlock
 							doCommit = true;
 						}
 					}
@@ -161,11 +169,9 @@ public class NPlayerLifeActivity extends Activity {
 							for (Player p : rla.players) {
 								synchronized (p.lifeAdapter) {
 									p.lifeAdapter.commit();
-									// p.history.setAdapter(p.lifeAdapter);
 								}
 								synchronized (p.poisonAdapter) {
 									p.poisonAdapter.commit();
-									// p.history.setAdapter(p.poisonAdapter);
 								}
 							}
 						}
@@ -203,8 +209,6 @@ public class NPlayerLifeActivity extends Activity {
 		resetting = false;
 	}
 
-	// TODO figure out how the history gets correctly set the first time in
-	// landscape, and replicate it elsewhere
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -224,13 +228,25 @@ public class NPlayerLifeActivity extends Activity {
 
 		players = new ArrayList<Player>(2);
 
-		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			rla = new PlayerAdapter(this, R.layout.life_counter_player_col, players);
-		}
-		else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-			rla = new PlayerAdapter(this, R.layout.life_counter_player_row, players);
-		}
+		DisplayMetrics dm = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(dm);
 
+		if (dm.xdpi < 170) {
+			if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+				rla = new PlayerAdapter(this, R.layout.life_counter_player_col_small, players);
+			}
+			else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+				rla = new PlayerAdapter(this, R.layout.life_counter_player_row_small, players);
+			}
+		}
+		else {
+			if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+				rla = new PlayerAdapter(this, R.layout.life_counter_player_col, players);
+			}
+			else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+				rla = new PlayerAdapter(this, R.layout.life_counter_player_row, players);
+			}
+		}
 		if (lifeData == null || lifeData.length() == 0) {
 			rla.players.add(new Player("Player 1", INITIAL_LIFE, INITIAL_POISON, (Context) this));
 			rla.players.add(new Player("Player 2", INITIAL_LIFE, INITIAL_POISON, (Context) this));
@@ -281,13 +297,11 @@ public class NPlayerLifeActivity extends Activity {
 		}
 
 		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			lv = (HorizontalListView) findViewById(R.id.h_list);
-			// registerForContextMenu(lv);
+			HorizontalListView lv = (HorizontalListView) findViewById(R.id.h_list);
 			lv.setAdapter(rla);
 		}
 		else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-			lv = (ListView) findViewById(R.id.v_list);
-			// registerForContextMenu(lv);
+			ListView lv = (ListView) findViewById(R.id.v_list);
 			lv.setAdapter(rla);
 		}
 
@@ -305,7 +319,6 @@ public class NPlayerLifeActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-
 			case R.id.add_player:
 				numPlayers++;
 				rla.players.add(new Player("Player " + numPlayers, INITIAL_LIFE, INITIAL_POISON, (Context) this));
@@ -336,11 +349,9 @@ public class NPlayerLifeActivity extends Activity {
 		editor.commit();
 
 		Intent intent = getIntent();
-		overridePendingTransition(0, 0);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 		finish();
 
-		overridePendingTransition(0, 0);
 		startActivity(intent);
 	}
 
@@ -369,7 +380,6 @@ public class NPlayerLifeActivity extends Activity {
 		activeType = type;
 
 		switch (activeType) {
-			// TODO figure out why p.setAdapter() clears the view in landscape
 			case LIFE:
 				lifeButton.setImageResource(R.drawable.life_button_highlighted);
 				poisonButton.setImageResource(R.drawable.poison_button);
@@ -488,8 +498,6 @@ public class NPlayerLifeActivity extends Activity {
 							}
 						}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
-
-								/* User clicked cancel so do some stuff */
 							}
 						}).create();
 
@@ -555,10 +563,6 @@ public class NPlayerLifeActivity extends Activity {
 			count++;
 			delta = 0;
 			notifyDataSetChanged();
-			// TODO figure out something which will refresh the history ListView in
-			// landscape mode
-			// lv.setAdapter(rla); // sorta works, but doesn't account for poison, and
-			// always resets the list to inital position
 		}
 
 		public int getCount() {
@@ -587,8 +591,6 @@ public class NPlayerLifeActivity extends Activity {
 			absolute = (TextView) v.findViewById(R.id.absolute);
 			relative = (TextView) v.findViewById(R.id.relative);
 			if (relative == null || absolute == null) {
-				// Log.e("Life Counter",
-				// "failed to inflate history adapter row view correctly");
 				TextView error = new TextView(context);
 				error.setText("ERROR!");
 				return error;
@@ -671,9 +673,7 @@ public class NPlayerLifeActivity extends Activity {
 			history = lv;
 			switch (activeType) {
 				case LIFE:
-					history.setAdapter(this.lifeAdapter); // TODO figure out why this
-																								// works in Portrait and why the
-																								// code in setAdapter() doesnt
+					history.setAdapter(this.lifeAdapter);
 					break;
 				case POISON:
 					history.setAdapter(this.poisonAdapter);
@@ -831,5 +831,4 @@ public class NPlayerLifeActivity extends Activity {
 			return data + ";\n";
 		}
 	}
-
 }

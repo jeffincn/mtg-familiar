@@ -77,13 +77,13 @@
             android:gravity="center"
             style="@style/text"
             android:text="20"
-            android:textSize="63dp" />
+            android:textSize="42dp" />
     </LinearLayout>
     <!-- History -->
 
     <LinearLayout
         android:layout_width="140dp"
-        android:layout_height="214dp"
+        android:layout_height="186dp"
         android:background="@drawable/textview_backdrop"
         android:orientation="vertical" >
 

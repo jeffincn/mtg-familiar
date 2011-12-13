@@ -56,10 +56,10 @@ public class CardDbAdapter {
 	private static final String	DATABASE_TABLE_LEGAL_SETS			= "legal_sets";
 	private static final String	DATABASE_TABLE_BANNED_CARDS		= "banned_cards";
 
-	public static final int			DATABASE_VERSION							= 13;
+	public static final int			DATABASE_VERSION							= 15;
 
 	public static final String	KEY_ID												= "_id";
-	public static final String	KEY_NAME											= SearchManager.SUGGEST_COLUMN_TEXT_1;											// "name";
+	public static final String	KEY_NAME											= SearchManager.SUGGEST_COLUMN_TEXT_1;	// "name";
 	public static final String	KEY_SET												= "expansion";
 	public static final String	KEY_TYPE											= "type";
 	public static final String	KEY_ABILITY										= "cardtext";
@@ -74,10 +74,12 @@ public class CardDbAdapter {
 	public static final String	KEY_ARTIST										= "artist";
 	public static final String	KEY_NUMBER										= "number";
 	public static final String	KEY_MULTIVERSEID							= "multiverseID";
+	public static final String	KEY_RULINGS										= "rulings";
 
 	public static final String	KEY_CODE											= "code";
 	public static final String	KEY_CODE_MTGI									= "code_mtgi";
 	public static final String	KEY_NAME_TCGPLAYER						= "name_tcgplayer";
+	public static final String	KEY_DATE											= "date";
 
 	public static final String	KEY_FORMAT										= "format";
 	public static final String	KEY_LEGALITY									= "legality";
@@ -95,13 +97,15 @@ public class CardDbAdapter {
 																																+ " integer, " + KEY_ABILITY + " text, " + KEY_FLAVOR
 																																+ " text, " + KEY_ARTIST + " text, " + KEY_NUMBER
 																																+ " text, " + KEY_MULTIVERSEID + " integer not null, "
-																																+ KEY_COLOR + " text not null);";
+																																+ KEY_COLOR + " text not null, " + KEY_RULINGS
+																																+ " text);";
 
 	private static final String	DATABASE_CREATE_SETS					= "create table " + DATABASE_TABLE_SETS + "(" + KEY_ID
 																																+ " integer primary key autoincrement, " + KEY_NAME
 																																+ " text not null, " + KEY_CODE
 																																+ " text not null unique, " + KEY_CODE_MTGI
-																																+ " text not null, " + KEY_NAME_TCGPLAYER + " text);";
+																																+ " text not null, " + KEY_NAME_TCGPLAYER + " text, "
+																																+ KEY_DATE + " integer);";
 
 	private static final String	DATABASE_CREATE_FORMATS				= "create table " + DATABASE_TABLE_FORMATS + "(" + KEY_ID
 																																+ " integer primary key autoincrement, " + KEY_NAME
@@ -235,13 +239,14 @@ public class CardDbAdapter {
 		return mDb.insert(DATABASE_TABLE_CARDS, null, initialValues);
 	}
 
-	public long createSet(String name, String code, String code_mtgi) {
+	public long createSet(String name, String code, String code_mtgi, long date) {
 		ContentValues initialValues = new ContentValues();
 
 		// initialValues.put(KEY_ID, 0);// wrong
 		initialValues.put(KEY_CODE, code);
 		initialValues.put(KEY_NAME, name);
 		initialValues.put(KEY_CODE_MTGI, code_mtgi);
+		initialValues.put(KEY_DATE, date);
 
 		return mDb.insert(DATABASE_TABLE_SETS, null, initialValues);
 	}
@@ -252,6 +257,7 @@ public class CardDbAdapter {
 		initialValues.put(KEY_CODE, set.code);
 		initialValues.put(KEY_NAME, set.name);
 		initialValues.put(KEY_CODE_MTGI, set.code_magiccards);
+		initialValues.put(KEY_DATE, set.date);
 
 		return mDb.insert(DATABASE_TABLE_SETS, null, initialValues);
 	}
@@ -284,7 +290,7 @@ public class CardDbAdapter {
 	public Cursor fetchAllSets() {
 
 		return mDb.query(DATABASE_TABLE_SETS, new String[] { KEY_ID, KEY_NAME, KEY_CODE, KEY_CODE_MTGI }, null, null, null,
-				null, KEY_NAME);
+				null, KEY_DATE+" DESC");
 	}
 
 	public boolean doesSetExist(String code) {
@@ -439,12 +445,12 @@ public class CardDbAdapter {
 			}
 			else {
 				String[] nameParts = cardname.split(" ");
-				for(String s : nameParts){
-					if(statement == null){
+				for (String s : nameParts) {
+					if (statement == null) {
 						statement = "(" + KEY_NAME + " LIKE '%" + s + "%')";
 					}
-					else{
-						statement += " AND (" + KEY_NAME + " LIKE '%" + s + "%')";						
+					else {
+						statement += " AND (" + KEY_NAME + " LIKE '%" + s + "%')";
 					}
 				}
 			}
@@ -692,8 +698,8 @@ public class CardDbAdapter {
 					}
 					statement += "NOT EXISTS (SELECT * FROM " + DATABASE_TABLE_BANNED_CARDS + " WHERE " + DATABASE_TABLE_CARDS
 							+ "." + KEY_NAME + " = " + DATABASE_TABLE_BANNED_CARDS + "." + KEY_NAME + " AND "
-							+ DATABASE_TABLE_BANNED_CARDS + "." + KEY_FORMAT + " = '" + formatNames[i] + "' AND "+
-							DATABASE_TABLE_BANNED_CARDS + "." + KEY_LEGALITY + " = " + BANNED +")";
+							+ DATABASE_TABLE_BANNED_CARDS + "." + KEY_FORMAT + " = '" + formatNames[i] + "' AND "
+							+ DATABASE_TABLE_BANNED_CARDS + "." + KEY_LEGALITY + " = " + BANNED + ")";
 
 					if (cSets != null) {
 						cSets.deactivate();
@@ -809,9 +815,10 @@ public class CardDbAdapter {
 
 	public int checkLegality(String mCardName, String format) {
 		mCardName = mCardName.replace("'", "''");
-		format = format.replace("'", "''"); //Just to be safe; remember Bobby Tables
+		format = format.replace("'", "''"); // Just to be safe; remember Bobby
+																				// Tables
 		try {
-			//The new way (single query per type, should be much faster) - Alex
+			// The new way (single query per type, should be much faster) - Alex
 			String sql = "SELECT COALESCE(CASE (SELECT 1 FROM " + DATABASE_TABLE_CARDS + " c INNER JOIN "
 					+ DATABASE_TABLE_LEGAL_SETS + " ls ON ls." + KEY_SET + " = c." + KEY_SET + " WHERE ls." + KEY_FORMAT + " = '"
 					+ format + "' AND c." + KEY_NAME + " = '" + mCardName + "') WHEN 1 THEN NULL ELSE CASE WHEN '" + format

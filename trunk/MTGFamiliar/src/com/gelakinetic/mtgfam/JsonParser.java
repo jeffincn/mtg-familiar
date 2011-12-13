@@ -74,6 +74,9 @@ public class JsonParser {
 								if (s2.equalsIgnoreCase("q")) { // code
 									set.code = reader.nextString();
 								}
+								if (s2.equalsIgnoreCase("y")) { // date
+									set.date = reader.nextLong();
+								}
 							}
 							mDbHelper.createSet(set);
 							reader.endObject();
@@ -93,6 +96,9 @@ public class JsonParser {
 									}
 									if (s2.equalsIgnoreCase("q")) { // code
 										set.code = reader.nextString();
+									}
+									if (s2.equalsIgnoreCase("y")) { // date
+										set.date = reader.nextLong();
 									}
 								}
 								mDbHelper.createSet(set);

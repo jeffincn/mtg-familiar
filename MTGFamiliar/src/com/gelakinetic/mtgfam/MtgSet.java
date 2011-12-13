@@ -23,10 +23,12 @@ public class MtgSet {
 	public String	code;
 	public String	code_magiccards;
 	public String	name;
+	public long date;
 
 	public MtgSet() {
 		code = "";
 		code_magiccards = "";
 		name = "";
+		date=0;
 	}
 }

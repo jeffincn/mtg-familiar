@@ -109,8 +109,6 @@ public class MainActivity extends Activity implements Runnable {
 				startActivity(i);
 			}
 		});
-
-		
 		
 		search.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -305,7 +303,7 @@ public class MainActivity extends Activity implements Runnable {
 		if (type == DBFROMAPK) {
 			dialog = new ProgressDialog(MainActivity.this);
 			dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			dialog.setMessage("Decompressing database...");
+			dialog.setMessage("Decompressing database.");
 			dialog.setCancelable(false);
 			dialog.show();
 			threadType = type;
@@ -323,7 +321,7 @@ public class MainActivity extends Activity implements Runnable {
 			if ((curTime - lastLegalityUpdate) > (updatefrequency * 24 * 60 * 60)) {
 				dialog = new ProgressDialog(MainActivity.this);
 				dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-				dialog.setMessage("Checking for Updates. Please wait...");
+				dialog.setMessage("Checking for Updates. Please wait.");
 				dialog.setCancelable(false);
 				dialog.show();
 
@@ -335,7 +333,7 @@ public class MainActivity extends Activity implements Runnable {
 		else if (type == DBFROMWEB) {
 			dialog = new ProgressDialog(MainActivity.this);
 			dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-			dialog.setMessage("Downloading and db from web. Please wait...");
+			dialog.setMessage("Downloading and parsing db from web. Please wait.");
 			dialog.setCancelable(false);
 			dialog.show();
 
@@ -483,7 +481,7 @@ public class MainActivity extends Activity implements Runnable {
 																	}
 																	dialog = new ProgressDialog(MainActivity.this);
 																	dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-																	dialog.setMessage("Adding " + patchname + ". Please wait...");
+																	dialog.setMessage("Adding " + patchname + ". Please wait.");
 																	dialog.setCancelable(false);
 																	dialog.show();
 

@@ -19,17 +19,24 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.zip.GZIPInputStream;
 
 import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Resources.NotFoundException;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
+import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 
 /**
@@ -138,11 +145,12 @@ public class CardDbAdapter {
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+			System.out.print(oldVersion +" to "+newVersion);
 			// Log.w(TAG, "Upgrading database from version " + oldVersion + " to " +
 			// newVersion + ", which will destroy all old data");
-			db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_CARDS);
-			db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_SETS);
-			onCreate(db);
+//			db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_CARDS);
+//			db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_SETS);
+//			onCreate(db);
 		}
 	}
 
@@ -153,6 +161,11 @@ public class CardDbAdapter {
 	 *          the Context within which to work
 	 */
 	public CardDbAdapter(Context ctx) {
+		
+		if(CardDbAdapter.isDbOutOfDate(ctx)){
+			CardDbAdapter.copyDB(ctx);
+		}
+		
 		this.mCtx = ctx;
 	}
 
@@ -970,5 +983,62 @@ public class CardDbAdapter {
 		 * FTS_VIRTUAL_TABLE instead of KEY_WORD (to search across the entire table,
 		 * but sorting the relevance could be difficult.
 		 */
+	}
+	
+	public static final String	DB_PATH						= "/data/data/com.gelakinetic.mtgfam/databases/";
+	public static final String	DB_NAME						= "data";
+
+	public static boolean isDbOutOfDate(Context ctx){
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ctx);
+		File f = new File(DB_PATH, DB_NAME);
+		int dbVersion = preferences.getInt("databaseVersion", -1);
+		if (!f.exists() || f.length() < 1048576 || dbVersion < CardDbAdapter.DATABASE_VERSION) {
+			return true;
+		}		
+		return false;
+	}
+	
+	public static void copyDB(Context ctx) {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ctx);
+		SharedPreferences.Editor editor = preferences.edit();
+
+		try {
+			File folder = new File(DB_PATH);
+			if (!folder.exists()) {
+				folder.mkdir();
+			}
+			File db = new File(folder, DB_NAME);
+			if (db.exists()) {
+				db.delete();
+				editor.putString("lastUpdate", "");
+				editor.putInt("databaseVersion", -1);
+				editor.commit();
+			}
+			if (!db.exists()) {
+
+				GZIPInputStream gis = new GZIPInputStream(ctx.getResources().openRawResource(R.raw.db));
+				FileOutputStream fos = new FileOutputStream(db);
+
+				byte[] buffer = new byte[1024];
+				int length;
+				while ((length = gis.read(buffer)) > 0) {
+					fos.write(buffer, 0, length);
+				}
+
+				editor.putInt("databaseVersion", CardDbAdapter.DATABASE_VERSION);
+				editor.commit();
+
+				// Close the streams
+				fos.flush();
+				fos.close();
+				gis.close();
+			}
+		}
+		catch (NotFoundException e) {
+		}
+		catch (IOException e) {
+		}
+		catch (Exception e) {
+		}
 	}
 }

@@ -68,7 +68,6 @@ public class CardSearchProvider extends ContentProvider {
 
 	@Override
 	public boolean onCreate() {
-		// mDictionary = new DictionaryDatabase(getContext());
 		mDbAdapter = new CardDbAdapter(getContext());
 		mDbAdapter.open();
 		return true;

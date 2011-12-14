@@ -20,11 +20,9 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 package com.gelakinetic.mtgfam;
 
 import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.PrintWriter; 
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.MalformedURLException;
@@ -44,7 +42,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.content.res.Resources.NotFoundException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -61,8 +58,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class MainActivity extends Activity implements Runnable {
-	private static final String	DB_PATH						= "/data/data/com.gelakinetic.mtgfam/databases/";
-	private static final String	DB_NAME						= "data";
 	private static final int		DBFROMAPK					= 0;
 	private static final int		OTAPATCH					= 1;
 	private static final int		APPLYINGPATCH			= 3;
@@ -157,9 +152,7 @@ public class MainActivity extends Activity implements Runnable {
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-		File f = new File(DB_PATH, DB_NAME);
-		int dbVersion = preferences.getInt("databaseVersion", -1);
-		if (!f.exists() || dbVersion != CardDbAdapter.DATABASE_VERSION) {
+		if(CardDbAdapter.isDbOutOfDate((Context)this)){
 			startThread(DBFROMAPK);
 		}
 		else {
@@ -347,7 +340,7 @@ public class MainActivity extends Activity implements Runnable {
 	public void run() {
 		try {
 			if (threadType == DBFROMAPK) {
-				copyDB();
+				CardDbAdapter.copyDB(mCtx);
 				handler.sendEmptyMessage(DBFROMAPK);
 			}
 			else if (threadType == OTAPATCH) {
@@ -535,52 +528,6 @@ public class MainActivity extends Activity implements Runnable {
 
 	void parseTCGNames() {
 		JsonParser.readTCGNameJsonStream(this, mDbHelper);
-	}
-
-	private void copyDB() {
-		SharedPreferences.Editor editor = preferences.edit();
-
-		if (mDbHelper != null) {
-			mDbHelper.close();
-		}
-		try {
-			File folder = new File(DB_PATH);
-			if (!folder.exists()) {
-				folder.mkdir();
-			}
-			File db = new File(folder, DB_NAME);
-			if (db.exists()) {
-				db.delete();
-				editor.putString("lastUpdate", "");
-				editor.putInt("databaseVersion", -1);
-				editor.commit();
-			}
-			if (!db.exists()) {
-
-				GZIPInputStream gis = new GZIPInputStream(getResources().openRawResource(R.raw.db));
-				FileOutputStream fos = new FileOutputStream(db);
-
-				byte[] buffer = new byte[1024];
-				int length;
-				while ((length = gis.read(buffer)) > 0) {
-					fos.write(buffer, 0, length);
-				}
-
-				editor.putInt("databaseVersion", CardDbAdapter.DATABASE_VERSION);
-				editor.commit();
-
-				// Close the streams
-				fos.flush();
-				fos.close();
-				gis.close();
-			}
-		}
-		catch (NotFoundException e) {
-		}
-		catch (IOException e) {
-		}
-		catch (Exception e) {
-		}
 	}
 
 	public void cardAdded() {

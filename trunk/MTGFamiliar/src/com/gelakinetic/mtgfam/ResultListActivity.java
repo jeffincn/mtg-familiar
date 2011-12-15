@@ -89,16 +89,21 @@ public class ResultListActivity extends ListActivity {
 
 		Bundle extras = intent.getExtras();
 
+		preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean consolidate = preferences.getBoolean("consolidateSearch", false);
+		
 		if (Intent.ACTION_VIEW.equals(intent.getAction())) {
 			// handles a click on a search suggestion; launches activity to show word
 			Uri u = intent.getData();
 			id = Long.parseLong(u.getLastPathSegment());
-			c = mDbHelper.fetchCard(id, null);
+			String name = mDbHelper.getNameFromId(id);
+			c = mDbHelper.Search(name, null, null, "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
+					CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, true, returnTypes, false, null, consolidate);
 		}
 		else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
 			String query = intent.getStringExtra(SearchManager.QUERY);
 			c = mDbHelper.Search(query, null, null, "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-					CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, true, returnTypes, false, null);
+					CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, true, returnTypes, false, null, consolidate);
 		}
 		else if ((id = extras.getLong("id")) != 0L) {
 			c = mDbHelper.fetchCard(id, null);
@@ -120,7 +125,7 @@ public class ResultListActivity extends ListActivity {
 					extras.getFloat(SearchActivity.TOU_CHOICE), extras.getString(SearchActivity.TOU_LOGIC),
 					extras.getInt(SearchActivity.CMC), extras.getString(SearchActivity.CMC_LOGIC),
 					extras.getString(SearchActivity.FORMAT), extras.getString(SearchActivity.RARITY),
-					extras.getString(SearchActivity.FLAVOR), extras.getString(SearchActivity.ARTIST), true, returnTypes, false, null);
+					extras.getString(SearchActivity.FLAVOR), extras.getString(SearchActivity.ARTIST), true, returnTypes, false, null, consolidate);
 		}
 
 		if (c == null || c.getCount() == 0) {
@@ -198,8 +203,6 @@ public class ResultListActivity extends ListActivity {
 	}
 
 	private void fillData(Cursor c) {
-
-		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		ArrayList<String> fromList = new ArrayList<String>();
 		ArrayList<Integer> toList = new ArrayList<Integer>();

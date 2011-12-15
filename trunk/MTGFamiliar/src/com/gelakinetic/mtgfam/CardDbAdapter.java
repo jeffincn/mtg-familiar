@@ -83,6 +83,8 @@ public class CardDbAdapter {
 	public static final String	KEY_MULTIVERSEID							= "multiverseID";
 	public static final String	KEY_RULINGS										= "rulings";
 
+	public static final String[] KEYS = {KEY_ID, KEY_NAME, KEY_SET, KEY_TYPE, KEY_ABILITY, KEY_COLOR, KEY_MANACOST, KEY_CMC, KEY_POWER, KEY_TOUGHNESS, KEY_RARITY, KEY_LOYALTY, KEY_FLAVOR, KEY_ARTIST, KEY_NUMBER, KEY_MULTIVERSEID, KEY_RULINGS};
+
 	public static final String	KEY_CODE											= "code";
 	public static final String	KEY_CODE_MTGI									= "code_mtgi";
 	public static final String	KEY_NAME_TCGPLAYER						= "name_tcgplayer";
@@ -95,39 +97,39 @@ public class CardDbAdapter {
 	private SQLiteDatabase			mDb;
 
 	private static final String	DATABASE_CREATE_CARDS					= "create table " + DATABASE_TABLE_CARDS + "(" + KEY_ID
-																																+ " integer primary key autoincrement, " + KEY_NAME
-																																+ " text not null, " + KEY_SET + " text not null, "
-																																+ KEY_TYPE + " text not null, " + KEY_RARITY
-																																+ " integer, " + KEY_MANACOST + " text, " + KEY_CMC
-																																+ " integer not null, " + KEY_POWER + " real, "
-																																+ KEY_TOUGHNESS + " real, " + KEY_LOYALTY
-																																+ " integer, " + KEY_ABILITY + " text, " + KEY_FLAVOR
-																																+ " text, " + KEY_ARTIST + " text, " + KEY_NUMBER
-																																+ " text, " + KEY_MULTIVERSEID + " integer not null, "
-																																+ KEY_COLOR + " text not null, " + KEY_RULINGS
-																																+ " text);";
+	+ " integer primary key autoincrement, " + KEY_NAME
+	+ " text not null, " + KEY_SET + " text not null, "
+	+ KEY_TYPE + " text not null, " + KEY_RARITY
+	+ " integer, " + KEY_MANACOST + " text, " + KEY_CMC
+	+ " integer not null, " + KEY_POWER + " real, "
+	+ KEY_TOUGHNESS + " real, " + KEY_LOYALTY
+	+ " integer, " + KEY_ABILITY + " text, " + KEY_FLAVOR
+	+ " text, " + KEY_ARTIST + " text, " + KEY_NUMBER
+	+ " text, " + KEY_MULTIVERSEID + " integer not null, "
+	+ KEY_COLOR + " text not null, " + KEY_RULINGS
+	+ " text);";
 
 	private static final String	DATABASE_CREATE_SETS					= "create table " + DATABASE_TABLE_SETS + "(" + KEY_ID
-																																+ " integer primary key autoincrement, " + KEY_NAME
-																																+ " text not null, " + KEY_CODE
-																																+ " text not null unique, " + KEY_CODE_MTGI
-																																+ " text not null, " + KEY_NAME_TCGPLAYER + " text, "
-																																+ KEY_DATE + " integer);";
+	+ " integer primary key autoincrement, " + KEY_NAME
+	+ " text not null, " + KEY_CODE
+	+ " text not null unique, " + KEY_CODE_MTGI
+	+ " text not null, " + KEY_NAME_TCGPLAYER + " text, "
+	+ KEY_DATE + " integer);";
 
 	private static final String	DATABASE_CREATE_FORMATS				= "create table " + DATABASE_TABLE_FORMATS + "(" + KEY_ID
-																																+ " integer primary key autoincrement, " + KEY_NAME
-																																+ " text not null);";
+	+ " integer primary key autoincrement, " + KEY_NAME
+	+ " text not null);";
 
 	private static final String	DATABASE_CREATE_LEGAL_SETS		= "create table " + DATABASE_TABLE_LEGAL_SETS + "("
-																																+ KEY_ID + " integer primary key autoincrement, "
-																																+ KEY_SET + " text not null, " + KEY_FORMAT
-																																+ " text not null);";
+	+ KEY_ID + " integer primary key autoincrement, "
+	+ KEY_SET + " text not null, " + KEY_FORMAT
+	+ " text not null);";
 
 	private static final String	DATABASE_CREATE_BANNED_CARDS	= "create table " + DATABASE_TABLE_BANNED_CARDS + "("
-																																+ KEY_ID + " integer primary key autoincrement, "
-																																+ KEY_NAME + " text not null, " + KEY_LEGALITY
-																																+ " integer not null, " + KEY_FORMAT
-																																+ " text not null);";
+	+ KEY_ID + " integer primary key autoincrement, "
+	+ KEY_NAME + " text not null, " + KEY_LEGALITY
+	+ " integer not null, " + KEY_FORMAT
+	+ " text not null);";
 
 	private final Context				mCtx;
 
@@ -148,9 +150,9 @@ public class CardDbAdapter {
 			System.out.print(oldVersion +" to "+newVersion);
 			// Log.w(TAG, "Upgrading database from version " + oldVersion + " to " +
 			// newVersion + ", which will destroy all old data");
-//			db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_CARDS);
-//			db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_SETS);
-//			onCreate(db);
+			//			db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_CARDS);
+			//			db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_SETS);
+			//			onCreate(db);
 		}
 	}
 
@@ -161,11 +163,11 @@ public class CardDbAdapter {
 	 *          the Context within which to work
 	 */
 	public CardDbAdapter(Context ctx) {
-		
+
 		if(CardDbAdapter.isDbOutOfDate(ctx)){
 			CardDbAdapter.copyDB(ctx);
 		}
-		
+
 		this.mCtx = ctx;
 	}
 
@@ -355,7 +357,7 @@ public class CardDbAdapter {
 					KEY_TOUGHNESS, KEY_LOYALTY, KEY_ABILITY, KEY_FLAVOR, KEY_ARTIST, KEY_NUMBER, KEY_COLOR, KEY_MULTIVERSEID };
 		}
 		Cursor mCursor = mDb
-				.query(true, DATABASE_TABLE_CARDS, columns, KEY_ID + "=" + id, null, null, null, KEY_NAME, null);
+		.query(true, DATABASE_TABLE_CARDS, columns, KEY_ID + "=" + id, null, null, null, KEY_NAME, null);
 		if (mCursor != null) {
 			mCursor.moveToFirst();
 		}
@@ -436,7 +438,7 @@ public class CardDbAdapter {
 	public Cursor Search(String cardname, String cardtext, String cardtype, String color, int colorlogic, String sets,
 			float pow_choice, String pow_logic, float tou_choice, String tou_logic, int cmc, String cmcLogic, String formats,
 			String rarity, String flavor, String artist, boolean backface, String[] returnTypes, boolean autocomplete,
-			String groupBy) {
+			String groupBy, boolean consolidate) {
 		Cursor mCursor = null;
 
 		if (cardname != null)
@@ -704,15 +706,15 @@ public class CardDbAdapter {
 
 					if (cSets.getCount() != 0) {
 						statement += "EXISTS (SELECT * FROM " + DATABASE_TABLE_LEGAL_SETS + " WHERE " + DATABASE_TABLE_CARDS + "."
-								+ KEY_SET + " = " + DATABASE_TABLE_LEGAL_SETS + "." + KEY_SET + " AND " + DATABASE_TABLE_LEGAL_SETS
-								+ "." + KEY_FORMAT + " = '" + formatNames[i] + "')";
+						+ KEY_SET + " = " + DATABASE_TABLE_LEGAL_SETS + "." + KEY_SET + " AND " + DATABASE_TABLE_LEGAL_SETS
+						+ "." + KEY_FORMAT + " = '" + formatNames[i] + "')";
 
 						statement += " AND ";
 					}
 					statement += "NOT EXISTS (SELECT * FROM " + DATABASE_TABLE_BANNED_CARDS + " WHERE " + DATABASE_TABLE_CARDS
-							+ "." + KEY_NAME + " = " + DATABASE_TABLE_BANNED_CARDS + "." + KEY_NAME + " AND "
-							+ DATABASE_TABLE_BANNED_CARDS + "." + KEY_FORMAT + " = '" + formatNames[i] + "' AND "
-							+ DATABASE_TABLE_BANNED_CARDS + "." + KEY_LEGALITY + " = " + BANNED + ")";
+					+ "." + KEY_NAME + " = " + DATABASE_TABLE_BANNED_CARDS + "." + KEY_NAME + " AND "
+					+ DATABASE_TABLE_BANNED_CARDS + "." + KEY_FORMAT + " = '" + formatNames[i] + "' AND "
+					+ DATABASE_TABLE_BANNED_CARDS + "." + KEY_LEGALITY + " = " + BANNED + ")";
 
 					if (cSets != null) {
 						cSets.deactivate();
@@ -737,7 +739,34 @@ public class CardDbAdapter {
 		}
 
 		try {
-			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, returnTypes, statement, null, groupBy, null, KEY_NAME, null);
+			String sel = null;
+			for(String s : returnTypes){
+				if(sel==null){
+					sel = DATABASE_TABLE_CARDS +"."+ s;
+				}
+				else{
+					sel += ", " + DATABASE_TABLE_CARDS +"."+s;
+				}
+			}
+			sel += ", " + DATABASE_TABLE_SETS +"."+ KEY_DATE;
+
+			for(String key : KEYS){
+				statement = statement.replace(key, DATABASE_TABLE_CARDS + "." + key);
+			}
+
+			String sql = "SELECT * FROM ( " +
+			"SELECT " + sel +
+			" FROM (" + DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_CARDS + "." + KEY_SET + " = " + DATABASE_TABLE_SETS + "."	+ KEY_CODE + ")" +
+			" WHERE " + statement +
+			" ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " ASC)";
+
+			if(consolidate){
+				sql += " GROUP BY " + KEY_NAME;
+			}
+			else{
+				sql += " ORDER BY " + KEY_NAME;				
+			}
+			mCursor = mDb.rawQuery(sql, null);
 		}
 		catch (SQLiteException e) {
 			return null;
@@ -829,15 +858,15 @@ public class CardDbAdapter {
 	public int checkLegality(String mCardName, String format) {
 		mCardName = mCardName.replace("'", "''");
 		format = format.replace("'", "''"); // Just to be safe; remember Bobby
-																				// Tables
+		// Tables
 		try {
 			// The new way (single query per type, should be much faster) - Alex
 			String sql = "SELECT COALESCE(CASE (SELECT 1 FROM " + DATABASE_TABLE_CARDS + " c INNER JOIN "
-					+ DATABASE_TABLE_LEGAL_SETS + " ls ON ls." + KEY_SET + " = c." + KEY_SET + " WHERE ls." + KEY_FORMAT + " = '"
-					+ format + "' AND c." + KEY_NAME + " = '" + mCardName + "') WHEN 1 THEN NULL ELSE CASE WHEN '" + format
-					+ "' = 'Legacy' " + "THEN NULL WHEN '" + format + "' = 'Vintage' THEN NULL ELSE 1 END END, (SELECT "
-					+ KEY_LEGALITY + " from " + DATABASE_TABLE_BANNED_CARDS + " WHERE " + KEY_NAME + " = '" + mCardName
-					+ "' AND " + KEY_FORMAT + " = '" + format + "'), 0) AS " + KEY_LEGALITY;
+			+ DATABASE_TABLE_LEGAL_SETS + " ls ON ls." + KEY_SET + " = c." + KEY_SET + " WHERE ls." + KEY_FORMAT + " = '"
+			+ format + "' AND c." + KEY_NAME + " = '" + mCardName + "') WHEN 1 THEN NULL ELSE CASE WHEN '" + format
+			+ "' = 'Legacy' " + "THEN NULL WHEN '" + format + "' = 'Vintage' THEN NULL ELSE 1 END END, (SELECT "
+			+ KEY_LEGALITY + " from " + DATABASE_TABLE_BANNED_CARDS + " WHERE " + KEY_NAME + " = '" + mCardName
+			+ "' AND " + KEY_FORMAT + " = '" + format + "'), 0) AS " + KEY_LEGALITY;
 
 			Cursor c = mDb.rawQuery(sql, null);
 			c.moveToFirst();
@@ -984,7 +1013,7 @@ public class CardDbAdapter {
 		 * but sorting the relevance could be difficult.
 		 */
 	}
-	
+
 	public static final String	DB_PATH						= "/data/data/com.gelakinetic.mtgfam/databases/";
 	public static final String	DB_NAME						= "data";
 
@@ -997,7 +1026,7 @@ public class CardDbAdapter {
 		}		
 		return false;
 	}
-	
+
 	public static void copyDB(Context ctx) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ctx);
 		SharedPreferences.Editor editor = preferences.edit();
@@ -1040,5 +1069,21 @@ public class CardDbAdapter {
 		}
 		catch (Exception e) {
 		}
+	}
+
+	public String getNameFromId(long id) {
+		Cursor mCursor = null;
+		String name;
+		String statement = "(" + KEY_ID + " = " + id + ")";
+		try {
+			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID, KEY_NAME }, statement, null, null, null, KEY_ID,
+					null);
+			mCursor.moveToFirst();
+			name = mCursor.getString(mCursor.getColumnIndex(KEY_NAME));
+		}
+		catch (Exception e) {
+			return null;
+		}
+		return name;
 	}
 }

@@ -59,9 +59,14 @@
 
         <CheckBoxPreference
             android:defaultValue="true"
+            android:key="consolidateSearch"
+            android:title="@string/consolidate" android:summary="@string/consolidatetext"/>
+
+        <CheckBoxPreference
+            android:defaultValue="true"
             android:key="setPref"
             android:title="@string/setPreftitle" />
-
+        
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="manacostPref"

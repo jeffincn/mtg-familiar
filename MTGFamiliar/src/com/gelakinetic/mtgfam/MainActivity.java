@@ -42,6 +42,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -54,6 +55,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -65,6 +67,7 @@ public class MainActivity extends Activity implements Runnable {
 	private static final int		EXCEPTION					= 99;
 	private static final int		ABOUTDIALOG				= 0;
 	private static final int		CHANGELOGDIALOG		= 1;
+	private static final int		DONATEDIALOG			= 2;
 	private LinearLayout				search;
 	private LinearLayout				life;
 	private LinearLayout				rng;
@@ -214,7 +217,38 @@ public class MainActivity extends Activity implements Runnable {
 	protected Dialog onCreateDialog(int id) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-		if (id == ABOUTDIALOG) {
+		if (id == DONATEDIALOG){
+			builder.setTitle("Donate to the Devs");
+			builder.setNeutralButton("Thanks Anyway!", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.cancel();
+				}
+			});
+
+			LayoutInflater inflater = getLayoutInflater();
+			View dialoglayout = inflater.inflate(R.layout.about_dialog, (ViewGroup) findViewById(R.id.dialog_layout_root));
+
+			TextView text = (TextView) dialoglayout.findViewById(R.id.aboutfield);
+			text.setText(Html.fromHtml(getString(R.string.donate_to_devs)));
+			text.setMovementMethod(LinkMovementMethod.getInstance());
+			
+			text.setTextSize(15);
+			
+			ImageView paypal = (ImageView)dialoglayout.findViewById(R.id.imageview1);
+			paypal.setImageResource(R.drawable.paypal);
+			paypal.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					Intent myIntent = new Intent(Intent.ACTION_VIEW,
+							Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ALR4TSXWPPHUL"));
+
+							startActivity(myIntent); 
+				}
+			});
+			((ImageView)dialoglayout.findViewById(R.id.imageview2)).setVisibility(View.GONE);
+
+			builder.setView(dialoglayout);
+		}
+		else if (id == ABOUTDIALOG) {
 			// You have to catch the exception because the package stuff is all
 			// run-time
 			if (pInfo != null) {
@@ -286,6 +320,12 @@ public class MainActivity extends Activity implements Runnable {
 				return true;
 			case R.id.aboutapp:
 				showDialog(ABOUTDIALOG);
+				return true;
+			case R.id.whatsnew:
+				showDialog(CHANGELOGDIALOG);
+				return true;
+			case R.id.donate:
+				showDialog(DONATEDIALOG);
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

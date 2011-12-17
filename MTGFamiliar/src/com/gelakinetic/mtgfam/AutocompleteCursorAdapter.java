@@ -49,9 +49,7 @@ public class AutocompleteCursorAdapter extends CursorAdapter {
 
 		Cursor cursor = null;
 		try {
-			cursor = mDbAdapter.Search(filter, null, null, "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-					CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, true, new String[] { CardDbAdapter.KEY_ID,
-							CardDbAdapter.KEY_NAME }, true, CardDbAdapter.KEY_NAME, true);
+			cursor = mDbAdapter.autoComplete(filter);
 		}
 		catch (Exception e) {
 			return null;

@@ -434,11 +434,32 @@ public class CardDbAdapter {
 
 		return mDb.update(DATABASE_TABLE_CARDS, args, KEY_ID + "=" + id, null) > 0;
 	}
+	
+	public Cursor autoComplete(String cardname)
+	{
+		Cursor mCursor = null;
+		
+		if(cardname != null)
+			cardname = cardname.replace("'", "''").trim();
+		
+		String sql = "SELECT MIN(" + KEY_ID + ") AS " + KEY_ID + ", " + KEY_NAME + " FROM " + DATABASE_TABLE_CARDS + " WHERE " + KEY_NAME +
+				" LIKE '" + cardname + "%' GROUP BY " + KEY_NAME + " ORDER BY " + KEY_NAME;
+		try {
+			mCursor = mDb.rawQuery(sql, null);
+		}
+		catch (SQLiteException ex) {
+			return null;
+		}
+		if(mCursor != null) {
+			mCursor.moveToFirst();
+		}
+		
+		return mCursor;
+	}
 
 	public Cursor Search(String cardname, String cardtext, String cardtype, String color, int colorlogic, String sets,
 			float pow_choice, String pow_logic, float tou_choice, String tou_logic, int cmc, String cmcLogic, String formats,
-			String rarity, String flavor, String artist, boolean backface, String[] returnTypes, boolean autocomplete,
-			String groupBy, boolean consolidate) {
+			String rarity, String flavor, String artist, boolean backface, String[] returnTypes, boolean consolidate) {
 		Cursor mCursor = null;
 
 		if (cardname != null)
@@ -452,122 +473,94 @@ public class CardDbAdapter {
 		if (artist != null)
 			artist = artist.replace("'", "''").trim();
 
-		String statement = null;
+		String statement = " WHERE 1=1";
 
 		if (cardname != null) {
-			if (autocomplete) {
-				statement = "(" + KEY_NAME + " LIKE '" + cardname + "%')";
-			}
-			else {
-				String[] nameParts = cardname.split(" ");
-				for (String s : nameParts) {
-					if (statement == null) {
-						statement = "(" + KEY_NAME + " LIKE '%" + s + "%')";
-					}
-					else {
-						statement += " AND (" + KEY_NAME + " LIKE '%" + s + "%')";
-					}
-				}
+			String[] nameParts = cardname.split(" ");
+			for (String s : nameParts) {
+				statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_NAME + " LIKE '%" + s + "%')";
 			}
 		}
 
 		if (cardtext != null) {
-			if (statement == null) {
-				statement = "(" + KEY_ABILITY + " LIKE '%" + cardtext + "%')";
-			}
-			else {
-				statement += " AND (" + KEY_ABILITY + " LIKE '%" + cardtext + "%')";
-			}
+			statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " LIKE '%" + cardtext + "%')";
 		}
 
 		if (cardtype != null) {
 			String[] types = cardtype.split(" ");
-			if (statement == null) {
-				statement = "(";
-			}
-			else {
-				statement += " AND (";
-			}
+			statement += " AND (";
 
-			boolean firstType = false;
+			boolean firstType = true;
 			for (String s : types) {
 				if (firstType) {
+					firstType = false;
+				}
+				else {
 					statement += " AND ";
 				}
-				statement += KEY_TYPE + " LIKE '%" + s + "%'";
-				firstType = true;
+				statement += DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%'";
 			}
 
 			statement += ")";
 		}
 
 		if (flavor != null) {
-			if (statement == null) {
-				statement = "(" + KEY_FLAVOR + " LIKE '%" + flavor + "%')";
-			}
-			else {
-				statement += " AND (" + KEY_FLAVOR + " LIKE '%" + flavor + "%')";
-			}
+			statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_FLAVOR + " LIKE '%" + flavor + "%')";
 		}
 
 		if (artist != null) {
-			if (statement == null) {
-				statement = "(" + KEY_ARTIST + " LIKE '%" + artist + "%')";
-			}
-			else {
-				statement += " AND (" + KEY_ARTIST + " LIKE '%" + artist + "%')";
-			}
+			statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_ARTIST + " LIKE '%" + artist + "%')";
 		}
 
 		if (!(color.equals("wubrgl") || (color.equals("WUBRGL") && colorlogic == 0))) {
-			boolean firstprint = true;
-
-			if (statement == null) {
-				statement = "((";
-			}
-			else {
-				statement += " AND ((";
-			}
+			boolean firstPrint = true;
+			statement += " AND ((";
 
 			// Can't contain these colors
 			for (byte b : color.getBytes()) {
 				char c = (char) b;
 
 				if (c > 'a') {
-					if (firstprint == false) {
-						statement += " AND ";
-					}
-					firstprint = false;
-
-					if (c == 'l' || c == 'L') {
-						statement += KEY_COLOR + " NOT GLOB '[CLA]'";
+					if (firstPrint) {
+						firstPrint = false;
 					}
 					else {
-						statement += KEY_COLOR + " NOT LIKE '%" + Character.toUpperCase(c) + "%'";
+						statement += " AND ";
+					}
+
+					if (c == 'l' || c == 'L') {
+						statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR + " NOT GLOB '[CLA]'";
+					}
+					else {
+						statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR + " NOT LIKE '%" + Character.toUpperCase(c) + "%'";
 					}
 				}
 			}
 
 			statement += ") AND (";
-			firstprint = true;
+			firstPrint = true;
 
 			// Might contain these colors
 			for (byte b : color.getBytes()) {
 				char c = (char) b;
 				if (c < 'a') {
-					if (firstprint == false && colorlogic == 1) {
-						statement += " AND ";
-					}
-					else if (firstprint == false) {
-						statement += " OR ";
-					}
-					firstprint = false;
-
-					if (c == 'l' || c == 'L') {
-						statement += KEY_COLOR + " GLOB '[CLA]'";
+					if (firstPrint) {
+						firstPrint = false;
 					}
 					else {
-						statement += KEY_COLOR + " LIKE '%" + c + "%'";
+						if (colorlogic == 1) {
+							statement += " AND ";
+						}
+						else {
+							statement += " OR ";
+						}
+					}
+
+					if (c == 'l' || c == 'L') {
+						statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR + " GLOB '[CLA]'";
+					}
+					else {
+						statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR + " LIKE '%" + c + "%'";
 					}
 
 				}
@@ -576,12 +569,7 @@ public class CardDbAdapter {
 		}
 
 		if (sets != null) {
-			if (statement == null) {
-				statement = "(";
-			}
-			else {
-				statement += " AND (";
-			}
+			statement += " AND (";
 
 			boolean first = true;
 
@@ -592,80 +580,60 @@ public class CardDbAdapter {
 				else {
 					statement += " OR ";
 				}
-				statement += KEY_SET + "=\"" + s + "\"";
+				statement += DATABASE_TABLE_CARDS + "." + KEY_SET + " = '" + s + "'";
 			}
 
 			statement += ")";
 		}
 
 		if (pow_choice != NOONECARES) {
-			if (statement == null) {
-				statement = "(";
-			}
-			else {
-				statement += " AND (";
-			}
+			statement += " AND (";
 
 			if (pow_choice > STAR) {
-				statement += KEY_POWER + " " + pow_logic + " " + pow_choice;
+				statement += DATABASE_TABLE_CARDS + "." + KEY_POWER + " " + pow_logic + " " + pow_choice;
 				if (pow_logic.equals("<")) {
-					statement += " AND " + KEY_POWER + " > " + STAR;
+					statement += " AND " + DATABASE_TABLE_CARDS + "." + KEY_POWER + " > " + STAR;
 				}
 			}
 			else if (pow_logic.equals("=")) {
-				statement += KEY_POWER + " " + pow_logic + " " + pow_choice;
+				statement += DATABASE_TABLE_CARDS + "." + KEY_POWER + " " + pow_logic + " " + pow_choice;
 			}
 			statement += ")";
 		}
 
 		if (tou_choice != NOONECARES) {
-			if (statement == null) {
-				statement = "(";
-			}
-			else {
-				statement += " AND (";
-			}
+			statement += " AND (";
 
 			if (tou_choice > STAR) {
-				statement += KEY_TOUGHNESS + " " + tou_logic + " " + tou_choice;
+				statement += DATABASE_TABLE_CARDS + "." + KEY_TOUGHNESS + " " + tou_logic + " " + tou_choice;
 				if (tou_logic.equals("<")) {
-					statement += " AND " + KEY_TOUGHNESS + " > " + STAR;
+					statement += " AND " + DATABASE_TABLE_CARDS + "." + KEY_TOUGHNESS + " > " + STAR;
 				}
 			}
 			else if (tou_logic.equals("=")) {
-				statement += KEY_TOUGHNESS + " " + tou_logic + " " + tou_choice;
+				statement += DATABASE_TABLE_CARDS + "." + KEY_TOUGHNESS + " " + tou_logic + " " + tou_choice;
 			}
 			statement += ")";
 		}
 
 		if (cmc != -1) {
-			if (statement == null) {
-				statement = "(";
-			}
-			else {
-				statement += " AND (";
-			}
+			statement += " AND (";
 
-			statement += KEY_CMC + " " + cmcLogic + " " + cmc + ")";
+			statement += DATABASE_TABLE_CARDS + "." + KEY_CMC + " " + cmcLogic + " " + cmc + ")";
 		}
 
 		if (rarity != null) {
-			if (statement == null) {
-				statement = "(";
-			}
-			else {
-				statement += " AND (";
-			}
+			statement += " AND (";
 
-			boolean firstprint = false;
+			boolean firstPrint = true;
 			for (int i = 0; i < rarity.length(); i++) {
-				if (!firstprint) {
-					statement += KEY_RARITY + " = " + (int) rarity.toUpperCase().charAt(i) + "";
-					firstprint = true;
+				if (firstPrint) {
+					firstPrint = false;
 				}
 				else {
-					statement += " OR " + KEY_RARITY + " = " + (int) rarity.toUpperCase().charAt(i) + "";
+					statement += " OR ";
 				}
+				statement += DATABASE_TABLE_CARDS + "." + KEY_RARITY + " = " + (int) rarity.toUpperCase().charAt(i) + "";
 			}
 			statement += ")";
 		}
@@ -682,12 +650,7 @@ public class CardDbAdapter {
 			c.deactivate();
 			c.close();
 
-			if (statement == null) {
-				statement = "(";
-			}
-			else {
-				statement += " AND (";
-			}
+			statement += " AND (";
 
 			boolean first = true;
 
@@ -726,15 +689,11 @@ public class CardDbAdapter {
 		}
 
 		if (!backface) {
-			if (statement == null) {
-				statement = "(" + KEY_NUMBER + " NOT LIKE '%b%')";
-			}
-			else {
-				statement += " AND (" + KEY_NUMBER + " NOT LIKE '%b%')";
-			}
+			statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_NUMBER + " NOT LIKE '%b%')";
 		}
 
-		if (statement == null) {
+		if (statement.equals(" WHERE 1=1")) {
+			//If the statement is just this, it means we added nothing
 			return null;
 		}
 
@@ -742,29 +701,26 @@ public class CardDbAdapter {
 			String sel = null;
 			for(String s : returnTypes){
 				if(sel==null){
-					sel = DATABASE_TABLE_CARDS +"."+ s;
+					sel = DATABASE_TABLE_CARDS + "." + s;
 				}
 				else{
-					sel += ", " + DATABASE_TABLE_CARDS +"."+s;
+					sel += ", " + DATABASE_TABLE_CARDS + "." + s;
 				}
 			}
-			sel += ", " + DATABASE_TABLE_SETS +"."+ KEY_DATE;
+			sel += ", " + DATABASE_TABLE_SETS + "." + KEY_DATE;
 
-			for(String key : KEYS){
-				statement = statement.replace(key, DATABASE_TABLE_CARDS + "." + key);
-			}
-
-			String sql = "SELECT * FROM ( " +
+			String sql = "SELECT * FROM (" +
 			"SELECT " + sel +
-			" FROM (" + DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_CARDS + "." + KEY_SET + " = " + DATABASE_TABLE_SETS + "."	+ KEY_CODE + ")" +
-			" WHERE " + statement +
+			" FROM (" + DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_CARDS + "." + KEY_SET +
+			" = " + DATABASE_TABLE_SETS + "."	+ KEY_CODE + ")" +
+			statement + //Contains "WHERE" now
 			" ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " ASC)";
 
-			if(consolidate){
+			if (consolidate) {
 				sql += " GROUP BY " + KEY_NAME;
 			}
-			else{
-				sql += " ORDER BY " + KEY_NAME;				
+			else {
+				sql += " ORDER BY " + KEY_NAME;
 			}
 			mCursor = mDb.rawQuery(sql, null);
 		}

@@ -458,7 +458,7 @@ public class CardDbAdapter {
 	}
 
 	public Cursor Search(String cardname, String cardtext, String cardtype, String color, int colorlogic, String sets,
-			float pow_choice, String pow_logic, float tou_choice, String tou_logic, int cmc, String cmcLogic, String formats,
+			float pow_choice, String pow_logic, float tou_choice, String tou_logic, int cmc, String cmcLogic, String format,
 			String rarity, String flavor, String artist, boolean backface, String[] returnTypes, boolean consolidate) {
 		Cursor mCursor = null;
 
@@ -637,57 +637,21 @@ public class CardDbAdapter {
 			}
 			statement += ")";
 		}
-
-		if (formats != null) {
-
-			Cursor c = fetchAllFormats();
-			String[] formatNames = new String[c.getCount()];
-			c.moveToFirst();
-			for (int i = 0; i < c.getCount(); i++) {
-				formatNames[i] = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
-				c.moveToNext();
+		
+		String tbl = DATABASE_TABLE_CARDS;
+		if(format != null){
+			if(!(format.equals("Legacy") || format.equals("Vintage"))){
+				tbl = "("+DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_LEGAL_SETS + " ON " + DATABASE_TABLE_CARDS +"."+ KEY_SET +"="+ DATABASE_TABLE_LEGAL_SETS+"."+KEY_SET +" AND "+ DATABASE_TABLE_LEGAL_SETS +"."+KEY_FORMAT +"='"+ format +"')";
 			}
-			c.deactivate();
-			c.close();
-
-			statement += " AND (";
-
-			boolean first = true;
-
-			for (int i = 0; i < formatNames.length; i++) {
-				if (formats.contains(formatNames[i])) {
-					if (first) {
-						first = false;
-					}
-					else {
-						statement += " AND ";
-					}
-
-					// get all sets in the format
-					Cursor cSets = mDb.query(DATABASE_TABLE_LEGAL_SETS, new String[] { KEY_ID, KEY_SET }, KEY_FORMAT + " = '"
-							+ formatNames[i] + "'", null, null, null, null);
-
-					if (cSets.getCount() != 0) {
-						statement += "EXISTS (SELECT * FROM " + DATABASE_TABLE_LEGAL_SETS + " WHERE " + DATABASE_TABLE_CARDS + "."
-						+ KEY_SET + " = " + DATABASE_TABLE_LEGAL_SETS + "." + KEY_SET + " AND " + DATABASE_TABLE_LEGAL_SETS
-						+ "." + KEY_FORMAT + " = '" + formatNames[i] + "')";
-
-						statement += " AND ";
-					}
-					statement += "NOT EXISTS (SELECT * FROM " + DATABASE_TABLE_BANNED_CARDS + " WHERE " + DATABASE_TABLE_CARDS
-					+ "." + KEY_NAME + " = " + DATABASE_TABLE_BANNED_CARDS + "." + KEY_NAME + " AND "
-					+ DATABASE_TABLE_BANNED_CARDS + "." + KEY_FORMAT + " = '" + formatNames[i] + "' AND "
-					+ DATABASE_TABLE_BANNED_CARDS + "." + KEY_LEGALITY + " = " + BANNED + ")";
-
-					if (cSets != null) {
-						cSets.deactivate();
-						cSets.close();
-					}
-				}
+			else{
+				statement += "AND NOT " + KEY_SET +"= 'UNH' AND NOT " + KEY_SET +"= 'UG'";
 			}
-			statement += ")";
+			statement += " AND NOT EXISTS (SELECT * FROM " + DATABASE_TABLE_BANNED_CARDS + " WHERE " + DATABASE_TABLE_CARDS
+			+ "." + KEY_NAME + " = " + DATABASE_TABLE_BANNED_CARDS + "." + KEY_NAME + " AND "
+			+ DATABASE_TABLE_BANNED_CARDS + "." + KEY_FORMAT + " = '" + format + "' AND "
+			+ DATABASE_TABLE_BANNED_CARDS + "." + KEY_LEGALITY + " = " + BANNED + ")";
 		}
-
+				
 		if (!backface) {
 			statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_NUMBER + " NOT LIKE '%b%')";
 		}
@@ -711,7 +675,7 @@ public class CardDbAdapter {
 
 			String sql = "SELECT * FROM (" +
 			"SELECT " + sel +
-			" FROM (" + DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_CARDS + "." + KEY_SET +
+			" FROM (" + tbl + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_CARDS + "." + KEY_SET +
 			" = " + DATABASE_TABLE_SETS + "."	+ KEY_CODE + ")" +
 			statement + //Contains "WHERE" now
 			" ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " ASC)";

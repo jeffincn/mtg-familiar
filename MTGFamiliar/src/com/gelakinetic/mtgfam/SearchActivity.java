@@ -92,7 +92,6 @@ public class SearchActivity extends Activity {
 	private Spinner								cmcChoice;
 	private Button								formatButton;
 	private String[]							formatNames;
-	private boolean[]							formatChecked;
 	private Button								rarityButton;
 	private String[]							rarityNames;
 	private boolean[]							rarityChecked;
@@ -101,6 +100,7 @@ public class SearchActivity extends Activity {
 	private Dialog								rarityDialog;
 	private EditText							flavorfield;
 	private EditText							artistfield;
+	private int	selectedFormat;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -283,21 +283,25 @@ public class SearchActivity extends Activity {
 			}
 			c.deactivate();
 			c.close();
-			formatChecked = new boolean[formatNames.length];
 		}
 		else {
 			formatNames = new String[0];
-			formatChecked = new boolean[0];
 		}
 		Resources res = getResources();
 		rarityNames = res.getStringArray(R.array.rarities);
 		rarityChecked = new boolean[rarityNames.length];
+		
+		selectedFormat = -1;
 
 		setDialog = new AlertDialog.Builder(this).setTitle("Sets")
 				.setMultiChoiceItems(setNames, setChecked, new DialogSelectionClickHandler())
 				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
 		formatDialog = new AlertDialog.Builder(this).setTitle("Formats")
-				.setMultiChoiceItems(formatNames, formatChecked, new DialogSelectionClickHandler())
+				.setSingleChoiceItems(formatNames, selectedFormat, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						selectedFormat = which;
+					}
+				})
 				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
 		rarityDialog = new AlertDialog.Builder(this).setTitle("Rarities")
 				.setMultiChoiceItems(rarityNames, rarityChecked, new DialogSelectionClickHandler())
@@ -317,10 +321,8 @@ public class SearchActivity extends Activity {
 		formatDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 			public void onDismiss(DialogInterface arg0) {
 				formatButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
-				for (int i = 0; i < formatChecked.length; i++) {
-					if (formatChecked[i]) {
-						formatButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
-					}
+				if (selectedFormat != -1) {
+					formatButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
 				}
 			}
 		});
@@ -421,15 +423,8 @@ public class SearchActivity extends Activity {
 		}
 
 		String fmt = null;
-		for (int i = 0; i < formatChecked.length; i++) {
-			if (formatChecked[i]) {
-				if (fmt == null) {
-					fmt = formatNames[i];
-				}
-				else {
-					fmt += "-" + formatNames[i];
-				}
-			}
+		if(selectedFormat != -1){
+			fmt = formatNames[selectedFormat];
 		}
 
 		String rarity = null;
@@ -598,14 +593,13 @@ public class SearchActivity extends Activity {
 				touLogic.setSelection(0);
 				touChoice.setSelection(0);
 				cmcLogic.setSelection(0);
+				cmcLogic.setSelection(1); // CMC should default to <
 				cmcChoice.setSelection(0);
 
 				for (int i = 0; i < setChecked.length; i++) {
 					setChecked[i] = false;
 				}
-				for (int i = 0; i < formatChecked.length; i++) {
-					formatChecked[i] = false;
-				}
+				selectedFormat = -1;
 				for (int i = 0; i < rarityChecked.length; i++) {
 					rarityChecked[i] = false;
 				}
@@ -617,8 +611,12 @@ public class SearchActivity extends Activity {
 						.setMultiChoiceItems(setNames, setChecked, new DialogSelectionClickHandler())
 						.setPositiveButton("OK", new DialogButtonClickHandler()).create();
 				formatDialog = new AlertDialog.Builder(this).setTitle("Formats")
-						.setMultiChoiceItems(formatNames, formatChecked, new DialogSelectionClickHandler())
-						.setPositiveButton("OK", new DialogButtonClickHandler()).create();
+				.setSingleChoiceItems(formatNames, selectedFormat, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						selectedFormat = which;
+					}
+				})
+				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
 				rarityDialog = new AlertDialog.Builder(this).setTitle("Rarities")
 						.setMultiChoiceItems(rarityNames, rarityChecked, new DialogSelectionClickHandler())
 						.setPositiveButton("OK", new DialogButtonClickHandler()).create();
@@ -637,10 +635,8 @@ public class SearchActivity extends Activity {
 				formatDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 					public void onDismiss(DialogInterface arg0) {
 						formatButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
-						for (int i = 0; i < formatChecked.length; i++) {
-							if (formatChecked[i]) {
-								formatButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
-							}
+						if(selectedFormat != -1){
+							formatButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
 						}
 					}
 				});

@@ -5,7 +5,7 @@
     android:paddingBottom="5dip"
     android:paddingLeft="5dip"
     android:paddingRight="5dip"
-    android:paddingTop="5dip" >
+    android:paddingTop="5dip">
 
     <TextView
         android:id="@+id/player_name"
@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="Player 1" />
+        android:text="Player 1" android:gravity="center"/>
 
     <!-- Health and +/- buttons -->
 

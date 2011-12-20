@@ -231,22 +231,13 @@ public class NPlayerLifeActivity extends Activity {
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 
-		if (dm.xdpi < 170) {
-			if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-				rla = new PlayerAdapter(this, R.layout.life_counter_player_col_small, players);
-			}
-			else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-				rla = new PlayerAdapter(this, R.layout.life_counter_player_row_small, players);
-			}
+		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			rla = new PlayerAdapter(this, R.layout.life_counter_player_col, players);
 		}
-		else {
-			if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-				rla = new PlayerAdapter(this, R.layout.life_counter_player_col, players);
-			}
-			else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-				rla = new PlayerAdapter(this, R.layout.life_counter_player_row, players);
-			}
+		else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+			rla = new PlayerAdapter(this, R.layout.life_counter_player_row, players);
 		}
+		
 		if (lifeData == null || lifeData.length() == 0) {
 			rla.players.add(new Player("Player 1", INITIAL_LIFE, INITIAL_POISON, (Context) this));
 			rla.players.add(new Player("Player 2", INITIAL_LIFE, INITIAL_POISON, (Context) this));

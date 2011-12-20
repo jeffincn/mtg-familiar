@@ -19,7 +19,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <item
+    <item android:id="@+id/quittosearch" android:title="@string/quittosearch"></item><item
         android:id="@+id/image"
         android:title="@string/image"/>
 
@@ -34,6 +34,6 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <item
         android:id="@+id/gatherer"
         android:title="@string/gatherer"></item>
-    <item android:id="@+id/quittosearch" android:title="@string/quittosearch"></item>
+    
 
 </menu>

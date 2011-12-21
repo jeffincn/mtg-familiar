@@ -1,21 +1,30 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:weightSum="1" android:gravity="center_vertical" android:layout_height="fill_parent" android:paddingRight="5dp" android:paddingLeft="5dp" android:paddingBottom="2dp" android:paddingTop="2dp">
+    android:paddingBottom="2dp"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:paddingTop="2dp"
+    android:weightSum="1" >
 
     <!-- Health and +/- buttons -->
 
     <LinearLayout
         android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight=".6"
+        android:gravity="center"
         android:orientation="vertical"
-        android:paddingRight="5dp" android:gravity="center" android:layout_weight=".6" android:layout_height="fill_parent">
+        android:paddingRight="5dp" >
 
         <TextView
             android:id="@+id/player_name"
+            style="@style/text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Player 1"
-            style="@style/text" />
+            android:text="Player 1" />
 
         <!-- +1/+5 buttons -->
 
@@ -27,8 +36,8 @@
             <Button
                 android:id="@+id/player_plus1"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="+1"
                 android:textSize="20sp" />
 
@@ -46,7 +55,8 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" android:layout_marginBottom="-8dp">
+            android:layout_marginBottom="-8dp"
+            android:orientation="horizontal" >
 
             <Button
                 android:id="@+id/player_minus1"
@@ -61,30 +71,38 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="-5" android:textSize="20sp"/>
+                android:text="-5"
+                android:textSize="20sp" />
         </LinearLayout>
 
         <!-- Health display -->
 
         <TextView
             android:id="@+id/player_readout"
-            android:layout_width="fill_parent"
-            android:gravity="center"
             style="@style/text"
+            android:layout_width="fill_parent"
+            android:layout_marginBottom="-8dp"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:paddingTop="-5dp"
             android:text="20"
-            android:maxLines="1" android:textSize="63dp" android:paddingTop="-5dp" android:includeFontPadding="false" android:layout_marginBottom="-8dp"/>
+            android:textSize="63dp" />
     </LinearLayout>
     <!-- History -->
 
     <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight=".4"
         android:background="@drawable/textview_backdrop"
-        android:orientation="vertical" android:layout_height="fill_parent" android:layout_width="0dp" android:layout_weight=".4">
+        android:orientation="vertical" >
 
         <ListView
             android:id="@+id/player_history"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:padding="1dp">
+            android:padding="1dp" >
         </ListView>
     </LinearLayout>
 

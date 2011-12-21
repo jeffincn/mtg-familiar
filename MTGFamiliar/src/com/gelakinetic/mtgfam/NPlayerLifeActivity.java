@@ -316,11 +316,12 @@ public class NPlayerLifeActivity extends Activity {
 		else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
 			listSizePx = lv.getHeight();
 		}
-		if(rla.players.size() == 2){
+		if(rla.players.size() < 3){
 			for(Player p : rla.players){
-				p.setHistoryAdapterHeight(listSizePx/2);
+				p.setLayoutSize(listSizePx/2);
 			}
 		}
+		lv.invalidate();
 	}
 
 	@Override
@@ -432,8 +433,15 @@ public class NPlayerLifeActivity extends Activity {
 			LayoutInflater inflater = getLayoutInflater();
 			View row = inflater.inflate(textViewResourceId, parent, false);
 
-			players.get(position).addOutputViews((TextView) row.findViewById(R.id.player_name),
-					(TextView) row.findViewById(R.id.player_readout), (ListView) row.findViewById(R.id.player_history));
+
+			if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+				players.get(position).addOutputViews((TextView) row.findViewById(R.id.player_name),
+						(TextView) row.findViewById(R.id.player_readout), (ListView) row.findViewById(R.id.player_history), (LinearLayout)row.findViewById(R.id.nplayer_col));
+			}
+			else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+				players.get(position).addOutputViews((TextView) row.findViewById(R.id.player_name),
+						(TextView) row.findViewById(R.id.player_readout), (ListView) row.findViewById(R.id.player_history), (LinearLayout)row.findViewById(R.id.nplayer_row));
+			}
 			players.get(position).addButtons((Button) row.findViewById(R.id.player_minus1),
 					(Button) row.findViewById(R.id.player_plus1), (Button) row.findViewById(R.id.player_minus5),
 					(Button) row.findViewById(R.id.player_plus5));
@@ -638,8 +646,8 @@ public class NPlayerLifeActivity extends Activity {
 		private Button		plusButton5;
 		private ListView	history;
 		public HistoryAdapter	lifeAdapter, poisonAdapter;
-		private int	sizeLimit =-1;
 		private int	orien;
+		private LinearLayout layout;
 
 		public static final int	CONSTRAINT_POISON	= 0, CONSTRAINT_LIFE = Integer.MAX_VALUE - 1;
 
@@ -686,11 +694,12 @@ public class NPlayerLifeActivity extends Activity {
 			history.invalidate();
 		}
 
-		public void addOutputViews(TextView n, TextView l, ListView lv) {
+		public void addOutputViews(TextView n, TextView l, ListView lv, LinearLayout ll) {
 			TVname = n;
 			TVlife = l;
 			history = lv;
-
+			layout = ll;
+			
 			switch (activeType) {
 				case LIFE:
 					history.setAdapter(this.lifeAdapter);
@@ -711,21 +720,24 @@ public class NPlayerLifeActivity extends Activity {
 			});
 		}
 
-		public void setHistoryAdapterHeight(int i) {
+		public void setLayoutSize(int i) {
 			
-			if(sizeLimit == -1 || this.orien != orientation){
-				this.orien = orientation;
-				sizeLimit = i;
-			}
-
+			// Gets the layout params that will allow you to resize the layout
+			LayoutParams params = layout.getLayoutParams();
+			
 			if (orien == Configuration.ORIENTATION_LANDSCAPE) {
-				history.setLayoutParams(new LinearLayout.LayoutParams(sizeLimit-6, LayoutParams.FILL_PARENT));
-				// history.setLayoutParams(newLayoutParams(LayoutParams.FILL_PARENT,sizeLimit));
+				// Changes the height and width to the specified *pixels*
+				params.height = LayoutParams.FILL_PARENT;
+				params.width = i;
 			}
 			else if (orien == Configuration.ORIENTATION_PORTRAIT) {
-				history.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, sizeLimit-6));
-				history.invalidate(); // force redraw
+				// Changes the height and width to the specified *pixels*
+				params.height = i;
+				params.width = LayoutParams.FILL_PARENT;
 			}
+			
+			layout.setLayoutParams(params);
+			// listView holding each row is invalidated after this is called, rather than invalidating each row
 		}
 
 		public void refreshTextViews() {

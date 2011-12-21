@@ -73,19 +73,16 @@
             android:title="@string/manacostPreftitle" />
 
         <CheckBoxPreference
-            android:defaultValue="false"
             android:key="typePref"
-            android:title="@string/typePreftitle" />
+            android:title="@string/typePreftitle" android:defaultValue="true"/>
 
         <CheckBoxPreference
-            android:defaultValue="false"
             android:key="abilityPref"
-            android:title="@string/abilityPreftitle" />
+            android:title="@string/abilityPreftitle" android:defaultValue="true"/>
 
         <CheckBoxPreference
-            android:defaultValue="false"
             android:key="ptPref"
-            android:title="@string/ptPreftitle" />
+            android:title="@string/ptPreftitle" android:defaultValue="true"/>
     </PreferenceCategory>
     <!--
          <PreferenceCategory android:title="Deck Manager"> <EditTextPreference 

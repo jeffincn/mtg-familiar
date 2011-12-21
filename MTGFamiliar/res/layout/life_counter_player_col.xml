@@ -5,7 +5,7 @@
     android:paddingBottom="5dip"
     android:paddingLeft="5dip"
     android:paddingRight="5dip"
-    android:paddingTop="5dip" >
+    android:paddingTop="5dip" android:id="@+id/nplayer_col">
 
     <TextView
         android:id="@+id/player_name"

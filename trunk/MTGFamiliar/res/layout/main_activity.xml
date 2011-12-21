@@ -79,7 +79,7 @@
                     android:text="@string/cardsearch"
                     android:textSize="30dip" />
             </LinearLayout>
-
+            <!--
             <LinearLayout
                 android:id="@+id/lifecounter"
                 android:layout_width="fill_parent"
@@ -105,8 +105,9 @@
                     android:text="@string/lifecounter"
                     android:textSize="30dip" />
             </LinearLayout>
-            
-                <LinearLayout
+            -->
+
+            <LinearLayout
                 android:id="@+id/Nplayerlifecounter"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -128,7 +129,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="12dip"
                     android:layout_weight="3"
-                    android:text="N Player Life Counter"
+                    android:text="@string/lifecounter"
                     android:textSize="30dip" />
             </LinearLayout>
 
@@ -234,9 +235,6 @@
                     android:layout_weight="3"
                     android:text="@string/deckmanagement"
                     android:textSize="30dip" />
-
-                
-
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

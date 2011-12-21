@@ -69,7 +69,7 @@ public class MainActivity extends Activity implements Runnable {
 	private static final int		CHANGELOGDIALOG		= 1;
 	private static final int		DONATEDIALOG			= 2;
 	private LinearLayout				search;
-	private LinearLayout				life;
+//	private LinearLayout				life;
 	private LinearLayout				rng;
 	private LinearLayout				manapool;
 	private Context							mCtx;
@@ -94,7 +94,7 @@ public class MainActivity extends Activity implements Runnable {
 		mCtx = this;
 
 		search = (LinearLayout) findViewById(R.id.cardsearch);
-		life = (LinearLayout) findViewById(R.id.lifecounter);
+//		life = (LinearLayout) findViewById(R.id.lifecounter);
 		rng = (LinearLayout) findViewById(R.id.rng);
 		manapool = (LinearLayout) findViewById(R.id.manapool);
 		randomCard = (LinearLayout) findViewById(R.id.randomCard);
@@ -114,14 +114,14 @@ public class MainActivity extends Activity implements Runnable {
 				startActivity(i);
 			}
 		});
-
+/*
 		life.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent(mCtx, LifeCounterActivity.class);
 				startActivity(i);
 			}
 		});
-
+*/
 		rng.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent(mCtx, DiceActivity.class);

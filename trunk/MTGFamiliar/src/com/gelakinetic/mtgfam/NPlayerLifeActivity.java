@@ -32,11 +32,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -82,6 +86,8 @@ public class NPlayerLifeActivity extends Activity {
 
 	private Player													playerToHaveNameChanged;
 	private EditText												nameInput;
+	AdapterView<ListAdapter> lv;
+	private int	listSizePx;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -181,6 +187,8 @@ public class NPlayerLifeActivity extends Activity {
 		};
 
 		scheduler.scheduleWithFixedDelay(runnable, timerTick, timerTick, TimeUnit.MILLISECONDS);
+		
+		
 	}
 
 	@Override
@@ -208,6 +216,7 @@ public class NPlayerLifeActivity extends Activity {
 		}
 		resetting = false;
 	}
+
 
 	@Override
 	public void onResume() {
@@ -288,15 +297,30 @@ public class NPlayerLifeActivity extends Activity {
 		}
 
 		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			HorizontalListView lv = (HorizontalListView) findViewById(R.id.h_list);
+			lv = (HorizontalListView) findViewById(R.id.h_list);
 			lv.setAdapter(rla);
 		}
 		else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-			ListView lv = (ListView) findViewById(R.id.v_list);
+			lv = (ListView) findViewById(R.id.v_list);
 			lv.setAdapter(rla);
 		}
-
+		
 		setType(activeType);
+	}
+
+	@Override
+	public void onWindowFocusChanged (boolean hasFocus) {
+		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			listSizePx = lv.getWidth();
+		}
+		else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+			listSizePx = lv.getHeight();
+		}
+		if(rla.players.size() == 2){
+			for(Player p : rla.players){
+				p.setHistoryAdapterHeight(listSizePx/2);
+			}
+		}
 	}
 
 	@Override
@@ -614,6 +638,8 @@ public class NPlayerLifeActivity extends Activity {
 		private Button		plusButton5;
 		private ListView	history;
 		public HistoryAdapter	lifeAdapter, poisonAdapter;
+		private int	sizeLimit =-1;
+		private int	orien;
 
 		public static final int	CONSTRAINT_POISON	= 0, CONSTRAINT_LIFE = Integer.MAX_VALUE - 1;
 
@@ -624,11 +650,7 @@ public class NPlayerLifeActivity extends Activity {
 			this.lifeAdapter = new HistoryAdapter(context, life);
 			this.poisonAdapter = new HistoryAdapter(context, poison);
 			me = this;
-		}
-
-		public void setName(String text) {
-			name = text;
-			TVname.setText(text);
+			this.orien = orientation;
 		}
 
 		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context) {
@@ -638,9 +660,15 @@ public class NPlayerLifeActivity extends Activity {
 			this.lifeAdapter = new HistoryAdapter(context, life);
 			this.poisonAdapter = new HistoryAdapter(context, poison);
 			me = this;
+			this.orien = orientation;
 
 			lifeAdapter.addHistory(lhist, INITIAL_LIFE);
 			poisonAdapter.addHistory(phist, INITIAL_POISON);
+		}
+
+		public void setName(String text) {
+			name = text;
+			TVname.setText(text);
 		}
 
 		public void setAdapter(int TYPE) {
@@ -662,6 +690,7 @@ public class NPlayerLifeActivity extends Activity {
 			TVname = n;
 			TVlife = l;
 			history = lv;
+
 			switch (activeType) {
 				case LIFE:
 					history.setAdapter(this.lifeAdapter);
@@ -680,6 +709,23 @@ public class NPlayerLifeActivity extends Activity {
 				}
 
 			});
+		}
+
+		public void setHistoryAdapterHeight(int i) {
+			
+			if(sizeLimit == -1 || this.orien != orientation){
+				this.orien = orientation;
+				sizeLimit = i;
+			}
+
+			if (orien == Configuration.ORIENTATION_LANDSCAPE) {
+				history.setLayoutParams(new LinearLayout.LayoutParams(sizeLimit-6, LayoutParams.FILL_PARENT));
+				// history.setLayoutParams(newLayoutParams(LayoutParams.FILL_PARENT,sizeLimit));
+			}
+			else if (orien == Configuration.ORIENTATION_PORTRAIT) {
+				history.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, sizeLimit-6));
+				history.invalidate(); // force redraw
+			}
 		}
 
 		public void refreshTextViews() {

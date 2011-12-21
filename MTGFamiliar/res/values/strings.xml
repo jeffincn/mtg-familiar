@@ -190,7 +190,7 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
  - You can now search MTG Familiar from Android\'s global search.&lt;br />&lt;br />
  - Added autocomplete functionality in both the quick and advanced search.&lt;br />&lt;br />
  - Added the ability to add or remove players to the life counter.&lt;br />&lt;br />
- - Added preference to only return most recent copy of a card during search.&lt;br />&lt;br />
+ - Added preference to only return most recent printing of a card during search.&lt;br />&lt;br />
  - Rewrote internal card legality code. It works for reprints now.&lt;br />&lt;br />
  - UI improvements for artists with long names
    	</string>

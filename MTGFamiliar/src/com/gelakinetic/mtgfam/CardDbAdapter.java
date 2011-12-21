@@ -677,13 +677,14 @@ public class CardDbAdapter {
 			"SELECT " + sel +
 			" FROM (" + tbl + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_CARDS + "." + KEY_SET +
 			" = " + DATABASE_TABLE_SETS + "."	+ KEY_CODE + ")" +
-			statement + //Contains "WHERE" now
-			" ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " ASC)";
+			statement;		
 
 			if (consolidate) {
+				sql += " ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " ASC)";
 				sql += " GROUP BY " + KEY_NAME;
 			}
 			else {
+				sql += " ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC)";
 				sql += " ORDER BY " + KEY_NAME;
 			}
 			mCursor = mDb.rawQuery(sql, null);

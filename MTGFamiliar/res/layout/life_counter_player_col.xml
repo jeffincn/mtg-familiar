@@ -13,7 +13,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="Player 1" android:gravity="center" android:layout_weight="0"/>
+        android:layout_weight="0"
+        android:gravity="center"
+        android:text="Player 1" />
 
     <!-- Health and +/- buttons -->
 
@@ -27,28 +29,38 @@
     <!-- Health display -->
 
     <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
         android:orientation="horizontal"
-         android:layout_weight="1" android:layout_height="fill_parent" android:weightSum="1" android:layout_width="fill_parent">
+        android:weightSum="1" >
 
         <TextView
             android:id="@+id/player_readout"
             style="@style/text"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_weight=".5"
             android:gravity="center"
+            android:maxLines="1"
             android:paddingRight="5dp"
             android:text="20"
-            android:textSize="72dp"
-            android:layout_width="0dp" android:maxLines="1" android:layout_weight=".5"/>
+            android:textSize="72dp" />
 
         <!-- History -->
 
-<!-- android:layout_width="140dp"
-            android:layout_height="214dp"-->
-            
+
+        <!--
+     android:layout_width="140dp"
+            android:layout_height="214dp"
+        -->
+
         <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="fill_parent"
+            android:layout_weight=".5"
             android:background="@drawable/textview_backdrop"
-            android:orientation="horizontal" android:layout_width="0dp" android:layout_weight=".5">
+            android:orientation="horizontal" >
 
             <ListView
                 android:id="@+id/player_history"
@@ -60,14 +72,47 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_weight="0"
         android:orientation="horizontal"
-        android:paddingTop="5dp" android:layout_weight="0">
-        <Button android:layout_weight="1" android:layout_height="wrap_content" android:layout_width="0dp" android:id="@+id/player_plus5" android:text="+5" android:textSize="20sp"></Button>
-        <Button android:layout_weight="1" android:layout_height="wrap_content" android:layout_width="0dp" android:id="@+id/player_plus1" android:text="+1" android:textSize="20sp"></Button>
-        <Button android:layout_weight="1" android:layout_height="wrap_content" android:layout_width="0dp" android:id="@+id/player_minus1" android:text="-1" android:textSize="20sp"></Button>
-        <Button android:layout_weight="1" android:layout_height="wrap_content" android:layout_width="0dp" android:id="@+id/player_minus5" android:text="-5" android:textSize="20sp"></Button>
+        android:paddingTop="5dp" >
+
+        <Button
+            android:id="@+id/player_plus5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="+5"
+            android:textSize="20sp" >
+        </Button>
+
+        <Button
+            android:id="@+id/player_plus1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="+1"
+            android:textSize="20sp" >
+        </Button>
+
+        <Button
+            android:id="@+id/player_minus1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="-1"
+            android:textSize="20sp" >
+        </Button>
+
+        <Button
+            android:id="@+id/player_minus5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="-5"
+            android:textSize="20sp" >
+        </Button>
     </LinearLayout>
 
 </LinearLayout>

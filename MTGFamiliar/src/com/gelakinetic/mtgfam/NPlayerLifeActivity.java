@@ -87,7 +87,13 @@ public class NPlayerLifeActivity extends Activity {
 	private Player													playerToHaveNameChanged;
 	private EditText												nameInput;
 	AdapterView<ListAdapter> lv;
-	private int	listSizePx;
+	private int	listSizeWidth;
+	private int listSizeHeight;
+	
+	public int LayoutWidthPortrait = -10;
+	public int LayoutHeightPortrait = -10;
+	public int LayoutWidthLandscape = -10;
+	public int LayoutHeightLandscape = -10;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -310,15 +316,18 @@ public class NPlayerLifeActivity extends Activity {
 
 	@Override
 	public void onWindowFocusChanged (boolean hasFocus) {
+		listSizeWidth = lv.getWidth();
+		listSizeHeight = lv.getHeight();
+
 		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			listSizePx = lv.getWidth();
+			listSizeWidth/=2;
 		}
 		else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-			listSizePx = lv.getHeight();
+			listSizeHeight/=2;
 		}
-		if(rla.players.size() < 3){
+		if(rla.players.size() < 3 || orientation == Configuration.ORIENTATION_LANDSCAPE){
 			for(Player p : rla.players){
-				p.setLayoutSize(listSizePx/2);
+				p.setLayoutSize(listSizeWidth, listSizeHeight);
 			}
 		}
 		lv.invalidate();
@@ -433,10 +442,9 @@ public class NPlayerLifeActivity extends Activity {
 			LayoutInflater inflater = getLayoutInflater();
 			View row = inflater.inflate(textViewResourceId, parent, false);
 
-
 			if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
 				players.get(position).addOutputViews((TextView) row.findViewById(R.id.player_name),
-						(TextView) row.findViewById(R.id.player_readout), (ListView) row.findViewById(R.id.player_history), (LinearLayout)row.findViewById(R.id.nplayer_col));
+						(TextView) row.findViewById(R.id.player_readout), (ListView) row.findViewById(R.id.player_history), (LinearLayout)row.findViewById(R.id.history_layout)/*row.findViewById(R.id.nplayer_col)*/);
 			}
 			else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
 				players.get(position).addOutputViews((TextView) row.findViewById(R.id.player_name),
@@ -447,6 +455,7 @@ public class NPlayerLifeActivity extends Activity {
 					(Button) row.findViewById(R.id.player_plus5));
 
 			players.get(position).refreshTextViews();
+			players.get(position).resizeLayout();
 
 			return row;
 		}
@@ -648,6 +657,8 @@ public class NPlayerLifeActivity extends Activity {
 		public HistoryAdapter	lifeAdapter, poisonAdapter;
 		private int	orien;
 		private LinearLayout layout;
+		private int pHeight = -1;
+		private int pWidth = -1;
 
 		public static final int	CONSTRAINT_POISON	= 0, CONSTRAINT_LIFE = Integer.MAX_VALUE - 1;
 
@@ -720,24 +731,49 @@ public class NPlayerLifeActivity extends Activity {
 			});
 		}
 
-		public void setLayoutSize(int i) {
+		public void setLayoutSize(int listSizeWidth, int listSizeHeight) {
 			
-			// Gets the layout params that will allow you to resize the layout
-			LayoutParams params = layout.getLayoutParams();
-			
-			if (orien == Configuration.ORIENTATION_LANDSCAPE) {
-				// Changes the height and width to the specified *pixels*
-				params.height = LayoutParams.FILL_PARENT;
-				params.width = i;
-			}
-			else if (orien == Configuration.ORIENTATION_PORTRAIT) {
-				// Changes the height and width to the specified *pixels*
-				params.height = i;
-				params.width = LayoutParams.FILL_PARENT;
+			if(TVlife == null){
+				return;
 			}
 			
+			if (LayoutHeightLandscape == -10 && orien == Configuration.ORIENTATION_LANDSCAPE) {
+				LayoutHeightLandscape = listSizeHeight - (TVname.getHeight() + plusButton1.getHeight() + 15);//LayoutParams.FILL_PARENT;
+				LayoutWidthLandscape = listSizeWidth-TVlife.getWidth()-16; // 16 is for padding, px instead of dp for this reason
+			}
+			else if (LayoutHeightPortrait == -10 && orien == Configuration.ORIENTATION_PORTRAIT) {
+				// Changes the height and width to the specified *pixels*
+				LayoutHeightPortrait = listSizeHeight;
+				LayoutWidthPortrait = LayoutParams.FILL_PARENT;
+			}
+			this.resizeLayout();
+		}
+		
+		public void resizeLayout(){
+			// Changes the height and width to the specified *pixels*
+			LayoutParams params = null;
+			if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+
+				if(LayoutWidthLandscape == -10){
+					return;
+				}
+
+				params = layout.getLayoutParams();
+				params.height = LayoutHeightLandscape;
+				params.width = LayoutWidthLandscape;
+			}
+			else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+				
+				if(LayoutWidthPortrait == -10){
+					return;
+				}
+
+				params = layout.getLayoutParams();
+				params.height = LayoutHeightPortrait;
+				params.width = LayoutWidthPortrait;
+			}
 			layout.setLayoutParams(params);
-			// listView holding each row is invalidated after this is called, rather than invalidating each row
+			layout.invalidate();
 		}
 
 		public void refreshTextViews() {

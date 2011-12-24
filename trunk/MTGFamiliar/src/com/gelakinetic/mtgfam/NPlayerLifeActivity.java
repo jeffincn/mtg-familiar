@@ -46,59 +46,63 @@ import android.widget.TextView;
 
 public class NPlayerLifeActivity extends Activity {
 
-	private ImageView												poisonButton;
-	private ImageView												lifeButton;
-	private ImageView												dieButton;
-	private ImageView												poolButton;
-	private ImageView												resetButton;
-	private Activity												anchor;
-	private static final int								DIALOG_RESET_CONFIRM	= 0;
-	private static final int								DIALOG_REMOVE_PLAYER	= 1;
-	private static final int								DIALOG_SET_NAME				= 2;
-	private static final int								LIFE									= 0;
-	private static final int								POISON								= 1;
+	private ImageView poisonButton;
+	private ImageView lifeButton;
+	private ImageView dieButton;
+	private ImageView poolButton;
+	private ImageView resetButton;
+	private Activity anchor;
+	private static final int DIALOG_RESET_CONFIRM = 0;
+	private static final int DIALOG_REMOVE_PLAYER = 1;
+	private static final int DIALOG_SET_NAME = 2;
+	private static final int LIFE = 0;
+	private static final int POISON = 1;
 
-	private int															timerTick, timerValue, timerStart;
-	private Object													timerLock;
-	private final ScheduledExecutorService	scheduler							= Executors.newScheduledThreadPool(1);
-	private Handler													handler;
-	private static int											activeType						= -1;
-	private PlayerAdapter										rla;
-	private int															orientation;
-	private ArrayList<Player>								players;
-	private boolean													resetting							= false;
-	private SharedPreferences								preferences;
-	private boolean													canGetLock;
-	private PowerManager										pm;
-	private WakeLock												wl;
-	private Editor													editor;
-	private int															numPlayers						= 0;
-	private String[]												names;
-	private Runnable												runnable;
+	private int timerTick, timerValue, timerStart;
+	private Object timerLock;
+	private final ScheduledExecutorService scheduler = Executors
+			.newScheduledThreadPool(1);
+	private Handler handler;
+	private static int activeType = -1;
+	private PlayerAdapter rla;
+	private int orientation;
+	private ArrayList<Player> players;
+	private boolean resetting = false;
+	private SharedPreferences preferences;
+	private boolean canGetLock;
+	private PowerManager pm;
+	private WakeLock wl;
+	private Editor editor;
+	private int numPlayers = 0;
+	private String[] names;
+	private Runnable runnable;
 
-	public static final int									INITIAL_LIFE					= 20;
-	public static final int									INITIAL_POISON				= 0;
-	public static final int									TERMINAL_LIFE					= 0;
-	public static final int									TERMINAL_POISON				= 10;
-	private static final String							PLAYER_DATA						= "player_data";
-	protected static final int							EVERYTHING						= 0;
-	protected static final int							JUST_TOTALS						= 1;
+	public static final int INITIAL_LIFE = 20;
+	public static final int INITIAL_POISON = 0;
+	public static final int TERMINAL_LIFE = 0;
+	public static final int TERMINAL_POISON = 10;
+	private static final String PLAYER_DATA = "player_data";
+	protected static final int EVERYTHING = 0;
+	protected static final int JUST_TOTALS = 1;
 
-	private Player													playerToHaveNameChanged;
-	private EditText												nameInput;
+	private Player playerToHaveNameChanged;
+	private EditText nameInput;
 	AdapterView<ListAdapter> lv;
-	private int	listSizeWidth;
+	private int listSizeWidth;
 	private int listSizeHeight;
-	
+
 	public int LayoutWidthPortrait = -10;
 	public int LayoutHeightPortrait = -10;
 	public int LayoutWidthLandscape = -10;
 	public int LayoutHeightLandscape = -10;
+	private NPlayerLifeActivity me;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		me = this;
 
 		// Android 1.5 (API3) isnt compatable with horizontal listview. just lock it
 		// in portrait
@@ -168,8 +172,8 @@ public class NPlayerLifeActivity extends Activity {
 					if (timerValue > 0) {
 						timerValue -= timerTick;
 						if (timerValue <= 0) {
-							 // This is used instead of having the commit loop here so I don't
-							 // have to think about deadlock
+							// This is used instead of having the commit loop here so I don't
+							// have to think about deadlock
 							doCommit = true;
 						}
 					}
@@ -192,9 +196,9 @@ public class NPlayerLifeActivity extends Activity {
 			}
 		};
 
-		scheduler.scheduleWithFixedDelay(runnable, timerTick, timerTick, TimeUnit.MILLISECONDS);
-		
-		
+		scheduler.scheduleWithFixedDelay(runnable, timerTick, timerTick,
+				TimeUnit.MILLISECONDS);
+
 	}
 
 	@Override
@@ -223,7 +227,6 @@ public class NPlayerLifeActivity extends Activity {
 		resetting = false;
 	}
 
-
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -248,17 +251,17 @@ public class NPlayerLifeActivity extends Activity {
 
 		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
 			rla = new PlayerAdapter(this, R.layout.life_counter_player_col, players);
-		}
-		else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+		} else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
 			rla = new PlayerAdapter(this, R.layout.life_counter_player_row, players);
 		}
-		
+
 		if (lifeData == null || lifeData.length() == 0) {
-			rla.players.add(new Player("Player 1", INITIAL_LIFE, INITIAL_POISON, (Context) this));
-			rla.players.add(new Player("Player 2", INITIAL_LIFE, INITIAL_POISON, (Context) this));
+			rla.players.add(new Player("Player 1", INITIAL_LIFE, INITIAL_POISON,
+					(Context) this));
+			rla.players.add(new Player("Player 2", INITIAL_LIFE, INITIAL_POISON,
+					(Context) this));
 			numPlayers = 2;
-		}
-		else {
+		} else {
 			numPlayers = 0;
 			String[] playerLines = lifeData.split("\n");
 			for (String line : playerLines) {
@@ -269,8 +272,7 @@ public class NPlayerLifeActivity extends Activity {
 					for (int i = 0; i < lifehist.length; i++) {
 						lhist[i] = Integer.parseInt(lifehist[i]);
 					}
-				}
-				catch (NumberFormatException e) {
+				} catch (NumberFormatException e) {
 					lhist = null;
 				}
 
@@ -281,23 +283,21 @@ public class NPlayerLifeActivity extends Activity {
 					for (int i = 0; i < poisonhist.length; i++) {
 						phist[i] = Integer.parseInt(poisonhist[i]);
 					}
-				}
-				catch (NumberFormatException e) {
+				} catch (NumberFormatException e) {
 					phist = null;
-				}
-				catch (ArrayIndexOutOfBoundsException e) {
+				} catch (ArrayIndexOutOfBoundsException e) {
 					phist = null;
 				}
 
-				rla.players.add(new Player(data[0], Integer.parseInt(data[1]), Integer.parseInt(data[3]), lhist, phist,
-						(Context) this));
+				rla.players.add(new Player(data[0], Integer.parseInt(data[1]), Integer
+						.parseInt(data[3]), lhist, phist, (Context) this));
 				numPlayers++;
 			}
 			String lastName = rla.players.get(rla.players.size() - 1).name;
 			try {
-				numPlayers = Integer.parseInt("" + lastName.charAt(lastName.length() - 1));
-			}
-			catch (NumberFormatException e) {
+				numPlayers = Integer.parseInt(""
+						+ lastName.charAt(lastName.length() - 1));
+			} catch (NumberFormatException e) {
 
 			}
 		}
@@ -305,31 +305,52 @@ public class NPlayerLifeActivity extends Activity {
 		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
 			lv = (HorizontalListView) findViewById(R.id.h_list);
 			lv.setAdapter(rla);
-		}
-		else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+		} else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
 			lv = (ListView) findViewById(R.id.v_list);
 			lv.setAdapter(rla);
 		}
-		
+
 		setType(activeType);
 	}
 
 	@Override
-	public void onWindowFocusChanged (boolean hasFocus) {
+	public void onWindowFocusChanged(boolean hasFocus) {
+		
+		if(!hasFocus){
+			return;
+		}
+		
 		listSizeWidth = lv.getWidth();
 		listSizeHeight = lv.getHeight();
 
 		if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			listSizeWidth/=2;
-		}
-		else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-			listSizeHeight/=2;
-		}
-		if(rla.players.size() < 3 || orientation == Configuration.ORIENTATION_LANDSCAPE){
-			for(Player p : rla.players){
-				p.setLayoutSize(listSizeWidth, listSizeHeight);
+			switch (rla.players.size()) {
+			case 1:
+				break;
+			case 2:
+				listSizeWidth /= 2;
+				break;
+			default:
+				listSizeWidth = (int) ((float) listSizeWidth * 0.45);
+				break;
+			}
+		} else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+			switch (rla.players.size()) {
+			case 1:
+				break;
+			case 2:
+				listSizeHeight /= 2;
+				break;
+			default:
+				listSizeHeight = LayoutParams.FILL_PARENT;
+				break;
 			}
 		}
+
+		for (Player p : rla.players) {
+			p.setLayoutSize(listSizeWidth, listSizeHeight);
+		}
+		rla.notifyDataSetChanged();
 		lv.invalidate();
 	}
 
@@ -344,16 +365,22 @@ public class NPlayerLifeActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-			case R.id.add_player:
-				numPlayers++;
-				rla.players.add(new Player("Player " + numPlayers, INITIAL_LIFE, INITIAL_POISON, (Context) this));
-				rla.notifyDataSetChanged();
-				return true;
-			case R.id.remove_player:
-				showDialog(DIALOG_REMOVE_PLAYER);
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
+		case R.id.add_player:
+			numPlayers++;
+			rla.players.add(new Player("Player " + numPlayers, INITIAL_LIFE,
+					INITIAL_POISON, (Context) this));
+			rla.notifyDataSetChanged();
+			LayoutWidthPortrait = -10;
+			LayoutHeightPortrait = -10;
+			LayoutWidthLandscape = -10;
+			LayoutHeightLandscape = -10;
+			me.onWindowFocusChanged(true);
+			return true;
+		case R.id.remove_player:
+			showDialog(DIALOG_REMOVE_PLAYER);
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
 		}
 	}
 
@@ -363,8 +390,7 @@ public class NPlayerLifeActivity extends Activity {
 
 		if (type == EVERYTHING) {
 			editor.putString(PLAYER_DATA, null);
-		}
-		else if (type == JUST_TOTALS) {
+		} else if (type == JUST_TOTALS) {
 			String data = "";
 			for (Player p : rla.players) {
 				data += p.toFreshString();
@@ -382,22 +408,22 @@ public class NPlayerLifeActivity extends Activity {
 
 	private void update() {
 		switch (activeType) {
-			case LIFE:
-				for (Player p : rla.players) {
-					if (p.TVlife != null) {
-						p.TVlife.setTextColor(0xFFFFFFFF);
-						p.TVlife.setText("" + p.life);
-					}
+		case LIFE:
+			for (Player p : rla.players) {
+				if (p.TVlife != null) {
+					p.TVlife.setTextColor(0xFFFFFFFF);
+					p.TVlife.setText("" + p.life);
 				}
-				break;
-			case POISON:
-				for (Player p : rla.players) {
-					if (p.TVlife != null) {
-						p.TVlife.setTextColor(0xFF009000);
-						p.TVlife.setText("" + p.poison);
-					}
+			}
+			break;
+		case POISON:
+			for (Player p : rla.players) {
+				if (p.TVlife != null) {
+					p.TVlife.setTextColor(0xFF009000);
+					p.TVlife.setText("" + p.poison);
 				}
-				break;
+			}
+			break;
 		}
 	}
 
@@ -405,33 +431,34 @@ public class NPlayerLifeActivity extends Activity {
 		activeType = type;
 
 		switch (activeType) {
-			case LIFE:
-				lifeButton.setImageResource(R.drawable.life_button_highlighted);
-				poisonButton.setImageResource(R.drawable.poison_button);
-				if (rla != null && rla.players != null) {
-					for (Player p : rla.players) {
-						p.setAdapter(type);
-					}
+		case LIFE:
+			lifeButton.setImageResource(R.drawable.life_button_highlighted);
+			poisonButton.setImageResource(R.drawable.poison_button);
+			if (rla != null && rla.players != null) {
+				for (Player p : rla.players) {
+					p.setAdapter(type);
 				}
-				break;
-			case POISON:
-				lifeButton.setImageResource(R.drawable.life_button);
-				poisonButton.setImageResource(R.drawable.poison_button_highlighted);
-				if (rla != null && rla.players != null) {
-					for (Player p : rla.players) {
-						p.setAdapter(type);
-					}
+			}
+			break;
+		case POISON:
+			lifeButton.setImageResource(R.drawable.life_button);
+			poisonButton.setImageResource(R.drawable.poison_button_highlighted);
+			if (rla != null && rla.players != null) {
+				for (Player p : rla.players) {
+					p.setAdapter(type);
 				}
-				break;
+			}
+			break;
 		}
 	}
 
 	public class PlayerAdapter extends ArrayAdapter<Player> {
 
-		public ArrayList<Player>	players;
-		private int								textViewResourceId;
+		public ArrayList<Player> players;
+		private int textViewResourceId;
 
-		public PlayerAdapter(Context context, int textViewResourceId, ArrayList<Player> ps) {
+		public PlayerAdapter(Context context, int textViewResourceId,
+				ArrayList<Player> ps) {
 			super(context, textViewResourceId, ps);
 			players = ps;
 			this.textViewResourceId = textViewResourceId;
@@ -443,15 +470,27 @@ public class NPlayerLifeActivity extends Activity {
 			View row = inflater.inflate(textViewResourceId, parent, false);
 
 			if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-				players.get(position).addOutputViews((TextView) row.findViewById(R.id.player_name),
-						(TextView) row.findViewById(R.id.player_readout), (ListView) row.findViewById(R.id.player_history), (LinearLayout)row.findViewById(R.id.history_layout)/*row.findViewById(R.id.nplayer_col)*/);
+				players.get(position).addOutputViews(
+						(TextView) row.findViewById(R.id.player_name),
+						(TextView) row.findViewById(R.id.player_readout),
+						(ListView) row.findViewById(R.id.player_history),
+						(LinearLayout) row.findViewById(R.id.history_layout)/*
+																																 * row.findViewById
+																																 * (
+																																 * R.id.nplayer_col
+																																 * )
+																																 */);
+			} else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+				players.get(position).addOutputViews(
+						(TextView) row.findViewById(R.id.player_name),
+						(TextView) row.findViewById(R.id.player_readout),
+						(ListView) row.findViewById(R.id.player_history),
+						(LinearLayout) row.findViewById(R.id.nplayer_row));
 			}
-			else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-				players.get(position).addOutputViews((TextView) row.findViewById(R.id.player_name),
-						(TextView) row.findViewById(R.id.player_readout), (ListView) row.findViewById(R.id.player_history), (LinearLayout)row.findViewById(R.id.nplayer_row));
-			}
-			players.get(position).addButtons((Button) row.findViewById(R.id.player_minus1),
-					(Button) row.findViewById(R.id.player_plus1), (Button) row.findViewById(R.id.player_minus5),
+			players.get(position).addButtons(
+					(Button) row.findViewById(R.id.player_minus1),
+					(Button) row.findViewById(R.id.player_plus1),
+					(Button) row.findViewById(R.id.player_minus5),
 					(Button) row.findViewById(R.id.player_plus5));
 
 			players.get(position).refreshTextViews();
@@ -464,9 +503,9 @@ public class NPlayerLifeActivity extends Activity {
 	@Override
 	protected void onPrepareDialog(final int id, final Dialog dialog) {
 		switch (id) {
-			case DIALOG_SET_NAME:
-				nameInput.setText("");
-				break;
+		case DIALOG_SET_NAME:
+			nameInput.setText("");
+			break;
 		}
 	}
 
@@ -475,77 +514,89 @@ public class NPlayerLifeActivity extends Activity {
 		final Context context = (Context) this;
 		Dialog dialog;
 		switch (id) {
-			case DIALOG_RESET_CONFIRM:
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setMessage("Reset counters and pool?").setCancelable(true)
-						.setPositiveButton("Players and Totals", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								ManaPoolActivity.reset(context);
-								dialog.cancel();
-								reset(EVERYTHING);
-							}
-						}).setNeutralButton("Just Totals", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								ManaPoolActivity.reset(context);
-								dialog.cancel();
-								reset(JUST_TOTALS);
-							}
-						}).setNegativeButton("No", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								dialog.cancel();
-							}
-						});
+		case DIALOG_RESET_CONFIRM:
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder
+					.setMessage("Reset counters and pool?")
+					.setCancelable(true)
+					.setPositiveButton("Players and Totals",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) {
+									ManaPoolActivity.reset(context);
+									dialog.cancel();
+									reset(EVERYTHING);
+								}
+							})
+					.setNeutralButton("Just Totals",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) {
+									ManaPoolActivity.reset(context);
+									dialog.cancel();
+									reset(JUST_TOTALS);
+								}
+							}).setNegativeButton("No", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.cancel();
+						}
+					});
 
-				dialog = builder.create();
-				break;
-			case DIALOG_REMOVE_PLAYER:
-				names = new String[rla.players.size()];
-				for (int i = 0; i < rla.players.size(); i++) {
-					names[i] = rla.players.get(i).name;
+			dialog = builder.create();
+			break;
+		case DIALOG_REMOVE_PLAYER:
+			names = new String[rla.players.size()];
+			for (int i = 0; i < rla.players.size(); i++) {
+				names[i] = rla.players.get(i).name;
+			}
+
+			builder = new AlertDialog.Builder(this);
+			builder.setTitle(getString(R.string.removeplayer));
+
+			builder.setItems(names, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int item) {
+					rla.players.remove(item);
+					rla.notifyDataSetChanged();
+					LayoutWidthPortrait = -10;
+					LayoutHeightPortrait = -10;
+					LayoutWidthLandscape = -10;
+					LayoutHeightLandscape = -10;
+					me.onWindowFocusChanged(true);
+					removeDialog(DIALOG_REMOVE_PLAYER);
 				}
+			});
 
-				builder = new AlertDialog.Builder(this);
-				builder.setTitle(getString(R.string.removeplayer));
+			dialog = builder.create();
+			break;
+		case DIALOG_SET_NAME:
 
-				builder.setItems(names, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int item) {
-						rla.players.remove(item);
-						rla.notifyDataSetChanged();
-						removeDialog(DIALOG_REMOVE_PLAYER);
-					}
-				});
+			// This example shows how to add a custom layout to an AlertDialog
+			LayoutInflater factory = LayoutInflater.from(this);
+			final View textEntryView = factory.inflate(
+					R.layout.alert_dialog_text_entry, null);
+			nameInput = (EditText) textEntryView.findViewById(R.id.editText1);
+			dialog = new AlertDialog.Builder(this).setTitle("Enter Name")
+					.setView(textEntryView)
+					.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							playerToHaveNameChanged.setName(nameInput.getText().toString());
+						}
+					}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+						}
+					}).create();
 
-				dialog = builder.create();
-				break;
-			case DIALOG_SET_NAME:
-
-				// This example shows how to add a custom layout to an AlertDialog
-				LayoutInflater factory = LayoutInflater.from(this);
-				final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
-				nameInput = (EditText) textEntryView.findViewById(R.id.editText1);
-				dialog = new AlertDialog.Builder(this).setTitle("Enter Name").setView(textEntryView)
-						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int whichButton) {
-								playerToHaveNameChanged.setName(nameInput.getText().toString());
-							}
-						}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int whichButton) {
-							}
-						}).create();
-
-				break;
-			default:
-				dialog = null;
+			break;
+		default:
+			dialog = null;
 		}
 		return dialog;
 	}
 
 	private class HistoryAdapter extends BaseAdapter {
-		private int													count, initialValue, delta;
-		private ArrayList<Vector<Integer>>	list;
-		private Context											context;
+		private int count, initialValue, delta;
+		private ArrayList<Vector<Integer>> list;
+		private Context context;
 
-		public static final int							ABSOLUTE	= 0, RELATIVE = 1;
+		public static final int ABSOLUTE = 0, RELATIVE = 1;
 
 		public HistoryAdapter(Context context, int initialValue) {
 			this.context = context;
@@ -562,16 +613,14 @@ public class NPlayerLifeActivity extends Activity {
 					vi.add(hist[i]);
 					try {
 						vi.add(hist[i] - hist[i + 1]);
-					}
-					catch (Exception e) {
+					} catch (Exception e) {
 						vi.add(hist[i] - initial_val);
 					}
 					list.add(vi);
 					count++;
 					delta = 0;
 				}
-			}
-			catch (NullPointerException e) {
+			} catch (NullPointerException e) {
 			}
 			notifyDataSetChanged();
 		}
@@ -617,7 +666,8 @@ public class NPlayerLifeActivity extends Activity {
 
 		public View getView(int position, View convertView, ViewGroup parent) {
 			TextView relative, absolute;
-			LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			LayoutInflater vi = (LayoutInflater) context
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			View v = vi.inflate(R.layout.history_adapter_row, null);
 			Vector<Integer> row = list.get(position);
 			absolute = (TextView) v.findViewById(R.id.absolute);
@@ -641,26 +691,24 @@ public class NPlayerLifeActivity extends Activity {
 
 	public class Player {
 
-		public String			name;
-		public int				life;
-		public int				poison;
-		public Player			me;
+		public String name;
+		public int life;
+		public int poison;
+		public Player me;
 
-		public TextView		TVname;
-		public TextView		TVlife;
+		public TextView TVname;
+		public TextView TVlife;
 
-		public Button			minusButton1;
-		public Button			plusButton1;
-		private Button		minusButton5;
-		private Button		plusButton5;
-		private ListView	history;
-		public HistoryAdapter	lifeAdapter, poisonAdapter;
-		private int	orien;
+		public Button minusButton1;
+		public Button plusButton1;
+		private Button minusButton5;
+		private Button plusButton5;
+		private ListView history;
+		public HistoryAdapter lifeAdapter, poisonAdapter;
 		private LinearLayout layout;
-		private int pHeight = -1;
-		private int pWidth = -1;
 
-		public static final int	CONSTRAINT_POISON	= 0, CONSTRAINT_LIFE = Integer.MAX_VALUE - 1;
+		public static final int CONSTRAINT_POISON = 0,
+				CONSTRAINT_LIFE = Integer.MAX_VALUE - 1;
 
 		public Player(String n, int l, int p, Context context) {
 			name = n;
@@ -669,17 +717,16 @@ public class NPlayerLifeActivity extends Activity {
 			this.lifeAdapter = new HistoryAdapter(context, life);
 			this.poisonAdapter = new HistoryAdapter(context, poison);
 			me = this;
-			this.orien = orientation;
 		}
 
-		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context) {
+		public Player(String n, int l, int p, int[] lhist, int[] phist,
+				Context context) {
 			name = n;
 			life = l;
 			poison = p;
 			this.lifeAdapter = new HistoryAdapter(context, life);
 			this.poisonAdapter = new HistoryAdapter(context, poison);
 			me = this;
-			this.orien = orientation;
 
 			lifeAdapter.addHistory(lhist, INITIAL_LIFE);
 			poisonAdapter.addHistory(phist, INITIAL_POISON);
@@ -695,29 +742,30 @@ public class NPlayerLifeActivity extends Activity {
 				return;
 			}
 			switch (TYPE) {
-				case LIFE:
-					history.setAdapter(this.lifeAdapter);
-					break;
-				case POISON:
-					history.setAdapter(this.poisonAdapter);
-					break;
+			case LIFE:
+				history.setAdapter(this.lifeAdapter);
+				break;
+			case POISON:
+				history.setAdapter(this.poisonAdapter);
+				break;
 			}
 			history.invalidate();
 		}
 
-		public void addOutputViews(TextView n, TextView l, ListView lv, LinearLayout ll) {
+		public void addOutputViews(TextView n, TextView l, ListView lv,
+				LinearLayout ll) {
 			TVname = n;
 			TVlife = l;
 			history = lv;
 			layout = ll;
-			
+
 			switch (activeType) {
-				case LIFE:
-					history.setAdapter(this.lifeAdapter);
-					break;
-				case POISON:
-					history.setAdapter(this.poisonAdapter);
-					break;
+			case LIFE:
+				history.setAdapter(this.lifeAdapter);
+				break;
+			case POISON:
+				history.setAdapter(this.poisonAdapter);
+				break;
 			}
 			refreshTextViews();
 
@@ -732,39 +780,48 @@ public class NPlayerLifeActivity extends Activity {
 		}
 
 		public void setLayoutSize(int listSizeWidth, int listSizeHeight) {
-			
-			if(TVlife == null){
+
+			if (TVlife == null) {
 				return;
 			}
-			
-			if (LayoutHeightLandscape == -10 && orien == Configuration.ORIENTATION_LANDSCAPE) {
-				LayoutHeightLandscape = listSizeHeight - (TVname.getHeight() + plusButton1.getHeight() + 15);//LayoutParams.FILL_PARENT;
-				LayoutWidthLandscape = listSizeWidth-TVlife.getWidth()-16; // 16 is for padding, px instead of dp for this reason
-			}
-			else if (LayoutHeightPortrait == -10 && orien == Configuration.ORIENTATION_PORTRAIT) {
+
+			if (LayoutHeightLandscape == -10
+					&& orientation == Configuration.ORIENTATION_LANDSCAPE) {
+				LayoutHeightLandscape = listSizeHeight
+						- (TVname.getHeight() + plusButton1.getHeight() + 15);// LayoutParams.FILL_PARENT;
+				LayoutWidthLandscape = listSizeWidth - TVlife.getWidth() - 16; // 16 is
+																																				// for
+																																				// padding,
+																																				// px
+																																				// instead
+																																				// of dp
+																																				// for
+																																				// this
+																																				// reason
+			} else if (LayoutHeightPortrait == -10
+					&& orientation == Configuration.ORIENTATION_PORTRAIT) {
 				// Changes the height and width to the specified *pixels*
 				LayoutHeightPortrait = listSizeHeight;
 				LayoutWidthPortrait = LayoutParams.FILL_PARENT;
 			}
 			this.resizeLayout();
 		}
-		
-		public void resizeLayout(){
+
+		public void resizeLayout() {
 			// Changes the height and width to the specified *pixels*
 			LayoutParams params = null;
 			if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
 
-				if(LayoutWidthLandscape == -10){
+				if (LayoutWidthLandscape == -10) {
 					return;
 				}
 
 				params = layout.getLayoutParams();
 				params.height = LayoutHeightLandscape;
 				params.width = LayoutWidthLandscape;
-			}
-			else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-				
-				if(LayoutWidthPortrait == -10){
+			} else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+
+				if (LayoutWidthPortrait == -10) {
 					return;
 				}
 
@@ -781,8 +838,7 @@ public class NPlayerLifeActivity extends Activity {
 			if (activeType == LIFE) {
 				TVlife.setText("" + life);
 				TVlife.setTextColor(0xFFFFFFFF);
-			}
-			else if (activeType == POISON) {
+			} else if (activeType == POISON) {
 				TVlife.setText("" + poison);
 				TVlife.setTextColor(0xFF009000);
 			}
@@ -790,42 +846,43 @@ public class NPlayerLifeActivity extends Activity {
 
 		private void setValue(int type, int value) {
 			switch (type) {
-				case LIFE:
-					if (value > CONSTRAINT_LIFE) {
-						value = CONSTRAINT_LIFE;
-					}
-					life = value;
-					break;
-				case POISON:
-					if (value < CONSTRAINT_POISON) {
-						value = CONSTRAINT_POISON;
-					}
-					poison = value;
+			case LIFE:
+				if (value > CONSTRAINT_LIFE) {
+					value = CONSTRAINT_LIFE;
+				}
+				life = value;
+				break;
+			case POISON:
+				if (value < CONSTRAINT_POISON) {
+					value = CONSTRAINT_POISON;
+				}
+				poison = value;
 			}
 		}
 
 		private void incrementValue(int type, int delta) {
 			int value = 0;
 			switch (type) {
-				case LIFE:
-					value = life;
-					if (value + delta > CONSTRAINT_LIFE) {
-						delta = CONSTRAINT_LIFE - value;
-					}
-					lifeAdapter.update(delta);
-					break;
-				case POISON:
-					value = poison;
-					if (value + delta < CONSTRAINT_POISON) {
-						delta = CONSTRAINT_POISON - value;
-					}
-					poisonAdapter.update(delta);
-					break;
+			case LIFE:
+				value = life;
+				if (value + delta > CONSTRAINT_LIFE) {
+					delta = CONSTRAINT_LIFE - value;
+				}
+				lifeAdapter.update(delta);
+				break;
+			case POISON:
+				value = poison;
+				if (value + delta < CONSTRAINT_POISON) {
+					delta = CONSTRAINT_POISON - value;
+				}
+				poisonAdapter.update(delta);
+				break;
 			}
 			setValue(type, value + delta);
 		}
 
-		public void addButtons(Button minus1, Button plus1, Button minus5, Button plus5) {
+		public void addButtons(Button minus1, Button plus1, Button minus5,
+				Button plus5) {
 			minusButton1 = minus1;
 			plusButton1 = plus1;
 			minusButton5 = minus5;
@@ -883,8 +940,7 @@ public class NPlayerLifeActivity extends Activity {
 				if (first) {
 					first = false;
 					data += i.get(0);
-				}
-				else {
+				} else {
 					data += "," + i.get(0);
 				}
 			}
@@ -897,8 +953,7 @@ public class NPlayerLifeActivity extends Activity {
 				if (first) {
 					first = false;
 					data += i.get(0);
-				}
-				else {
+				} else {
 					data += "," + i.get(0);
 				}
 			}

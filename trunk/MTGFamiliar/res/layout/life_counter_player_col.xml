@@ -3,10 +3,7 @@
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingBottom="5px"
-    android:paddingLeft="5px"
-    android:paddingRight="5px"
-    android:paddingTop="5px" >
+    android:padding="5dp">
 
     <TextView
         android:id="@+id/player_name"
@@ -14,12 +11,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical|center_horizontal"
-        android:text="Player 1" />
+        android:text="Player 1" android:layout_weight="0"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:orientation="horizontal" >
+        android:orientation="horizontal" android:layout_weight="1">
 
         <TextView
             android:id="@+id/player_readout"
@@ -27,10 +24,8 @@
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:minWidth="86sp"
-            android:paddingRight="5px"
             android:text="20"
-            android:textSize="72dp" />
+            android:textSize="72dp" android:maxLines="1" android:minWidth="135dp"/>
 
         <LinearLayout
             android:id="@+id/history_layout"
@@ -51,8 +46,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="5dp" >
+        android:orientation="horizontal" android:paddingTop="5dp" android:layout_marginRight="-5dp" android:layout_weight="0" android:layout_marginBottom="-10dp">
+        <Button android:text="+5" android:textSize="20sp" android:layout_weight="1" android:id="@+id/player_plus5" android:layout_width="0dp" android:layout_height="wrap_content"></Button>
 
         <Button
             android:id="@+id/player_plus1"
@@ -60,14 +55,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="+1"
-            android:textSize="20sp" />
-
-        <Button
-            android:id="@+id/player_plus5"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="+5"
             android:textSize="20sp" />
 
         <Button

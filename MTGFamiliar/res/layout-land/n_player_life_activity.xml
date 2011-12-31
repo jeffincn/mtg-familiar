@@ -1,23 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/linearLayout1"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent" 
+    android:orientation="horizontal">
 
     <com.devsmart.android.ui.HorizontalListView
         android:id="@+id/h_list"
-        android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/divider" />
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
 
     <View
         android:id="@+id/divider"
         android:layout_width="1dip"
         android:layout_height="fill_parent"
-        android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/linearLayout2"
         android:background="#FFAAAAAA" />
 
     <!-- Command bar: reset, poison, etc. -->
@@ -26,9 +23,6 @@
         android:id="@+id/linearLayout2"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/linearLayout2"
         android:orientation="vertical" >
 
         <ImageView
@@ -72,4 +66,4 @@
             android:src="@drawable/reset_button" />
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

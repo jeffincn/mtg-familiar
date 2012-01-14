@@ -497,7 +497,7 @@ public class NPlayerLifeActivity extends Activity {
 	protected void onPrepareDialog(final int id, final Dialog dialog) {
 		switch (id) {
 			case DIALOG_SET_NAME:
-				nameInput.setText("");
+				nameInput.setText(playerToHaveNameChanged.name);
 				break;
 		}
 	}

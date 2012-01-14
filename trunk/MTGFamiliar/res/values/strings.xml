@@ -150,7 +150,6 @@ Thanks to zagaberoo for beautiful graphics and even more beautiful code.&lt;br /
 Thanks to April King for the massive QA effort, and learning Java. Shh, don\'t tell anyone about that.&lt;br />&lt;br />
 Thanks to Toastdeib for being my SQL guru sitting on top of the mountain.&lt;br />&lt;br />
 Thanks to chaudakh for the wonderful Gatherer Extractor program.&lt;br />&lt;br />
-Thanks to dinocore1 for the excellent HorizontalListView.&lt;br />&lt;br />
 Thanks to reddit\'s &lt;a href="http://www.reddit.com/r/magicTCG/">/r/magictcg&lt;/a> for testing and feedback.&lt;br />&lt;br />
 Thanks to my brother for the icon.&lt;br />&lt;br />
 Thanks to Chedy @ &lt;a href="http://tcgplayer.com">TCGPlayer.com&lt;/a> for the price API.&lt;br />&lt;br />
@@ -189,7 +188,6 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
  - Added donation button in the main menu. Check it out!&lt;br />&lt;br />
  - You can now search MTG Familiar from Android\'s global search.&lt;br />&lt;br />
  - Added autocomplete functionality in both the quick and advanced search.&lt;br />&lt;br />
- - Added the ability to add or remove players to the life counter.&lt;br />&lt;br />
  - Added preference to only return most recent printing of a card during search.&lt;br />&lt;br />
  - Rewrote internal card legality code. It works for reprints now.&lt;br />&lt;br />
  - UI improvements for artists with long names

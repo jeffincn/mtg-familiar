@@ -94,8 +94,12 @@
         <item>16</item>
     </string-array>
     <string-array name="color_spinner">
-        <item>May Include Any Colors</item>
+        <item>May Include Any Color(s)</item>
         <item>Must Include All Colors</item>
+        <!-- Lines below added by Reuben Kriegel -->
+        <item>No Other Colors</item>
+        <item>Exact (all selected and no others)</item>
+        <!-- End addition -->
     </string-array>
 
     <string name="pow">Power</string>
@@ -270,4 +274,11 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
         You can click the button below to donate via PayPal. $1 is cool. $5 is cooler. You get the drift.&lt;br />&lt;br />
         So, how generous are you feeling today?</string>
         
+    <!-- String-Array below added by Reuben Kriegel -->
+    <string-array name="text_spinner">
+	    <item>All words</item>
+	    <item>Any word(s)</item>
+	    <item>Exact phrase</item>
+    </string-array>
+    <!-- End addition -->
 </resources>

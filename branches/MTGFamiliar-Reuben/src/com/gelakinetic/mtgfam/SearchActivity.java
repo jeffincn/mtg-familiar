@@ -62,7 +62,10 @@ public class SearchActivity extends Activity {
 	protected static final String	ARTIST			= "artist";
 	protected static final String	FLAVOR			= "flavor";
 	protected static final String	RANDOM			= "random";
-
+	//lines below added by Reuben Kriegel
+	protected static final String	TEXTLOGIC		= "textlogic";
+	//End addition
+	
 	protected static final int		SETLIST			= 0;
 	protected static final int		FORMATLIST	= 1;
 	protected static final int		RARITYLIST	= 2;
@@ -100,6 +103,9 @@ public class SearchActivity extends Activity {
 	private Dialog								rarityDialog;
 	private EditText							flavorfield;
 	private EditText							artistfield;
+	//Variable below added by Reuben Kriegel
+	private Spinner								textspinner;
+	
 	private int	selectedFormat;
 
 	/** Called when the activity is first created. */
@@ -121,7 +127,7 @@ public class SearchActivity extends Activity {
 		artistfield = (EditText) findViewById(R.id.artistsearch);
 		
 		
-		// So pressing ender does the search
+		// So pressing enter does the search
 		namefield.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
 		namefield.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
@@ -184,6 +190,7 @@ public class SearchActivity extends Activity {
 		checkboxL = (CheckBox) findViewById(R.id.checkBoxL);
 
 		colorspinner = (Spinner) findViewById(R.id.colorlogic);
+		textspinner = (Spinner) findViewById(R.id.textlogic);
 
 		setButton = (Button) findViewById(R.id.setsearch);
 		formatButton = (Button) findViewById(R.id.formatsearch);
@@ -231,6 +238,11 @@ public class SearchActivity extends Activity {
 				android.R.layout.simple_spinner_item);
 		adapter6.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		colorspinner.setAdapter(adapter6);
+
+		ArrayAdapter<CharSequence> adapter7 = ArrayAdapter.createFromResource(this, R.array.text_spinner, 
+				android.R.layout.simple_spinner_item);
+		adapter7.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		textspinner.setAdapter(adapter7);
 
 		setButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -513,6 +525,9 @@ public class SearchActivity extends Activity {
 		i.putExtra(ARTIST, artist);
 		i.putExtra(FLAVOR, flavor);
 		i.putExtra(RANDOM, isRandom);
+		// Line below added by Reuben Kriegel
+		i.putExtra(TEXTLOGIC, textspinner.getSelectedItemPosition());
+		// End addition
 		startActivityForResult(i, 0);
 	}
 

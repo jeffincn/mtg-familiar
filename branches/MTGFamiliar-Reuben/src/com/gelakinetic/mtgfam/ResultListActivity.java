@@ -98,12 +98,12 @@ public class ResultListActivity extends ListActivity {
 			id = Long.parseLong(u.getLastPathSegment());
 			String name = mDbHelper.getNameFromId(id);
 			c = mDbHelper.Search(name, null, null, "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-					CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, true, returnTypes, consolidate);
+					CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, true, returnTypes, consolidate);
 		}
 		else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
 			String query = intent.getStringExtra(SearchManager.QUERY);
 			c = mDbHelper.Search(query, null, null, "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-					CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, true, returnTypes, consolidate);
+					CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, true, returnTypes, consolidate);
 		}
 		else if ((id = extras.getLong("id")) != 0L) {
 			c = mDbHelper.fetchCard(id, null);
@@ -125,7 +125,8 @@ public class ResultListActivity extends ListActivity {
 					extras.getFloat(SearchActivity.TOU_CHOICE), extras.getString(SearchActivity.TOU_LOGIC),
 					extras.getInt(SearchActivity.CMC), extras.getString(SearchActivity.CMC_LOGIC),
 					extras.getString(SearchActivity.FORMAT), extras.getString(SearchActivity.RARITY),
-					extras.getString(SearchActivity.FLAVOR), extras.getString(SearchActivity.ARTIST), true, returnTypes, consolidate);
+					extras.getString(SearchActivity.FLAVOR), extras.getString(SearchActivity.ARTIST), 
+					extras.getInt(SearchActivity.TEXTLOGIC), true, returnTypes, consolidate);
 		}
 
 		if (c == null || c.getCount() == 0) {

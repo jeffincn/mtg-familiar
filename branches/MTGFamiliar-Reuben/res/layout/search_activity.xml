@@ -15,7 +15,7 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content" >
 
-    <LinearLayout
+    <LinearLayout 
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical" >
@@ -39,7 +39,8 @@
             android:imeOptions="actionSearch"
             android:inputType="text"
             android:singleLine="true" />
-
+		<!-- Original code below -->
+        <!--
         <EditText
             android:id="@+id/textsearch"
             android:layout_width="fill_parent"
@@ -49,7 +50,34 @@
             android:imeOptions="actionSearch"
             android:inputType="text"
             android:singleLine="true" />
-
+        -->
+		<!-- Modified version below by Reuben Kriegel -->
+		<LinearLayout
+            android:id="@+id/linearLayout11"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" >
+			<!-- EditText below by Adam Feinstein -->
+            <EditText
+	            android:id="@+id/textsearch"
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1"
+	            android:hint="@string/text"
+	            android:imeOptions="actionSearch"
+	            android:inputType="text"
+	            android:singleLine="true" />
+			
+			<!-- Spinner below by Reuben Kriegel -->
+            <Spinner
+                android:id="@+id/textlogic"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:hint="@string/artist"
+                android:imeOptions="actionSearch" />
+        </LinearLayout>
+        
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

@@ -179,13 +179,25 @@ public class Main implements ActionListener {
 			JSONObject cdb = jo.getJSONObject("mtg_carddatabase");
 			
 			JSONObject sets = cdb.getJSONObject("sets");
-			JSONArray set = sets.getJSONArray("set");
-			//System.out.println("sets: " + set.length());
 			
-			int setLen = set.length();
+			JSONArray set = null;
+			int setLen;
+			try{
+				set= sets.getJSONArray("set");
+				setLen = set.length();
+			}
+			catch(Exception e){
+				setLen = 1;
+			}
+			
 			for(int i=0; i < setLen; i++){
-				JSONObject s = (JSONObject)set.remove(0);
-							
+				JSONObject s;
+				if(set != null){
+					s = (JSONObject)set.remove(0);
+				}
+				else{
+					s = (JSONObject) sets.remove("set");
+				}
 				System.out.print(s.getString("name")+"\t"+s.getString("date")+"\t");
 				
 				String date = s.getString("date");
@@ -197,8 +209,12 @@ public class Main implements ActionListener {
 				long epochTime = cal.getTimeInMillis();
 				s.put("date", epochTime);
 				System.out.println(epochTime);
-//				set.remove(i);
-				set.put(s);
+				if(set != null){
+					set.put(s);
+				}
+				else{
+					sets.put("set", s);
+				}
 			}
 			
 			JSONObject cards = cdb.getJSONObject("cards");

@@ -5,11 +5,20 @@
     android:layout_height="fill_parent" 
     android:orientation="horizontal">
 
-    <com.devsmart.android.ui.HorizontalListView
-        android:id="@+id/h_list"
+    <HorizontalScrollView
+        android:id="@+id/playerScrollView"
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1" />
+        android:layout_weight="1" >
+
+        <LinearLayout
+	        android:id="@+id/playerList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" 
+            android:orientation="horizontal" >
+        </LinearLayout>
+
+    </HorizontalScrollView>
 
     <View
         android:id="@+id/divider"

@@ -90,7 +90,7 @@ public class ResultListActivity extends ListActivity {
 		Bundle extras = intent.getExtras();
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		boolean consolidate = preferences.getBoolean("consolidateSearch", false);
+		boolean consolidate = preferences.getBoolean("consolidateSearch", true);
 		
 		if (Intent.ACTION_VIEW.equals(intent.getAction())) {
 			// handles a click on a search suggestion; launches activity to show word
@@ -216,15 +216,15 @@ public class ResultListActivity extends ListActivity {
 			fromList.add(CardDbAdapter.KEY_MANACOST);
 			toList.add(R.id.cardcost);
 		}
-		if (preferences.getBoolean("typePref", false)) {
+		if (preferences.getBoolean("typePref", true)) {
 			fromList.add(CardDbAdapter.KEY_TYPE);
 			toList.add(R.id.cardtype);
 		}
-		if (preferences.getBoolean("abilityPref", false)) {
+		if (preferences.getBoolean("abilityPref", true)) {
 			fromList.add(CardDbAdapter.KEY_ABILITY);
 			toList.add(R.id.cardability);
 		}
-		if (preferences.getBoolean("ptPref", false)) {
+		if (preferences.getBoolean("ptPref", true)) {
 			fromList.add(CardDbAdapter.KEY_POWER);
 			toList.add(R.id.cardp);
 			fromList.add(CardDbAdapter.KEY_TOUGHNESS);

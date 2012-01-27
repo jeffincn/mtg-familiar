@@ -22,7 +22,7 @@ package com.gelakinetic.mtgfam;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter; 
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.MalformedURLException;
@@ -60,30 +60,30 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class MainActivity extends Activity implements Runnable {
-	private static final int		DBFROMAPK					= 0;
-	private static final int		OTAPATCH					= 1;
-	private static final int		APPLYINGPATCH			= 3;
-	private static final int		DBFROMWEB					= 4;
-	private static final int		EXCEPTION					= 99;
-	private static final int		ABOUTDIALOG				= 0;
-	private static final int		CHANGELOGDIALOG		= 1;
-	private static final int		DONATEDIALOG			= 2;
-	private LinearLayout				search;
-	private LinearLayout				rng;
-	private LinearLayout				manapool;
-	private Context							mCtx;
-	private CardDbAdapter				mDbHelper;
-	private ProgressDialog			dialog;
-	private int									numCards, numCardsAdded = 0;
-	private int									threadType;
-	private String							patchname;
-	private boolean							dialogReady;
-	private SharedPreferences		preferences;
-	private String							stacktrace;
-	private LinearLayout				deckmanagement;
-	private PackageInfo					pInfo;
-	private LinearLayout				randomCard;
-	private LinearLayout nbplayerbutton;
+	private static final int	DBFROMAPK				= 0;
+	private static final int	OTAPATCH				= 1;
+	private static final int	APPLYINGPATCH		= 3;
+	private static final int	DBFROMWEB				= 4;
+	private static final int	EXCEPTION				= 99;
+	private static final int	ABOUTDIALOG			= 0;
+	private static final int	CHANGELOGDIALOG	= 1;
+	private static final int	DONATEDIALOG		= 2;
+	private LinearLayout			search;
+	private LinearLayout			rng;
+	private LinearLayout			manapool;
+	private Context						mCtx;
+	private CardDbAdapter			mDbHelper;
+	private ProgressDialog		dialog;
+	private int								numCards, numCardsAdded = 0;
+	private int								threadType;
+	private String						patchname;
+	private boolean						dialogReady;
+	private SharedPreferences	preferences;
+	private String						stacktrace;
+	private LinearLayout			deckmanagement;
+	private PackageInfo				pInfo;
+	private LinearLayout			randomCard;
+	private LinearLayout			nbplayerbutton;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -97,17 +97,15 @@ public class MainActivity extends Activity implements Runnable {
 		manapool = (LinearLayout) findViewById(R.id.manapool);
 		randomCard = (LinearLayout) findViewById(R.id.randomCard);
 		deckmanagement = (LinearLayout) findViewById(R.id.deckManagement);
-		nbplayerbutton = (LinearLayout)findViewById(R.id.Nplayerlifecounter);
-		
-		nbplayerbutton .setOnClickListener(new View.OnClickListener() {
+		nbplayerbutton = (LinearLayout) findViewById(R.id.Nplayerlifecounter);
+
+		nbplayerbutton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				// NPlayer is kinda broken. 1.3 update has the old counter
-//				Intent i = new Intent(mCtx, NPlayerLifeActivity.class);
-				Intent i = new Intent(mCtx, LifeCounterActivity.class);
+				Intent i = new Intent(mCtx, NPlayerLifeActivity.class);
 				startActivity(i);
 			}
 		});
-		
+
 		search.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent(mCtx, SearchActivity.class);
@@ -148,7 +146,7 @@ public class MainActivity extends Activity implements Runnable {
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-		if(CardDbAdapter.isDbOutOfDate((Context)this)){
+		if (CardDbAdapter.isDbOutOfDate((Context) this)) {
 			startThread(DBFROMAPK);
 		}
 		else {
@@ -182,9 +180,9 @@ public class MainActivity extends Activity implements Runnable {
 	}
 
 	@Override
-	protected void onResume(){
+	protected void onResume() {
 		super.onResume();
-		MyApp appState = ((MyApp)getApplicationContext());
+		MyApp appState = ((MyApp) getApplicationContext());
 		appState.setState(0);
 	}
 
@@ -210,7 +208,7 @@ public class MainActivity extends Activity implements Runnable {
 	protected Dialog onCreateDialog(int id) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-		if (id == DONATEDIALOG){
+		if (id == DONATEDIALOG) {
 			builder.setTitle("Donate to the Devs");
 			builder.setNeutralButton("Thanks Anyway!", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
@@ -224,20 +222,20 @@ public class MainActivity extends Activity implements Runnable {
 			TextView text = (TextView) dialoglayout.findViewById(R.id.aboutfield);
 			text.setText(Html.fromHtml(getString(R.string.donate_to_devs)));
 			text.setMovementMethod(LinkMovementMethod.getInstance());
-			
+
 			text.setTextSize(15);
-			
-			ImageView paypal = (ImageView)dialoglayout.findViewById(R.id.imageview1);
+
+			ImageView paypal = (ImageView) dialoglayout.findViewById(R.id.imageview1);
 			paypal.setImageResource(R.drawable.paypal);
 			paypal.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
-					Intent myIntent = new Intent(Intent.ACTION_VIEW,
-							Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ALR4TSXWPPHUL"));
+					Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri
+							.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ALR4TSXWPPHUL"));
 
-							startActivity(myIntent); 
+					startActivity(myIntent);
 				}
 			});
-			((ImageView)dialoglayout.findViewById(R.id.imageview2)).setVisibility(View.GONE);
+			((ImageView) dialoglayout.findViewById(R.id.imageview2)).setVisibility(View.GONE);
 
 			builder.setView(dialoglayout);
 		}
@@ -297,8 +295,12 @@ public class MainActivity extends Activity implements Runnable {
 		// Handle item selection
 		switch (item.getItemId()) {
 
-//			 case R.id.buildWebDB: startThread(DBFROMWEB); return true;
-//			 case R.id.refreshDB: startThread(DBFROMAPK); return true;
+//			case R.id.buildWebDB:
+//				startThread(DBFROMWEB);
+//				return true;
+//			case R.id.refreshDB:
+//				startThread(DBFROMAPK);
+//				return true;
 
 			case R.id.checkUpdate:
 				// Set the last legality update time back to zero on a forced update
@@ -384,15 +386,15 @@ public class MainActivity extends Activity implements Runnable {
 				}
 				ArrayList<String[]> patchInfo = JsonParser.readUpdateJsonStream(this);
 
-					try {
-						parseLegality(new URL("https://sites.google.com/site/mtgfamiliar/manifests/legality.json"));
-					}
-					catch (MalformedURLException e1) {
-					}
-					
-					if (patchInfo != null) {
+				try {
+					parseLegality(new URL("https://sites.google.com/site/mtgfamiliar/manifests/legality.json"));
+				}
+				catch (MalformedURLException e1) {
+				}
 
-						for (int i = 0; i < patchInfo.size(); i++) {
+				if (patchInfo != null) {
+
+					for (int i = 0; i < patchInfo.size(); i++) {
 						String[] set = patchInfo.get(i);
 						if (!mDbHelper.doesSetExist(set[2])) {
 							try {
@@ -473,7 +475,7 @@ public class MainActivity extends Activity implements Runnable {
 																			;
 																		}
 																	}
-//																	startThread(OTAPATCH);
+																	// startThread(OTAPATCH);
 																	break;
 																case OTAPATCH:
 																	// If it successfully updated, update the

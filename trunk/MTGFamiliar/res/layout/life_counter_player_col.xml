@@ -3,7 +3,11 @@
     android:id="@+id/nplayer_col"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:orientation="horizontal" android:paddingBottom="0dp" android:paddingLeft="5px" android:paddingRight="5px" android:paddingTop="5px">
+    android:orientation="horizontal"
+    android:paddingBottom="0dp"
+    android:paddingLeft="5px"
+    android:paddingRight="5px"
+    android:paddingTop="5px" >
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -34,34 +38,30 @@
                 android:gravity="center"
                 android:maxLines="1"
                 android:text="20"
-                android:textSize="72dp" android:width="144dp"/>
+                android:textSize="72dp"
+                android:width="144dp" />
 
             <LinearLayout
                 android:id="@+id/history_layout"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:background="@drawable/textview_backdrop"
-                android:orientation="horizontal">
+                android:orientation="horizontal" >
 
                 <ListView
                     android:id="@+id/player_history"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="1px"/>
+                    android:padding="1px" />
             </LinearLayout>
         </LinearLayout>
-
-        <!--
-        android:layout_marginBottom="-10dp"
-        android:layout_marginRight="-5dp"
-        -->
 
         <LinearLayout
             android:id="@+id/buttonLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingTop="5px" android:layout_marginRight="-5dp" android:layout_marginLeft="-5dp">
+            android:paddingTop="5px" >
 
             <Button
                 android:id="@+id/player_plus5"
@@ -69,7 +69,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="+5"
-                android:textSize="20sp" android:layout_marginBottom="-10px"/>
+                android:textSize="20sp" />
 
             <Button
                 android:id="@+id/player_plus1"
@@ -77,7 +77,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="+1"
-                android:textSize="20sp" android:layout_marginBottom="-10px"/>
+                android:textSize="20sp" />
 
             <Button
                 android:id="@+id/player_minus1"
@@ -85,7 +85,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="-1"
-                android:textSize="20sp" android:layout_marginBottom="-10px"/>
+                android:textSize="20sp" />
 
             <Button
                 android:id="@+id/player_minus5"
@@ -93,7 +93,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="-5"
-                android:textSize="20sp" android:layout_marginBottom="-10px"/>
+                android:textSize="20sp" />
         </LinearLayout>
     </LinearLayout>
+
 </LinearLayout>

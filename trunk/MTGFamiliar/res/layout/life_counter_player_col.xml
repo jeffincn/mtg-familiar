@@ -9,6 +9,12 @@
     android:paddingRight="5px"
     android:paddingTop="5px" >
 
+        <View
+        android:id="@+id/divider"
+        android:layout_width="1px"
+        android:layout_height="fill_parent"
+        android:background="#FFAAAAAA" />
+    
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -39,7 +45,7 @@
                 android:maxLines="1"
                 android:text="20"
                 android:textSize="72dp"
-                android:width="144dp" />
+                android:padding = "10dp" />
 
             <LinearLayout
                 android:id="@+id/history_layout"

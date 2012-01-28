@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/scrollView1"
-    android:layout_width="match_parent"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content" >
 
     <LinearLayout
@@ -12,7 +12,7 @@
 
         <LinearLayout
             android:id="@+id/linearLayout1"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5sp"
             android:layout_marginTop="5sp"
@@ -26,8 +26,8 @@
 
             <LinearLayout
                 android:id="@+id/linearLayout2"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
                 android:orientation="vertical" >
 
                 <TextView
@@ -39,12 +39,12 @@
 
                 <Spinner
                     android:id="@+id/momir_spinner"
-                    android:layout_width="match_parent"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content" />
 
                 <Button
                     android:id="@+id/momir_button"
-                    android:layout_width="match_parent"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/random_creature" />
             </LinearLayout>
@@ -52,7 +52,7 @@
 
         <LinearLayout
             android:id="@+id/linearLayout3"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5sp"
             android:layout_marginTop="5sp"
@@ -66,8 +66,8 @@
 
             <LinearLayout
                 android:id="@+id/linearLayout4"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
                 android:orientation="vertical" >
 
                 <TextView
@@ -79,12 +79,12 @@
 
                 <Spinner
                     android:id="@+id/stonehewer_spinner"
-                    android:layout_width="match_parent"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content" />
 
                 <Button
                     android:id="@+id/stonehewer_button"
-                    android:layout_width="match_parent"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/random_eqipment" />
             </LinearLayout>
@@ -92,7 +92,7 @@
 
         <LinearLayout
             android:id="@+id/linearLayout5"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5sp"
             android:layout_marginTop="5sp"
@@ -106,19 +106,19 @@
 
             <LinearLayout
                 android:id="@+id/linearLayout6"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
                 android:orientation="vertical" >
 
                 <Button
                     android:id="@+id/jhorira_instant_button"
-                    android:layout_width="match_parent"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/random_instant" />
 
                 <Button
                     android:id="@+id/jhorira_sorcery_button"
-                    android:layout_width="match_parent"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/random_sorcery" />
             </LinearLayout>

@@ -62,7 +62,7 @@
 
             <LinearLayout
                 android:id="@+id/linearLayout3"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="3dip"
                 android:orientation="horizontal" >
@@ -165,7 +165,7 @@
 
             <LinearLayout
                 android:id="@+id/linearLayout4"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content" >
 
                 <LinearLayout

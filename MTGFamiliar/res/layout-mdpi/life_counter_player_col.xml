@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/nplayer_col"
-    android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:paddingBottom="0dp"
     android:paddingLeft="5px"
     android:paddingRight="5px"
-    android:paddingTop="5px" >
+    android:paddingTop="5px" android:layout_width="fill_parent">
 
     <View
         android:id="@+id/divider"
@@ -16,9 +15,8 @@
         android:background="#FFAAAAAA" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:orientation="vertical" >
+        android:orientation="vertical" android:layout_width="fill_parent">
 
         <TextView
             android:id="@+id/player_name"
@@ -34,19 +32,19 @@
             android:layout_height="fill_parent"
             android:layout_weight="1"
             android:orientation="horizontal" android:layout_width="fill_parent" android:weightSum="1">
-            <LinearLayout android:layout_height="match_parent" android:id="@+id/linearLayout1" android:layout_weight=".5" android:layout_width="0dp" android:orientation="vertical">
-                <TextView android:gravity="center" android:textSize="72dp" android:paddingBottom="10dp" android:paddingTop="10dp" android:paddingRight="0dp" android:layout_height="match_parent" android:text="20" android:paddingLeft="0dp" style="@style/text" android:maxLines="1" android:id="@+id/player_readout" android:layout_marginLeft="-18dp" android:layout_marginRight="-18dp"></TextView>
+            <LinearLayout android:layout_height="match_parent" android:id="@+id/linearLayout1" android:orientation="vertical" android:layout_width="fill_parent">
+                <TextView android:gravity="center" android:textSize="72dp" android:paddingBottom="10dp" android:paddingTop="10dp" android:paddingRight="0dp" android:layout_height="match_parent" android:text="20" android:paddingLeft="0dp" style="@style/text" android:maxLines="1" android:id="@+id/player_readout" android:layout_width="fill_parent"></TextView>
             </LinearLayout>
 
             <LinearLayout
                 android:layout_height="fill_parent"
                 android:background="@drawable/textview_backdrop"
-                android:orientation="vertical" android:layout_width="0dp" android:layout_weight=".5">
+                android:orientation="vertical" android:layout_width="fill_parent" android:visibility="gone">
 
                 <ListView
                     android:id="@+id/player_history"
                     android:layout_height="wrap_content"
-                    android:padding="1dp" android:layout_width="fill_parent" android:paddingLeft="36dp">
+                    android:padding="1dp" android:layout_width="fill_parent" android:paddingLeft="36dp" android:visibility="gone">
                 </ListView>
             </LinearLayout>
         </LinearLayout>

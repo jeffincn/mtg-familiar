@@ -31,27 +31,24 @@
 
         <LinearLayout
             android:id="@+id/middle_layout"
-            android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:orientation="horizontal" >
+            android:orientation="horizontal" android:weightSum="1" android:layout_width="fill_parent">
 
             <TextView
                 android:id="@+id/player_readout"
                 style="@style/text"
-                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:maxLines="1"
                 android:padding="10dp"
                 android:text="20"
-                android:textSize="72dp" />
+                android:textSize="72dp" android:layout_weight=".5" android:layout_width="0dp"/>
 
             <LinearLayout
-                android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:background="@drawable/textview_backdrop"
-                android:orientation="vertical" >
+                android:orientation="vertical" android:layout_weight=".5" android:layout_width="0dp">
 
                 <ListView
                     android:id="@+id/player_history"
@@ -67,7 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingTop="5px" >
+            android:paddingTop="5px" android:layout_marginRight="-10px">
 
             <Button
                 android:id="@+id/player_plus5"

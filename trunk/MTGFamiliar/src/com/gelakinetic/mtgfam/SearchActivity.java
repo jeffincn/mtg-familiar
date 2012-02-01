@@ -72,7 +72,8 @@ public class SearchActivity extends Activity {
 	private Button								searchbutton;
 	private AutoCompleteTextView	namefield;
 	private EditText							textfield;
-	private EditText							typefield;
+	private AutoCompleteTextView	supertypefield;
+	private EditText							subtypefield;
 	private CheckBox							checkboxW;
 	private CheckBox							checkboxU;
 	private CheckBox							checkboxB;
@@ -119,7 +120,8 @@ public class SearchActivity extends Activity {
 		namefield = (AutoCompleteTextView) findViewById(R.id.namesearch);
 		namefield.setAdapter(new AutocompleteCursorAdapter(mCtx, null));
 		textfield = (EditText) findViewById(R.id.textsearch);
-		typefield = (EditText) findViewById(R.id.typesearch);
+		supertypefield = (AutoCompleteTextView) findViewById(R.id.supertypesearch);
+		subtypefield = (EditText) findViewById(R.id.subtypesearch);
 		flavorfield = (EditText) findViewById(R.id.flavorsearch);
 		artistfield = (EditText) findViewById(R.id.artistsearch);
 		
@@ -146,7 +148,22 @@ public class SearchActivity extends Activity {
 			}
 		});
 
-		typefield.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+		supertypefield.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
+				if (arg1 == EditorInfo.IME_ACTION_SEARCH) {
+					searchbutton.performClick();
+					return true;
+				}
+				return false;
+			}
+		});
+		
+		String[] supertypes = getResources().getStringArray(R.array.supertypes);
+		ArrayAdapter<String> supertypeadapter = new ArrayAdapter<String>(this, R.layout.supertype_list_item, supertypes);
+		supertypefield.setThreshold(1);
+		supertypefield.setAdapter(supertypeadapter);
+		
+		subtypefield.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
 				if (arg1 == EditorInfo.IME_ACTION_SEARCH) {
 					searchbutton.performClick();
@@ -358,7 +375,9 @@ public class SearchActivity extends Activity {
 	private void doSearch(boolean isRandom) {
 		String name = namefield.getText().toString();
 		String text = textfield.getText().toString();
-		String type = typefield.getText().toString();
+		String supertype = supertypefield.getText().toString();
+		String subtype = subtypefield.getText().toString();
+		String type = supertype + " " + subtype;
 		String flavor = flavorfield.getText().toString();
 		String artist = artistfield.getText().toString();
 
@@ -585,7 +604,8 @@ public class SearchActivity extends Activity {
 
 			case R.id.search_menu_clear:
 				namefield.setText("");
-				typefield.setText("");
+				supertypefield.setText("");
+				subtypefield.setText("");
 				textfield.setText("");
 				artistfield.setText("");
 				flavorfield.setText("");

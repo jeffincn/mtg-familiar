@@ -80,7 +80,7 @@ public class NPlayerLifeActivity extends Activity {
 	private Player													playerToHaveNameChanged;
 
 	private ArrayList<Player>								players;
-	private TextView												nameInput;
+	private EditText												nameInput;
 	private PowerManager										pm;
 	private WakeLock												wl;
 	private boolean													resetting;
@@ -352,8 +352,10 @@ public class NPlayerLifeActivity extends Activity {
 	protected void onPrepareDialog(final int id, final Dialog dialog) {
 		switch (id) {
 			case DIALOG_SET_NAME:
-				if(playerToHaveNameChanged != null)
+				if (playerToHaveNameChanged != null) {
 					nameInput.setText(playerToHaveNameChanged.name);
+					nameInput.selectAll();
+				}
 				break;
 		}
 	}

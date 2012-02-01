@@ -30,15 +30,31 @@
             android:inputType="text"
             android:singleLine="true" />
 
-        <EditText
-            android:id="@+id/typesearch"
+        <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="@string/type"
-            android:imeOptions="actionSearch"
-            android:inputType="text"
-            android:singleLine="true" />
+            android:orientation="horizontal" >
+
+            <AutoCompleteTextView
+                android:id="@+id/supertypesearch"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:hint="@string/supertype"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:singleLine="true" />
+
+            <EditText
+                android:id="@+id/subtypesearch"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:hint="@string/subtype"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:singleLine="true" />
+        </LinearLayout>
 
         <EditText
             android:id="@+id/textsearch"

@@ -14,6 +14,24 @@
 
     <string name="app_name">MTG Familiar</string>
 
+    <string-array name="supertypes">
+        <item>Artifact</item>
+        <item>Basic</item>
+        <item>Creature</item>
+        <item>Enchantment</item>
+        <item>Instant</item>
+        <item>Land</item>
+        <item>Legendary</item>
+        <item>Ongoing</item>
+        <item>Plane</item>
+        <item>Planeswalker</item>
+        <item>Scheme</item>
+        <item>Snow</item>
+        <item>Sorcery</item>
+        <item>Tribal</item>
+        <item>Vanguard</item>
+        <item>World</item>
+    </string-array>
     <string-array name="logic_spinner">
         <item>></item>
         <item>&lt;</item>
@@ -141,7 +159,8 @@
     <string name="tcgplayerlink">Click here for all prices and trend info</string>
     <string name="toast_no_result">No Results Found</string>
     <string name="name">Name</string>
-    <string name="type">Type</string>
+    <string name="subtype">Subype</string>
+    <string name="supertype">Superype</string>
     <string name="text">Text</string>
     <string name="flavor_text">Flavor Text</string>
     <string name="artist">Artist</string>
@@ -198,12 +217,11 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
  - UI improvements for artists with long names
         -->
         <!-- 1.4 -->
-
    - Added the ability to add, remove, and rename players from the life counter&lt;br />&lt;br />
    - Made more life counter data persistent&lt;br />&lt;br />
-   - Added new logic options for searching by color and ability text
+   - Added new logic options for searching by color and ability text&lt;br />&lt;br />
+   - Split type search into super and subtype search
      	</string>
-     	
     <string name="gatherer">Gatherer Page</string>
     <string name="lifetitle">Life Counter</string>
     <string name="wakelocksummary">Force the life counter screen to never go to sleep</string>
@@ -281,8 +299,9 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
         So, how generous are you feeling today?</string>
 
     <string-array name="text_spinner">
-	    <item>All words</item>
-	    <item>Any word(s)</item>
-	    <item>Exact phrase</item>
+        <item>All words</item>
+        <item>Any word(s)</item>
+        <item>Exact phrase</item>
     </string-array>
+
 </resources>

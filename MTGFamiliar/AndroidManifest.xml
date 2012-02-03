@@ -122,6 +122,13 @@
                 android:name="android.app.default_searchable"
                 android:value=".ResultListActivity" />
         </activity>
+        <activity
+        	android:label="@string/app_name"
+        	android:name="com.gelakinetic.mtgfam.RoundTimerActivity" >	
+       	</activity>
+        <service 
+        	android:name="com.gelakinetic.mtgfam.RoundTimerService">
+        </service>
             
         <!-- Provides search suggestions for words and their definitions. -->
         <provider

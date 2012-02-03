@@ -303,5 +303,15 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
         <item>Any word(s)</item>
         <item>Exact phrase</item>
     </string-array>
+    <string name="set_timer">Set Timer</string>
+    <string name="cancel_timer">Cancel Timer</string>
+    <string name="default_time">00:00:00</string>
+    <string name="timertitle">Round Timer</string>
+    <string name="ringtonetitle">Timer Ringtone</string>
+    <string name="ringtonesummary">Select a notification ringtone to play when the round timer ends</string>
+    <string name="roundtimer">Round Timer</string>
+    <string name="roundend_text">The round will end in:</string>
+    <string name="hours">HH</string>
+    <string name="minutes">MM</string>
 
 </resources>

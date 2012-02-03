@@ -110,6 +110,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
+                        android:gravity="center"
                         android:text="@string/lifecounter"
                         android:textSize="30dip" >
                     </TextView>
@@ -189,6 +190,30 @@
                         android:text="@string/random"
                         android:textSize="30dip" />
                 </LinearLayout>
+                
+				<LinearLayout
+	            	android:id="@+id/roundTimer"
+	            	android:layout_width="fill_parent"
+	            	android:layout_height="wrap_content"
+	            	android:layout_weight="1"
+	            	android:orientation="vertical" >
+	            
+	            	<ImageView 
+	            		android:layout_width="wrap_content"
+	            		android:layout_height="wrap_content"
+	            		android:layout_gravity="center_horizontal"
+	            		android:src="@drawable/round_timer_icon" /> <!-- Temporary as a filler for now -->
+	            		
+	            	<TextView 
+	            		style="@style/text"
+	            		android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:layout_gravity="center_horizontal"
+	                    android:gravity="center"
+	                    android:text="@string/roundtimer"
+	                    android:textSize="30dip" />
+            
+            	</LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/randomCard"

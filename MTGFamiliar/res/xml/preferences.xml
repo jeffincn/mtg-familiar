@@ -54,6 +54,17 @@
             android:summary="@string/wakelocksummary"
             android:title="@string/wakelocktitle" />
     </PreferenceCategory>
+    
+    <PreferenceCategory android:title="@string/timertitle" >
+    
+    	<RingtonePreference
+    		android:ringtoneType="notification"
+    		android:showSilent="false"
+    		android:key="timerSound"
+    		android:summary="@string/ringtonesummary"
+    		android:title="@string/ringtonetitle" />
+    
+    </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/resultlisttitle" >
 

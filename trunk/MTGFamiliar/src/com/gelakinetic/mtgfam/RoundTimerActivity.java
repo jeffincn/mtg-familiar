@@ -1,7 +1,5 @@
 package com.gelakinetic.mtgfam;
 
-import java.util.Calendar;
-
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -133,7 +131,6 @@ public class RoundTimerActivity extends Activity {
 		long timeInMillis = ((hours * 3600) + (minutes * 60)) * 1000;
 		if(timeInMillis == 0)
 		{
-			Toast.makeText(this, "Please specify an amount of time greater than 0 seconds.", Toast.LENGTH_LONG).show();
 			return false;
 		}
 		
@@ -144,11 +141,6 @@ public class RoundTimerActivity extends Activity {
 		}
 		
 		startUpdatingDisplay();
-		
-		Calendar then = Calendar.getInstance();
-		then.add(Calendar.HOUR, hours);
-		then.add(Calendar.MINUTE, minutes);
-		Toast.makeText(this, String.format("Timer has been set. An alarm\nwill sound at %1$tl:%1$tM %1$Tp.", then), Toast.LENGTH_LONG).show();
 		return true;
 	}
 	

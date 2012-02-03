@@ -84,6 +84,7 @@ public class MainActivity extends Activity implements Runnable {
 	private PackageInfo				pInfo;
 	private LinearLayout			randomCard;
 	private LinearLayout			nbplayerbutton;
+	private LinearLayout			roundTimer;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -98,6 +99,7 @@ public class MainActivity extends Activity implements Runnable {
 		randomCard = (LinearLayout) findViewById(R.id.randomCard);
 		deckmanagement = (LinearLayout) findViewById(R.id.deckManagement);
 		nbplayerbutton = (LinearLayout) findViewById(R.id.Nplayerlifecounter);
+		roundTimer = (LinearLayout) findViewById(R.id.roundTimer);
 
 		nbplayerbutton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -140,6 +142,13 @@ public class MainActivity extends Activity implements Runnable {
 				startActivity(i);
 			}
 		});
+		
+		roundTimer.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Intent i = new Intent(mCtx, RoundTimerActivity.class);
+				startActivity(i);
+			}
+		});
 
 		// Uncomment to get to deck management, currently under construction
 		deckmanagement.setVisibility(View.GONE);
@@ -172,6 +181,9 @@ public class MainActivity extends Activity implements Runnable {
 			editor.putInt("lastVersion", pInfo.versionCode);
 			editor.commit();
 		}
+		
+		Intent i = new Intent(this, RoundTimerService.class);
+		startService(i);
 	}
 
 	@Override

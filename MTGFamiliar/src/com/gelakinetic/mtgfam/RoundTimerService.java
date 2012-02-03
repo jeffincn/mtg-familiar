@@ -1,6 +1,10 @@
 package com.gelakinetic.mtgfam;
 
+import java.util.Calendar;
+
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -29,11 +33,14 @@ public class RoundTimerService extends Service {
 	}
 	
 	private static String FILTER = "AlarmEvent";
+	private static int NOTIFICATION_ID = 53; //Arbitrary; we just need something no one else is using
 	
 	private boolean running;
 	private long endTime;
 	private Uri soundFile;
 	private MediaPlayer player;
+
+	private NotificationManager nm;
 	
 	private Handler cleanupHandler = new Handler();
 	private Runnable cleanupTask = new Runnable() 
@@ -61,11 +68,17 @@ public class RoundTimerService extends Service {
 				player = MediaPlayer.create(RoundTimerService.this, soundFile);
 				player.start();
 				
+				//Then we clear the status bar notification
+				nm.cancel(NOTIFICATION_ID);
+				
 				//And then we schedule a cleanup in 10 seconds, which will release the old player so we aren't wasting resources
 				cleanupHandler.removeCallbacks(cleanupTask);
 				cleanupHandler.postDelayed(cleanupTask, 10000);
 			}
 		}, new IntentFilter(FILTER));
+		
+		nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+		
 		return START_NOT_STICKY;
 	}
 	
@@ -79,33 +92,6 @@ public class RoundTimerService extends Service {
 	public boolean onUnbind(Intent intent)
 	{		
 		return true;
-	}
-	
-	/**
-	 * Returns the soundFile property of this service so we can see if the user has changed it.
-	 * @return The URI to the current sound file
-	 **/
-	public Uri getSoundFile()
-	{
-		return this.soundFile;
-	}
-	
-	/**
-	 * Sets the soundFile property of this service so it can play an alert tone.
-	 * @param soundFile The URI to the desired sound file
-	 **/
-	public void setSoundFile(Uri soundFile)
-	{
-		this.soundFile = soundFile;
-	}
-	
-	/**
-	 * Returns whether the service has been assigned a sound file yet.
-	 * @return true if soundFile is not null, false otherwise
-	 **/
-	public boolean hasSoundFile()
-	{
-		return soundFile != null;
 	}
 
 	/**
@@ -125,6 +111,21 @@ public class RoundTimerService extends Service {
 			Intent i = new Intent(FILTER);
 			PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
 			alarm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, endTime, pi);
+			
+			Context c = getApplication().getApplicationContext();
+			Intent notificationIntent = new Intent(c, RoundTimerActivity.class);
+			PendingIntent contentIntent = PendingIntent.getActivity(c, 0, notificationIntent, 0);
+			
+			Calendar then = Calendar.getInstance();
+			then.add(Calendar.MILLISECOND, (int)durationInMillis);
+			String messageText = String.format("The round will end at %1$tl:%1$tM %1$Tp.", then);
+			String titleText = "Round Timer";
+			
+			Notification n = new Notification(R.drawable.rt_notification_icon, messageText, System.currentTimeMillis());
+			n.flags |= Notification.FLAG_ONGOING_EVENT;
+			n.setLatestEventInfo(c, titleText, messageText, contentIntent);
+			
+			nm.notify(NOTIFICATION_ID, n);
 			
 			return true;
 		}
@@ -149,6 +150,8 @@ public class RoundTimerService extends Service {
 			Intent i = new Intent(FILTER);
 			PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
 			alarm.cancel(pi);
+			
+			nm.cancel(NOTIFICATION_ID);
 			
 			return true;
 		}

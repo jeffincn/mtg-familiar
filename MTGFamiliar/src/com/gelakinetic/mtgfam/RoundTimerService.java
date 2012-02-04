@@ -41,6 +41,11 @@ public class RoundTimerService extends Service {
 	private MediaPlayer player;
 
 	private NotificationManager nm;
+	private PendingIntent contentIntent;
+	private Context c;
+	private String titleText = "Round Timer";
+	private String timerStartText = "The round will end at %1$tl:%1$tM %1$Tp.";
+	private String timerEndText = "The round has ended.";
 	
 	private Handler cleanupHandler = new Handler();
 	private Runnable cleanupTask = new Runnable() 
@@ -68,8 +73,14 @@ public class RoundTimerService extends Service {
 				player = MediaPlayer.create(RoundTimerService.this, soundFile);
 				player.start();
 				
-				//Then we clear the status bar notification
+				//Then we clear the ongoing status bar notification and make a new one
+				Notification n = new Notification(R.drawable.rt_notification_icon, timerEndText, System.currentTimeMillis());
+				n.flags |= Notification.FLAG_AUTO_CANCEL;
+				n.setLatestEventInfo(getApplication().getApplicationContext(), titleText, timerEndText, contentIntent);
+				
 				nm.cancel(NOTIFICATION_ID);
+				
+				nm.notify(NOTIFICATION_ID, n);
 				
 				//And then we schedule a cleanup in 10 seconds, which will release the old player so we aren't wasting resources
 				cleanupHandler.removeCallbacks(cleanupTask);
@@ -78,6 +89,11 @@ public class RoundTimerService extends Service {
 		}, new IntentFilter(FILTER));
 		
 		nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+		
+		c = getApplication().getApplicationContext();
+		
+		Intent notificationIntent = new Intent(c, RoundTimerActivity.class);
+		contentIntent = PendingIntent.getActivity(c, 0, notificationIntent, 0);
 		
 		return START_NOT_STICKY;
 	}
@@ -112,19 +128,18 @@ public class RoundTimerService extends Service {
 			PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
 			alarm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, endTime, pi);
 			
-			Context c = getApplication().getApplicationContext();
-			Intent notificationIntent = new Intent(c, RoundTimerActivity.class);
-			PendingIntent contentIntent = PendingIntent.getActivity(c, 0, notificationIntent, 0);
-			
 			Calendar then = Calendar.getInstance();
 			then.add(Calendar.MILLISECOND, (int)durationInMillis);
-			String messageText = String.format("The round will end at %1$tl:%1$tM %1$Tp.", then);
-			String titleText = "Round Timer";
+			String messageText = String.format(timerStartText, then);
 			
 			Notification n = new Notification(R.drawable.rt_notification_icon, messageText, System.currentTimeMillis());
 			n.flags |= Notification.FLAG_ONGOING_EVENT;
 			n.setLatestEventInfo(c, titleText, messageText, contentIntent);
 			
+			//Clear any existing notifications just in case there's still one there
+			nm.cancel(NOTIFICATION_ID);
+			
+			//Then show the new one
 			nm.notify(NOTIFICATION_ID, n);
 			
 			return true;

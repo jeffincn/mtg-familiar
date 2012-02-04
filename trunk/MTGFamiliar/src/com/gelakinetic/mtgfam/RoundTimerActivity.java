@@ -2,6 +2,7 @@ package com.gelakinetic.mtgfam;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -122,8 +124,13 @@ public class RoundTimerActivity extends Activity {
 	}
 	
 	private boolean setTimer()
-	{		
+	{
+		//Hide the soft keyboard if it's showing
+		InputMethodManager manager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+		manager.hideSoftInputFromWindow(picker.getWindowToken(), 0);
+		
 		//Get the duration
+		picker.clearFocus(); //This forces the inner value to update, in case the user typed it in manually
 		int hours = picker.getCurrentHour();
 		int minutes = picker.getCurrentMinute();
 		

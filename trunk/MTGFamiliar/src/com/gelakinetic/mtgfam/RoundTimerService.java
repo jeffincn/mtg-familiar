@@ -83,7 +83,11 @@ public class RoundTimerService extends Service {
 				
 				//When we get the alarm broadcast, we first start playing the alert sound
 				player = MediaPlayer.create(RoundTimerService.this, soundFile);
-				player.start();
+				if(player != null)
+				{
+					//If create fails for some reason, it will return null and we don't want null pointer exceptions
+					player.start();
+				}	
 				
 				//Then we clear the ongoing status bar notification and make a new one
 				Notification n = new Notification(R.drawable.rt_notification_icon, timerEndText, System.currentTimeMillis());

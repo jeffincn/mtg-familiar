@@ -60,7 +60,19 @@ public class RoundTimerService extends Service {
 	};
 	
 	@Override
+	public void onStart(Intent intent, int startId)
+	{
+		handleStartup(intent);
+	}
+	
+	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) 
+	{
+		handleStartup(intent);		
+		return START_NOT_STICKY;
+	}
+	
+	private void handleStartup(Intent intent)
 	{
 		registerReceiver(new BroadcastReceiver() {
 			@Override
@@ -94,8 +106,6 @@ public class RoundTimerService extends Service {
 		
 		Intent notificationIntent = new Intent(c, RoundTimerActivity.class);
 		contentIntent = PendingIntent.getActivity(c, 0, notificationIntent, 0);
-		
-		return START_NOT_STICKY;
 	}
 	
 	@Override

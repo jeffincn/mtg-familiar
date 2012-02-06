@@ -21,10 +21,12 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
     <item
         android:id="@+id/add_player"
+        android:icon="@drawable/menu_plus"
         android:title="@string/addplayer"></item>
 
     <item
         android:id="@+id/remove_player"
+        android:icon="@drawable/menu_minus"
         android:title="@string/removeplayer"/>
 
 </menu>

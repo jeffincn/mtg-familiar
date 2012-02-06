@@ -313,5 +313,9 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     <string name="roundend_text">The round will end in:</string>
     <string name="hours">HH</string>
     <string name="minutes">MM</string>
+    <string name="life_clear_dialog_message">Clear life totals or players?\nMana pool will also be cleared.</string>
+    <string name="life_clear_dialog_players_life_button">Both</string>
+    <string name="life_clear_dialog_life_button">Life</string>
+    <string name="dialog_cancel">Cancel</string>
 
 </resources>

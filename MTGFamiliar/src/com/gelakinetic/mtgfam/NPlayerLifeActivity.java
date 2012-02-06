@@ -368,20 +368,21 @@ public class NPlayerLifeActivity extends Activity {
 		switch (id) {
 			case DIALOG_RESET_CONFIRM:
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setMessage("Reset counters and pool?").setCancelable(true)
-						.setPositiveButton("Players and Totals", new DialogInterface.OnClickListener() {
+				builder.setMessage(getString(R.string.life_clear_dialog_message)).setCancelable(true)
+						.setPositiveButton(getString(R.string.life_clear_dialog_players_life_button),
+                                new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								ManaPoolActivity.reset(context);
-								dialog.cancel();
 								reset(EVERYTHING);
 							}
-						}).setNeutralButton("Just Totals", new DialogInterface.OnClickListener() {
+						}).setNeutralButton(getString(R.string.life_clear_dialog_life_button),
+                            new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								ManaPoolActivity.reset(context);
-								dialog.cancel();
 								reset(JUST_TOTALS);
 							}
-						}).setNegativeButton("No", new DialogInterface.OnClickListener() {
+						}).setNegativeButton(getString(R.string.dialog_cancel),
+                            new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								dialog.cancel();
 							}

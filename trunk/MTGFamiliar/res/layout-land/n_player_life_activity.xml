@@ -56,7 +56,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:scaleType="center"
-            android:src="@drawable/die_button" />
+            android:src="@drawable/die_button_xml" />
 
         <ImageView
             android:id="@+id/pool_button"
@@ -64,7 +64,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:scaleType="center"
-            android:src="@drawable/pool_button" />
+            android:src="@drawable/pool_button_xml" />
 
         <ImageView
             android:id="@+id/reset_button"
@@ -72,7 +72,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:scaleType="center"
-            android:src="@drawable/reset_button" />
+            android:src="@drawable/reset_button_xml" />
     </LinearLayout>
 
 </LinearLayout>

@@ -46,7 +46,6 @@ public class RoundTimerActivity extends Activity {
 	
 	private ServiceConnection connection = new ServiceConnection() 
 	{
-		@Override
 		public void onServiceConnected(ComponentName className, IBinder service)
 		{
 			RoundTimerBinder binder = (RoundTimerBinder)service;
@@ -61,7 +60,6 @@ public class RoundTimerActivity extends Activity {
 			}
 		}
 		
-		@Override
 		public void onServiceDisconnected(ComponentName className)
 		{
 			bound = false;

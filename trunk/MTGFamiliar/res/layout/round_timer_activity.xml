@@ -48,8 +48,7 @@
 		android:layout_height="wrap_content"
 		android:layout_gravity="center_horizontal"
 		android:textSize="8pt"
-		android:text="@string/set_timer" 
-		android:onClick="handleClick" />
+		android:text="@string/set_timer" />
 		
 	<View 
         android:layout_width="fill_parent"

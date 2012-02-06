@@ -83,6 +83,11 @@ public class RoundTimerActivity extends Activity {
 		picker.setCurrentMinute(0);
 		
 		this.actionButton = (Button)findViewById(R.id.rt_action_button);
+		actionButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				handleClick(v);
+			}
+		});
 		
 		this.timeView = (TextView)findViewById(R.id.rt_time_display);
 	}

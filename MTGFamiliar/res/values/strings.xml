@@ -216,13 +216,15 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
  - Rewrote internal card legality code. It works for reprints now.&lt;br />&lt;br />
  - UI improvements for artists with long names
         -->
-        <!-- 1.4 -->
+        <!-- 1.4 
    - Added the ability to add, remove, and rename players from the life counter&lt;br />&lt;br />
    - Made more life counter data persistent&lt;br />&lt;br />
    - Added new logic options for searching by color and ability text&lt;br />&lt;br />
    - Split type search into super and subtype search&lt;br />&lt;br />
    - Fixed searching for pre-Android 2.1 devices. Sorry for breaking that!
-   
+   -->
+   <!--  1.5 -->
+   - Added a round timer. Never miss the end of the round again! (Warning: does not guarantee not going to time)
      	</string>
     <string name="gatherer">Gatherer Page</string>
     <string name="lifetitle">Life Counter</string>

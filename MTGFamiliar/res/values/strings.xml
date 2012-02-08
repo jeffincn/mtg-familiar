@@ -159,8 +159,8 @@
     <string name="tcgplayerlink">Click here for all prices and trend info</string>
     <string name="toast_no_result">No Results Found</string>
     <string name="name">Name</string>
-    <string name="subtype">Subype</string>
-    <string name="supertype">Superype</string>
+    <string name="subtype">Subtype</string>
+    <string name="supertype">Supertype</string>
     <string name="text">Text</string>
     <string name="flavor_text">Flavor Text</string>
     <string name="artist">Artist</string>
@@ -220,7 +220,9 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
    - Added the ability to add, remove, and rename players from the life counter&lt;br />&lt;br />
    - Made more life counter data persistent&lt;br />&lt;br />
    - Added new logic options for searching by color and ability text&lt;br />&lt;br />
-   - Split type search into super and subtype search
+   - Split type search into super and subtype search&lt;br />&lt;br />
+   - Fixed searching for pre-Android 2.1 devices. Sorry for breaking that!
+   
      	</string>
     <string name="gatherer">Gatherer Page</string>
     <string name="lifetitle">Life Counter</string>

@@ -184,32 +184,31 @@
                     android:text="@string/random"
                     android:textSize="30dip" />
             </LinearLayout>
-            
+
             <LinearLayout
-            	android:id="@+id/roundTimer"
-            	android:layout_width="fill_parent"
-            	android:layout_height="wrap_content"
-            	android:gravity="center"
-            	android:orientation="horizontal" >
-            
-            	<ImageView 
-            		android:layout_width="0dp"
-            		android:layout_height="wrap_content"
-            		android:layout_marginBottom="8dip"
-            		android:layout_marginTop="8dip"
-            		android:layout_weight="1"
-            		android:scaleType="center"
-            		android:src="@drawable/round_timer_icon" /> <!-- Temporary as a filler for now -->
-            		
-            	<TextView 
-            		style="@style/text"
-            		android:layout_width="0dp"
+                android:id="@+id/roundTimer"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dip"
+                    android:layout_marginTop="8dip"
+                    android:layout_weight="1"
+                    android:scaleType="center"
+                    android:src="@drawable/round_timer_icon" /> <!-- Temporary as a filler for now -->
+
+                <TextView
+                    style="@style/text"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="12dip"
                     android:layout_weight="3"
                     android:text="@string/roundtimer"
                     android:textSize="30dip" />
-            
             </LinearLayout>
 
             <LinearLayout

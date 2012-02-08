@@ -274,7 +274,13 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
         You can click the button below to donate via PayPal. $1 is cool. $5 is cooler. You get the drift.&lt;br />&lt;br />
         So, how generous are you feeling today?</string>
         
-    <!-- String-Array below added by Reuben Kriegel -->
+    <!-- Code below added by Reuben Kriegel -->
+    <string-array name="type_spinner">
+	    <item>All types</item>
+	    <item>Any type(s)</item>
+	    <item>NOT any selected type(s)</item>
+    </string-array>
+    
     <string-array name="text_spinner">
 	    <item>All words</item>
 	    <item>Any word(s)</item>

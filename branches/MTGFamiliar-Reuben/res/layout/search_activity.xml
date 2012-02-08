@@ -30,6 +30,8 @@
             android:inputType="text"
             android:singleLine="true" />
 
+		<!-- Original code below -->
+        <!--
         <EditText
             android:id="@+id/typesearch"
             android:layout_width="fill_parent"
@@ -39,8 +41,7 @@
             android:imeOptions="actionSearch"
             android:inputType="text"
             android:singleLine="true" />
-		<!-- Original code below -->
-        <!--
+            
         <EditText
             android:id="@+id/textsearch"
             android:layout_width="fill_parent"
@@ -53,6 +54,31 @@
         -->
 		<!-- Modified version below by Reuben Kriegel -->
 		<LinearLayout
+            android:id="@+id/linearLayout12"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" >
+			<!-- EditText below by Adam Feinstein -->
+            <EditText
+	            android:id="@+id/typesearch"
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1"
+	            android:hint="@string/type"
+	            android:imeOptions="actionSearch"
+	            android:inputType="text"
+	            android:singleLine="true" />
+			
+			<!-- Spinner below by Reuben Kriegel -->
+            <Spinner
+                android:id="@+id/typelogic"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:imeOptions="actionSearch" />
+        </LinearLayout>
+        
+        <LinearLayout
             android:id="@+id/linearLayout11"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -74,7 +100,6 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
-                android:hint="@string/artist"
                 android:imeOptions="actionSearch" />
         </LinearLayout>
         

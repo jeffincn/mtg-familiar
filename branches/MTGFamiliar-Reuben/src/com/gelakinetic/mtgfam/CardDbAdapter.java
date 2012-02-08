@@ -459,7 +459,8 @@ public class CardDbAdapter {
 
 	public Cursor Search(String cardname, String cardtext, String cardtype, String color, int colorlogic, String sets,
 			float pow_choice, String pow_logic, float tou_choice, String tou_logic, int cmc, String cmcLogic, String format,
-			String rarity, String flavor, String artist, int text_logic, boolean backface, String[] returnTypes, boolean consolidate) {
+			String rarity, String flavor, String artist, int type_logic, int text_logic, boolean backface,
+			String[] returnTypes, boolean consolidate) {
 		Cursor mCursor = null;
 
 		if (cardname != null)
@@ -488,10 +489,11 @@ public class CardDbAdapter {
 			statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " LIKE '%" + cardtext + "%')";
 		}
 		*/
+/*************************************************************************************/
 		/**
 		 * Reuben's version
 		 * Differences: Original code is verbose only, but mine allows for matching exact
-		 * text, all words, or just any one word
+		 * text, all words, or just any one word.
 		 */
 		if (cardtext != null) {
 			String[] cardTextParts = cardtext.split(" ");	//Separate each individual
@@ -503,9 +505,10 @@ public class CardDbAdapter {
 			 * phrase.  The second option (1) finds cards that have 1 or more of the
 			 * chosen words in their text.  The third option (2) searches for the exact
 			 * phrase as entered by the user.  The 'default' option is impossible via
-			 * the way the code is written, but I believe it's also mandatory.  The if
-			 * statement at the end is theorhetically unnecessary, because once we've
-			 * entered the current if statement, there is no way to NOT change the
+			 * the way the code is written, but I believe it's also mandatory to include
+			 * it in case someone else is perhaps fussing with the code and breaks it.
+			 * The if statement at the end is theorhetically unnecessary, because once 
+			 * we've entered the current if statement, there is no way to NOT change the
 			 * statement variable.  However, you never really know who's going to break
 			 * open your code and fuss around with it, so it's always good to leave some
 			 * small safety measures.
@@ -534,8 +537,11 @@ public class CardDbAdapter {
 				default: break;
 			}
 		}
-		/**End Reuben's Version*/
+		/**End Reuben's version*/
+/*************************************************************************************/
 		
+		/**Original code below*/
+		/*
 		if (cardtype != null) {
 			String[] types = cardtype.split(" ");
 			statement += " AND (";
@@ -553,6 +559,45 @@ public class CardDbAdapter {
 
 			statement += ")";
 		}
+		*/
+/*************************************************************************************/
+		/**
+		 * Reuben's version
+		 * Differences: Original version only allowed for including all types, not any
+		 * of the types or excluding the given types.
+		 */
+		if (cardtype != null) {
+			String[] cardTypeParts = cardtype.split(" ");	//Separate each individual
+			
+			switch (type_logic) {
+				case 0: for(String s : cardTypeParts) {
+							statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE +
+									 " LIKE '%" + s + "%')";
+						}
+						break;
+				case 1: boolean firstRun = true;
+						for(String s : cardTypeParts)
+						{
+							if(firstRun)
+							{
+								firstRun = false;
+								statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
+							}
+							else
+								statement += " OR (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
+						}
+						statement += ")";
+						break;
+				case 2: for(String s : cardTypeParts) {
+						statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE +
+								 " NOT LIKE '%" + s + "%')";
+						}
+						break;
+				default: break;
+			}
+		}
+		/**End Reuben's version*/
+/*************************************************************************************/
 
 		if (flavor != null) {
 			statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_FLAVOR + " LIKE '%" + flavor + "%')";
@@ -561,7 +606,7 @@ public class CardDbAdapter {
 		if (artist != null) {
 			statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_ARTIST + " LIKE '%" + artist + "%')";
 		}
-
+		
 		/**
 		 * Original code below
 		 */
@@ -622,7 +667,8 @@ public class CardDbAdapter {
 			statement += "))";
 		}
 		*/
-		
+
+/*************************************************************************************/
 		/**
 		 * Code below added/modified by Reuben.
 		 * Differences: Original version only had 'Any' and 'All' options and lacked
@@ -685,100 +731,8 @@ public class CardDbAdapter {
 			else
 				statement += ")";
 		}
-		/*
-		if (!(color.equals("wubrgl") || (color.equals("WUBRGL") && colorlogic == 0))) {
-			byte[] bytes = color.getBytes();
-			char[] letters = {};
-			for(int i = 0; i < bytes.length; i++)
-				letters[i] = (char) bytes[i];
-				
-			statement += " AND ((";
-			
-			if(colorlogic == 0 || colorlogic == 1)
-			{
-				for(char c : letters)
-				{
-					switch(c) {
-					case 'W':	statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR +
-							" LIKE '%" + Character.toUpperCase(c) +"%'";
-							break;
-					case 'U':	statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR +
-							" LIKE '%" + Character.toUpperCase(c) +"%'";
-							break;
-					case 'B':	statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR +
-							" LIKE '%" + Character.toUpperCase(c) +"%'";
-							break;
-					case 'R':	statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR +
-							" LIKE '%" + Character.toUpperCase(c) +"%'";
-							break;
-					case 'G':	statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR +
-							" LIKE '%" + Character.toUpperCase(c) +"%'";
-							break;
-					}
-				}
-			}
-
-			if(colorlogic == 2 || colorlogic == 3)
-			for(char c : letters)
-			{
-				switch(c) {
-				case 'w':	statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR +
-						" NOT LIKE '%" + Character.toUpperCase(c) +"%'";
-						break;
-				case 'u':	statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR +
-						" NOT LIKE '%" + Character.toUpperCase(c) +"%'";
-						break;
-				case 'b':	statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR +
-						" NOT LIKE '%" + Character.toUpperCase(c) +"%'";
-						break;
-				case 'r':	statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR +
-						" NOT LIKE '%" + Character.toUpperCase(c) +"%'";
-						break;
-				case 'g':	statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR +
-						" NOT LIKE '%" + Character.toUpperCase(c) +"%'";
-						break;
-				}
-				
-				if(!(c=='l' || c=='L'))
-				{
-					char[] letters2 = {'w','u','b','r','g','L'};
-					if(letters.equals(letters2))
-					{
-						for(char ch : letters)
-						{
-							statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR +
-										" NOT LIKE '%" + Character.toUpperCase(ch) +
-										"%') AND (";
-							statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR +
-										" NOT LIKE '%" + Character.toUpperCase(ch) +
-										"%') AND (";
-							statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR +
-										" NOT LIKE '%" + Character.toUpperCase(ch) +
-										"%') AND (";
-							statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR +
-										" NOT LIKE '%" + Character.toUpperCase(ch) +
-										"%') AND (";
-							statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR +
-										" NOT LIKE '%" + Character.toUpperCase(ch) +
-										"%'))";
-						}
-					}
-					else
-						statement += ")";
-				}
-				else
-					statement += ") AND (";
-			}
-			
-			char[] letters2 = {'w','u','b','r','g','L'};
-			if(letters.equals(letters2))
-			{
-				statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR +
-				" NOT LIKE '%";
-			}
-		}
-		*/
 		/** End of addition */
+/*************************************************************************************/
 		
 		if (sets != null) {
 			statement += " AND (";

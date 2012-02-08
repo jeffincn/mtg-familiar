@@ -574,21 +574,7 @@ public class CardViewActivity extends Activity implements Runnable {
 					else {
 						DisplayMetrics metrics = new DisplayMetrics();
 						getWindowManager().getDefaultDisplay().getMetrics(metrics);
-						int myHeight = 0;
-
-						switch (metrics.densityDpi) {
-							case DisplayMetrics.DENSITY_HIGH:
-								myHeight = display.getHeight() - 48;
-								break;
-							case DisplayMetrics.DENSITY_MEDIUM:
-								myHeight = display.getHeight() - 32;
-								break;
-							case DisplayMetrics.DENSITY_LOW:
-								myHeight = display.getHeight() - 24;
-								break;
-							default:
-								break;
-						}
+						int myHeight = display.getHeight() - 24;
 
 						scale = (myHeight - 10) / (float) d.getIntrinsicHeight();
 					}

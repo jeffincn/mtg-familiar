@@ -184,7 +184,7 @@
                     android:text="@string/random"
                     android:textSize="30dip" />
             </LinearLayout>
-
+<!-- 
             <LinearLayout
                 android:id="@+id/roundTimer"
                 android:layout_width="fill_parent"
@@ -199,7 +199,7 @@
                     android:layout_marginTop="8dip"
                     android:layout_weight="1"
                     android:scaleType="center"
-                    android:src="@drawable/round_timer_icon" /> <!-- Temporary as a filler for now -->
+                    android:src="@drawable/round_timer_icon" />
 
                 <TextView
                     style="@style/text"
@@ -210,7 +210,7 @@
                     android:text="@string/roundtimer"
                     android:textSize="30dip" />
             </LinearLayout>
-
+ -->
             <LinearLayout
                 android:id="@+id/randomCard"
                 android:layout_width="fill_parent"

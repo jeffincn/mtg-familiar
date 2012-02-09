@@ -35,14 +35,9 @@ public class RoundTimerActivity extends Activity {
 					timerHandler.postDelayed(updateTimeViewTask, 100);
 					actionButton.setText(R.string.pause_timer);
 				}
-				else
+				else if(!tService.isRunning())
 				{
-					actionButton.setText(R.string.start_timer);
-					
-					if(!tService.isRunning())
-					{
-						displaySelectedTime();
-					}
+					displaySelectedTime();
 				}
 			}
 		}
@@ -155,7 +150,7 @@ public class RoundTimerActivity extends Activity {
 				{
 					if(pause())
 					{
-						actionButton.setText(R.string.start_timer);
+						actionButton.setText(R.string.resume_timer);
 					}
 				}
 			}
@@ -173,6 +168,7 @@ public class RoundTimerActivity extends Activity {
 			if(tService.isRunning())
 			{
 				reset();
+				actionButton.setText(R.string.start_timer);
 			}
 			displaySelectedTime();
 		}

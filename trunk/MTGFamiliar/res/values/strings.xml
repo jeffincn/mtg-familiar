@@ -308,6 +308,7 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
         <item>Exact phrase</item>
     </string-array>
     <string name="start_timer">Start Timer</string>
+    <string name="resume_timer">Resume Timer</string>
     <string name="pause_timer">Pause Timer</string>
     <string name="reset_timer">Reset Timer</string>
     <string name="timertitle">Round Timer</string>

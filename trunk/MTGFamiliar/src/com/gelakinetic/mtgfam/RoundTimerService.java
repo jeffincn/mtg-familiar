@@ -36,7 +36,9 @@ public class RoundTimerService extends Service {
 	private static int NOTIFICATION_ID = 53; //Arbitrary; we just need something no one else is using
 	
 	private boolean running;
+	private boolean paused;
 	private long endTime;
+	private long timeLeft;
 	private Uri soundFile;
 	private MediaPlayer player;
 
@@ -90,13 +92,7 @@ public class RoundTimerService extends Service {
 				}	
 				
 				//Then we clear the ongoing status bar notification and make a new one
-				Notification n = new Notification(R.drawable.rt_notification_icon, timerEndText, System.currentTimeMillis());
-				n.flags |= Notification.FLAG_AUTO_CANCEL;
-				n.setLatestEventInfo(getApplication().getApplicationContext(), titleText, timerEndText, contentIntent);
-				
-				nm.cancel(NOTIFICATION_ID);
-				
-				nm.notify(NOTIFICATION_ID, n);
+				showEndNotification();
 				
 				//And then we schedule a cleanup in 10 seconds, which will release the old player so we aren't wasting resources
 				cleanupHandler.removeCallbacks(cleanupTask);
@@ -110,6 +106,10 @@ public class RoundTimerService extends Service {
 		
 		Intent notificationIntent = new Intent(c, RoundTimerActivity.class);
 		contentIntent = PendingIntent.getActivity(c, 0, notificationIntent, 0);
+		
+		running = false;
+		paused = false;
+		timeLeft = 0;
 	}
 	
 	@Override
@@ -134,27 +134,17 @@ public class RoundTimerService extends Service {
 	{
 		if(durationInMillis > 0 && !running)
 		{
-			endTime = SystemClock.elapsedRealtime() + durationInMillis;
+			timeLeft = durationInMillis;
+			endTime = SystemClock.elapsedRealtime() + timeLeft;
 			running = true;
+			paused = false;
 			
 			AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
 			Intent i = new Intent(FILTER);
 			PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
 			alarm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, endTime, pi);
 			
-			Calendar then = Calendar.getInstance();
-			then.add(Calendar.MILLISECOND, (int)durationInMillis);
-			String messageText = String.format(timerStartText, then);
-			
-			Notification n = new Notification(R.drawable.rt_notification_icon, messageText, System.currentTimeMillis());
-			n.flags |= Notification.FLAG_ONGOING_EVENT;
-			n.setLatestEventInfo(c, titleText, messageText, contentIntent);
-			
-			//Clear any existing notifications just in case there's still one there
-			nm.cancel(NOTIFICATION_ID);
-			
-			//Then show the new one
-			nm.notify(NOTIFICATION_ID, n);
+			showRunningNotification();
 			
 			return true;
 		}
@@ -165,15 +155,14 @@ public class RoundTimerService extends Service {
 	}
 	
 	/**
-	 * Cancels the current timer, provided that it is currently running
-	 * @return true if the timer gets canceled, false otherwise
+	 * Pauses the timer, provided that it is running and not paused
+	 * @return true if the timer gets paused, false otherwise
 	 **/
-	public boolean cancel()
+	public boolean pauseTimer()
 	{
-		if(running)
+		if(running && !paused)
 		{
-			endTime = SystemClock.elapsedRealtime();
-			running = false;
+			timeLeft = endTime - SystemClock.elapsedRealtime();
 			
 			AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
 			Intent i = new Intent(FILTER);
@@ -182,11 +171,60 @@ public class RoundTimerService extends Service {
 			
 			nm.cancel(NOTIFICATION_ID);
 			
+			paused = true;
+			
 			return true;
 		}
 		else
 		{
 			return false;
+		}
+	}
+
+	/**
+	 * Resumes the timer, provided that it is running and paused
+	 * @return true if the timer resumes, false otherwise
+	 **/
+	public boolean resumeTimer()
+	{
+		if(running && paused)
+		{
+			endTime = SystemClock.elapsedRealtime() + timeLeft;
+			
+			AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+			Intent i = new Intent(FILTER);
+			PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
+			alarm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, endTime, pi);
+			
+			showRunningNotification();
+			
+			paused = false;
+			
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * Resets the current timer, provided that it is currently running
+	 **/
+	public void reset()
+	{
+		if(running)
+		{
+			endTime = SystemClock.elapsedRealtime();
+			running = false;
+			paused = false;
+			
+			AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+			Intent i = new Intent(FILTER);
+			PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
+			alarm.cancel(pi);
+			
+			nm.cancel(NOTIFICATION_ID);
 		}
 	}
 	
@@ -196,11 +234,15 @@ public class RoundTimerService extends Service {
 	 **/
 	public String getTimeLeftDisplay()
 	{
-		long timeLeft = endTime - SystemClock.elapsedRealtime();
-		if(timeLeft < 0)
+		if(running && !paused)
 		{
-			timeLeft = 0;
-			running = false;
+			timeLeft = endTime - SystemClock.elapsedRealtime();
+			
+			if(timeLeft < 0)
+			{
+				timeLeft = 0;
+				running = false;
+			}
 		}
 		
 		long timeLeftInSecs = (timeLeft / 1000);
@@ -244,5 +286,42 @@ public class RoundTimerService extends Service {
 	public boolean isRunning()
 	{
 		return running;
+	}
+	
+	/**
+	 * Returns whether or not the timer is currently paused
+	 * @return true if the timer is paused, false otherwise
+	 **/
+	public boolean isPaused()
+	{
+		return paused;
+	}
+	
+	private void showRunningNotification()
+	{
+		Calendar then = Calendar.getInstance();
+		then.add(Calendar.MILLISECOND, (int)timeLeft);
+		String messageText = String.format(timerStartText, then);
+		
+		Notification n = new Notification(R.drawable.rt_notification_icon, messageText, System.currentTimeMillis());
+		n.flags |= Notification.FLAG_ONGOING_EVENT;
+		n.setLatestEventInfo(c, titleText, messageText, contentIntent);
+		
+		//Clear any existing notifications just in case there's still one there
+		nm.cancel(NOTIFICATION_ID);
+		
+		//Then show the new one
+		nm.notify(NOTIFICATION_ID, n);
+	}
+	
+	private void showEndNotification()
+	{
+		Notification n = new Notification(R.drawable.rt_notification_icon, timerEndText, System.currentTimeMillis());
+		n.flags |= Notification.FLAG_AUTO_CANCEL;
+		n.setLatestEventInfo(getApplication().getApplicationContext(), titleText, timerEndText, contentIntent);
+		
+		nm.cancel(NOTIFICATION_ID);
+		
+		nm.notify(NOTIFICATION_ID, n);
 	}
 }

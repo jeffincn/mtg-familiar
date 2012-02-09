@@ -307,9 +307,9 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
         <item>Any word(s)</item>
         <item>Exact phrase</item>
     </string-array>
-    <string name="set_timer">Set Timer</string>
-    <string name="cancel_timer">Cancel Timer</string>
-    <string name="default_time">00:00:00</string>
+    <string name="start_timer">Start Timer</string>
+    <string name="pause_timer">Pause Timer</string>
+    <string name="reset_timer">Reset Timer</string>
     <string name="timertitle">Round Timer</string>
     <string name="ringtonetitle">Timer Ringtone</string>
     <string name="ringtonesummary">Select a notification ringtone to play when the round timer ends</string>
@@ -321,5 +321,25 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     <string name="life_clear_dialog_players_life_button">Both</string>
     <string name="life_clear_dialog_life_button">Life</string>
     <string name="dialog_cancel">Cancel</string>
+    <string name="rt_defaulttime_title">Default Round Length</string>
+    <string name="rt_defaulttime_desc">Set the default length for the round timer</string>
+    <string-array name="rt_defaulttimes">
+    	<item>30 minutes</item>
+        <item>35 minutes</item>
+        <item>40 minutes</item>
+        <item>45 minutes</item>
+        <item>50 minutes</item>
+        <item>55 minutes</item>
+        <item>1 hour</item>
+    </string-array>
+    <string-array name="rt_defaulttimesvalues">
+        <item>30</item>
+        <item>35</item>
+        <item>40</item>
+        <item>45</item>
+        <item>50</item>
+        <item>55</item>
+        <item>60</item>
+    </string-array>
 
 </resources>

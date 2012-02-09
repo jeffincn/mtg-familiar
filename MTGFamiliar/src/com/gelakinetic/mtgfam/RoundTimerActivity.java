@@ -5,10 +5,12 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -28,14 +30,19 @@ public class RoundTimerActivity extends Activity {
 			{				
 				timeView.setText(tService.getTimeLeftDisplay());
 				
-				if(tService.isRunning())
+				if(tService.isRunning() && !tService.isPaused())
 				{
 					timerHandler.postDelayed(updateTimeViewTask, 100);
-					actionButton.setText(R.string.cancel_timer);
+					actionButton.setText(R.string.pause_timer);
 				}
 				else
 				{
-					actionButton.setText(R.string.set_timer);
+					actionButton.setText(R.string.start_timer);
+					
+					if(!tService.isRunning())
+					{
+						displaySelectedTime();
+					}
 				}
 			}
 		}
@@ -57,6 +64,10 @@ public class RoundTimerActivity extends Activity {
 				{
 					startUpdatingDisplay();
 				}
+				else
+				{
+					displaySelectedTime();
+				}
 			}
 		}
 		
@@ -68,6 +79,7 @@ public class RoundTimerActivity extends Activity {
 
 	private TimePicker picker;
 	private Button actionButton;
+	private Button resetButton;
 	private TextView timeView;
 	
 	@Override
@@ -79,13 +91,31 @@ public class RoundTimerActivity extends Activity {
 		
 		this.picker = (TimePicker)findViewById(R.id.rt_time_picker);
 		picker.setIs24HourView(true);
-		picker.setCurrentHour(0);
-		picker.setCurrentMinute(0);
+		
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(RoundTimerActivity.this);
+		int length;
+		try	{
+			length = Integer.parseInt(settings.getString("roundLength", "50"));
+		}
+		catch(Exception ex)	{
+			//Eat the exception; this should never happen in practice, and if it does we just want to
+			//default to 50 and pretend nothing broke
+			length = 50;
+		}
+		picker.setCurrentHour(length / 60);
+		picker.setCurrentMinute(length % 60);
 		
 		this.actionButton = (Button)findViewById(R.id.rt_action_button);
 		actionButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				handleClick(v);
+				startPauseClick(v);
+			}
+		});
+		
+		this.resetButton = (Button)findViewById(R.id.rt_reset_button);
+		resetButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				resetClick(v);
 			}
 		});
 		
@@ -101,7 +131,7 @@ public class RoundTimerActivity extends Activity {
 		bindService(i, connection, BIND_AUTO_CREATE);
 	}
 	
-	public void handleClick(View view)
+	public void startPauseClick(View view)
 	{
 		if(bound)
 		{
@@ -109,20 +139,42 @@ public class RoundTimerActivity extends Activity {
 			{
 				if(setTimer())
 				{
-					actionButton.setText(R.string.cancel_timer);
+					actionButton.setText(R.string.pause_timer);
 				}
 			}
 			else
 			{
-				if(cancel())
+				if(tService.isPaused())
 				{
-					actionButton.setText(R.string.set_timer);
+					if(resume())
+					{
+						actionButton.setText(R.string.pause_timer);
+					}
+				}
+				else
+				{
+					if(pause())
+					{
+						actionButton.setText(R.string.start_timer);
+					}
 				}
 			}
 		}
 		else
 		{
 			Toast.makeText(this, "Unable to perform action: the timer service is not properly bound.", Toast.LENGTH_LONG).show();
+		}
+	}
+	
+	public void resetClick(View view)
+	{
+		if(bound)
+		{
+			if(tService.isRunning())
+			{
+				reset();
+			}
+			displaySelectedTime();
 		}
 	}
 	
@@ -146,7 +198,7 @@ public class RoundTimerActivity extends Activity {
 		
 		if(!tService.setTimer(timeInMillis))
 		{
-			Toast.makeText(this, "Timer could not be set: the clock is already running.", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "Timer could not be set: it is already running.", Toast.LENGTH_LONG).show();
 			return false;
 		}
 		
@@ -154,14 +206,31 @@ public class RoundTimerActivity extends Activity {
 		return true;
 	}
 	
-	private boolean cancel()
+	private boolean pause()
 	{
-		if(!tService.cancel())
+		if(!tService.pauseTimer())
 		{
-			Toast.makeText(this, "Timer could not be canceled: no countdown is currently running.", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "Timer could not be paused.", Toast.LENGTH_LONG).show();
 			return false;
 		}
 		return true;
+	}
+	
+	private boolean resume()
+	{
+		if(!tService.resumeTimer())
+		{
+			Toast.makeText(this, "Timer could not be resumed.", Toast.LENGTH_LONG).show();
+			return false;
+		}
+		
+		startUpdatingDisplay();
+		return true;
+	}
+	
+	private void reset()
+	{
+		tService.reset();
 	}
 	
 	private void startUpdatingDisplay()
@@ -169,5 +238,28 @@ public class RoundTimerActivity extends Activity {
 		timeView.setText(tService.getTimeLeftDisplay());
 		timerHandler.removeCallbacks(updateTimeViewTask);
 		timerHandler.postDelayed(updateTimeViewTask, 100);
+	}
+	
+	private void displaySelectedTime()
+	{
+		String selectedTime = "";
+		int hour = picker.getCurrentHour();
+		int minute = picker.getCurrentMinute();
+		
+		if(hour < 10)
+		{
+			selectedTime += "0";
+		}
+		selectedTime += String.valueOf(hour);
+		selectedTime += ":";
+		
+		if(minute < 10)
+		{
+			selectedTime += "0";
+		}
+		selectedTime += String.valueOf(minute);
+		selectedTime += ":00";
+		
+		timeView.setText(selectedTime);
 	}
 }

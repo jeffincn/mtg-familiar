@@ -57,6 +57,22 @@
     
     <PreferenceCategory android:title="@string/timertitle" >
     
+    	<!-- <EditTextPreference 
+    		android:key="roundLength"
+    		android:title="@string/rt_defaulttime_title"
+    		android:summary="@string/rt_defaulttime_desc"
+    		android:defaultValue="50"
+    		android:dialogTitle="Round Length"
+    		android:dialogMessage="Enter a value in minutes" /> -->
+
+    	<ListPreference 
+    		android:entries="@array/rt_defaulttimes"
+    		android:entryValues="@array/rt_defaulttimesvalues"
+    		android:defaultValue="50"
+    		android:key="roundLength"
+    		android:title="@string/rt_defaulttime_title"
+    		android:summary="@string/rt_defaulttime_desc" />
+
     	<RingtonePreference
     		android:ringtoneType="notification"
     		android:showSilent="false"

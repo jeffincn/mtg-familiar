@@ -239,6 +239,7 @@ public class RoundTimerActivity extends Activity {
 	private void displaySelectedTime()
 	{
 		String selectedTime = "";
+		picker.clearFocus(); //This forces the inner value to update, in case the user typed it in manually
 		int hour = picker.getCurrentHour();
 		int minute = picker.getCurrentMinute();
 		

@@ -135,15 +135,6 @@ public class CardDbAdapter {
 
 	private final Context					mCtx;
 
-	public static final int				TEXT_INCLUDE_ALL							= 0;
-	public static final int				TEXT_INCLUDE_SOME							= 1;
-	public static final int				TEXT_EXACT_MATCH							= 2;
-
-	public static final int				MAY_INCLUDE_ANY_COLOR					= 0;
-	public static final int				MUST_INCLUDE_ALL_COLOR				= 1;
-	public static final int				NO_OTHER_COLOR								= 2;
-	public static final int				EXACT_COLOR										= 3;
-
 	private static class DatabaseHelper extends SQLiteOpenHelper {
 
 		DatabaseHelper(Context context) {
@@ -469,8 +460,8 @@ public class CardDbAdapter {
 
 	public Cursor Search(String cardname, String cardtext, String cardtype, String color, int colorlogic, String sets,
 			float pow_choice, String pow_logic, float tou_choice, String tou_logic, int cmc, String cmcLogic, String format,
-			String rarity, String flavor, String artist, int text_logic, boolean backface, String[] returnTypes,
-			boolean consolidate) {
+			String rarity, String flavor, String artist, int type_logic, int text_logic, boolean backface,
+			String[] returnTypes, boolean consolidate) {
 		Cursor mCursor = null;
 
 		if (cardname != null)
@@ -493,6 +484,11 @@ public class CardDbAdapter {
 			}
 		}
 
+		/*************************************************************************************/
+		/**
+		 * Reuben's version Differences: Original code is verbose only, but mine
+		 * allows for matching exact text, all words, or just any one word.
+		 */
 		if (cardtext != null) {
 			String[] cardTextParts = cardtext.split(" "); // Separate each individual
 
@@ -503,21 +499,21 @@ public class CardDbAdapter {
 			 * phrase. The second option (1) finds cards that have 1 or more of the
 			 * chosen words in their text. The third option (2) searches for the exact
 			 * phrase as entered by the user. The 'default' option is impossible via
-			 * the way the code is written, but I believe it's also mandatory. The if
-			 * statement at the end is theoretically unnecessary, because once we've
-			 * entered the current if statement, there is no way to NOT change the
-			 * statement variable. However, you never really know who's going to break
-			 * open your code and fuss around with it, so it's always good to leave
-			 * some small safety measures.
+			 * the way the code is written, but I believe it's also mandatory to
+			 * include it in case someone else is perhaps fussing with the code and
+			 * breaks it. The if statement at the end is theorhetically unnecessary,
+			 * because once we've entered the current if statement, there is no way to
+			 * NOT change the statement variable. However, you never really know who's
+			 * going to break open your code and fuss around with it, so it's always
+			 * good to leave some small safety measures.
 			 */
-
 			switch (text_logic) {
-				case TEXT_INCLUDE_ALL:
+				case 0:
 					for (String s : cardTextParts) {
 						statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " LIKE '%" + s + "%')";
 					}
 					break;
-				case TEXT_INCLUDE_SOME:
+				case 1:
 					boolean firstRun = true;
 					for (String s : cardTextParts) {
 						if (firstRun) {
@@ -529,31 +525,104 @@ public class CardDbAdapter {
 					}
 					statement += ")";
 					break;
-				case TEXT_EXACT_MATCH:
+				case 2:
 					statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " LIKE '%" + cardtext + "%')";
 					break;
 				default:
 					break;
 			}
 		}
+		/** End Reuben's version */
+
+		/**
+		 * Reuben's version Differences: Original version only allowed for including
+		 * all types, not any of the types or excluding the given types.
+		 */
+
+		String supertypes = null;
+		String subtypes = null;
 
 		if (cardtype != null) {
-			String[] types = cardtype.split(" ");
-			statement += " AND (";
-
-			boolean firstType = true;
-			for (String s : types) {
-				if (firstType) {
-					firstType = false;
-				}
-				else {
-					statement += " AND ";
-				}
-				statement += DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%'";
+			boolean containsSupertype = true;
+			if (cardtype.substring(0, 3).equals(" - ")) {
+				containsSupertype = false;
 			}
-
-			statement += ")";
+			String[] split = cardtype.split(" - ");
+			if (split.length >= 2) {
+				supertypes = split[0].replace(" -", "");
+				subtypes = split[1].replace(" -", "");
+			}
+			else if (containsSupertype) {
+				supertypes = cardtype.replace(" -", "");
+			}
+			else {
+				subtypes = cardtype.replace(" -", "");
+			}
 		}
+
+		if (supertypes != null) {
+			String[] supertypesParts = supertypes.split(" "); // Separate each individual
+
+			switch (type_logic) {
+				case 0:
+					for (String s : supertypesParts) {
+						statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + " %')";
+					}
+					break;
+				case 1:
+					boolean firstRun = true;
+					for (String s : supertypesParts) {
+						if (firstRun) {
+							firstRun = false;
+							statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + " %')";
+						}
+						else
+							statement += " OR (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + " %')";
+					}
+					statement += ")";
+					break;
+				case 2:
+					for (String s : supertypesParts) {
+						statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s + " %')";
+					}
+					break;
+				default:
+					break;
+			}
+		}
+		
+		if (subtypes != null) {
+			String[] subtypesParts = subtypes.split(" "); // Separate each individual
+
+			switch (type_logic) {
+				case 0:
+					for (String s : subtypesParts) {
+						statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
+					}
+					break;
+				case 1:
+					boolean firstRun = true;
+					for (String s : subtypesParts) {
+						if (firstRun) {
+							firstRun = false;
+							statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
+						}
+						else
+							statement += " OR (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
+					}
+					statement += ")";
+					break;
+				case 2:
+					for (String s : subtypesParts) {
+						statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s + "%')";
+					}
+					break;
+				default:
+					break;
+			}
+		}
+		/** End Reuben's version */
+		/*************************************************************************************/
 
 		if (flavor != null) {
 			statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_FLAVOR + " LIKE '%" + flavor + "%')";
@@ -563,7 +632,13 @@ public class CardDbAdapter {
 			statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_ARTIST + " LIKE '%" + artist + "%')";
 		}
 
-		if (!(color.equals("wubrgl") || (color.equals("WUBRGL") && colorlogic == MAY_INCLUDE_ANY_COLOR))) {
+		/*************************************************************************************/
+		/**
+		 * Code below added/modified by Reuben. Differences: Original version only
+		 * had 'Any' and 'All' options and lacked 'Exclusive' and 'Exact' matching.
+		 * In addition, original programming only provided exclusive results.
+		 */
+		if (!(color.equals("wubrgl") || (color.equals("WUBRGL") && colorlogic == 0))) {
 			boolean firstPrint = true;
 
 			// Can't contain these colors
@@ -571,7 +646,7 @@ public class CardDbAdapter {
 			 * ...if the chosen color logic was exactly (2) or none (3) of the
 			 * selected colors
 			 */
-			if (colorlogic > MUST_INCLUDE_ALL_COLOR)
+			if (colorlogic > 1) // if colorlogic is 2 or 3 it will be greater than 1
 			{
 				statement += " AND ((";
 				for (byte b : color.getBytes()) {
@@ -595,7 +670,7 @@ public class CardDbAdapter {
 			firstPrint = true;
 
 			// Might contain these colors
-			if (colorlogic < NO_OTHER_COLOR)
+			if (colorlogic < 2)
 				statement += " AND (";
 
 			for (byte b : color.getBytes()) {
@@ -604,7 +679,7 @@ public class CardDbAdapter {
 					if (firstPrint)
 						firstPrint = false;
 					else {
-						if (colorlogic == MUST_INCLUDE_ALL_COLOR || colorlogic == EXACT_COLOR)
+						if (colorlogic == 1 || colorlogic == 3)
 							statement += " AND ";
 						else
 							statement += " OR ";
@@ -616,13 +691,13 @@ public class CardDbAdapter {
 						statement += DATABASE_TABLE_CARDS + "." + KEY_COLOR + " LIKE '%" + c + "%'";
 				}
 			}
-			if (colorlogic > MUST_INCLUDE_ALL_COLOR) {
+			if (colorlogic > 1)
 				statement += "))";
-			}
-			else {
+			else
 				statement += ")";
-			}
 		}
+		/** End of addition */
+		/*************************************************************************************/
 
 		if (sets != null) {
 			statement += " AND (";
@@ -723,22 +798,24 @@ public class CardDbAdapter {
 			String sel = null;
 			for (String s : returnTypes) {
 				if (sel == null) {
-					sel = DATABASE_TABLE_CARDS + "." + s + " AS " + s;
+					sel = DATABASE_TABLE_CARDS + "." + s;
 				}
 				else {
-					sel += ", " + DATABASE_TABLE_CARDS + "." + s + " AS " + s;
+					sel += ", " + DATABASE_TABLE_CARDS + "." + s;
 				}
 			}
 			sel += ", " + DATABASE_TABLE_SETS + "." + KEY_DATE;
 
-			String sql = "SELECT " + sel + " FROM " + tbl + " JOIN " + DATABASE_TABLE_SETS + " ON "
-					+ DATABASE_TABLE_CARDS + "." + KEY_SET + " = " + DATABASE_TABLE_SETS + "." + KEY_CODE + statement;
+			String sql = "SELECT * FROM (" + "SELECT " + sel + " FROM (" + tbl + " JOIN " + DATABASE_TABLE_SETS + " ON "
+					+ DATABASE_TABLE_CARDS + "." + KEY_SET + " = " + DATABASE_TABLE_SETS + "." + KEY_CODE + ")" + statement;
 
 			if (consolidate) {
-				sql += " GROUP BY " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " ORDER BY " + DATABASE_TABLE_CARDS + "." + KEY_NAME;
+				sql += " ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " ASC)";
+				sql += " GROUP BY " + KEY_NAME;
 			}
 			else {
-				sql += " ORDER BY " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC";
+				sql += " ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC)";
+				sql += " ORDER BY " + KEY_NAME;
 			}
 			mCursor = mDb.rawQuery(sql, null);
 		}

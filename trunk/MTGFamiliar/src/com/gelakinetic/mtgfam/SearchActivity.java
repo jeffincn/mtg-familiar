@@ -62,7 +62,10 @@ public class SearchActivity extends Activity {
 	protected static final String	ARTIST			= "artist";
 	protected static final String	FLAVOR			= "flavor";
 	protected static final String	RANDOM			= "random";
+	//lines below added by Reuben Kriegel
+	protected static final String	TYPELOGIC		= "typelogic";
 	protected static final String	TEXTLOGIC		= "textlogic";
+	//End addition
 	
 	protected static final int		SETLIST			= 0;
 	protected static final int		FORMATLIST	= 1;
@@ -102,7 +105,10 @@ public class SearchActivity extends Activity {
 	private Dialog								rarityDialog;
 	private EditText							flavorfield;
 	private EditText							artistfield;
+
+	//Variables below added by Reuben Kriegel
 	private Spinner								textspinner;
+	private Spinner								typespinner;
 	
 	private int	selectedFormat;
 
@@ -205,6 +211,7 @@ public class SearchActivity extends Activity {
 
 		colorspinner = (Spinner) findViewById(R.id.colorlogic);
 		textspinner = (Spinner) findViewById(R.id.textlogic);
+		typespinner = (Spinner) findViewById(R.id.typelogic);
 
 		setButton = (Button) findViewById(R.id.setsearch);
 		formatButton = (Button) findViewById(R.id.formatsearch);
@@ -252,11 +259,23 @@ public class SearchActivity extends Activity {
 				android.R.layout.simple_spinner_item);
 		adapter6.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		colorspinner.setAdapter(adapter6);
-
+		
+		// Lines Below added by Reuben Kriegel
 		ArrayAdapter<CharSequence> adapter7 = ArrayAdapter.createFromResource(this, R.array.text_spinner, 
 				android.R.layout.simple_spinner_item);
 		adapter7.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		textspinner.setAdapter(adapter7);
+		
+		ArrayAdapter<CharSequence> adapter8 = ArrayAdapter.createFromResource(this, R.array.type_spinner, 
+				android.R.layout.simple_spinner_item);
+		adapter8.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		typespinner.setAdapter(adapter8);
+		// End addition
+		
+		ArrayAdapter<CharSequence> adapter9 = ArrayAdapter.createFromResource(this, R.array.text_spinner, 
+				android.R.layout.simple_spinner_item);
+		adapter9.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		textspinner.setAdapter(adapter9);
 
 		setButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -377,7 +396,7 @@ public class SearchActivity extends Activity {
 		String text = textfield.getText().toString();
 		String supertype = supertypefield.getText().toString();
 		String subtype = subtypefield.getText().toString();
-		String type = supertype + " " + subtype;
+		String type = supertype + " - " + subtype;
 		String flavor = flavorfield.getText().toString();
 		String artist = artistfield.getText().toString();
 
@@ -541,7 +560,10 @@ public class SearchActivity extends Activity {
 		i.putExtra(ARTIST, artist);
 		i.putExtra(FLAVOR, flavor);
 		i.putExtra(RANDOM, isRandom);
+		// Lines below added by Reuben Kriegel
+		i.putExtra(TYPELOGIC, typespinner.getSelectedItemPosition());
 		i.putExtra(TEXTLOGIC, textspinner.getSelectedItemPosition());
+		// End addition
 		startActivityForResult(i, 0);
 	}
 

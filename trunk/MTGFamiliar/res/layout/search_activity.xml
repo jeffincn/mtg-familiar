@@ -30,10 +30,16 @@
             android:inputType="text"
             android:singleLine="true" />
 
+        <!-- Modified version below by Reuben Kriegel -->
+
         <LinearLayout
-            android:layout_width="fill_parent"
+            android:id="@+id/linearLayout12"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="horizontal" >
+
+            <!-- EditText below by Adam Feinstein -->
 
             <AutoCompleteTextView
                 android:id="@+id/supertypesearch"
@@ -54,7 +60,19 @@
                 android:imeOptions="actionSearch"
                 android:inputType="text"
                 android:singleLine="true" />
+
+            <!-- Spinner below by Reuben Kriegel -->
+
         </LinearLayout>
+
+        <Spinner
+            android:id="@+id/typelogic"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:imeOptions="actionSearch" />
+
+        <!-- EditText below by Adam Feinstein -->
 
         <EditText
             android:id="@+id/textsearch"
@@ -66,12 +84,13 @@
             android:inputType="text"
             android:singleLine="true" />
 
+        <!-- Spinner below by Reuben Kriegel -->
+
         <Spinner
             android:id="@+id/textlogic"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:hint="@string/artist"
             android:imeOptions="actionSearch" />
 
         <LinearLayout

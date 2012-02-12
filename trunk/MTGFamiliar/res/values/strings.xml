@@ -302,11 +302,6 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
         You can click the button below to donate via PayPal. $1 is cool. $5 is cooler. You get the drift.&lt;br />&lt;br />
         So, how generous are you feeling today?</string>
 
-    <string-array name="text_spinner">
-        <item>All words</item>
-        <item>Any word(s)</item>
-        <item>Exact phrase</item>
-    </string-array>
     <string name="start_timer">Start Timer</string>
     <string name="resume_timer">Resume Timer</string>
     <string name="pause_timer">Pause Timer</string>
@@ -343,4 +338,16 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
         <item>60</item>
     </string-array>
 
+            <string-array name="type_spinner">
+	    <item>All types</item>
+	    <item>Any type(s)</item>
+	    <item>NOT any selected type(s)</item>
+    </string-array>
+    
+    <string-array name="text_spinner">
+	    <item>All words</item>
+	    <item>Any word(s)</item>
+	    <item>Exact phrase</item>
+    </string-array>
+    
 </resources>

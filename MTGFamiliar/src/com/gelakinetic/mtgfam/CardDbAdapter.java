@@ -135,6 +135,14 @@ public class CardDbAdapter {
 
 	private final Context					mCtx;
 
+	public static final String			EXCLUDE_TOKEN								= "!";
+	public static final int				EXCLUDE_TOKEN_START							= 1;
+
+	public static final int				MAY_INCLUDE_ANY_COLOR					= 0;
+	public static final int				MUST_INCLUDE_ALL_COLOR				= 1;
+	public static final int				NO_OTHER_COLOR								= 2;
+	public static final int				EXACT_COLOR										= 3;
+
 	private static class DatabaseHelper extends SQLiteOpenHelper {
 
 		DatabaseHelper(Context context) {
@@ -510,7 +518,10 @@ public class CardDbAdapter {
 			switch (text_logic) {
 				case 0:
 					for (String s : cardTextParts) {
-						statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " LIKE '%" + s + "%')";
+						if(s.contains(EXCLUDE_TOKEN))
+							statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " NOT LIKE '%" + s.substring(EXCLUDE_TOKEN_START) + "%')";
+						else
+							statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " LIKE '%" + s + "%')";
 					}
 					break;
 				case 1:
@@ -518,10 +529,18 @@ public class CardDbAdapter {
 					for (String s : cardTextParts) {
 						if (firstRun) {
 							firstRun = false;
-							statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " LIKE '%" + s + "%')";
+							if(s.contains(EXCLUDE_TOKEN))
+								statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " NOT LIKE '%" + s.substring(EXCLUDE_TOKEN_START) + "%')";
+							else
+								statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " LIKE '%" + s + "%')";
 						}
 						else
-							statement += " OR (" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " LIKE '%" + s + "%')";
+						{
+							if(s.contains(EXCLUDE_TOKEN))
+								statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " NOT LIKE '%" + s.substring(EXCLUDE_TOKEN_START) + "%')";
+							else
+								statement += " OR (" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " LIKE '%" + s + "%')";
+						}
 					}
 					statement += ")";
 					break;
@@ -566,7 +585,10 @@ public class CardDbAdapter {
 			switch (type_logic) {
 				case 0:
 					for (String s : supertypesParts) {
-						statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + " %')";
+						if(s.contains(EXCLUDE_TOKEN))
+							statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s.substring(1) + "%')";
+						else
+							statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
 					}
 					break;
 				case 1:
@@ -574,16 +596,23 @@ public class CardDbAdapter {
 					for (String s : supertypesParts) {
 						if (firstRun) {
 							firstRun = false;
-							statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + " %')";
+
+							if(s.contains(EXCLUDE_TOKEN))
+								statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s.substring(1) + "%')";
+							else
+								statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
 						}
 						else
-							statement += " OR (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + " %')";
+							if(s.contains(EXCLUDE_TOKEN))
+								statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s.substring(1) + "%')";
+							else
+								statement += " OR (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
 					}
 					statement += ")";
 					break;
 				case 2:
 					for (String s : supertypesParts) {
-						statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s + " %')";
+						statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s + "%')";
 					}
 					break;
 				default:
@@ -597,7 +626,10 @@ public class CardDbAdapter {
 			switch (type_logic) {
 				case 0:
 					for (String s : subtypesParts) {
-						statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
+						if(s.contains(EXCLUDE_TOKEN))
+							statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s.substring(1) + "%')";
+						else
+							statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
 					}
 					break;
 				case 1:
@@ -605,10 +637,16 @@ public class CardDbAdapter {
 					for (String s : subtypesParts) {
 						if (firstRun) {
 							firstRun = false;
-							statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
+							if(s.contains(EXCLUDE_TOKEN))
+								statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s.substring(1) + "%')";
+							else
+								statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
 						}
 						else
-							statement += " OR (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
+							if(s.contains(EXCLUDE_TOKEN))
+								statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s.substring(1) + "%')";
+							else
+								statement += " OR (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
 					}
 					statement += ")";
 					break;

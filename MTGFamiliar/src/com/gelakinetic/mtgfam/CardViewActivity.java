@@ -34,7 +34,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -50,6 +49,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
 import android.text.ClipboardManager;
 import android.text.Html;
 import android.text.Html.ImageGetter;
@@ -71,7 +75,7 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-public class CardViewActivity extends Activity implements Runnable {
+public class CardViewActivity extends FragmentActivity implements Runnable {
 
 	private static final int			PICLOAD				= 0;
 	private static final int			PRICELOAD			= 1;
@@ -129,6 +133,7 @@ public class CardViewActivity extends Activity implements Runnable {
 	private Button								rightRandom;
 	private String[]							legalities;
 	private String[]							formats;
+	private MenuFragment					mFragment1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -374,18 +379,28 @@ public class CardViewActivity extends Activity implements Runnable {
 			((ImageView) findViewById(R.id.cardpic)).setVisibility(View.GONE);
 		}
 
+		FragmentManager fm = getSupportFragmentManager();
+		FragmentTransaction ft = fm.beginTransaction();
+		mFragment1 = (MenuFragment) fm.findFragmentByTag("f1");
+		if (mFragment1 == null) {
+			mFragment1 = new MenuFragment();
+			mFragment1.cva = this;
+			ft.add(mFragment1, "f1");
+		}
+		ft.commit();
+
 	}
 
 	@Override
-	protected void onResume(){
+	protected void onResume() {
 		super.onResume();
-		MyApp appState = ((MyApp)getApplicationContext());
-		if(appState.getState() == QUITTOSEARCH){
+		MyApp appState = ((MyApp) getApplicationContext());
+		if (appState.getState() == QUITTOSEARCH) {
 			this.finish();
 			return;
 		}
 	}
-	
+
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -413,13 +428,6 @@ public class CardViewActivity extends Activity implements Runnable {
 
 	Drawable drawable_from_url(String url, String src_name) throws java.net.MalformedURLException, java.io.IOException {
 		return Drawable.createFromStream(((java.io.InputStream) new java.net.URL(url).getContent()), src_name);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.card_menu, menu);
-		return true;
 	}
 
 	private class FetchLegalityTask extends AsyncTask<String, Integer, Long> {
@@ -459,35 +467,6 @@ public class CardViewActivity extends Activity implements Runnable {
 			showDialog(GETLEGALITY);
 		}
 
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle item selection
-		switch (item.getItemId()) {
-			case R.id.image:
-				showDialog(GETIMAGE);
-				return true;
-			case R.id.price:
-				showDialog(GETPRICE);
-				return true;
-			case R.id.legality:
-				new FetchLegalityTask().execute((String[]) null);
-				return true;
-			case R.id.gatherer:
-				String url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid="
-						+ c.getInt(c.getColumnIndex(CardDbAdapter.KEY_MULTIVERSEID));
-				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-				startActivity(browserIntent);
-				return true;
-			case R.id.quittosearch:
-				MyApp appState = ((MyApp)getApplicationContext());
-				appState.setState(QUITTOSEARCH);
-				this.finish();
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
 	}
 
 	@Override
@@ -717,6 +696,58 @@ public class CardViewActivity extends Activity implements Runnable {
 				return true;
 			default:
 				return super.onContextItemSelected(item);
+		}
+	}
+
+	/**
+	 * A fragment that displays a menu. This fragment happens to not have a UI (it
+	 * does not implement onCreateView), but it could also have one if it wanted.
+	 */
+	public static class MenuFragment extends Fragment {
+
+		public CardViewActivity	cva;
+
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			setHasOptionsMenu(true);
+		}
+
+		@Override
+		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+			inflater.inflate(R.menu.card_menu, menu);
+			for(int i=0; i < menu.size(); i++){
+				MenuItemCompat.setShowAsAction(menu.getItem(i), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM | MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT);
+			}
+		}
+
+		@Override
+		public boolean onOptionsItemSelected(MenuItem item) {
+			// Handle item selection
+			switch (item.getItemId()) {
+				case R.id.image:
+					cva.showDialog(GETIMAGE);
+					return true;
+				case R.id.price:
+					cva.showDialog(GETPRICE);
+					return true;
+				case R.id.legality:
+					cva.new FetchLegalityTask().execute((String[]) null);
+					return true;
+				case R.id.gatherer:
+					String url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid="
+							+ cva.c.getInt(cva.c.getColumnIndex(CardDbAdapter.KEY_MULTIVERSEID));
+					Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+					startActivity(browserIntent);
+					return true;
+				case R.id.quittosearch:
+					MyApp appState = ((MyApp) cva.getApplicationContext());
+					appState.setState(QUITTOSEARCH);
+					cva.finish();
+					return true;
+				default:
+					return super.onOptionsItemSelected(item);
+			}
 		}
 	}
 }

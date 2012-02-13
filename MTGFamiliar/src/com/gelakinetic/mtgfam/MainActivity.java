@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.zip.GZIPInputStream;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -47,6 +46,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
@@ -59,7 +63,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class MainActivity extends Activity implements Runnable {
+public class MainActivity extends FragmentActivity implements Runnable {
 	private static final int	DBFROMAPK				= 0;
 	private static final int	OTAPATCH				= 1;
 	private static final int	APPLYINGPATCH		= 3;
@@ -80,11 +84,11 @@ public class MainActivity extends Activity implements Runnable {
 	private boolean						dialogReady;
 	private SharedPreferences	preferences;
 	private String						stacktrace;
-	private LinearLayout			deckmanagement;
 	private PackageInfo				pInfo;
 	private LinearLayout			randomCard;
 	private LinearLayout			nbplayerbutton;
 	private LinearLayout			roundTimer;
+	private MenuFragment	mFragment1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -97,7 +101,6 @@ public class MainActivity extends Activity implements Runnable {
 		rng = (LinearLayout) findViewById(R.id.rng);
 		manapool = (LinearLayout) findViewById(R.id.manapool);
 		randomCard = (LinearLayout) findViewById(R.id.randomCard);
-		deckmanagement = (LinearLayout) findViewById(R.id.deckManagement);
 		nbplayerbutton = (LinearLayout) findViewById(R.id.Nplayerlifecounter);
 		roundTimer = (LinearLayout) findViewById(R.id.roundTimer);
 
@@ -129,13 +132,6 @@ public class MainActivity extends Activity implements Runnable {
 			}
 		});
 
-		deckmanagement.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				Intent i = new Intent(mCtx, DeckManagementActivity.class);
-				startActivity(i);
-			}
-		});
-
 		randomCard.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent(mCtx, RandomCardActivity.class);
@@ -149,9 +145,6 @@ public class MainActivity extends Activity implements Runnable {
 				startActivity(i);
 			}
 		});
-
-		// Uncomment to get to deck management, currently under construction
-		deckmanagement.setVisibility(View.GONE);
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -184,6 +177,16 @@ public class MainActivity extends Activity implements Runnable {
 		
 		Intent i = new Intent(this, RoundTimerService.class);
 		startService(i);
+		
+		FragmentManager fm = getSupportFragmentManager();
+		FragmentTransaction ft = fm.beginTransaction();
+		mFragment1 = (MenuFragment) fm.findFragmentByTag("f1");
+		if (mFragment1 == null) {
+			mFragment1 = new MenuFragment();
+			mFragment1.ma = this;
+			ft.add(mFragment1, "f1");
+		}
+		ft.commit();
 	}
 
 	@Override
@@ -295,49 +298,6 @@ public class MainActivity extends Activity implements Runnable {
 		return builder.create();
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.main_menu, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle item selection
-		switch (item.getItemId()) {
-
-//			case R.id.buildWebDB:
-//				startThread(DBFROMWEB);
-//				return true;
-//			case R.id.refreshDB:
-//				startThread(DBFROMAPK);
-//				return true;
-
-			case R.id.checkUpdate:
-				// Set the last legality update time back to zero on a forced update
-				SharedPreferences.Editor editor = preferences.edit();
-				editor.putInt("lastLegalityUpdate", 0);
-				editor.commit();
-
-				startThread(OTAPATCH);
-				return true;
-			case R.id.preferences:
-				startActivity(new Intent().setClass(this, PreferencesActivity.class));
-				return true;
-			case R.id.aboutapp:
-				showDialog(ABOUTDIALOG);
-				return true;
-			case R.id.whatsnew:
-				showDialog(CHANGELOGDIALOG);
-				return true;
-			case R.id.donate:
-				showDialog(DONATEDIALOG);
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
-	}
 
 	public void startThread(int type) {
 		if (type == DBFROMAPK) {
@@ -594,5 +554,65 @@ public class MainActivity extends Activity implements Runnable {
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
+	}
+	
+	/**
+	 * A fragment that displays a menu. This fragment happens to not have a UI (it
+	 * does not implement onCreateView), but it could also have one if it wanted.
+	 */
+	public static class MenuFragment extends Fragment {
+
+		public MainActivity	ma;
+
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			setHasOptionsMenu(true);
+		}
+
+		@Override
+		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+			inflater.inflate(R.menu.main_menu, menu);
+			for(int i=0; i < menu.size(); i++){
+				MenuItemCompat.setShowAsAction(menu.getItem(i), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM | MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT);
+			}
+		}
+
+		@Override
+		public boolean onOptionsItemSelected(MenuItem item) {
+			// Handle item selection
+			switch (item.getItemId()) {
+
+//				case R.id.buildWebDB:
+//					startThread(DBFROMWEB);
+//					return true;
+//				case R.id.refreshDB:
+//					startThread(DBFROMAPK);
+//					return true;
+
+				case R.id.checkUpdate:
+					// Set the last legality update time back to zero on a forced update
+					SharedPreferences.Editor editor = ma.preferences.edit();
+					editor.putInt("lastLegalityUpdate", 0);
+					editor.commit();
+
+					ma.startThread(OTAPATCH);
+					return true;
+				case R.id.preferences:
+					startActivity(new Intent().setClass(ma, PreferencesActivity.class));
+					return true;
+				case R.id.aboutapp:
+					ma.showDialog(ABOUTDIALOG);
+					return true;
+				case R.id.whatsnew:
+					ma.showDialog(CHANGELOGDIALOG);
+					return true;
+				case R.id.donate:
+					ma.showDialog(DONATEDIALOG);
+					return true;
+				default:
+					return super.onOptionsItemSelected(item);
+			}
+		}
 	}
 }

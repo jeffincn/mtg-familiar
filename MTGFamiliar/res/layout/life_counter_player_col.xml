@@ -5,13 +5,13 @@
     android:layout_height="fill_parent"
     android:orientation="horizontal"
     android:paddingBottom="0dp"
-    android:paddingLeft="5px"
-    android:paddingRight="5px"
-    android:paddingTop="5px" >
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:paddingTop="5dp" >
 
     <View
         android:id="@+id/divider"
-        android:layout_width="1px"
+        android:layout_width="1dp"
         android:layout_height="fill_parent"
         android:background="#FFAAAAAA" />
 
@@ -82,7 +82,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingTop="5px" >
+            android:paddingTop="5dp" >
 
             <Button
                 android:id="@+id/player_minus5"

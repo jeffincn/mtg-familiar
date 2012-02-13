@@ -22,7 +22,6 @@ package com.gelakinetic.mtgfam;
 import java.util.ArrayList;
 import java.util.Random;
 
-import android.app.ListActivity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -33,6 +32,11 @@ import android.database.MergeCursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -42,7 +46,7 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-public class ResultListActivity extends ListActivity {
+public class ResultListActivity extends FragmentActivity {
 
 	static final int					NO_RESULT							= 1;
 	static int								cursorPosition				= 0;
@@ -58,6 +62,7 @@ public class ResultListActivity extends ListActivity {
 	private int								randomIndex						= 0;
 	private int								numChoices;
 	private boolean						randomFromMenu				= false;
+	private MenuFragment	mFragment1;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -65,6 +70,16 @@ public class ResultListActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.result_list_activity);
 
+		FragmentManager fm = getSupportFragmentManager();
+		FragmentTransaction ft = fm.beginTransaction();
+		mFragment1 = (MenuFragment) fm.findFragmentByTag("f1");
+		if (mFragment1 == null) {
+			mFragment1 = new MenuFragment();
+			mFragment1.rla = this;
+			ft.add(mFragment1, "f1");
+		}
+		ft.commit();
+		
 		MyApp appState = ((MyApp)getApplicationContext());
 		if(appState.getState() == CardViewActivity.QUITTOSEARCH){
 			this.finish();
@@ -138,7 +153,7 @@ public class ResultListActivity extends ListActivity {
 		}
 		else {
 
-			lv = getListView();
+			lv = (ListView)findViewById(R.id.resultList);//getListView();
 			registerForContextMenu(lv);
 
 			if (extras.getBoolean(SearchActivity.RANDOM)) {
@@ -243,7 +258,7 @@ public class ResultListActivity extends ListActivity {
 		}
 
 		ResultListAdapter rla = new ResultListAdapter(this, R.layout.card_row, c, from, to, this.getResources());
-		setListAdapter(rla);
+		lv.setAdapter(rla);
 	}
 
 	@Override
@@ -282,7 +297,7 @@ public class ResultListActivity extends ListActivity {
 					id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
 					i.putExtra("id", id);
 					i.putExtra(SearchActivity.RANDOM, isRandom);
-					i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+//					i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 					startActivityForResult(i, 0);
 					break;
 				case CardViewActivity.RANDOMRIGHT:
@@ -314,31 +329,6 @@ public class ResultListActivity extends ListActivity {
 		super.onConfigurationChanged(newConfig);
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		cursorPosition = 0;
-		cursorPositionOffset = 0;
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.result_list_menu, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle item selection
-		switch (item.getItemId()) {
-			case R.id.search_menu_random_search:
-				randomFromMenu = true;
-				startRandom();
-				return true;
-			case R.id.preferences:
-				startActivity(new Intent().setClass(this, PreferencesActivity.class));
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
-	}
-
 	private void startRandom() {
 		isRandom = true;
 
@@ -363,5 +353,45 @@ public class ResultListActivity extends ListActivity {
 		i.putExtra("id", id);
 		i.putExtra(SearchActivity.RANDOM, isRandom);
 		startActivityForResult(i, 0);
+	}
+	
+
+	/**
+	 * A fragment that displays a menu. This fragment happens to not have a UI (it
+	 * does not implement onCreateView), but it could also have one if it wanted.
+	 */
+	public static class MenuFragment extends Fragment {
+
+		public ResultListActivity	rla;
+
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			setHasOptionsMenu(true);
+		}
+
+		@Override
+		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+			inflater.inflate(R.menu.result_list_menu, menu);
+			for(int i=0; i < menu.size(); i++){
+				MenuItemCompat.setShowAsAction(menu.getItem(i), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM | MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT);
+			}
+		}
+
+		@Override
+		public boolean onOptionsItemSelected(MenuItem item) {
+			// Handle item selection
+			switch (item.getItemId()) {
+				case R.id.search_menu_random_search:
+					rla.randomFromMenu = true;
+					rla.startRandom();
+					return true;
+				case R.id.preferences:
+					startActivity(new Intent().setClass(rla, PreferencesActivity.class));
+					return true;
+				default:
+					return super.onOptionsItemSelected(item);
+			}
+		}
 	}
 }

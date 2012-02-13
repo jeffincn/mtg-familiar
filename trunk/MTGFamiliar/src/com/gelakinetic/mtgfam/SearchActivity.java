@@ -19,7 +19,6 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -30,6 +29,11 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.PorterDuff.Mode;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -44,7 +48,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Spinner;
 
-public class SearchActivity extends Activity {
+public class SearchActivity extends FragmentActivity {
 	protected static final String	NAME				= "name";
 	protected static final String	TEXT				= "text";
 	protected static final String	TYPE				= "type";
@@ -62,11 +66,11 @@ public class SearchActivity extends Activity {
 	protected static final String	ARTIST			= "artist";
 	protected static final String	FLAVOR			= "flavor";
 	protected static final String	RANDOM			= "random";
-	//lines below added by Reuben Kriegel
+	// lines below added by Reuben Kriegel
 	protected static final String	TYPELOGIC		= "typelogic";
 	protected static final String	TEXTLOGIC		= "textlogic";
-	//End addition
-	
+	// End addition
+
 	protected static final int		SETLIST			= 0;
 	protected static final int		FORMATLIST	= 1;
 	protected static final int		RARITYLIST	= 2;
@@ -106,17 +110,28 @@ public class SearchActivity extends Activity {
 	private EditText							flavorfield;
 	private EditText							artistfield;
 
-	//Variables below added by Reuben Kriegel
+	// Variables below added by Reuben Kriegel
 	private Spinner								textspinner;
 	private Spinner								typespinner;
-	
-	private int	selectedFormat;
+
+	private int										selectedFormat;
+	private MenuFragment					mFragment1;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.search_activity);
+
+		FragmentManager fm = getSupportFragmentManager();
+		FragmentTransaction ft = fm.beginTransaction();
+		mFragment1 = (MenuFragment) fm.findFragmentByTag("f1");
+		if (mFragment1 == null) {
+			mFragment1 = new MenuFragment();
+			mFragment1.sa = this;
+			ft.add(mFragment1, "f1");
+		}
+		ft.commit();
 
 		mCtx = this;
 
@@ -130,8 +145,7 @@ public class SearchActivity extends Activity {
 		subtypefield = (EditText) findViewById(R.id.subtypesearch);
 		flavorfield = (EditText) findViewById(R.id.flavorsearch);
 		artistfield = (EditText) findViewById(R.id.artistsearch);
-		
-		
+
 		// So pressing enter does the search
 		namefield.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
 		namefield.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -163,12 +177,12 @@ public class SearchActivity extends Activity {
 				return false;
 			}
 		});
-		
+
 		String[] supertypes = getResources().getStringArray(R.array.supertypes);
 		ArrayAdapter<String> supertypeadapter = new ArrayAdapter<String>(this, R.layout.supertype_list_item, supertypes);
 		supertypefield.setThreshold(1);
 		supertypefield.setAdapter(supertypeadapter);
-		
+
 		subtypefield.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
 				if (arg1 == EditorInfo.IME_ACTION_SEARCH) {
@@ -259,20 +273,20 @@ public class SearchActivity extends Activity {
 				android.R.layout.simple_spinner_item);
 		adapter6.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		colorspinner.setAdapter(adapter6);
-		
+
 		// Lines Below added by Reuben Kriegel
-		ArrayAdapter<CharSequence> adapter7 = ArrayAdapter.createFromResource(this, R.array.text_spinner, 
+		ArrayAdapter<CharSequence> adapter7 = ArrayAdapter.createFromResource(this, R.array.text_spinner,
 				android.R.layout.simple_spinner_item);
 		adapter7.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		textspinner.setAdapter(adapter7);
-		
-		ArrayAdapter<CharSequence> adapter8 = ArrayAdapter.createFromResource(this, R.array.type_spinner, 
+
+		ArrayAdapter<CharSequence> adapter8 = ArrayAdapter.createFromResource(this, R.array.type_spinner,
 				android.R.layout.simple_spinner_item);
 		adapter8.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		typespinner.setAdapter(adapter8);
 		// End addition
-		
-		ArrayAdapter<CharSequence> adapter9 = ArrayAdapter.createFromResource(this, R.array.text_spinner, 
+
+		ArrayAdapter<CharSequence> adapter9 = ArrayAdapter.createFromResource(this, R.array.text_spinner,
 				android.R.layout.simple_spinner_item);
 		adapter9.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		textspinner.setAdapter(adapter9);
@@ -335,7 +349,7 @@ public class SearchActivity extends Activity {
 		Resources res = getResources();
 		rarityNames = res.getStringArray(R.array.rarities);
 		rarityChecked = new boolean[rarityNames.length];
-		
+
 		selectedFormat = -1;
 
 		setDialog = new AlertDialog.Builder(this).setTitle("Sets")
@@ -346,8 +360,7 @@ public class SearchActivity extends Activity {
 					public void onClick(DialogInterface dialog, int which) {
 						selectedFormat = which;
 					}
-				})
-				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
+				}).setPositiveButton("OK", new DialogButtonClickHandler()).create();
 		rarityDialog = new AlertDialog.Builder(this).setTitle("Rarities")
 				.setMultiChoiceItems(rarityNames, rarityChecked, new DialogSelectionClickHandler())
 				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
@@ -385,12 +398,12 @@ public class SearchActivity extends Activity {
 	}
 
 	@Override
-	protected void onResume(){
+	protected void onResume() {
 		super.onResume();
-		MyApp appState = ((MyApp)getApplicationContext());
+		MyApp appState = ((MyApp) getApplicationContext());
 		appState.setState(0);
 	}
-	
+
 	private void doSearch(boolean isRandom) {
 		String name = namefield.getText().toString();
 		String text = textfield.getText().toString();
@@ -470,7 +483,7 @@ public class SearchActivity extends Activity {
 		}
 
 		String fmt = null;
-		if(selectedFormat != -1){
+		if (selectedFormat != -1) {
 			fmt = formatNames[selectedFormat];
 		}
 
@@ -607,114 +620,6 @@ public class SearchActivity extends Activity {
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.search_menu, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle item selection
-		switch (item.getItemId()) {
-			case R.id.search_menu_random_search:
-				doSearch(true);
-				return true;
-			case R.id.search_menu_search:
-				doSearch(false);
-				return true;
-
-			case R.id.search_menu_clear:
-				namefield.setText("");
-				supertypefield.setText("");
-				subtypefield.setText("");
-				textfield.setText("");
-				artistfield.setText("");
-				flavorfield.setText("");
-
-				checkboxW.setChecked(false);
-				checkboxU.setChecked(false);
-				checkboxB.setChecked(false);
-				checkboxR.setChecked(false);
-				checkboxG.setChecked(false);
-				checkboxL.setChecked(false);
-				colorspinner.setSelection(0);
-
-				powLogic.setSelection(0);
-				powChoice.setSelection(0);
-				touLogic.setSelection(0);
-				touChoice.setSelection(0);
-				cmcLogic.setSelection(0);
-				cmcLogic.setSelection(1); // CMC should default to <
-				cmcChoice.setSelection(0);
-
-				for (int i = 0; i < setChecked.length; i++) {
-					setChecked[i] = false;
-				}
-				selectedFormat = -1;
-				for (int i = 0; i < rarityChecked.length; i++) {
-					rarityChecked[i] = false;
-				}
-				this.removeDialog(SETLIST);
-				this.removeDialog(FORMATLIST);
-				this.removeDialog(RARITYLIST);
-
-				setDialog = new AlertDialog.Builder(this).setTitle("Sets")
-						.setMultiChoiceItems(setNames, setChecked, new DialogSelectionClickHandler())
-						.setPositiveButton("OK", new DialogButtonClickHandler()).create();
-				formatDialog = new AlertDialog.Builder(this).setTitle("Formats")
-				.setSingleChoiceItems(formatNames, selectedFormat, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						selectedFormat = which;
-					}
-				})
-				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
-				rarityDialog = new AlertDialog.Builder(this).setTitle("Rarities")
-						.setMultiChoiceItems(rarityNames, rarityChecked, new DialogSelectionClickHandler())
-						.setPositiveButton("OK", new DialogButtonClickHandler()).create();
-
-				setDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-					public void onDismiss(DialogInterface arg0) {
-						setButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
-						for (int i = 0; i < setChecked.length; i++) {
-							if (setChecked[i]) {
-								setButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
-							}
-						}
-					}
-				});
-
-				formatDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-					public void onDismiss(DialogInterface arg0) {
-						formatButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
-						if(selectedFormat != -1){
-							formatButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
-						}
-					}
-				});
-
-				rarityDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-					public void onDismiss(DialogInterface arg0) {
-						rarityButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
-						for (int i = 0; i < rarityChecked.length; i++) {
-							if (rarityChecked[i]) {
-								rarityButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
-							}
-						}
-					}
-				});
-
-				setButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
-				formatButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
-				rarityButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
-
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
-	}
-
-	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == 0) {
 			if (resultCode == ResultListActivity.NO_RESULT) {
@@ -726,5 +631,130 @@ public class SearchActivity extends Activity {
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
+	}
+
+	public void clear() {
+		namefield.setText("");
+		supertypefield.setText("");
+		subtypefield.setText("");
+		textfield.setText("");
+		artistfield.setText("");
+		flavorfield.setText("");
+
+		checkboxW.setChecked(false);
+		checkboxU.setChecked(false);
+		checkboxB.setChecked(false);
+		checkboxR.setChecked(false);
+		checkboxG.setChecked(false);
+		checkboxL.setChecked(false);
+		colorspinner.setSelection(0);
+
+		powLogic.setSelection(0);
+		powChoice.setSelection(0);
+		touLogic.setSelection(0);
+		touChoice.setSelection(0);
+		cmcLogic.setSelection(0);
+		cmcLogic.setSelection(1); // CMC should default to <
+		cmcChoice.setSelection(0);
+
+		for (int i = 0; i < setChecked.length; i++) {
+			setChecked[i] = false;
+		}
+		selectedFormat = -1;
+		for (int i = 0; i < rarityChecked.length; i++) {
+			rarityChecked[i] = false;
+		}
+		this.removeDialog(SETLIST);
+		this.removeDialog(FORMATLIST);
+		this.removeDialog(RARITYLIST);
+
+		setDialog = new AlertDialog.Builder(this).setTitle("Sets")
+				.setMultiChoiceItems(setNames, setChecked, new DialogSelectionClickHandler())
+				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
+		formatDialog = new AlertDialog.Builder(this).setTitle("Formats")
+				.setSingleChoiceItems(formatNames, selectedFormat, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						selectedFormat = which;
+					}
+				}).setPositiveButton("OK", new DialogButtonClickHandler()).create();
+		rarityDialog = new AlertDialog.Builder(this).setTitle("Rarities")
+				.setMultiChoiceItems(rarityNames, rarityChecked, new DialogSelectionClickHandler())
+				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
+
+		setDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			public void onDismiss(DialogInterface arg0) {
+				setButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
+				for (int i = 0; i < setChecked.length; i++) {
+					if (setChecked[i]) {
+						setButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
+					}
+				}
+			}
+		});
+
+		formatDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			public void onDismiss(DialogInterface arg0) {
+				formatButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
+				if (selectedFormat != -1) {
+					formatButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
+				}
+			}
+		});
+
+		rarityDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			public void onDismiss(DialogInterface arg0) {
+				rarityButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
+				for (int i = 0; i < rarityChecked.length; i++) {
+					if (rarityChecked[i]) {
+						rarityButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
+					}
+				}
+			}
+		});
+
+		setButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
+		formatButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
+		rarityButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
+	}
+
+	/**
+	 * A fragment that displays a menu. This fragment happens to not have a UI (it
+	 * does not implement onCreateView), but it could also have one if it wanted.
+	 */
+	public static class MenuFragment extends Fragment {
+
+		public SearchActivity	sa;
+
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			setHasOptionsMenu(true);
+		}
+
+		@Override
+		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+			inflater.inflate(R.menu.search_menu, menu);
+			for (int i = 0; i < menu.size(); i++) {
+				MenuItemCompat.setShowAsAction(menu.getItem(i), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM | MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT);
+			}
+		}
+
+		@Override
+		public boolean onOptionsItemSelected(MenuItem item) {
+			// Handle item selection
+			switch (item.getItemId()) {
+				case R.id.search_menu_random_search:
+					sa.doSearch(true);
+					return true;
+				case R.id.search_menu_search:
+					sa.doSearch(false);
+					return true;
+				case R.id.search_menu_clear:
+					sa.clear();
+					return true;
+				default:
+					return super.onOptionsItemSelected(item);
+			}
+		}
 	}
 }

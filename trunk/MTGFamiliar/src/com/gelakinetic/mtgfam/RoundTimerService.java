@@ -67,12 +67,12 @@ public class RoundTimerService extends Service {
 		handleStartup(intent);
 	}
 	
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) 
-	{
-		handleStartup(intent);		
-		return START_NOT_STICKY;
-	}
+//	@Override
+//	public void onStartCommand(Intent intent, int startId) 
+//	{
+//		handleStartup(intent);		
+//		return START_NOT_STICKY;
+//	}
 	
 	private void handleStartup(Intent intent)
 	{

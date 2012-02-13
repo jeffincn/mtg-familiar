@@ -20,20 +20,16 @@
     <TextView
         android:id="@+id/format"
         style="@style/text"
-        android:layout_width="fill_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_margin="5dip"
-        android:layout_weight="1"
-        android:text="TextView" />
+        android:layout_weight="1"/>
 
     <TextView
         android:id="@+id/status"
         style="@style/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_margin="5dip"
-        android:text="TextView" />
+        android:layout_margin="5dip"/>
 
 </LinearLayout>

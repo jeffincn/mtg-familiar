@@ -34,7 +34,7 @@
 
         <LinearLayout
             android:id="@+id/linearLayout12"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="horizontal" >
@@ -112,7 +112,7 @@
                     android:id="@+id/checkBoxW"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:button="@drawable/wcheck_selector" />
+                    android:button="@xml/wcheck_selector" />
             </LinearLayout>
 
             <LinearLayout
@@ -126,7 +126,7 @@
                     android:id="@+id/checkBoxU"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:button="@drawable/ucheck_selector" />
+                    android:button="@xml/ucheck_selector" />
             </LinearLayout>
 
             <LinearLayout
@@ -140,7 +140,7 @@
                     android:id="@+id/checkBoxB"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:button="@drawable/bcheck_selector" />
+                    android:button="@xml/bcheck_selector" />
             </LinearLayout>
 
             <LinearLayout
@@ -154,7 +154,7 @@
                     android:id="@+id/checkBoxR"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:button="@drawable/rcheck_selector" />
+                    android:button="@xml/rcheck_selector" />
             </LinearLayout>
 
             <LinearLayout
@@ -168,7 +168,7 @@
                     android:id="@+id/checkBoxG"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:button="@drawable/gcheck_selector" />
+                    android:button="@xml/gcheck_selector" />
             </LinearLayout>
 
             <LinearLayout
@@ -182,7 +182,7 @@
                     android:id="@+id/checkBoxL"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:button="@drawable/xcheck_selector" />
+                    android:button="@xml/xcheck_selector" />
             </LinearLayout>
         </LinearLayout>
 
@@ -201,7 +201,7 @@
             <TextView
                 android:id="@+id/textView1"
                 style="@style/text"
-                android:layout_width="120dip"
+                android:layout_width="125dip"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="@string/pow" />
@@ -228,7 +228,7 @@
             <TextView
                 android:id="@+id/textView2"
                 style="@style/text"
-                android:layout_width="120dip"
+                android:layout_width="125dip"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="@string/tou" />
@@ -255,7 +255,7 @@
             <TextView
                 android:id="@+id/textView3"
                 style="@style/text"
-                android:layout_width="120dip"
+                android:layout_width="125dip"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="@string/cmc" />

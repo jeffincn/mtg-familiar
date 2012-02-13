@@ -18,12 +18,16 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.gelakinetic.mtgfam;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,12 +36,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ManaPoolActivity extends Activity {
+public class ManaPoolActivity extends FragmentActivity {
 	private Button	whiteMinus, blueMinus, blackMinus, redMinus, greenMinus, colorlessMinus, spellMinus;
 	private Button	whitePlus, bluePlus, blackPlus, redPlus, greenPlus, colorlessPlus, spellPlus;
 	private TextView	whiteReadout, blueReadout, blackReadout, redReadout, greenReadout, colorlessReadout, spellReadout;
 
 	private int				white, blue, black, red, green, colorless, spell;
+	private MenuFragment	mFragment1;
 
 	@Override
 	public void onCreate(Bundle savedInstance) {
@@ -252,6 +257,16 @@ public class ManaPoolActivity extends Activity {
 				update();
 			}
 		});
+		
+		FragmentManager fm = getSupportFragmentManager();
+		FragmentTransaction ft = fm.beginTransaction();
+		mFragment1 = (MenuFragment) fm.findFragmentByTag("f1");
+		if (mFragment1 == null) {
+			mFragment1 = new MenuFragment();
+			mFragment1.mpa = this;
+			ft.add(mFragment1, "f1");
+		}
+		ft.commit();
 	}
 
 	@Override
@@ -273,26 +288,6 @@ public class ManaPoolActivity extends Activity {
 	protected void onStop() {
 		super.onStop();
 		store();
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.mana_pool_menu, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.clear_all:
-				reset(this);
-				load();
-				update();
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
 	}
 
 	private void load() {
@@ -332,5 +327,42 @@ public class ManaPoolActivity extends Activity {
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
+	}
+	
+
+	/**
+	 * A fragment that displays a menu. This fragment happens to not have a UI (it
+	 * does not implement onCreateView), but it could also have one if it wanted.
+	 */
+	public static class MenuFragment extends Fragment {
+
+		public ManaPoolActivity	mpa;
+
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			setHasOptionsMenu(true);
+		}
+
+		@Override
+		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+			inflater.inflate(R.menu.mana_pool_menu, menu);
+			for(int i=0; i < menu.size(); i++){
+				MenuItemCompat.setShowAsAction(menu.getItem(i), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM | MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT);
+			}
+		}
+
+		@Override
+		public boolean onOptionsItemSelected(MenuItem item) {
+			switch (item.getItemId()) {
+				case R.id.clear_all:
+					ManaPoolActivity.reset(mpa);
+					mpa.load();
+					mpa.update();
+					return true;
+				default:
+					return super.onOptionsItemSelected(item);
+			}
+		}
 	}
 }

@@ -1,16 +1,17 @@
 package com.gelakinetic.mtgfam;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -20,7 +21,7 @@ import android.widget.Toast;
 
 import com.gelakinetic.mtgfam.RoundTimerService.RoundTimerBinder;
 
-public class RoundTimerActivity extends Activity {
+public class RoundTimerActivity extends FragmentActivity {
 	private Handler timerHandler = new Handler();
 	private Runnable updateTimeViewTask = new Runnable() 
 	{
@@ -76,13 +77,23 @@ public class RoundTimerActivity extends Activity {
 	private Button actionButton;
 	private Button resetButton;
 	private TextView timeView;
+	private MenuFragment	mFragment1;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.round_timer_activity);
-		this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		//this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		
+		FragmentManager fm = getSupportFragmentManager();
+		FragmentTransaction ft = fm.beginTransaction();
+		mFragment1 = (MenuFragment) fm.findFragmentByTag("f1");
+		if (mFragment1 == null) {
+			mFragment1 = new MenuFragment(this, R.menu.timer_menu);
+			ft.add(mFragment1, "f1");
+		}
+		ft.commit();
 		
 		this.picker = (TimePicker)findViewById(R.id.rt_time_picker);
 		picker.setIs24HourView(true);

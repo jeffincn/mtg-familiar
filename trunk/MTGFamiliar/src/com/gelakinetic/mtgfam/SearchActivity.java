@@ -29,14 +29,10 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.PorterDuff.Mode;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.MenuItemCompat;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -127,8 +123,7 @@ public class SearchActivity extends FragmentActivity {
 		FragmentTransaction ft = fm.beginTransaction();
 		mFragment1 = (MenuFragment) fm.findFragmentByTag("f1");
 		if (mFragment1 == null) {
-			mFragment1 = new MenuFragment();
-			mFragment1.sa = this;
+			mFragment1 = new MenuFragment(this, R.menu.search_menu);
 			ft.add(mFragment1, "f1");
 		}
 		ft.commit();
@@ -717,44 +712,21 @@ public class SearchActivity extends FragmentActivity {
 		rarityButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
 	}
 
-	/**
-	 * A fragment that displays a menu. This fragment happens to not have a UI (it
-	 * does not implement onCreateView), but it could also have one if it wanted.
-	 */
-	public static class MenuFragment extends Fragment {
-
-		public SearchActivity	sa;
-
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			setHasOptionsMenu(true);
-		}
-
-		@Override
-		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-			inflater.inflate(R.menu.search_menu, menu);
-			for (int i = 0; i < menu.size(); i++) {
-				MenuItemCompat.setShowAsAction(menu.getItem(i), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM | MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT);
-			}
-		}
-
-		@Override
-		public boolean onOptionsItemSelected(MenuItem item) {
-			// Handle item selection
-			switch (item.getItemId()) {
-				case R.id.search_menu_random_search:
-					sa.doSearch(true);
-					return true;
-				case R.id.search_menu_search:
-					sa.doSearch(false);
-					return true;
-				case R.id.search_menu_clear:
-					sa.clear();
-					return true;
-				default:
-					return super.onOptionsItemSelected(item);
-			}
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+			case R.id.search_menu_random_search:
+				doSearch(true);
+				return true;
+			case R.id.search_menu_search:
+				doSearch(false);
+				return true;
+			case R.id.search_menu_clear:
+				clear();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 }

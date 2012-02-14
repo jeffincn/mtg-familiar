@@ -22,14 +22,4 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
           android:icon="@android:drawable/ic_menu_search"
           android:actionViewClass="android.widget.SearchView"
           />
-    <item
-        android:id="@+id/search_menu_random_search"
-        android:icon="@android:drawable/ic_menu_help"
-        android:title="@string/randomButton"></item>
-
-    <item
-        android:id="@+id/preferences"
-        android:icon="@android:drawable/ic_menu_preferences"
-        android:title="@string/preferences"/>
-
 </menu>

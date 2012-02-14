@@ -13,14 +13,10 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -193,8 +189,7 @@ public class NPlayerLifeActivity extends FragmentActivity {
 		FragmentTransaction ft = fm.beginTransaction();
 		mFragment1 = (MenuFragment) fm.findFragmentByTag("f1");
 		if (mFragment1 == null) {
-			mFragment1 = new MenuFragment();
-			mFragment1.npla = this;
+			mFragment1 = new MenuFragment(this, R.menu.life_counter_menu);
 			ft.add(mFragment1, "f1");
 		}
 		ft.commit();
@@ -857,43 +852,20 @@ public class NPlayerLifeActivity extends FragmentActivity {
 		}
 	}
 	
-	/**
-	 * A fragment that displays a menu. This fragment happens to not have a UI (it
-	 * does not implement onCreateView), but it could also have one if it wanted.
-	 */
-	public static class MenuFragment extends Fragment {
-
-		public NPlayerLifeActivity	npla;
-
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			setHasOptionsMenu(true);
-		}
-
-		@Override
-		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-			inflater.inflate(R.menu.life_counter_menu, menu);
-			for(int i=0; i < menu.size(); i++){
-				MenuItemCompat.setShowAsAction(menu.getItem(i), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM | MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT);
-			}
-		}
-
-		@Override
-		public boolean onOptionsItemSelected(MenuItem item) {
-			// Handle item selection
-			switch (item.getItemId()) {
-				case R.id.add_player:
-					npla.addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, npla.anchor);
-					npla.listSizeWidth = -10;
-					npla.onWindowFocusChanged(true);
-					return true;
-				case R.id.remove_player:
-					npla.showDialog(DIALOG_REMOVE_PLAYER);
-					return true;
-				default:
-					return super.onOptionsItemSelected(item);
-			}
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+			case R.id.add_player:
+				addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, anchor);
+				listSizeWidth = -10;
+				onWindowFocusChanged(true);
+				return true;
+			case R.id.remove_player:
+				showDialog(DIALOG_REMOVE_PLAYER);
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 }

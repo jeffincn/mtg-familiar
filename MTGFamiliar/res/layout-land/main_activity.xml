@@ -16,38 +16,18 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <LinearLayout
-        android:id="@+id/linearLayout2"
-        android:layout_width="fill_parent"
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="6dip"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal" >
-
-        <ImageView
-            android:id="@+id/imageView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginRight="12dip"
-            android:src="@drawable/icon" />
-
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="42dip" />
-
-        <ImageView
-            android:id="@+id/ImageView01"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginLeft="12dip"
-            android:src="@drawable/icon" />
-    </LinearLayout>
+        android:layout_gravity="center"
+        android:drawableLeft="@drawable/icon"
+        android:drawablePadding="15dp"
+        android:drawableRight="@drawable/icon"
+        android:gravity="center"
+        android:text="@string/app_name"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="42dip" />
 
     <ScrollView
         android:layout_width="fill_parent"
@@ -56,7 +36,7 @@
 
         <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical" >
 
@@ -67,101 +47,42 @@
                 android:layout_marginBottom="3dip"
                 android:orientation="horizontal" >
 
-                <LinearLayout
+                <TextView
                     android:id="@+id/cardsearch"
-                    android:layout_width="fill_parent"
+                    style="@style/text"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
                     android:layout_weight="1"
-                    android:orientation="vertical" >
+                    android:drawableTop="@drawable/card_search_icon"
+                    android:gravity="center"
+                    android:text="@string/cardsearch"
+                    android:textSize="30dip" />
 
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:src="@drawable/card_search_icon" />
-
-                    <TextView
-                        style="@style/text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:gravity="center"
-                        android:text="@string/cardsearch"
-                        android:textSize="30dip" />
-                </LinearLayout>
-
-                <LinearLayout
+                <TextView
                     android:id="@+id/Nplayerlifecounter"
-                    android:layout_width="fill_parent"
+                    style="@style/text"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
                     android:layout_weight="1"
-                    android:orientation="vertical" >
+                    android:drawableTop="@drawable/life_counter_icon"
+                    android:gravity="center"
+                    android:text="@string/lifecounter"
+                    android:textSize="30dip" >
+                </TextView>
 
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:scaleType="center"
-                        android:src="@drawable/life_counter_icon" >
-                    </ImageView>
-
-                    <TextView
-                        style="@style/text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:gravity="center"
-                        android:text="@string/lifecounter"
-                        android:textSize="30dip" >
-                    </TextView>
-                </LinearLayout>
-                
-                <!--
-                <LinearLayout
-                    android:id="@+id/lifecounter"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical" >
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:src="@drawable/life_counter_icon" />
-
-                    <TextView
-                        style="@style/text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:text="@string/lifecounter"
-                        android:textSize="30dip" />
-                </LinearLayout>
-                -->
-
-                <LinearLayout
+                <TextView
                     android:id="@+id/manapool"
-                    android:layout_width="fill_parent"
+                    style="@style/text"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
                     android:layout_weight="1"
-                    android:orientation="vertical" >
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:src="@drawable/mana_pool_icon" />
-
-                    <TextView
-                        style="@style/text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:gravity="center"
-                        android:text="@string/manapool"
-                        android:textSize="30dip" />
-                </LinearLayout>
+                    android:drawableTop="@drawable/mana_pool_icon"
+                    android:gravity="center"
+                    android:text="@string/manapool"
+                    android:textSize="30dip" />
             </LinearLayout>
 
             <LinearLayout
@@ -169,74 +90,40 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content" >
 
-                <LinearLayout
+                <TextView
                     android:id="@+id/rng"
-                    android:layout_width="fill_parent"
+                    style="@style/text"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical" >
+                    android:drawableTop="@drawable/dice_icon"
+                    android:gravity="center_horizontal"
+                    android:text="@string/random"
+                    android:textSize="30dip" />
 
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:src="@drawable/dice_icon" />
+                <TextView
+                    android:id="@+id/roundTimer"
+                    style="@style/text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="1"
+                    android:drawableTop="@drawable/round_timer_icon"
+                    android:gravity="center"
+                    android:text="@string/roundtimer"
+                    android:textSize="30dip" />
 
-                    <TextView
-                        style="@style/text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:text="@string/random"
-                        android:textSize="30dip" />
-                </LinearLayout>
-
-				<LinearLayout
-	            	android:id="@+id/roundTimer"
-	            	android:layout_width="fill_parent"
-	            	android:layout_height="wrap_content"
-	            	android:layout_weight="1"
-	            	android:orientation="vertical" >
-	            
-	            	<ImageView 
-	            		android:layout_width="wrap_content"
-	            		android:layout_height="wrap_content"
-	            		android:layout_gravity="center_horizontal"
-	            		android:src="@drawable/round_timer_icon" />
-	            		
-	            	<TextView 
-	            		style="@style/text"
-	            		android:layout_width="wrap_content"
-	                    android:layout_height="wrap_content"
-	                    android:layout_gravity="center_horizontal"
-	                    android:gravity="center"
-	                    android:text="@string/roundtimer"
-	                    android:textSize="30dip" />
-            
-            	</LinearLayout>
-
-                <LinearLayout
+                <TextView
                     android:id="@+id/randomCard"
-                    android:layout_width="fill_parent"
+                    style="@style/text"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
                     android:layout_weight="1"
-                    android:orientation="vertical" >
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:src="@drawable/mojhosto_icon" />
-
-                    <TextView
-                        style="@style/text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:gravity="center"
-                        android:text="@string/mojhosto_label"
-                        android:textSize="30dip" />
-                </LinearLayout>
+                    android:drawableTop="@drawable/mojhosto_icon"
+                    android:gravity="center"
+                    android:text="@string/mojhosto_label"
+                    android:textSize="30dip" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

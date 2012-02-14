@@ -49,6 +49,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -130,7 +131,7 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 	private Button								rightRandom;
 	private String[]							legalities;
 	private String[]							formats;
-	private MenuFragment					mFragment1;
+	private Fragment					mFragment1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -380,7 +381,12 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 		FragmentTransaction ft = fm.beginTransaction();
 		mFragment1 = (MenuFragment) fm.findFragmentByTag("f1");
 		if (mFragment1 == null) {
-			mFragment1 = new MenuFragment(this, R.menu.card_menu);
+			try{
+				mFragment1 = new MenuFragment(this, R.menu.card_menu);
+			}
+			catch(VerifyError e){
+				mFragment1 = new MenuFragmentCompat(R.menu.card_menu);
+			}
 			ft.add(mFragment1, "f1");
 		}
 		ft.commit();

@@ -16,7 +16,7 @@
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:gravity="center"
         android:orientation="vertical" >
@@ -33,7 +33,7 @@
                 android:id="@+id/white_minus"
                 android:layout_width="60sp"
                 android:layout_height="wrap_content"
-                android:text="-"
+                android:text="@string/minus_str"
                 android:textSize="30sp" />
 
             <ImageView
@@ -50,14 +50,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dip"
                 android:layout_marginRight="20dip"
-                android:text="0"
+                android:text="@string/zero_str"
                 android:textSize="45sp" />
 
             <Button
                 android:id="@+id/white_plus"
                 android:layout_width="60sp"
                 android:layout_height="wrap_content"
-                android:text="+"
+                android:text="@string/plus_str"
                 android:textSize="30sp" />
         </LinearLayout>
         <!-- blue -->
@@ -72,7 +72,7 @@
                 android:id="@+id/blue_minus"
                 android:layout_width="60sp"
                 android:layout_height="wrap_content"
-                android:text="-"
+                android:text="@string/minus_str"
                 android:textSize="30sp" />
 
             <ImageView
@@ -89,14 +89,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dip"
                 android:layout_marginRight="20dip"
-                android:text="0"
+                android:text="@string/zero_str"
                 android:textSize="45sp" />
 
             <Button
                 android:id="@+id/blue_plus"
                 android:layout_width="60sp"
                 android:layout_height="wrap_content"
-                android:text="+"
+                android:text="@string/plus_str"
                 android:textSize="30sp" />
         </LinearLayout>
         <!-- black -->
@@ -111,7 +111,7 @@
                 android:id="@+id/black_minus"
                 android:layout_width="60sp"
                 android:layout_height="wrap_content"
-                android:text="-"
+                android:text="@string/minus_str"
                 android:textSize="30sp" />
 
             <ImageView
@@ -128,14 +128,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dip"
                 android:layout_marginRight="20dip"
-                android:text="0"
+                android:text="@string/zero_str"
                 android:textSize="45sp" />
 
             <Button
                 android:id="@+id/black_plus"
                 android:layout_width="60sp"
                 android:layout_height="wrap_content"
-                android:text="+"
+                android:text="@string/plus_str"
                 android:textSize="30sp" />
         </LinearLayout>
         <!-- red -->
@@ -150,7 +150,7 @@
                 android:id="@+id/red_minus"
                 android:layout_width="60sp"
                 android:layout_height="wrap_content"
-                android:text="-"
+                android:text="@string/minus_str"
                 android:textSize="30sp" />
 
             <ImageView
@@ -167,14 +167,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dip"
                 android:layout_marginRight="20dip"
-                android:text="0"
+                android:text="@string/zero_str"
                 android:textSize="45sp" />
 
             <Button
                 android:id="@+id/red_plus"
                 android:layout_width="60sp"
                 android:layout_height="wrap_content"
-                android:text="+"
+                android:text="@string/plus_str"
                 android:textSize="30sp" />
         </LinearLayout>
         <!-- green -->
@@ -189,7 +189,7 @@
                 android:id="@+id/green_minus"
                 android:layout_width="60sp"
                 android:layout_height="wrap_content"
-                android:text="-"
+                android:text="@string/minus_str"
                 android:textSize="30sp" />
 
             <ImageView
@@ -206,14 +206,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dip"
                 android:layout_marginRight="20dip"
-                android:text="0"
+                android:text="@string/zero_str"
                 android:textSize="45sp" />
 
             <Button
                 android:id="@+id/green_plus"
                 android:layout_width="60sp"
                 android:layout_height="wrap_content"
-                android:text="+"
+                android:text="@string/plus_str"
                 android:textSize="30sp" />
         </LinearLayout>
         <!-- colorless -->
@@ -228,7 +228,7 @@
                 android:id="@+id/colorless_minus"
                 android:layout_width="60sp"
                 android:layout_height="wrap_content"
-                android:text="-"
+                android:text="@string/minus_str"
                 android:textSize="30sp" />
 
             <ImageView
@@ -245,14 +245,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dip"
                 android:layout_marginRight="20dip"
-                android:text="0"
+                android:text="@string/zero_str"
                 android:textSize="45sp" />
 
             <Button
                 android:id="@+id/colorless_plus"
                 android:layout_width="60sp"
                 android:layout_height="wrap_content"
-                android:text="+"
+                android:text="@string/plus_str"
                 android:textSize="30sp" />
         </LinearLayout>
         <!-- spell -->
@@ -267,7 +267,7 @@
                 android:id="@+id/spell_minus"
                 android:layout_width="60sp"
                 android:layout_height="wrap_content"
-                android:text="-"
+                android:text="@string/minus_str"
                 android:textSize="30sp" />
 
             <ImageView
@@ -284,14 +284,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dip"
                 android:layout_marginRight="20dip"
-                android:text="0"
+                android:text="@string/zero_str"
                 android:textSize="45sp" />
 
             <Button
                 android:id="@+id/spell_plus"
                 android:layout_width="60sp"
                 android:layout_height="wrap_content"
-                android:text="+"
+                android:text="@string/plus_str"
                 android:textSize="30sp" />
         </LinearLayout>
     </LinearLayout>

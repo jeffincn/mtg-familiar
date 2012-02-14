@@ -33,7 +33,7 @@
             android:layout_weight="1"
             android:orientation="horizontal" android:layout_width="fill_parent" android:weightSum="1">
             <LinearLayout android:layout_height="fill_parent" android:id="@+id/linearLayout1" android:orientation="vertical" android:layout_width="fill_parent">
-                <TextView android:gravity="center" android:textSize="72dp" android:paddingBottom="10dp" android:paddingTop="10dp" android:paddingRight="0dp" android:layout_height="fill_parent" android:text="20" android:paddingLeft="0dp" style="@style/text" android:maxLines="1" android:id="@+id/player_readout" android:layout_width="fill_parent"></TextView>
+                <TextView android:gravity="center" android:textSize="72dp" android:paddingBottom="10dp" android:paddingTop="10dp" android:paddingRight="0dp" android:layout_height="fill_parent" android:text="@string/twenty_str" android:paddingLeft="0dp" style="@style/text" android:maxLines="1" android:id="@+id/player_readout" android:layout_width="fill_parent"></TextView>
             </LinearLayout>
 
             <LinearLayout
@@ -61,7 +61,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="-5"
+                android:text="@string/minus_five"
                 android:textSize="20sp"/>
     
             <Button
@@ -69,7 +69,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="-1"
+                android:text="@string/minus_one"
                 android:textSize="20sp" />
             
             <Button
@@ -77,7 +77,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="+1"
+                android:text="@string/plus_one"
                 android:textSize="20sp" />
 
             <Button
@@ -85,7 +85,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="+5"
+                android:text="@string/plus_five"
                 android:textSize="20sp" />
         </LinearLayout>
     </LinearLayout>

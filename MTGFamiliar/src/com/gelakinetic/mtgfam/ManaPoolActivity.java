@@ -23,6 +23,7 @@ import android.content.res.Configuration;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -38,7 +39,7 @@ public class ManaPoolActivity extends FragmentActivity {
 	private TextView	whiteReadout, blueReadout, blackReadout, redReadout, greenReadout, colorlessReadout, spellReadout;
 
 	private int				white, blue, black, red, green, colorless, spell;
-	private MenuFragment	mFragment1;
+	private Fragment	mFragment1;
 
 	@Override
 	public void onCreate(Bundle savedInstance) {
@@ -258,7 +259,12 @@ public class ManaPoolActivity extends FragmentActivity {
 		FragmentTransaction ft = fm.beginTransaction();
 		mFragment1 = (MenuFragment) fm.findFragmentByTag("f1");
 		if (mFragment1 == null) {
-			mFragment1 = new MenuFragment(this, R.menu.mana_pool_menu);
+			try{
+				mFragment1 = new MenuFragment(this, R.menu.mana_pool_menu);
+			}
+			catch(VerifyError e){
+				mFragment1 = new MenuFragmentCompat(R.menu.mana_pool_menu);
+			}
 			ft.add(mFragment1, "f1");
 		}
 		ft.commit();

@@ -29,6 +29,7 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.PorterDuff.Mode;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -111,7 +112,7 @@ public class SearchActivity extends FragmentActivity {
 	private Spinner								typespinner;
 
 	private int										selectedFormat;
-	private MenuFragment					mFragment1;
+	private Fragment					mFragment1;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -123,7 +124,12 @@ public class SearchActivity extends FragmentActivity {
 		FragmentTransaction ft = fm.beginTransaction();
 		mFragment1 = (MenuFragment) fm.findFragmentByTag("f1");
 		if (mFragment1 == null) {
-			mFragment1 = new MenuFragment(this, R.menu.search_menu);
+			try{
+				mFragment1 = new MenuFragment(this, R.menu.search_menu);
+			}
+			catch(VerifyError e){
+				mFragment1 = new MenuFragmentCompat(R.menu.search_menu);
+			}
 			ft.add(mFragment1, "f1");
 		}
 		ft.commit();

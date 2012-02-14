@@ -46,6 +46,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -56,7 +57,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class MainActivity extends FragmentActivity implements Runnable {
@@ -68,9 +68,6 @@ public class MainActivity extends FragmentActivity implements Runnable {
 	private static final int	ABOUTDIALOG			= 0;
 	private static final int	CHANGELOGDIALOG	= 1;
 	private static final int	DONATEDIALOG		= 2;
-	private LinearLayout			search;
-	private LinearLayout			rng;
-	private LinearLayout			manapool;
 	private Context						mCtx;
 	private CardDbAdapter			mDbHelper;
 	private ProgressDialog		dialog;
@@ -81,10 +78,13 @@ public class MainActivity extends FragmentActivity implements Runnable {
 	private SharedPreferences	preferences;
 	private String						stacktrace;
 	private PackageInfo				pInfo;
-	private LinearLayout			randomCard;
-	private LinearLayout			nbplayerbutton;
-	private LinearLayout			roundTimer;
-	private MenuFragment			mFragment1;
+	private TextView			search;
+	private TextView			rng;
+	private TextView			manapool;
+	private TextView			randomCard;
+	private TextView			nbplayerbutton;
+	private TextView			roundTimer;
+	private Fragment			mFragment1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -93,12 +93,12 @@ public class MainActivity extends FragmentActivity implements Runnable {
 
 		mCtx = this;
 
-		search = (LinearLayout) findViewById(R.id.cardsearch);
-		rng = (LinearLayout) findViewById(R.id.rng);
-		manapool = (LinearLayout) findViewById(R.id.manapool);
-		randomCard = (LinearLayout) findViewById(R.id.randomCard);
-		nbplayerbutton = (LinearLayout) findViewById(R.id.Nplayerlifecounter);
-		roundTimer = (LinearLayout) findViewById(R.id.roundTimer);
+		search = (TextView) findViewById(R.id.cardsearch);
+		rng = (TextView) findViewById(R.id.rng);
+		manapool = (TextView) findViewById(R.id.manapool);
+		randomCard = (TextView) findViewById(R.id.randomCard);
+		nbplayerbutton = (TextView) findViewById(R.id.Nplayerlifecounter);
+		roundTimer = (TextView) findViewById(R.id.roundTimer);
 
 		nbplayerbutton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -178,7 +178,12 @@ public class MainActivity extends FragmentActivity implements Runnable {
 		FragmentTransaction ft = fm.beginTransaction();
 		mFragment1 = (MenuFragment) fm.findFragmentByTag("f1");
 		if (mFragment1 == null) {
-			mFragment1 = new MenuFragment(this, R.menu.main_menu);
+			try{
+				mFragment1 = new MenuFragment(this, R.menu.main_menu);
+			}
+			catch(VerifyError e){
+				mFragment1 = new MenuFragmentCompat(R.menu.main_menu);
+			}
 			ft.add(mFragment1, "f1");
 		}
 		ft.commit();

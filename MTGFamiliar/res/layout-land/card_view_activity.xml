@@ -20,7 +20,7 @@
         android:id="@+id/linearLayout7"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="vertical" android:baselineAligned="false">
 
         <LinearLayout
             android:id="@+id/linearLayout1"
@@ -36,7 +36,7 @@
                 <TextView
                     android:id="@+id/name"
                     style="@style/text"
-                    android:layout_width="fill_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="3dip"
                     android:layout_weight="1"
@@ -63,7 +63,7 @@
                 <TextView
                     android:id="@+id/type"
                     style="@style/text"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="3dip"
                     android:layout_weight="1"
@@ -121,7 +121,7 @@
         <FrameLayout
             android:id="@+id/frameLayout1"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_height="0dp"
             android:layout_weight="1" />
 
         <LinearLayout
@@ -140,7 +140,7 @@
                 <TextView
                     android:id="@+id/artist"
                     style="@style/text"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" android:layout_marginBottom="0dip" android:layout_marginLeft="3dip" android:layout_marginRight="3dip" android:layout_marginTop="3dip" android:text="Zoltan Boros &amp; Gabor Szikzsai &amp; Blah Blah &amp; Foo Foo &amp; Sneef Sneef"/>
 
@@ -166,7 +166,7 @@
                 android:textSize="22dip" />
 
             <LinearLayout
-                android:id="@+id/linearLayout7"
+                android:id="@+id/linearLayout8"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

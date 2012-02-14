@@ -39,6 +39,10 @@ public class RoundTimerActivity extends FragmentActivity {
 				}
 				else if(!tService.isRunning())
 				{
+					//If this is called while the timer is not running, it means it was running
+					//and it just stopped, so display the initial time again and change the
+					//button text back to "Start"
+					actionButton.setText(R.string.start_timer);
 					displaySelectedTime();
 				}
 			}

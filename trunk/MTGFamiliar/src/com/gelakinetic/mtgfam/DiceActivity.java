@@ -28,6 +28,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -42,7 +43,7 @@ public class DiceActivity extends FragmentActivity {
 	private boolean													d2AsCoin;
 	private final ScheduledExecutorService	scheduler		= Executors.newScheduledThreadPool(1);
 	private Handler													handler;
-	private MenuFragment	mFragment1;
+	private Fragment	mFragment1;
 
 	public static final int									updateDelay	= 150;
 
@@ -55,7 +56,12 @@ public class DiceActivity extends FragmentActivity {
 		FragmentTransaction ft = fm.beginTransaction();
 		mFragment1 = (MenuFragment) fm.findFragmentByTag("f1");
 		if (mFragment1 == null) {
-			mFragment1 = new MenuFragment(this, R.menu.dice_menu);
+			try{
+				mFragment1 = new MenuFragment(this, R.menu.dice_menu);
+			}
+			catch(VerifyError e){
+				mFragment1 = new MenuFragmentCompat(R.menu.dice_menu);
+			}
 			ft.add(mFragment1, "f1");
 		}
 		ft.commit();

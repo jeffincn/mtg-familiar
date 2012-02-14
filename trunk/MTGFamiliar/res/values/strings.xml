@@ -12,7 +12,17 @@
 -->
 <resources>
 
-    <string name="app_name">MTG Familiar</string>
+    <string name="plus_str">+</string>
+	<string name="minus_str">-</string>
+    <string name="zero_str">0</string>
+    <string name="twenty_str">20</string>
+    
+    <string name="plus_one">+1</string>
+    <string name="plus_five">+5</string>
+    <string name="minus_one">-1</string>
+    <string name="minus_five">-5</string>
+        	
+	<string name="app_name">MTG Familiar</string>
 
     <string-array name="supertypes">
         <item>Artifact</item>
@@ -129,8 +139,6 @@
     <string name="lifecounter">Life Counter</string>
     <string name="manapool">Mana Pool</string>
     <string name="random">Dice</string>
-    <string name="plus">+</string>
-    <string name="minus">-</string>
     <string name="searchrarity">Rarity</string>
     <string name="clear">Clear Fields</string>
     <string name="clear_all">Clear All</string>
@@ -176,7 +184,7 @@ Thanks to reddit\'s &lt;a href="http://www.reddit.com/r/magicTCG/">/r/magictcg&l
 Thanks to my brother for the icon.&lt;br />&lt;br />
 Thanks to Chedy @ &lt;a href="http://tcgplayer.com">TCGPlayer.com&lt;/a> for the price API.&lt;br />&lt;br />
 Special thanks to Richard Garfield and the rest of the folks at &lt;a href="http://www.wizards.com/magic">Wizards of the Coast&lt;/a>.&lt;br />&lt;br />
---gelakinetic&lt;br />&lt;br />&lt;br />
+-gelakinetic&lt;br />&lt;br />&lt;br />
 Magic the Gathering and Magic the Gathering cards are ™ &amp; © Wizards of the Coast LLC.&lt;br />&lt;br />
 Program licenced under the &lt;a href="http://www.gnu.org/licenses/gpl.html">GNU General Public License v3+&lt;/a>.&lt;br />&lt;br />
 Media licenced under under the &lt;a href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License&lt;a>.</string>

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
@@ -43,19 +44,28 @@ public class MenuFragment extends Fragment {
 		for (int i = 0; i < menu.size(); i++) {
 			if (i == 0) {
 				try {
-					// Get the SearchView and set the searchable configuration
-					SearchManager searchManager = (SearchManager) mActivity.getSystemService(Context.SEARCH_SERVICE);
-					SearchView searchView = (SearchView) menu.getItem(i).getActionView();
-					SearchableInfo si = searchManager.getSearchableInfo(mActivity.getComponentName());
-					if(si == null){
-						// this activity is not searchable. just throw the exception to hide the icon
-						throw new NoSuchMethodError();
+					if(Build.VERSION.SDK_INT >= 11){ // honeycomb or greater
+						// Get the SearchView and set the searchable configuration
+						SearchManager searchManager = (SearchManager) mActivity.getSystemService(Context.SEARCH_SERVICE);
+						SearchView searchView = (SearchView) menu.getItem(i).getActionView();
+						SearchableInfo si = searchManager.getSearchableInfo(mActivity.getComponentName());
+						if(si == null){
+							// this activity is not searchable. just throw the exception to hide the icon
+							throw new NoSuchMethodError();
+						}
+						searchView.setSearchableInfo(si);
+						searchView.setIconifiedByDefault(true);
+						MenuItemCompat.setShowAsAction(menu.getItem(i), MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
 					}
-					searchView.setSearchableInfo(si);
-					searchView.setIconifiedByDefault(true);
-					MenuItemCompat.setShowAsAction(menu.getItem(i), MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+					else{
+						menu.getItem(0).setVisible(false);
+					}
 				}
 				catch (NoSuchMethodError e) {
+					// this must be a pre honeycomb platform, without the action bar. hide the menu option then!
+					menu.getItem(0).setVisible(false);
+				}
+				catch (VerifyError e) {
 					// this must be a pre honeycomb platform, without the action bar. hide the menu option then!
 					menu.getItem(0).setVisible(false);
 				}

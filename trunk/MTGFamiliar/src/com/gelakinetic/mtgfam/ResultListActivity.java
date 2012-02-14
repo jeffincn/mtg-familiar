@@ -32,6 +32,7 @@ import android.database.MergeCursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -58,7 +59,7 @@ public class ResultListActivity extends FragmentActivity {
 	private int								randomIndex						= 0;
 	private int								numChoices;
 	private boolean						randomFromMenu				= false;
-	private MenuFragment	mFragment1;
+	private Fragment	mFragment1;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -70,7 +71,12 @@ public class ResultListActivity extends FragmentActivity {
 		FragmentTransaction ft = fm.beginTransaction();
 		mFragment1 = (MenuFragment) fm.findFragmentByTag("f1");
 		if (mFragment1 == null) {
-			mFragment1 = new MenuFragment(this, R.menu.result_list_menu);
+			try{
+				mFragment1 = new MenuFragment(this, R.menu.result_list_menu);
+			}
+			catch(VerifyError e){
+				mFragment1 = new MenuFragmentCompat(R.menu.result_list_menu);
+			}
 			ft.add(mFragment1, "f1");
 		}
 		ft.commit();

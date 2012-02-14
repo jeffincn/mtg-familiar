@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -77,7 +78,7 @@ public class RoundTimerActivity extends FragmentActivity {
 	private Button actionButton;
 	private Button resetButton;
 	private TextView timeView;
-	private MenuFragment	mFragment1;
+	private Fragment	mFragment1;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -90,7 +91,12 @@ public class RoundTimerActivity extends FragmentActivity {
 		FragmentTransaction ft = fm.beginTransaction();
 		mFragment1 = (MenuFragment) fm.findFragmentByTag("f1");
 		if (mFragment1 == null) {
-			mFragment1 = new MenuFragment(this, R.menu.timer_menu);
+			try{
+				mFragment1 = new MenuFragment(this, R.menu.timer_menu);
+			}
+			catch(VerifyError e){
+				mFragment1 = new MenuFragmentCompat(R.menu.timer_menu);
+			}
 			ft.add(mFragment1, "f1");
 		}
 		ft.commit();

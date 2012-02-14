@@ -28,10 +28,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -43,7 +40,6 @@ public class DiceActivity extends FragmentActivity {
 	private boolean													d2AsCoin;
 	private final ScheduledExecutorService	scheduler		= Executors.newScheduledThreadPool(1);
 	private Handler													handler;
-	private Fragment	mFragment1;
 
 	public static final int									updateDelay	= 150;
 
@@ -52,19 +48,7 @@ public class DiceActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.dice_activity);
 
-		FragmentManager fm = getSupportFragmentManager();
-		FragmentTransaction ft = fm.beginTransaction();
-		mFragment1 = (MenuFragment) fm.findFragmentByTag("f1");
-		if (mFragment1 == null) {
-			try{
-				mFragment1 = new MenuFragment(this, R.menu.dice_menu);
-			}
-			catch(VerifyError e){
-				mFragment1 = new MenuFragmentCompat(R.menu.dice_menu);
-			}
-			ft.add(mFragment1, "f1");
-		}
-		ft.commit();
+		MenuFragmentCompat.init(this, R.menu.dice_menu, "dice_menu_fragment");
 		
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 		d2AsCoin = settings.getBoolean("d2AsCoin", true);

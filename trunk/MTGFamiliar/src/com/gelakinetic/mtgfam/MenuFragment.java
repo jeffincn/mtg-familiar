@@ -18,8 +18,8 @@ import android.widget.SearchView;
  */
 public class MenuFragment extends Fragment {
 
-	private static Activity	mActivity;
-	private static int			mRes;
+	private Activity	mActivity;
+	private int			mRes;
 
 	public MenuFragment(Activity a, int menuRes) {
 		super();
@@ -29,6 +29,7 @@ public class MenuFragment extends Fragment {
 
 	public MenuFragment() {
 		super();
+		
 	}
 
 	@Override
@@ -76,5 +77,11 @@ public class MenuFragment extends Fragment {
 						| MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT);
 			}
 		}
+	}
+
+	public void setVaribles(Activity a, int res) {
+		// TODO Auto-generated method stub
+		mActivity = a;
+		mRes = res;
 	}
 }

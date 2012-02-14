@@ -60,20 +60,14 @@ public class RoundTimerService extends Service {
 			}
 		}
 	};
-	
+
 	@Override
-	public void onStart(Intent intent, int startId)
+	public int onStartCommand(Intent intent, int flags, int startId) 
 	{
-		handleStartup(intent);
+		handleStartup(intent);          
+		return START_NOT_STICKY;
 	}
-	
-//	@Override
-//	public void onStartCommand(Intent intent, int startId) 
-//	{
-//		handleStartup(intent);		
-//		return START_NOT_STICKY;
-//	}
-	
+
 	private void handleStartup(Intent intent)
 	{
 		registerReceiver(new BroadcastReceiver() {

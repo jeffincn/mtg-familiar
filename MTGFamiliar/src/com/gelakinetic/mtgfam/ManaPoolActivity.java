@@ -23,13 +23,9 @@ import android.content.res.Configuration;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.MenuItemCompat;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -262,8 +258,7 @@ public class ManaPoolActivity extends FragmentActivity {
 		FragmentTransaction ft = fm.beginTransaction();
 		mFragment1 = (MenuFragment) fm.findFragmentByTag("f1");
 		if (mFragment1 == null) {
-			mFragment1 = new MenuFragment();
-			mFragment1.mpa = this;
+			mFragment1 = new MenuFragment(this, R.menu.mana_pool_menu);
 			ft.add(mFragment1, "f1");
 		}
 		ft.commit();
@@ -329,40 +324,16 @@ public class ManaPoolActivity extends FragmentActivity {
 		super.onConfigurationChanged(newConfig);
 	}
 	
-
-	/**
-	 * A fragment that displays a menu. This fragment happens to not have a UI (it
-	 * does not implement onCreateView), but it could also have one if it wanted.
-	 */
-	public static class MenuFragment extends Fragment {
-
-		public ManaPoolActivity	mpa;
-
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			setHasOptionsMenu(true);
-		}
-
-		@Override
-		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-			inflater.inflate(R.menu.mana_pool_menu, menu);
-			for(int i=0; i < menu.size(); i++){
-				MenuItemCompat.setShowAsAction(menu.getItem(i), MenuItemCompat.SHOW_AS_ACTION_IF_ROOM | MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT);
-			}
-		}
-
-		@Override
-		public boolean onOptionsItemSelected(MenuItem item) {
-			switch (item.getItemId()) {
-				case R.id.clear_all:
-					ManaPoolActivity.reset(mpa);
-					mpa.load();
-					mpa.update();
-					return true;
-				default:
-					return super.onOptionsItemSelected(item);
-			}
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.clear_all:
+				reset(this);
+				load();
+				update();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 }

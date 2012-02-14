@@ -237,29 +237,6 @@
                         android:text="@string/mojhosto_label"
                         android:textSize="30dip" />
                 </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/deckManagement"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical" >
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:src="@drawable/card_search_icon" />
-
-                    <TextView
-                        style="@style/text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:gravity="center"
-                        android:text="@string/deckmanagement"
-                        android:textSize="30dip" />
-                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

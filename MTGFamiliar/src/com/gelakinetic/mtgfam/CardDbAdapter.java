@@ -563,7 +563,7 @@ public class CardDbAdapter {
 
 		if (cardtype != null && !cardtype.equals("-")) {
 			boolean containsSupertype = true;
-			if (cardtype.substring(0, 3).equals(" - ")) {
+			if (cardtype.substring(0, 2).equals("- ")) {
 				containsSupertype = false;
 			}
 			String[] split = cardtype.split(" - ");
@@ -575,7 +575,7 @@ public class CardDbAdapter {
 				supertypes = cardtype.replace(" -", "");
 			}
 			else {
-				subtypes = cardtype.replace(" -", "");
+				subtypes = cardtype.replace("- ", "");
 			}
 		}
 

@@ -51,8 +51,6 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.text.ClipboardManager;
 import android.text.Html;
 import android.text.Html.ImageGetter;
@@ -377,20 +375,7 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 			((ImageView) findViewById(R.id.cardpic)).setVisibility(View.GONE);
 		}
 
-		FragmentManager fm = getSupportFragmentManager();
-		FragmentTransaction ft = fm.beginTransaction();
-		mFragment1 = (MenuFragment) fm.findFragmentByTag("f1");
-		if (mFragment1 == null) {
-			try{
-				mFragment1 = new MenuFragment(this, R.menu.card_menu);
-			}
-			catch(VerifyError e){
-				mFragment1 = new MenuFragmentCompat(R.menu.card_menu);
-			}
-			ft.add(mFragment1, "f1");
-		}
-		ft.commit();
-
+		MenuFragmentCompat.init(this, R.menu.card_menu, "card_view_menu_fragment");
 	}
 
 	@Override

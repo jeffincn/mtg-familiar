@@ -34,10 +34,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.text.Html;
 import android.view.MenuItem;
 import android.view.View;
@@ -63,7 +60,6 @@ public class RandomCardActivity extends FragmentActivity {
 	private ImageView						momirImage;
 	private ImageView						jhoiraImage;
 	private SharedPreferences		preferences;
-	private Fragment	mFragment1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -244,19 +240,7 @@ public class RandomCardActivity extends FragmentActivity {
 			editor.commit();
 		}
 		
-		FragmentManager fm = getSupportFragmentManager();
-		FragmentTransaction ft = fm.beginTransaction();
-		mFragment1 = (MenuFragment) fm.findFragmentByTag("f1");
-		if (mFragment1 == null) {
-			try{
-				mFragment1 = new MenuFragment(this, R.menu.random_menu);
-			}
-			catch(VerifyError e){
-				mFragment1 = new MenuFragmentCompat(R.menu.random_menu);
-			}
-			ft.add(mFragment1, "f1");
-		}
-		ft.commit();
+		MenuFragmentCompat.init(this, R.menu.random_menu, "random_card_menu_fragment");
 	}
 
 	@Override

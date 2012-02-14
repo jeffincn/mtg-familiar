@@ -46,10 +46,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
@@ -84,7 +81,6 @@ public class MainActivity extends FragmentActivity implements Runnable {
 	private TextView			randomCard;
 	private TextView			nbplayerbutton;
 	private TextView			roundTimer;
-	private Fragment			mFragment1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -173,20 +169,8 @@ public class MainActivity extends FragmentActivity implements Runnable {
 
 		Intent i = new Intent(this, RoundTimerService.class);
 		startService(i);
-
-		FragmentManager fm = getSupportFragmentManager();
-		FragmentTransaction ft = fm.beginTransaction();
-		mFragment1 = (MenuFragment) fm.findFragmentByTag("f1");
-		if (mFragment1 == null) {
-			try{
-				mFragment1 = new MenuFragment(this, R.menu.main_menu);
-			}
-			catch(VerifyError e){
-				mFragment1 = new MenuFragmentCompat(R.menu.main_menu);
-			}
-			ft.add(mFragment1, "f1");
-		}
-		ft.commit();
+		
+		MenuFragmentCompat.init(this, R.menu.main_menu, "main_menu_fragment");
 	}
 
 	@Override

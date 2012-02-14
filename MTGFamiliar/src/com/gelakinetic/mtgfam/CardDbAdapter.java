@@ -84,8 +84,8 @@ public class CardDbAdapter {
 	public static final String		KEY_RULINGS										= "rulings";
 
 	public static final String[]	KEYS													= { KEY_ID, KEY_NAME, KEY_SET, KEY_TYPE, KEY_ABILITY,
-			KEY_COLOR, KEY_MANACOST, KEY_CMC, KEY_POWER, KEY_TOUGHNESS, KEY_RARITY, KEY_LOYALTY, KEY_FLAVOR, KEY_ARTIST,
-			KEY_NUMBER, KEY_MULTIVERSEID, KEY_RULINGS							};
+		KEY_COLOR, KEY_MANACOST, KEY_CMC, KEY_POWER, KEY_TOUGHNESS, KEY_RARITY, KEY_LOYALTY, KEY_FLAVOR, KEY_ARTIST,
+		KEY_NUMBER, KEY_MULTIVERSEID, KEY_RULINGS							};
 
 	public static final String		KEY_CODE											= "code";
 	public static final String		KEY_CODE_MTGI									= "code_mtgi";
@@ -99,39 +99,39 @@ public class CardDbAdapter {
 	private SQLiteDatabase				mDb;
 
 	private static final String		DATABASE_CREATE_CARDS					= "create table " + DATABASE_TABLE_CARDS + "(" + KEY_ID
-																																	+ " integer primary key autoincrement, " + KEY_NAME
-																																	+ " text not null, " + KEY_SET + " text not null, "
-																																	+ KEY_TYPE + " text not null, " + KEY_RARITY
-																																	+ " integer, " + KEY_MANACOST + " text, " + KEY_CMC
-																																	+ " integer not null, " + KEY_POWER + " real, "
-																																	+ KEY_TOUGHNESS + " real, " + KEY_LOYALTY
-																																	+ " integer, " + KEY_ABILITY + " text, " + KEY_FLAVOR
-																																	+ " text, " + KEY_ARTIST + " text, " + KEY_NUMBER
-																																	+ " text, " + KEY_MULTIVERSEID
-																																	+ " integer not null, " + KEY_COLOR
-																																	+ " text not null, " + KEY_RULINGS + " text);";
+			+ " integer primary key autoincrement, " + KEY_NAME
+			+ " text not null, " + KEY_SET + " text not null, "
+			+ KEY_TYPE + " text not null, " + KEY_RARITY
+			+ " integer, " + KEY_MANACOST + " text, " + KEY_CMC
+			+ " integer not null, " + KEY_POWER + " real, "
+			+ KEY_TOUGHNESS + " real, " + KEY_LOYALTY
+			+ " integer, " + KEY_ABILITY + " text, " + KEY_FLAVOR
+			+ " text, " + KEY_ARTIST + " text, " + KEY_NUMBER
+			+ " text, " + KEY_MULTIVERSEID
+			+ " integer not null, " + KEY_COLOR
+			+ " text not null, " + KEY_RULINGS + " text);";
 
 	private static final String		DATABASE_CREATE_SETS					= "create table " + DATABASE_TABLE_SETS + "(" + KEY_ID
-																																	+ " integer primary key autoincrement, " + KEY_NAME
-																																	+ " text not null, " + KEY_CODE
-																																	+ " text not null unique, " + KEY_CODE_MTGI
-																																	+ " text not null, " + KEY_NAME_TCGPLAYER + " text, "
-																																	+ KEY_DATE + " integer);";
+			+ " integer primary key autoincrement, " + KEY_NAME
+			+ " text not null, " + KEY_CODE
+			+ " text not null unique, " + KEY_CODE_MTGI
+			+ " text not null, " + KEY_NAME_TCGPLAYER + " text, "
+			+ KEY_DATE + " integer);";
 
 	private static final String		DATABASE_CREATE_FORMATS				= "create table " + DATABASE_TABLE_FORMATS + "(" + KEY_ID
-																																	+ " integer primary key autoincrement, " + KEY_NAME
-																																	+ " text not null);";
+			+ " integer primary key autoincrement, " + KEY_NAME
+			+ " text not null);";
 
 	private static final String		DATABASE_CREATE_LEGAL_SETS		= "create table " + DATABASE_TABLE_LEGAL_SETS + "("
-																																	+ KEY_ID + " integer primary key autoincrement, "
-																																	+ KEY_SET + " text not null, " + KEY_FORMAT
-																																	+ " text not null);";
+			+ KEY_ID + " integer primary key autoincrement, "
+			+ KEY_SET + " text not null, " + KEY_FORMAT
+			+ " text not null);";
 
 	private static final String		DATABASE_CREATE_BANNED_CARDS	= "create table " + DATABASE_TABLE_BANNED_CARDS + "("
-																																	+ KEY_ID + " integer primary key autoincrement, "
-																																	+ KEY_NAME + " text not null, " + KEY_LEGALITY
-																																	+ " integer not null, " + KEY_FORMAT
-																																	+ " text not null);";
+			+ KEY_ID + " integer primary key autoincrement, "
+			+ KEY_NAME + " text not null, " + KEY_LEGALITY
+			+ " integer not null, " + KEY_FORMAT
+			+ " text not null);";
 
 	private final Context					mCtx;
 
@@ -516,39 +516,39 @@ public class CardDbAdapter {
 			 * good to leave some small safety measures.
 			 */
 			switch (text_logic) {
-				case 0:
-					for (String s : cardTextParts) {
+			case 0:
+				for (String s : cardTextParts) {
+					if(s.contains(EXCLUDE_TOKEN))
+						statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " NOT LIKE '%" + s.substring(EXCLUDE_TOKEN_START) + "%')";
+					else
+						statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " LIKE '%" + s + "%')";
+				}
+				break;
+			case 1:
+				boolean firstRun = true;
+				for (String s : cardTextParts) {
+					if (firstRun) {
+						firstRun = false;
+						if(s.contains(EXCLUDE_TOKEN))
+							statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " NOT LIKE '%" + s.substring(EXCLUDE_TOKEN_START) + "%')";
+						else
+							statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " LIKE '%" + s + "%')";
+					}
+					else
+					{
 						if(s.contains(EXCLUDE_TOKEN))
 							statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " NOT LIKE '%" + s.substring(EXCLUDE_TOKEN_START) + "%')";
 						else
-							statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " LIKE '%" + s + "%')";
+							statement += " OR (" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " LIKE '%" + s + "%')";
 					}
-					break;
-				case 1:
-					boolean firstRun = true;
-					for (String s : cardTextParts) {
-						if (firstRun) {
-							firstRun = false;
-							if(s.contains(EXCLUDE_TOKEN))
-								statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " NOT LIKE '%" + s.substring(EXCLUDE_TOKEN_START) + "%')";
-							else
-								statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " LIKE '%" + s + "%')";
-						}
-						else
-						{
-							if(s.contains(EXCLUDE_TOKEN))
-								statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " NOT LIKE '%" + s.substring(EXCLUDE_TOKEN_START) + "%')";
-							else
-								statement += " OR (" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " LIKE '%" + s + "%')";
-						}
-					}
-					statement += ")";
-					break;
-				case 2:
-					statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " LIKE '%" + cardtext + "%')";
-					break;
-				default:
-					break;
+				}
+				statement += ")";
+				break;
+			case 2:
+				statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + " LIKE '%" + cardtext + "%')";
+				break;
+			default:
+				break;
 			}
 		}
 		/** End Reuben's version */
@@ -583,80 +583,80 @@ public class CardDbAdapter {
 			String[] supertypesParts = supertypes.split(" "); // Separate each individual
 
 			switch (type_logic) {
-				case 0:
-					for (String s : supertypesParts) {
+			case 0:
+				for (String s : supertypesParts) {
+					if(s.contains(EXCLUDE_TOKEN))
+						statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s.substring(1) + "%')";
+					else
+						statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
+				}
+				break;
+			case 1:
+				boolean firstRun = true;
+				for (String s : supertypesParts) {
+					if (firstRun) {
+						firstRun = false;
+
+						if(s.contains(EXCLUDE_TOKEN))
+							statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s.substring(1) + "%')";
+						else
+							statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
+					}
+					else
 						if(s.contains(EXCLUDE_TOKEN))
 							statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s.substring(1) + "%')";
 						else
-							statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
-					}
-					break;
-				case 1:
-					boolean firstRun = true;
-					for (String s : supertypesParts) {
-						if (firstRun) {
-							firstRun = false;
-
-							if(s.contains(EXCLUDE_TOKEN))
-								statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s.substring(1) + "%')";
-							else
-								statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
-						}
-						else
-							if(s.contains(EXCLUDE_TOKEN))
-								statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s.substring(1) + "%')";
-							else
-								statement += " OR (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
-					}
-					statement += ")";
-					break;
-				case 2:
-					for (String s : supertypesParts) {
-						statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s + "%')";
-					}
-					break;
-				default:
-					break;
+							statement += " OR (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
+				}
+				statement += ")";
+				break;
+			case 2:
+				for (String s : supertypesParts) {
+					statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s + "%')";
+				}
+				break;
+			default:
+				break;
 			}
 		}
-		
+
 		if (subtypes != null) {
 			String[] subtypesParts = subtypes.split(" "); // Separate each individual
 
 			switch (type_logic) {
-				case 0:
-					for (String s : subtypesParts) {
+			case 0:
+				for (String s : subtypesParts) {
+					if(s.contains(EXCLUDE_TOKEN))
+						statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s.substring(1) + "%')";
+					else
+						statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
+				}
+				break;
+			case 1:
+				boolean firstRun = true;
+				for (String s : subtypesParts) {
+					if (firstRun) {
+						firstRun = false;
+						if(s.contains(EXCLUDE_TOKEN))
+							statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s.substring(1) + "%')";
+						else
+							statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
+					}
+					else
 						if(s.contains(EXCLUDE_TOKEN))
 							statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s.substring(1) + "%')";
 						else
-							statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
-					}
-					break;
-				case 1:
-					boolean firstRun = true;
-					for (String s : subtypesParts) {
-						if (firstRun) {
-							firstRun = false;
-							if(s.contains(EXCLUDE_TOKEN))
-								statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s.substring(1) + "%')";
-							else
-								statement += " AND ((" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
-						}
-						else
-							if(s.contains(EXCLUDE_TOKEN))
-								statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s.substring(1) + "%')";
-							else
-								statement += " OR (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
-					}
-					statement += ")";
-					break;
-				case 2:
-					for (String s : subtypesParts) {
-						statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s + "%')";
-					}
-					break;
-				default:
-					break;
+							statement += " OR (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " LIKE '%" + s + "%')";
+				}
+				statement += ")";
+				break;
+			case 2:
+				for (String s : subtypesParts) {
+					statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_TYPE + " NOT LIKE '%" + s + "%')";
+				}
+				break;
+			default:
+				break;
 			}
 		}
 		/** End Reuben's version */
@@ -836,24 +836,22 @@ public class CardDbAdapter {
 			String sel = null;
 			for (String s : returnTypes) {
 				if (sel == null) {
-					sel = DATABASE_TABLE_CARDS + "." + s;
+					sel = DATABASE_TABLE_CARDS + "." + s + " AS " + s;
 				}
 				else {
-					sel += ", " + DATABASE_TABLE_CARDS + "." + s;
+					sel += ", " + DATABASE_TABLE_CARDS + "." + s + " AS " + s;
 				}
 			}
 			sel += ", " + DATABASE_TABLE_SETS + "." + KEY_DATE;
 
-			String sql = "SELECT * FROM (" + "SELECT " + sel + " FROM (" + tbl + " JOIN " + DATABASE_TABLE_SETS + " ON "
-					+ DATABASE_TABLE_CARDS + "." + KEY_SET + " = " + DATABASE_TABLE_SETS + "." + KEY_CODE + ")" + statement;
+			String sql = "SELECT " + sel + " FROM " + tbl + " JOIN " + DATABASE_TABLE_SETS + " ON "
+					+ DATABASE_TABLE_CARDS + "." + KEY_SET + " = " + DATABASE_TABLE_SETS + "." + KEY_CODE + statement;
 
 			if (consolidate) {
-				sql += " ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " ASC)";
-				sql += " GROUP BY " + KEY_NAME;
+				sql += " GROUP BY " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " ORDER BY " + DATABASE_TABLE_CARDS + "." + KEY_NAME;
 			}
 			else {
-				sql += " ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC)";
-				sql += " ORDER BY " + KEY_NAME;
+				sql += " ORDER BY " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC";
 			}
 			mCursor = mDb.rawQuery(sql, null);
 		}

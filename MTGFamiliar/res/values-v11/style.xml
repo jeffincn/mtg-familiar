@@ -1,5 +1,6 @@
-/**
-Copyright 2011 Adam Feinstein
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright 2011 Adam Feinstein and April King.
 
 This file is part of MTG Familiar.
 
@@ -14,21 +15,10 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
- */
+along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<resources>
+    <style name="defaultStyle">
+	</style>
 
-package com.gelakinetic.mtgfam;
-
-import android.app.Application;
-
-public class MyApp extends Application {
-
-  private int myState;
-
-  public int getState(){
-    return myState;
-  }
-  public void setState(int s){
-    myState = s;
-  }
-}
+</resources>

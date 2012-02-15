@@ -148,7 +148,6 @@
     <string name="med">Average:</string>
     <string name="low">Low:</string>
     <string name="pricetitle">TCGPlayer.com Prices</string>
-    <string name="settings">Settings</string>
     <string name="chkupd">Force Update</string>
     <string name="preferences">Settings</string>
     <string name="transform">Transform</string>
@@ -157,13 +156,6 @@
     <string name="refreshDB">Refresh DB from APK</string>
     <string name="searchButton">Search!</string>
     <string name="randomButton">Randomize!</string>
-    <string name="deckmanagement">Deck Management</string>
-    <string name="defaultdeckpath">/Android/data/com.gelakinetic.mtgfam/</string>
-    <string name="defaultpathtitle">Path To Decks</string>
-    <string name="defaultpathsummary">This is the place on your SD card where decks are
-		saved to and read from</string>
-    <string name="default_deck_path_key">default_deck_path</string>
-    <string name="default_deck_path_dialog_title">Enter Path Here</string>
     <string name="tcgplayerlink">Click here for all prices and trend info</string>
     <string name="toast_no_result">No Results Found</string>
     <string name="name">Name</string>
@@ -232,7 +224,9 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
    - Fixed searching for pre-Android 2.1 devices. Sorry for breaking that!
    -->
    <!--  1.5 -->
-   - Added a round timer. Never miss the end of the round again! (Warning: does not guarantee not going to time)
+   - Added a round timer. Never miss the end of the round again! (Warning: does not guarantee not going to time)&lt;br />&lt;br />
+   - Added Action Bar features for Android 3.0+ devices. Hooray tablets!&lt;br />&lt;br />
+   - UI optimizations and general bugfixes
      	</string>
     <string name="gatherer">Gatherer Page</string>
     <string name="lifetitle">Life Counter</string>
@@ -272,7 +266,6 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     <string name="automaticupdatesummary">Check for new sets and bannings when the app opens</string>
     <string name="updatefrequencytitle">Update Frequency</string>
     <string name="updatefrequencysummary">Number of days to go between checking for new sets and bannings</string>
-    <string name="randomCard">Random Card</string>
     <string name="random_creature">Random Creature</string>
     <string name="random_eqipment">Random Equipment</string>
     <string name="random_instant">Three Random Instants</string>

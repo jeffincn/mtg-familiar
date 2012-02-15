@@ -49,7 +49,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.ClipboardManager;
 import android.text.Html;
@@ -71,6 +70,8 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+// I don't like doing this, but we've gotta stick with the old clipboard
+@SuppressWarnings("deprecation")
 public class CardViewActivity extends FragmentActivity implements Runnable {
 
 	private static final int			PICLOAD				= 0;
@@ -129,7 +130,6 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 	private Button								rightRandom;
 	private String[]							legalities;
 	private String[]							formats;
-	private Fragment					mFragment1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

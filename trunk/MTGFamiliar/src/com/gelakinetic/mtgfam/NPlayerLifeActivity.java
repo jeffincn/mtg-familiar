@@ -1,3 +1,22 @@
+/**
+Copyright 2011 Adam Feinstein and Michael Shick
+
+This file is part of MTG Familiar.
+
+MTG Familiar is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+MTG Familiar is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.gelakinetic.mtgfam;
 
 import android.app.AlertDialog;
@@ -181,7 +200,7 @@ public class NPlayerLifeActivity extends FragmentActivity {
 		scheduler.scheduleWithFixedDelay(runnable, timerTick, timerTick, TimeUnit.MILLISECONDS);
 
 		setType(LIFE);
-		
+
 		MenuFragmentCompat.init(this, R.menu.life_counter_menu, "life_counter_menu_fragment");
 	}
 
@@ -214,6 +233,22 @@ public class NPlayerLifeActivity extends FragmentActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
+
+		try {
+			dismissDialog(DIALOG_RESET_CONFIRM);
+		}
+		catch (IllegalArgumentException e) {
+		}
+		try {
+			dismissDialog(DIALOG_REMOVE_PLAYER);
+		}
+		catch (IllegalArgumentException e) {
+		}
+		try {
+			dismissDialog(DIALOG_SET_NAME);
+		}
+		catch (IllegalArgumentException e) {
+		}
 
 		mainLayout = (LinearLayout) findViewById(R.id.playerList);
 
@@ -324,8 +359,6 @@ public class NPlayerLifeActivity extends FragmentActivity {
 		}
 	}
 
-	
-
 	@Override
 	protected void onPrepareDialog(final int id, final Dialog dialog) {
 		switch (id) {
@@ -346,21 +379,22 @@ public class NPlayerLifeActivity extends FragmentActivity {
 		switch (id) {
 			case DIALOG_RESET_CONFIRM:
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setMessage(getString(R.string.life_clear_dialog_message)).setCancelable(true)
+				builder
+						.setMessage(getString(R.string.life_clear_dialog_message))
+						.setCancelable(true)
 						.setPositiveButton(getString(R.string.life_clear_dialog_players_life_button),
-                                new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								ManaPoolActivity.reset(context);
-								reset(EVERYTHING);
-							}
-						}).setNeutralButton(getString(R.string.life_clear_dialog_life_button),
-                            new DialogInterface.OnClickListener() {
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int id) {
+										ManaPoolActivity.reset(context);
+										reset(EVERYTHING);
+									}
+								})
+						.setNeutralButton(getString(R.string.life_clear_dialog_life_button), new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								ManaPoolActivity.reset(context);
 								reset(JUST_TOTALS);
 							}
-						}).setNegativeButton(getString(R.string.dialog_cancel),
-                            new DialogInterface.OnClickListener() {
+						}).setNegativeButton(getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								dialog.cancel();
 							}
@@ -395,6 +429,12 @@ public class NPlayerLifeActivity extends FragmentActivity {
 				dialog = new AlertDialog.Builder(this).setTitle("Enter Name").setView(textEntryView)
 						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
+								if (playerToHaveNameChanged == null) {
+									return;
+								}
+								if (nameInput == null) {
+									return;
+								}
 								playerToHaveNameChanged.setName(nameInput.getText().toString());
 							}
 						}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -500,7 +540,7 @@ public class NPlayerLifeActivity extends FragmentActivity {
 		editor.commit();
 
 		Intent intent = getIntent();
-//		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+		// intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 		finish();
 
 		startActivity(intent);
@@ -841,7 +881,7 @@ public class NPlayerLifeActivity extends FragmentActivity {
 			this.layout = layout;
 		}
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection

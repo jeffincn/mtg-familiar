@@ -350,5 +350,6 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
 	    <item>Any word(s)</item>
 	    <item>Exact phrase</item>
     </string-array>
+	    <string name="howlongistheround">How long is the round?\n(HH:MM)</string>
     
 </resources>

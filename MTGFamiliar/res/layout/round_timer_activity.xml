@@ -27,85 +27,85 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:layout_gravity="center_vertical"
         android:orientation="vertical" >
 
-        <LinearLayout
+        <TextView
+            style="@style/text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/howlongistheround" />
+        
+        <!-- 
+                <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
             android:orientation="horizontal" >
 
             <TextView
-                android:layout_width="fill_parent"
+                style="@style/text"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_margin="5dp"
                 android:layout_weight="1"
-                android:gravity="right"
-                android:text="@string/hours"
-                android:textSize="10pt" />
-
-            <View
-                android:layout_width="40dp"
-                android:layout_height="fill_parent" />
-
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="left"
-                android:text="@string/minutes"
-                android:textSize="10pt" />
-        </LinearLayout>
+                android:gravity="center"
+                android:text="@string/howlongistheround" />
+        </LinearLayout> -->
 
         <TimePicker
             android:id="@+id/rt_time_picker"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
             android:gravity="center" />
-
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="20dp" />
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
             android:orientation="horizontal" >
 
             <Button
                 android:id="@+id/rt_action_button"
-                android:layout_width="fill_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_weight="1"
+                android:lines="2"
                 android:text="@string/start_timer"
-                android:textSize="8pt" />
+                android:textSize="24dp" />
 
             <Button
                 android:id="@+id/rt_reset_button"
-                android:layout_width="fill_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_weight="1"
+                android:lines="2"
                 android:text="@string/reset_timer"
-                android:textSize="8pt" />
+                android:textSize="24dp" />
         </LinearLayout>
-
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="50dp" />
 
         <TextView
             android:id="@+id/rt_roundend"
+            style="@style/text"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
             android:gravity="center_horizontal"
-            android:text="@string/roundend_text"
-            android:textSize="12pt" />
+            android:text="@string/roundend_text" />
 
         <TextView
             android:id="@+id/rt_time_display"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
+            android:layout_margin="5dp"
             android:layout_weight="1"
             android:gravity="center_horizontal"
-            android:textSize="30pt" />
+            android:textSize="30pt"
+            style="@style/text"
+            android:text="00:00:00" />
     </LinearLayout>
 
 </ScrollView>

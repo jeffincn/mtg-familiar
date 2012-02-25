@@ -12,8 +12,10 @@
 -->
 <resources>
 
+    <string name="dberror">Database Error. Try clearing app data in Android\'s settings</string>
+    
     <string name="plus_str">+</string>
-	<string name="minus_str">-</string>
+    <string name="minus_str">-</string>
     <string name="zero_str">0</string>
     <string name="twenty_str">20</string>
     

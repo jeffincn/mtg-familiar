@@ -307,6 +307,8 @@ public class NPlayerLifeActivity extends FragmentActivity {
 			}
 			catch (NumberFormatException e) {
 			}
+			catch (StringIndexOutOfBoundsException e) {
+			}
 		}
 
 		setType(activeType);

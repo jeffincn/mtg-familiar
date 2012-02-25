@@ -439,6 +439,9 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 					case CardDbAdapter.BANNED:
 						legalities[i] = "Banned";
 						break;
+					default:
+						legalities[i] = "Error";
+						break;
 				}
 				cFormats.moveToNext();
 			}
@@ -474,6 +477,9 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 			return dialog;
 		}
 		else if (id == GETLEGALITY) {
+			if(formats == null)
+				return null;
+			
 			Dialog dialog = new Dialog(this);
 			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
@@ -487,8 +493,8 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 			List<HashMap<String, String>> fillMaps = new ArrayList<HashMap<String, String>>();
 			for (int i = 0; i < formats.length; i++) {
 				HashMap<String, String> map = new HashMap<String, String>();
-				map.put("format", formats[i]);
-				map.put("status", legalities[i]);
+				map.put(from[0], formats[i]);
+				map.put(from[1], legalities[i]);
 				fillMaps.add(map);
 			}
 

@@ -258,7 +258,8 @@ public class SearchActivity extends FragmentActivity {
 				android.R.layout.simple_spinner_item);
 		adapter6.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		colorspinner.setAdapter(adapter6);
-
+		colorspinner.setSelection(2);
+		
 		// Lines Below added by Reuben Kriegel
 		ArrayAdapter<CharSequence> adapter7 = ArrayAdapter.createFromResource(this, R.array.text_spinner,
 				android.R.layout.simple_spinner_item);
@@ -632,8 +633,11 @@ public class SearchActivity extends FragmentActivity {
 		checkboxR.setChecked(false);
 		checkboxG.setChecked(false);
 		checkboxL.setChecked(false);
-		colorspinner.setSelection(0);
-
+		colorspinner.setSelection(2);
+		
+		textspinner.setSelection(0);
+		typespinner.setSelection(0);
+		
 		powLogic.setSelection(0);
 		powChoice.setSelection(0);
 		touLogic.setSelection(0);

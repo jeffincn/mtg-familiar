@@ -921,16 +921,14 @@ public class CardDbAdapter {
 			}
 			sel += ", " + DATABASE_TABLE_SETS + "." + KEY_DATE;
 
-			String sql = "SELECT " + sel + " FROM " + tbl + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_CARDS
+			String sql = "SELECT * FROM (SELECT " + sel + " FROM " + tbl + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_CARDS
 					+ "." + KEY_SET + " = " + DATABASE_TABLE_SETS + "." + KEY_CODE + statement;
 
 			if (consolidate) {
-				sql += " GROUP BY " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " ORDER BY " + DATABASE_TABLE_CARDS + "."
-						+ KEY_NAME;
+				sql += " ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + ") GROUP BY " + KEY_NAME + " ORDER BY " + KEY_NAME;
 			}
 			else {
-				sql += " ORDER BY " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " + DATABASE_TABLE_SETS + "." + KEY_DATE
-						+ " DESC";
+				sql += " ORDER BY " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC)";
 			}
 			mCursor = mDb.rawQuery(sql, null);
 		}

@@ -18,11 +18,11 @@ You should have received a copy of the GNU General Public License
 along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    <item android:id="@+id/action_search"
-          android:icon="@android:drawable/ic_menu_search"
-          android:actionViewClass="android.widget.SearchView"
-          />
 
+    <item
+        android:id="@+id/action_search"
+        android:actionViewClass="android.widget.SearchView"
+        android:icon="@android:drawable/ic_menu_search"/>
     <item
         android:id="@+id/checkUpdate"
         android:icon="@android:drawable/ic_menu_view"
@@ -32,21 +32,20 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:icon="@android:drawable/ic_menu_preferences"
         android:title="@string/preferences"/>
     <item
-        android:id="@+id/aboutapp"
+        android:id="@+id/donate"
         android:icon="@android:drawable/ic_menu_info_details"
-        android:title="@string/about"/>
+        android:title="@string/donate" />
     <item
         android:id="@+id/whatsnew"
         android:icon="@android:drawable/ic_menu_info_details"
         android:title="@string/whatsnewtitle"/>
+    <item
+        android:id="@+id/aboutapp"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:title="@string/about"/>
     <!--
     <item android:title="@string/refreshDB" android:id="@+id/refreshDB"/>
     <item android:title="@string/webDB" android:id="@+id/buildWebDB"></item>
     -->
-    <item
-        android:id="@+id/donate"
-        android:icon="@android:drawable/ic_menu_info_details"
-        android:title="@string/donate">
-    </item>
 
 </menu>

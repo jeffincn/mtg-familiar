@@ -75,12 +75,12 @@ public class MainActivity extends FragmentActivity implements Runnable {
 	private SharedPreferences	preferences;
 	private String						stacktrace;
 	private PackageInfo				pInfo;
-	private TextView			search;
-	private TextView			rng;
-	private TextView			manapool;
-	private TextView			randomCard;
-	private TextView			nbplayerbutton;
-	private TextView			roundTimer;
+	private TextView					search;
+	private TextView					rng;
+	private TextView					manapool;
+	private TextView					randomCard;
+	private TextView					nbplayerbutton;
+	private TextView					roundTimer;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -137,6 +137,8 @@ public class MainActivity extends FragmentActivity implements Runnable {
 				startActivity(i);
 			}
 		});
+		
+		roundTimer.setVisibility(View.GONE);
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -169,7 +171,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 
 		Intent i = new Intent(this, RoundTimerService.class);
 		startService(i);
-		
+
 		MenuFragmentCompat.init(this, R.menu.main_menu, "main_menu_fragment");
 	}
 
@@ -433,11 +435,8 @@ public class MainActivity extends FragmentActivity implements Runnable {
 																	// startThread(OTAPATCH);
 																	break;
 																case OTAPATCH:
-																	// If it successfully updated, update the
-																	// timestamp
-																	int curTime = (int) (new Date().getTime() * .001); // should
-																																											// be
-																																											// global?
+																	// If it successfully updated, update the timestamp
+																	int curTime = (int) (new Date().getTime() * .001);
 																	SharedPreferences.Editor editor = preferences.edit();
 																	editor.putInt("lastLegalityUpdate", curTime);
 																	editor.commit();
@@ -539,7 +538,6 @@ public class MainActivity extends FragmentActivity implements Runnable {
 		super.onConfigurationChanged(newConfig);
 	}
 
-	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection

@@ -226,9 +226,9 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
    - Fixed searching for pre-Android 2.1 devices. Sorry for breaking that!
    -->
    <!--  1.5 -->
-   - Added a round timer. Never miss the end of the round again! (Warning: does not guarantee not going to time)&lt;br />&lt;br />
-   - Added Action Bar features for Android 3.0+ devices. Hooray tablets!&lt;br />&lt;br />
-   - UI optimizations and general bugfixes
+   - Improved compatability for Honeycomb and Ice Cream Sandwitch devices.&lt;br />&lt;br />
+   - Various database bugfixes.&lt;br />&lt;br />
+   - Various UI optimizations.
      	</string>
     <string name="gatherer">Gatherer Page</string>
     <string name="lifetitle">Life Counter</string>

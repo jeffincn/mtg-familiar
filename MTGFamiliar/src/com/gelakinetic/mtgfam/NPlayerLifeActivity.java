@@ -597,8 +597,8 @@ public class NPlayerLifeActivity extends FragmentActivity {
 				lastValue = list.get(0).get(ABSOLUTE).intValue();
 			}
 			Vector<Integer> v = new Vector<Integer>();
-			v.add(new Integer(lastValue + delta));
-			v.add(new Integer(delta));
+			v.add(Integer.valueOf(lastValue + delta));
+			v.add(Integer.valueOf(delta));
 			list.add(0, v);
 			count++;
 			delta = 0;

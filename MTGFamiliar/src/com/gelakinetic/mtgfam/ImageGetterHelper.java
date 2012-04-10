@@ -151,7 +151,7 @@ public class ImageGetterHelper {
 				}
 
 				for (int i = 0; i < drawableNums.length; i++) {
-					if (source.equals(new Integer(i).toString())) {
+					if (source.equals(Integer.valueOf(i).toString())) {
 						d = r.getDrawable(drawableNums[i]);
 					}
 				}

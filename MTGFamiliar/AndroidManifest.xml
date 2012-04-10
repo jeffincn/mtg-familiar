@@ -12,8 +12,8 @@
 -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    android:installLocation="auto"
     package="com.gelakinetic.mtgfam"
+    android:installLocation="auto"
     android:versionCode="8"
     android:versionName="1.5" >
 
@@ -39,10 +39,10 @@
         android:label="@string/app_name"
         android:theme="@style/defaultStyle" >
         <activity
-            android:name="com.gelakinetic.mtgfam.SearchActivity"
+            android:name=".SearchActivity"
             android:label="@string/app_name" />
         <activity
-            android:name="com.gelakinetic.mtgfam.ResultListActivity"
+            android:name=".ResultListActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
@@ -57,7 +57,7 @@
                 android:value=".ResultListActivity" />
         </activity>
         <activity
-            android:name="com.gelakinetic.mtgfam.CardViewActivity"
+            android:name=".CardViewActivity"
             android:label="@string/app_name" >
 
             <!-- enable the search dialog to send searches to SearchableActivity -->
@@ -66,7 +66,7 @@
                 android:value=".ResultListActivity" />
         </activity>
         <activity
-            android:name="com.gelakinetic.mtgfam.MainActivity"
+            android:name=".MainActivity"
             android:configChanges="keyboardHidden"
             android:label="@string/app_name" >
             <intent-filter>
@@ -80,7 +80,7 @@
                 android:value=".ResultListActivity" />
         </activity>
         <activity
-            android:name="com.gelakinetic.mtgfam.DiceActivity"
+            android:name=".DiceActivity"
             android:label="@string/app_name" >
 
             <!-- enable the search dialog to send searches to SearchableActivity -->
@@ -89,7 +89,7 @@
                 android:value=".ResultListActivity" />
         </activity>
         <activity
-            android:name="com.gelakinetic.mtgfam.PreferencesActivity"
+            android:name=".PreferencesActivity"
             android:label="@string/app_name" >
 
             <!-- enable the search dialog to send searches to SearchableActivity -->
@@ -98,7 +98,7 @@
                 android:value=".ResultListActivity" />
         </activity>
         <activity
-            android:name="com.gelakinetic.mtgfam.ManaPoolActivity"
+            android:name=".ManaPoolActivity"
             android:label="@string/app_name" >
 
             <!-- enable the search dialog to send searches to SearchableActivity -->
@@ -107,7 +107,7 @@
                 android:value=".ResultListActivity" />
         </activity>
         <activity
-            android:name="com.gelakinetic.mtgfam.RandomCardActivity"
+            android:name=".RandomCardActivity"
             android:label="@string/app_name" >
 
             <!-- enable the search dialog to send searches to SearchableActivity -->
@@ -116,7 +116,7 @@
                 android:value=".ResultListActivity" />
         </activity>
         <activity
-            android:name="com.gelakinetic.mtgfam.NPlayerLifeActivity"
+            android:name=".NPlayerLifeActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustPan" >
 
@@ -126,7 +126,7 @@
                 android:value=".ResultListActivity" />
         </activity>
         <activity
-            android:name="com.gelakinetic.mtgfam.RoundTimerActivity"
+            android:name=".RoundTimerActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop" >
             <meta-data
@@ -134,13 +134,23 @@
                 android:value=".ResultListActivity" />
         </activity>
 
-        <service android:name="com.gelakinetic.mtgfam.RoundTimerService" >
+        <service android:name=".RoundTimerService" >
         </service>
 
         <!-- Provides search suggestions for words and their definitions. -->
         <provider
             android:name=".CardSearchProvider"
             android:authorities="com.gelakinetic.mtgfam.CardSearchProvider" />
+
+        <receiver android:name="MTGFamiliarAppWidgetProvider" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/mtgfamiliar_appwidget_info" />
+        </receiver>
     </application>
 
 </manifest>

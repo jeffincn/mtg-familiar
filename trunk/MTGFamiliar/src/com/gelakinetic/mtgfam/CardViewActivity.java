@@ -250,7 +250,7 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 		float p = c.getFloat(c.getColumnIndex(CardDbAdapter.KEY_POWER));
 		float t = c.getFloat(c.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS));
 		if (loyalty != CardDbAdapter.NOONECARES) {
-			pt.setText(new Integer(loyalty).toString());
+			pt.setText(Integer.valueOf(loyalty).toString());
 		}
 		else if (p != CardDbAdapter.NOONECARES && t != CardDbAdapter.NOONECARES) {
 

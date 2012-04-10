@@ -152,10 +152,10 @@ public class ResultListAdapter extends SimpleCursorAdapter implements SectionInd
 						pow = "*^2";
 					else {
 						if (p == (int) p) {
-							pow = new Integer((int) p).toString();
+							pow = Integer.valueOf((int) p).toString();
 						}
 						else {
-							pow = new Float(p).toString();
+							pow = Float.valueOf(p).toString();
 							;
 						}
 					}
@@ -179,10 +179,10 @@ public class ResultListAdapter extends SimpleCursorAdapter implements SectionInd
 						tou = "*^2";
 					else {
 						if (t == (int) t) {
-							tou = new Integer((int) t).toString();
+							tou = Integer.valueOf((int) t).toString();
 						}
 						else {
-							tou = new Float(t).toString();
+							tou = Float.valueOf(t).toString();
 						}
 					}
 					textfield.setText(tou);

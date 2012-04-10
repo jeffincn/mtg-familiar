@@ -138,7 +138,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 			}
 		});
 		
-		roundTimer.setVisibility(View.GONE);
+		//roundTimer.setVisibility(View.GONE);
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 

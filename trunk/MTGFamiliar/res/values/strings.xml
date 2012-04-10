@@ -225,11 +225,19 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
    - Split type search into super and subtype search&lt;br />&lt;br />
    - Fixed searching for pre-Android 2.1 devices. Sorry for breaking that!
    -->
-   <!--  1.5 -->
+   <!--  1.5 
    - Improved compatability for Honeycomb and Ice Cream Sandwitch devices.&lt;br />&lt;br />
    - Various database bugfixes.&lt;br />&lt;br />
    - Various UI optimizations.
-     	</string>
+   -->
+   <!-- 1.6 -->
+   - Check out the new widget.&lt;br />&lt;br />
+   - And maybe a round timer.&lt;br />&lt;br />
+   - And maybe result swiping.&lt;br />&lt;br />
+   - And maybe some UI fixes for small screens.
+   
+   </string>
+     	
     <string name="gatherer">Gatherer Page</string>
     <string name="lifetitle">Life Counter</string>
     <string name="wakelocksummary">Force the life counter screen to never go to sleep</string>

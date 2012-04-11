@@ -15,7 +15,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
+along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <resources>
 
@@ -26,7 +26,15 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         <item name="android:textSize">24sp</item>
     </style>
 
-    <style name="defaultStyle" parent="android:Theme.NoTitleBar">
-	</style>
+    <style name="defaultStyle" parent="android:Theme.NoTitleBar"></style>
+
+    <style name="Theme.Transparent" parent="android:Theme">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
 
 </resources>

@@ -25,4 +25,6 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <color name="mythic">#FFA500</color>
 
     <color name="dark_gray">#383838</color>
+    <color name="transparent">#00000000</color>
+    
 </resources>

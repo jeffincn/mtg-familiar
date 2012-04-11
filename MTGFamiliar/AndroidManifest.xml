@@ -133,6 +133,17 @@
                 android:name="android.app.default_searchable"
                 android:value=".ResultListActivity" />
         </activity>
+        <activity
+            android:name=".TransparentSearchActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+             >
+
+            <!-- enable the search dialog to send searches to SearchableActivity -->
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".ResultListActivity" />
+        </activity>
 
         <service android:name=".RoundTimerService" >
         </service>
@@ -142,7 +153,7 @@
             android:name=".CardSearchProvider"
             android:authorities="com.gelakinetic.mtgfam.CardSearchProvider" />
 
-        <receiver android:name="MTGFamiliarAppWidgetProvider" >
+        <receiver android:name="com.gelakinetic.mtgfam.MTGFamiliarAppWidgetProvider" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

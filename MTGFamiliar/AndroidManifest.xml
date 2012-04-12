@@ -137,7 +137,9 @@
             android:name=".TransparentSearchActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
+            
              >
+            <!-- android:theme="@style/Theme.Transparent" -->
 
             <!-- enable the search dialog to send searches to SearchableActivity -->
             <meta-data

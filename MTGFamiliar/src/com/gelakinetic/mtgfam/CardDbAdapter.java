@@ -944,6 +944,46 @@ public class CardDbAdapter {
 		return mCursor;
 	}
 
+	public Cursor PrefixSearch(String cardname, String[] returnTypes) {
+		Cursor mCursor = null;
+
+		if (cardname != null)
+			cardname = cardname.replace("'", "''").trim();
+
+		String statement = " WHERE 1=1";
+
+		statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_NAME + " LIKE '" + cardname + "%')";
+
+		try {
+			String sel = null;
+			for (String s : returnTypes) {
+				if (sel == null) {
+					sel = DATABASE_TABLE_CARDS + "." + s + " AS " + s;
+				}
+				else {
+					sel += ", " + DATABASE_TABLE_CARDS + "." + s + " AS " + s;
+				}
+			}
+			sel += ", " + DATABASE_TABLE_SETS + "." + KEY_DATE;
+
+			String sql = "SELECT * FROM (SELECT " + sel + " FROM " + DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_CARDS
+					+ "." + KEY_SET + " = " + DATABASE_TABLE_SETS + "." + KEY_CODE + statement;
+
+			sql += " ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + ") GROUP BY " + KEY_NAME + " ORDER BY " + KEY_NAME;
+			mCursor = mDb.rawQuery(sql, null);
+		}
+		catch (SQLiteException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		catch (IllegalStateException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		if (mCursor != null) {
+			mCursor.moveToFirst();
+		}
+		return mCursor;
+	}
+
 	public int getTransform(String set, String number) {
 		Cursor mCursor = null;
 		int ID = -1;

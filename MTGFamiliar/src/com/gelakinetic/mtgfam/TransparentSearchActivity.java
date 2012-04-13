@@ -1,39 +1,33 @@
 package com.gelakinetic.mtgfam;
 
-import java.util.ArrayList;
-
 import android.app.Activity;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
-import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class TransparentSearchActivity extends Activity {
 
-	public EditText				namefield;
-	private ImageButton		searchButton;
-	private ListView			resultList;
+	public EditText						namefield;
+	private ImageView					searchButton;
+	private ListView					resultList;
 
-	private CardDbAdapter	mDbHelper;
-	private Cursor				c;
+	private CardDbAdapter			mDbHelper;
+	private Cursor						c;
 
-	private Context				mCtx;
+	private Context						mCtx;
 	private ResultListAdapter	rla;
-	private Cursor	emptyCursor;
+	private Cursor						emptyCursor;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -46,13 +40,13 @@ public class TransparentSearchActivity extends Activity {
 		mDbHelper.open();
 
 		namefield = (EditText) findViewById(R.id.transparent_namefield);
-		searchButton = (ImageButton) findViewById(R.id.search_button);
+		searchButton = (ImageView) findViewById(R.id.search_button);
 		resultList = (ListView) findViewById(R.id.result_list);
 
-		emptyCursor = mDbHelper.Search("there is no way a card has this name", null, null, "wubrgl", 0, null, CardDbAdapter.NOONECARES,
-				null, CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, true, new String[] {
-						CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME }, true);
-		
+		emptyCursor = mDbHelper.Search("there is no way a card has this name", null, null, "wubrgl", 0, null,
+				CardDbAdapter.NOONECARES, null, CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, true,
+				new String[] { CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME }, true);
+
 		searchButton.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -76,31 +70,24 @@ public class TransparentSearchActivity extends Activity {
 
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				if (s.length() >= 3) {
-					c = mDbHelper.Search(s.toString(), null, null, "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-							CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, true, new String[] {
-									CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME }, true);
-					fillData(c);
+				if (s.length() > 0) {
+					new AutocompleteQueryTask().execute(s.toString());
 				}
-				else{
+				else {
 					fillData(emptyCursor);
 				}
 			}
 
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				// TODO Auto-generated method stub
 
 			}
 		});
-
-		
 	}
 
 	private void fillData(Cursor c) {
@@ -121,32 +108,42 @@ public class TransparentSearchActivity extends Activity {
 		}
 
 		Intent i = new Intent(mCtx, ResultListActivity.class);
-		
-//		s.toString(), null, null, "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-//		CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, true, new String[] {
-//				CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME }, true
-				
+
 		i.putExtra(SearchActivity.NAME, name);
-		i.putExtra(SearchActivity.TEXT, (String)null);
-		i.putExtra(SearchActivity.TYPE, (String)null);
+		i.putExtra(SearchActivity.TEXT, (String) null);
+		i.putExtra(SearchActivity.TYPE, (String) null);
 		i.putExtra(SearchActivity.COLOR, "wubrgl");
 		i.putExtra(SearchActivity.COLORLOGIC, 0);
-		i.putExtra(SearchActivity.SET, (String)null);
-		i.putExtra(SearchActivity.FORMAT, (String)null);
-		i.putExtra(SearchActivity.POW_CHOICE, (float)CardDbAdapter.NOONECARES);
-		i.putExtra(SearchActivity.POW_LOGIC, (String)null);
-		i.putExtra(SearchActivity.TOU_CHOICE, (float)CardDbAdapter.NOONECARES);
-		i.putExtra(SearchActivity.TOU_LOGIC, (String)null);
+		i.putExtra(SearchActivity.SET, (String) null);
+		i.putExtra(SearchActivity.FORMAT, (String) null);
+		i.putExtra(SearchActivity.POW_CHOICE, (float) CardDbAdapter.NOONECARES);
+		i.putExtra(SearchActivity.POW_LOGIC, (String) null);
+		i.putExtra(SearchActivity.TOU_CHOICE, (float) CardDbAdapter.NOONECARES);
+		i.putExtra(SearchActivity.TOU_LOGIC, (String) null);
 		i.putExtra(SearchActivity.CMC, -1);
-		i.putExtra(SearchActivity.CMC_LOGIC, (String)null);
-		i.putExtra(SearchActivity.RARITY, (String)null);
-		i.putExtra(SearchActivity.ARTIST, (String)null);
-		i.putExtra(SearchActivity.FLAVOR, (String)null);
+		i.putExtra(SearchActivity.CMC_LOGIC, (String) null);
+		i.putExtra(SearchActivity.RARITY, (String) null);
+		i.putExtra(SearchActivity.ARTIST, (String) null);
+		i.putExtra(SearchActivity.FLAVOR, (String) null);
 		i.putExtra(SearchActivity.RANDOM, false);
 		// Lines below added by Reuben Kriegel
 		i.putExtra(SearchActivity.TYPELOGIC, 0);
 		i.putExtra(SearchActivity.TEXTLOGIC, 0);
 		// End addition
 		startActivityForResult(i, 0);
+	}
+
+	private class AutocompleteQueryTask extends AsyncTask<String, Void, Void> {
+		@Override
+		protected Void doInBackground(String... params) {
+			// TODO Auto-generated method stub
+			c = mDbHelper.PrefixSearch(params[0], new String[] { CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME });
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void param) {
+			fillData(c);
+		}
 	}
 }

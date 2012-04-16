@@ -197,7 +197,8 @@
                 android:id="@+id/colorlogic"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:textSize="18dp"  />
 
             <LinearLayout
                 android:id="@+id/linearLayout2"
@@ -293,21 +294,24 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/setsearch" />
+                    android:text="@string/setsearch"
+                    android:textSize="18dp" />
 
                 <Button
                     android:id="@+id/formatsearch"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/formatsearch" />
+                    android:text="@string/formatsearch" 
+                    android:textSize="18dp" />
 
                 <Button
                     android:id="@+id/raritysearch"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/searchrarity" />
+                    android:text="@string/searchrarity"
+                    android:textSize="18dp"  />
             </LinearLayout>
 
             <LinearLayout
@@ -344,6 +348,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0"
-        android:text="@string/searchButton" />
+        android:text="@string/searchButton"
+        android:textSize="18dp"  />
 
 </LinearLayout>

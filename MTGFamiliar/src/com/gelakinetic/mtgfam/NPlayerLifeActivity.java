@@ -354,6 +354,10 @@ public class NPlayerLifeActivity extends FragmentActivity {
 					listSizeHeight /= 2;
 					break;
 			}
+			if(listSizeHeight < 256){
+				listSizeHeight = 192;
+			}
+			
 		}
 
 		for (Player p : players) {

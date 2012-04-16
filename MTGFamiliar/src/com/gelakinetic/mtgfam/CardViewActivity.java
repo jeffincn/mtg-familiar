@@ -78,7 +78,6 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 	private static final int			PRICELOAD			= 1;
 
 	// Dont use 0, thats the default when the back key is pressed
-	protected static final int		TRANSFORM			= 1;
 	protected static final int		RANDOMLEFT		= 2;
 	protected static final int		RANDOMRIGHT		= 3;
 	protected static final int		QUITTOSEARCH	= 4;
@@ -130,21 +129,87 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 	private Button								rightRandom;
 	private String[]							legalities;
 	private String[]							formats;
+	private boolean								isRandom;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.card_view_activity);
 
+		name = (TextView) findViewById(R.id.name);
+		cost = (TextView) findViewById(R.id.cost);
+		type = (TextView) findViewById(R.id.type);
+		set = (TextView) findViewById(R.id.set);
+		ability = (TextView) findViewById(R.id.ability);
+		flavor = (TextView) findViewById(R.id.flavor);
+		artist = (TextView) findViewById(R.id.artist);
+		pt = (TextView) findViewById(R.id.pt);
+		transform = (Button) findViewById(R.id.transformbutton);
+		leftRandom = (Button) findViewById(R.id.randomLeft);
+		rightRandom = (Button) findViewById(R.id.randomRight);
+
 		imgGetter = ImageGetterHelper.GlyphGetter(getResources());
+
+		registerForContextMenu(name);
+		registerForContextMenu(cost);
+		registerForContextMenu(type);
+		registerForContextMenu(set);
+		registerForContextMenu(ability);
+		registerForContextMenu(pt);
+		registerForContextMenu(flavor);
+		registerForContextMenu(artist);
+
+		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		Bundle extras = getIntent().getExtras();
 		cardID = extras.getLong("id");
+		isRandom = extras.getBoolean(SearchActivity.RANDOM);
 
 		mDbHelper = new CardDbAdapter(this);
 		mDbHelper.open();
 
-		c = mDbHelper.fetchCard(cardID, null);
+		setInfoFromID(cardID);
+
+		MenuFragmentCompat.init(this, R.menu.card_menu, "card_view_menu_fragment");
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		MyApp appState = ((MyApp) getApplicationContext());
+		if (appState.getState() == QUITTOSEARCH) {
+			this.finish();
+			return;
+		}
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if (c != null) {
+			c.deactivate();
+			c.close();
+		}
+		if (mDbHelper != null) {
+			mDbHelper.close();
+		}
+		if (bmp != null) {
+			bmp.recycle();
+		}
+	}
+
+	private void setInfoFromID(long id) {
+		c = mDbHelper.fetchCard(id, null);
 		c.moveToFirst();
 
 		// http://magiccards.info/scans/en/mt/55.jpg
@@ -196,18 +261,6 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 			priceurl = null;
 		}
 
-		name = (TextView) findViewById(R.id.name);
-		cost = (TextView) findViewById(R.id.cost);
-		type = (TextView) findViewById(R.id.type);
-		set = (TextView) findViewById(R.id.set);
-		ability = (TextView) findViewById(R.id.ability);
-		flavor = (TextView) findViewById(R.id.flavor);
-		artist = (TextView) findViewById(R.id.artist);
-		pt = (TextView) findViewById(R.id.pt);
-		transform = (Button) findViewById(R.id.transformbutton);
-		leftRandom = (Button) findViewById(R.id.randomLeft);
-		rightRandom = (Button) findViewById(R.id.randomRight);
-
 		switch ((char) c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY))) {
 			case 'C':
 				set.setTextColor(this.getResources().getColor(R.color.common));
@@ -220,6 +273,9 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 				break;
 			case 'M':
 				set.setTextColor(this.getResources().getColor(R.color.mythic));
+				break;
+			case 'T':
+				set.setTextColor(this.getResources().getColor(R.color.timeshifted));
 				break;
 		}
 
@@ -305,13 +361,14 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 		if (number.contains("a") || number.contains("b")) {
 			transform.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
-					Intent i = new Intent();
-					i.putExtra(SET, setCode);
-					i.putExtra(NUMBER, number);
-					setResult(TRANSFORM, i);
-					finish();// transform!
-					// Froyo+ only, disabled animations
-					// overridePendingTransition(0, 0);
+					if (number.contains("a")) {
+						number = number.replace("a", "b");
+					}
+					else if (number.contains("b")) {
+						number = number.replace("b", "a");
+					}
+					long id = mDbHelper.getTransform(setCode, number);
+					setInfoFromID(id);
 				}
 			});
 			transform.setVisibility(View.VISIBLE);
@@ -320,7 +377,7 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 			transform.setVisibility(View.GONE);
 		}
 
-		if (extras.getBoolean(SearchActivity.RANDOM)) {
+		if (isRandom) {
 			leftRandom.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					Intent i = new Intent();
@@ -343,16 +400,6 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 			rightRandom.setVisibility(View.GONE);
 		}
 
-		registerForContextMenu(name);
-		registerForContextMenu(cost);
-		registerForContextMenu(type);
-		registerForContextMenu(set);
-		registerForContextMenu(ability);
-		registerForContextMenu(pt);
-		registerForContextMenu(flavor);
-		registerForContextMenu(artist);
-
-		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		if (preferences.getBoolean("picFirst", false)) {
 			cardpic = (ImageView) findViewById(R.id.cardpic);
 			loadTo = MAINPAGE;
@@ -373,43 +420,6 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 		}
 		else {
 			((ImageView) findViewById(R.id.cardpic)).setVisibility(View.GONE);
-		}
-
-		MenuFragmentCompat.init(this, R.menu.card_menu, "card_view_menu_fragment");
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		MyApp appState = ((MyApp) getApplicationContext());
-		if (appState.getState() == QUITTOSEARCH) {
-			this.finish();
-			return;
-		}
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		if (c != null) {
-			c.deactivate();
-			c.close();
-		}
-		if (mDbHelper != null) {
-			mDbHelper.close();
-		}
-		if (bmp != null) {
-			bmp.recycle();
 		}
 	}
 
@@ -477,9 +487,9 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 			return dialog;
 		}
 		else if (id == GETLEGALITY) {
-			if(formats == null)
+			if (formats == null)
 				return null;
-			
+
 			Dialog dialog = new Dialog(this);
 			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 

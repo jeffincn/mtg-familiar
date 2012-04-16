@@ -54,6 +54,7 @@
         <item>Uncommon</item>
         <item>Rare</item>
         <item>Mythic</item>
+        <item>Timeshifted</item>
     </string-array>
     <string-array name="pt_spinner">
         <item/>
@@ -232,6 +233,7 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
    -->
    <!-- 1.6 -->
    - Check out the new widget.&lt;br />&lt;br />
+   - Added "Timeshifted" rarity.&lt;br />&lt;br />
    - And maybe a round timer.&lt;br />&lt;br />
    - And maybe result swiping.&lt;br />&lt;br />
    - And maybe some UI fixes for small screens.
@@ -300,7 +302,7 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     Good luck, and have fun!</string>
     <string name="addplayer">Add a Player</string>
     <string name="removeplayer">Remove a Player</string>
-    <string name="quittosearch">Quit To Search</string>
+    <string name="quittosearch">Exit Results</string>
     <string name="consolidate">Consolidate Search Results</string>
     <string name="consolidatetext">Only show the most recent printing of a card</string>
     <string name="whatsnewtitle">What\'s New</string>

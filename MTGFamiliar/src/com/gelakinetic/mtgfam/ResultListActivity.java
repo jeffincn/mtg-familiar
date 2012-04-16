@@ -251,27 +251,8 @@ public class ResultListActivity extends FragmentActivity {
 		Intent i;
 		if (requestCode == 0) {
 
+			long id;
 			switch (resultCode) {
-				case CardViewActivity.TRANSFORM:
-					String number = data.getStringExtra(CardViewActivity.NUMBER);
-					String set = data.getStringExtra(CardViewActivity.SET);
-					if (number.contains("a")) {
-						number = number.replace("a", "b");
-					}
-					else if (number.contains("b")) {
-						number = number.replace("b", "a");
-					}
-
-					long id = mDbHelper.getTransform(set, number);
-					if (id != -1) {
-						i = new Intent(mCtx, CardViewActivity.class);
-						i.putExtra("id", id);
-						i.putExtra(SearchActivity.RANDOM, isRandom);
-						// Froyo+ only, disabled animations
-						// i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-						startActivityForResult(i, 0);
-					}
-					break;
 				case CardViewActivity.RANDOMLEFT:
 					randomIndex--;
 					if (randomIndex < 0) {

@@ -89,6 +89,13 @@ public class TransparentSearchActivity extends Activity {
 			}
 		});
 	}
+	
+	@Override
+	protected void onResume(){
+		super.onResume();
+		MyApp appState = ((MyApp)getApplicationContext());
+		appState.setState(0);
+	}
 
 	private void fillData(Cursor c) {
 

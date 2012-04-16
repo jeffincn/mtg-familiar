@@ -121,6 +121,9 @@ public class ResultListAdapter extends SimpleCursorAdapter implements SectionInd
 					case 'M':
 						textfield.setTextColor(resources.getColor(R.color.mythic));
 						break;
+					case 'T':
+						textfield.setTextColor(resources.getColor(R.color.timeshifted));
+						break;
 				}
 			}
 			else if (CardDbAdapter.KEY_TYPE.equals(from[i])) {

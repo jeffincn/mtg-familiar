@@ -17,13 +17,23 @@ public class MTGFamiliarAppWidgetProvider extends AppWidgetProvider {
           int appWidgetId = appWidgetIds[i];
 
           // Create an Intent to launch ExampleActivity
-          Intent intent = new Intent(context, TransparentSearchActivity.class);
-          PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+          Intent intentQuick = new Intent(context, TransparentSearchActivity.class);
+          PendingIntent pendingIntentQuick = PendingIntent.getActivity(context, 0, intentQuick, 0);
+
+          Intent intentMain = new Intent(context, MainActivity.class);
+          PendingIntent pendingIntentMain = PendingIntent.getActivity(context, 0, intentMain, 0);
+
+          Intent intentFullSearch = new Intent(context, SearchActivity.class);
+          PendingIntent pendingIntentFullSearch = PendingIntent.getActivity(context, 0, intentFullSearch, 0);
 
           // Get the layout for the App Widget and attach an on-click listener
           // to the button
           RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.mtgfamiliar_appwidget);
-          views.setOnClickPendingIntent(R.id.widget_linear_layout, pendingIntent);
+          views.setOnClickPendingIntent(R.id.transparent_namefield, pendingIntentQuick);
+
+          views.setOnClickPendingIntent(R.id.image_icon, pendingIntentMain);
+
+          views.setOnClickPendingIntent(R.id.search_button, pendingIntentFullSearch);
 
           // Tell the AppWidgetManager to perform an update on the current app widget
           appWidgetManager.updateAppWidget(appWidgetId, views);

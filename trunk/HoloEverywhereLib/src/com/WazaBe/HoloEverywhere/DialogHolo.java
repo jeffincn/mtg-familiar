@@ -7,15 +7,14 @@ import android.widget.TextView;
 
 public class DialogHolo extends Dialog {
 
-	private final Context mContext;
-	private TextView mTitle;
+	private final Context	mContext;
+	private TextView			mTitle;
 
 	public DialogHolo(Context context) {
 		super(context);
 		mContext = context;
 
-		View customView = View.inflate(mContext, R.layout.alert_dialog_holo,
-				null);
+		View customView = View.inflate(mContext, R.layout.alert_dialog_holo, null);
 		mTitle = (TextView) customView.findViewById(R.id.alertTitle);
 		setContentView(customView);
 
@@ -24,8 +23,7 @@ public class DialogHolo extends Dialog {
 	public DialogHolo(Context context, int theme) {
 		super(context, theme);
 		mContext = context;
-		View customView = View.inflate(mContext, R.layout.alert_dialog_holo,
-				null);
+		View customView = View.inflate(mContext, R.layout.alert_dialog_holo, null);
 		mTitle = (TextView) customView.findViewById(R.id.alertTitle);
 		setContentView(customView);
 

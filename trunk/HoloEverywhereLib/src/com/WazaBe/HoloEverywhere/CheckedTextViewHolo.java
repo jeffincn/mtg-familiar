@@ -7,9 +7,9 @@ import android.widget.CheckedTextView;
 
 public class CheckedTextViewHolo extends CheckedTextView {
 
-    public CheckedTextViewHolo(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        Typeface font = Typeface.createFromAsset(context.getAssets(), "Roboto-Regular.ttf");
-        setTypeface(font);
-    }
+	public CheckedTextViewHolo(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		Typeface font = Typeface.createFromAsset(context.getAssets(), "Roboto-Regular.ttf");
+		setTypeface(font);
+	}
 }

@@ -19,7 +19,12 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam;
 
-import android.app.AlertDialog;
+import java.util.ArrayList;
+import java.util.Vector;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -47,11 +52,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.Vector;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import com.WazaBe.HoloEverywhere.HoloAlertDialogBuilder;
 
 public class NPlayerLifeActivity extends FragmentActivity {
 
@@ -384,7 +385,7 @@ public class NPlayerLifeActivity extends FragmentActivity {
 		String[] names;
 		switch (id) {
 			case DIALOG_RESET_CONFIRM:
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				HoloAlertDialogBuilder builder = new HoloAlertDialogBuilder(this);
 				builder
 						.setMessage(getString(R.string.life_clear_dialog_message))
 						.setCancelable(true)
@@ -414,7 +415,7 @@ public class NPlayerLifeActivity extends FragmentActivity {
 					names[i] = players.get(i).name;
 				}
 
-				builder = new AlertDialog.Builder(this);
+				builder = new HoloAlertDialogBuilder(this);
 				builder.setTitle(getString(R.string.removeplayer));
 
 				builder.setItems(names, new DialogInterface.OnClickListener() {
@@ -432,7 +433,7 @@ public class NPlayerLifeActivity extends FragmentActivity {
 				LayoutInflater factory = LayoutInflater.from(this);
 				final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
 				nameInput = (EditText) textEntryView.findViewById(R.id.editText1);
-				dialog = new AlertDialog.Builder(this).setTitle("Enter Name").setView(textEntryView)
+				dialog = new HoloAlertDialogBuilder(this).setTitle("Enter Name").setView(textEntryView)
 						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
 								if (playerToHaveNameChanged == null) {

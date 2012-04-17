@@ -5,13 +5,12 @@ import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.widget.AutoCompleteTextView;
 
-public class AutoCompleteTextViewHolo extends AutoCompleteTextView{
-	
+public class AutoCompleteTextViewHolo extends AutoCompleteTextView {
+
 	public AutoCompleteTextViewHolo(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		Typeface font = Typeface.createFromAsset(context.getAssets(), "Roboto-Regular.ttf");
-        setTypeface(font);
+		setTypeface(font);
 	}
-
 
 }

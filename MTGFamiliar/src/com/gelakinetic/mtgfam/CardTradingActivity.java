@@ -98,7 +98,8 @@ public class CardTradingActivity extends FragmentActivity {
 				if (namefield.getText().toString().length() > 0) {
 					HashMap<String, String> data = new HashMap<String, String>();
 					data.put("name", namefield.getText().toString());
-					data.put("set", "");
+					data.put("setCode", "");
+					data.put("tcgName", "");
 					data.put("price", "loading");
 
 					lTradeLeft.add(data);

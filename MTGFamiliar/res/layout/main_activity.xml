@@ -93,6 +93,19 @@
                 android:text="@string/random"
                 android:textSize="30dip" />
 
+           <TextView
+                android:id="@+id/trade"
+                style="@style/text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/card_search_icon"
+                android:drawablePadding="15dp"
+                android:gravity="center_vertical"
+                android:text="@string/Trade"
+                android:textSize="30dip" />
+
             <TextView
                 android:id="@+id/roundTimer"
                 style="@style/text"

@@ -83,6 +83,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 	private TextView					randomCard;
 	private TextView					nbplayerbutton;
 	private TextView					roundTimer;
+	private TextView					trader;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -97,6 +98,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 		randomCard = (TextView) findViewById(R.id.randomCard);
 		nbplayerbutton = (TextView) findViewById(R.id.Nplayerlifecounter);
 		roundTimer = (TextView) findViewById(R.id.roundTimer);
+		trader = (TextView) findViewById(R.id.trade);
 
 		nbplayerbutton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -141,6 +143,13 @@ public class MainActivity extends FragmentActivity implements Runnable {
 		});
 		
 		//roundTimer.setVisibility(View.GONE);
+
+		trader.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Intent i = new Intent(mCtx, CardTradingActivity.class);
+				startActivity(i);
+			}
+		});
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 

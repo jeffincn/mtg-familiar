@@ -363,5 +363,9 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
 	    <item>Exact phrase</item>
     </string-array>
 	    <string name="howlongistheround">How long is the round?\n(HH:MM)</string>
+	    <string name="Trade">Trade Cards</string>
+	    <string name="addCardUp">Add Card \u25B2</string>
+	    <string name="addCardDown">Add Card \u25BC</string>
+	    <string name="tradeDefaultPrice">$0.00</string>
     
 </resources>

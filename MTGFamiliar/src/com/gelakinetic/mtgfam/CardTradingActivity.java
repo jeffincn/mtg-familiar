@@ -130,7 +130,6 @@ public class CardTradingActivity extends FragmentActivity {
 		});
 
 		lvTradeLeft.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 				final int removeAt = arg2;
 				new AlertDialog.Builder(mCtx).setMessage(lTradeLeft.get(removeAt).get("name")).setCancelable(true)
@@ -152,7 +151,6 @@ public class CardTradingActivity extends FragmentActivity {
 			}
 		});
 		lvTradeRight.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 				final int removeAt = arg2;
 				new AlertDialog.Builder(mCtx).setMessage(lTradeRight.get(removeAt).get("name")).setCancelable(true)

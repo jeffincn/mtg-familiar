@@ -49,7 +49,6 @@ public class TransparentSearchActivity extends Activity {
 
 		searchButton.setOnClickListener(new OnClickListener() {
 
-			@Override
 			public void onClick(View v) {
 				doSearch();
 			}
@@ -68,7 +67,6 @@ public class TransparentSearchActivity extends Activity {
 
 		namefield.addTextChangedListener(new TextWatcher() {
 
-			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				if (s.length() > 0) {
 					new AutocompleteQueryTask().execute(s.toString());
@@ -78,12 +76,10 @@ public class TransparentSearchActivity extends Activity {
 				}
 			}
 
-			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
 			}
 
-			@Override
 			public void afterTextChanged(Editable s) {
 
 			}

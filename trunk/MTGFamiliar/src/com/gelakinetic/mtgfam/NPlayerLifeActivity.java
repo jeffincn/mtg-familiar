@@ -25,6 +25,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -51,8 +52,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.WazaBe.HoloEverywhere.HoloAlertDialogBuilder;
 
 public class NPlayerLifeActivity extends FragmentActivity {
 
@@ -385,7 +384,7 @@ public class NPlayerLifeActivity extends FragmentActivity {
 		String[] names;
 		switch (id) {
 			case DIALOG_RESET_CONFIRM:
-				HoloAlertDialogBuilder builder = new HoloAlertDialogBuilder(this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder
 						.setMessage(getString(R.string.life_clear_dialog_message))
 						.setCancelable(true)
@@ -415,7 +414,7 @@ public class NPlayerLifeActivity extends FragmentActivity {
 					names[i] = players.get(i).name;
 				}
 
-				builder = new HoloAlertDialogBuilder(this);
+				builder = new AlertDialog.Builder(this);
 				builder.setTitle(getString(R.string.removeplayer));
 
 				builder.setItems(names, new DialogInterface.OnClickListener() {
@@ -433,7 +432,7 @@ public class NPlayerLifeActivity extends FragmentActivity {
 				LayoutInflater factory = LayoutInflater.from(this);
 				final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
 				nameInput = (EditText) textEntryView.findViewById(R.id.editText1);
-				dialog = new HoloAlertDialogBuilder(this).setTitle("Enter Name").setView(textEntryView)
+				dialog = new AlertDialog.Builder(this).setTitle("Enter Name").setView(textEntryView)
 						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
 								if (playerToHaveNameChanged == null) {

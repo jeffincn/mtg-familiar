@@ -27,6 +27,5 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     
 
     <color name="dark_gray">#383838</color>
-    <color name="transparent">#00000000</color>
     
 </resources>

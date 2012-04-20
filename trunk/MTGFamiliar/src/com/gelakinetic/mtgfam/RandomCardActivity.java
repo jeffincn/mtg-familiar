@@ -21,8 +21,7 @@ package com.gelakinetic.mtgfam;
 
 import java.util.Random;
 
-import com.WazaBe.HoloEverywhere.HoloAlertDialogBuilder;
-
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -256,7 +255,7 @@ public class RandomCardActivity extends FragmentActivity {
 
 		Dialog d = null;
 		if (id == RULESDIALOG) {
-			HoloAlertDialogBuilder builder = new HoloAlertDialogBuilder(this);
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setNeutralButton("Lets Play!", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.cancel();

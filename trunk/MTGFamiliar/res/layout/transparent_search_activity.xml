@@ -33,8 +33,9 @@
             android:ems="10"
             android:gravity="center_vertical"
             android:hint="@string/name"
-            android:inputType="text"
+            android:inputType="text|textNoSuggestions"
             android:singleLine="true"
+            android:textColor="#FFFFFF"
             android:textSize="18dp" >
 
             <requestFocus />

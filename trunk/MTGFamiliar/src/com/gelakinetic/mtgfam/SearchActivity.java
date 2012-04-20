@@ -19,6 +19,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -40,8 +41,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-
-import com.WazaBe.HoloEverywhere.HoloAlertDialogBuilder;
 
 public class SearchActivity extends FragmentActivity {
 	protected static final String	NAME				= "name";
@@ -339,16 +338,16 @@ public class SearchActivity extends FragmentActivity {
 
 		selectedFormat = -1;
 
-		setDialog = new HoloAlertDialogBuilder(this).setTitle("Sets")
+		setDialog = new AlertDialog.Builder(this).setTitle("Sets")
 				.setMultiChoiceItems(setNames, setChecked, new DialogSelectionClickHandler())
 				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
-		formatDialog = new HoloAlertDialogBuilder(this).setTitle("Formats")
+		formatDialog = new AlertDialog.Builder(this).setTitle("Formats")
 				.setSingleChoiceItems(formatNames, selectedFormat, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
 						selectedFormat = which;
 					}
 				}).setPositiveButton("OK", new DialogButtonClickHandler()).create();
-		rarityDialog = new HoloAlertDialogBuilder(this).setTitle("Rarities")
+		rarityDialog = new AlertDialog.Builder(this).setTitle("Rarities")
 				.setMultiChoiceItems(rarityNames, rarityChecked, new DialogSelectionClickHandler())
 				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
 
@@ -658,16 +657,16 @@ public class SearchActivity extends FragmentActivity {
 		this.removeDialog(FORMATLIST);
 		this.removeDialog(RARITYLIST);
 
-		setDialog = new HoloAlertDialogBuilder(this).setTitle("Sets")
+		setDialog = new AlertDialog.Builder(this).setTitle("Sets")
 				.setMultiChoiceItems(setNames, setChecked, new DialogSelectionClickHandler())
 				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
-		formatDialog = new HoloAlertDialogBuilder(this).setTitle("Formats")
+		formatDialog = new AlertDialog.Builder(this).setTitle("Formats")
 				.setSingleChoiceItems(formatNames, selectedFormat, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
 						selectedFormat = which;
 					}
 				}).setPositiveButton("OK", new DialogButtonClickHandler()).create();
-		rarityDialog = new HoloAlertDialogBuilder(this).setTitle("Rarities")
+		rarityDialog = new AlertDialog.Builder(this).setTitle("Rarities")
 				.setMultiChoiceItems(rarityNames, rarityChecked, new DialogSelectionClickHandler())
 				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
 

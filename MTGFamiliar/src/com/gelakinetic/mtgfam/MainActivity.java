@@ -31,8 +31,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.zip.GZIPInputStream;
 
-import com.WazaBe.HoloEverywhere.HoloAlertDialogBuilder;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -218,7 +216,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
-		HoloAlertDialogBuilder builder = new HoloAlertDialogBuilder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
 		if (id == DONATEDIALOG) {
 			builder.setTitle("Donate to the Devs");
@@ -490,7 +488,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 																		}
 																	}
 
-																	HoloAlertDialogBuilder builder = new HoloAlertDialogBuilder(mCtx);
+																	AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
 																	builder.setMessage(stacktrace).setCancelable(true);
 																	AlertDialog alert = builder.create();
 																	alert.show();

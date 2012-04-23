@@ -119,6 +119,9 @@ public class RoundTimerActivity extends FragmentActivity {
 	{
 		super.onResume();
 		
+		MyApp appState = ((MyApp)getApplicationContext());
+		appState.setState(0);
+		
 		if(!updatingDisplay)
 		{
 			startUpdatingDisplay();

@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -81,6 +82,8 @@ public class RoundTimerActivity extends FragmentActivity {
 		//this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		
 		registerReceiver(resultReceiver, new IntentFilter(RESULT_FILTER));
+		
+		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		
 		MenuFragmentCompat.init(this, R.menu.timer_menu, "round_timer_menu_fragment");
 		

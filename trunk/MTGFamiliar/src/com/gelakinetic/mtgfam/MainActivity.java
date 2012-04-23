@@ -182,6 +182,8 @@ public class MainActivity extends FragmentActivity implements Runnable {
 		startService(i);
 
 		MenuFragmentCompat.init(this, R.menu.main_menu, "main_menu_fragment");
+		
+		startService(new Intent(this, RoundTimerService.class));
 	}
 
 	@Override

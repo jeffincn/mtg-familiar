@@ -1,5 +1,5 @@
 /**
-Copyright 2011 Alex Levine
+Copyright 2012 Alex Levine
 
 This file is part of MTG Familiar.
 
@@ -19,85 +19,59 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam;
 
-import android.content.ComponentName;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
-
-import com.gelakinetic.mtgfam.RoundTimerService.RoundTimerBinder;
 
 public class RoundTimerActivity extends FragmentActivity {
+	
+	public static String RESULT_FILTER = "com.gelakinetic.mtgfam.RESULT_FILTER";
+	public static String EXTRA_END_TIME = "EndTime";
+	
 	private Handler timerHandler = new Handler();
 	private Runnable updateTimeViewTask = new Runnable() 
 	{
 		public void run()
-		{
-			if(bound) //To avoid potential null pointer exceptions
-			{				
-				timeView.setText(tService.getTimeLeftDisplay());
-				
-				if(tService.isRunning() && !tService.isPaused())
-				{
-					timerHandler.postDelayed(updateTimeViewTask, 100);
-					actionButton.setText(R.string.pause_timer);
-				}
-				else if(!tService.isRunning())
-				{
-					//If this is called while the timer is not running, it means it was running
-					//and it just stopped, so display the initial time again and change the
-					//button text back to "Start"
-					actionButton.setText(R.string.start_timer);
-					displaySelectedTime();
-				}
-			}
-		}
-	};
-	
-	private RoundTimerService tService;
-	private boolean bound = false;
-	
-	private ServiceConnection connection = new ServiceConnection() 
-	{
-		public void onServiceConnected(ComponentName className, IBinder service)
-		{
-			RoundTimerBinder binder = (RoundTimerBinder)service;
-			if(binder != null)
+		{	
+			displayTimeLeft();
+			
+			if(endTime > SystemClock.elapsedRealtime())
 			{
-				tService = binder.getService();
-				bound = true;
-				if(tService.isRunning())
-				{
-					startUpdatingDisplay();
-				}
-				else
-				{
-					displaySelectedTime();
-				}
+				actionButton.setText(R.string.cancel_timer);
+				timerHandler.postDelayed(updateTimeViewTask, 100);
 			}
-		}
-		
-		public void onServiceDisconnected(ComponentName className)
-		{
-			bound = false;
+			else
+			{
+				actionButton.setText(R.string.start_timer);
+			}
 		}
 	};
 
 	private TimePicker picker;
 	private Button actionButton;
-	private Button resetButton;
 	private TextView timeView;
+	
+	private long endTime;
+	private boolean updatingDisplay;
+	
+	private BroadcastReceiver resultReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			endTime = intent.getLongExtra(RoundTimerService.EXTRA_END_TIME, SystemClock.elapsedRealtime());
+			startUpdatingDisplay();
+		}
+	};
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -105,6 +79,8 @@ public class RoundTimerActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.round_timer_activity);
 		//this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		
+		registerReceiver(resultReceiver, new IntentFilter(RESULT_FILTER));
 		
 		MenuFragmentCompat.init(this, R.menu.timer_menu, "round_timer_menu_fragment");
 		
@@ -127,160 +103,125 @@ public class RoundTimerActivity extends FragmentActivity {
 		this.actionButton = (Button)findViewById(R.id.rt_action_button);
 		actionButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				startPauseClick(v);
-			}
-		});
-		
-		this.resetButton = (Button)findViewById(R.id.rt_reset_button);
-		resetButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				resetClick(v);
+				startCancelClick(v);
 			}
 		});
 		
 		this.timeView = (TextView)findViewById(R.id.rt_time_display);
+		
+		Intent i = new Intent(RoundTimerService.REQUEST_FILTER);
+		sendBroadcast(i);
+		updatingDisplay = true; //So onResume() doesn't start the updates before we get the response broadcast
 	}
 	
 	@Override
 	protected void onResume() 
 	{
 		super.onResume();
-
-		Intent i = new Intent(this, RoundTimerService.class);
-		bindService(i, connection, BIND_AUTO_CREATE);
+		
+		if(!updatingDisplay)
+		{
+			startUpdatingDisplay();
+		}
 	}
 	
-	public void startPauseClick(View view)
+	@Override
+	protected void onPause()
 	{
-		if(bound)
+		super.onPause();
+		updatingDisplay = false; //So we resume the updates when we resume the activity
+	}
+	
+	@Override
+	protected void onDestroy()
+	{
+		super.onDestroy();
+		unregisterReceiver(resultReceiver);
+	}
+	
+	public void startCancelClick(View view)
+	{
+		if(endTime > SystemClock.elapsedRealtime())
 		{
-			if(!tService.isRunning())
-			{
-				if(setTimer())
-				{
-					actionButton.setText(R.string.pause_timer);
-				}
-			}
-			else
-			{
-				if(tService.isPaused())
-				{
-					if(resume())
-					{
-						actionButton.setText(R.string.pause_timer);
-					}
-				}
-				else
-				{
-					if(pause())
-					{
-						actionButton.setText(R.string.resume_timer);
-					}
-				}
-			}
+			//We're running, so this command is cancel
+			endTime = SystemClock.elapsedRealtime();
+			
+			Intent i = new Intent(RoundTimerService.CANCEL_FILTER);
+			sendBroadcast(i);
+			
+			actionButton.setText(R.string.start_timer);
 		}
 		else
 		{
-			Toast.makeText(this, "Unable to perform action: the timer service is not properly bound.", Toast.LENGTH_LONG).show();
-		}
-	}
-	
-	public void resetClick(View view)
-	{
-		if(bound)
-		{
-			if(tService.isRunning())
+			//We're not running, so this command is start
+			picker.clearFocus(); //This forces the inner value to update, in case the user typed it in manually
+			int hours = picker.getCurrentHour();
+			int minutes = picker.getCurrentMinute();
+
+			long timeInMillis = ((hours * 3600) + (minutes * 60)) * 1000;
+			if(timeInMillis == 0)
 			{
-				reset();
-				actionButton.setText(R.string.start_timer);
+				return;
 			}
-			displaySelectedTime();
+			
+			endTime = SystemClock.elapsedRealtime() + timeInMillis;
+			
+			Intent i = new Intent(RoundTimerService.START_FILTER);
+			i.putExtra(EXTRA_END_TIME, endTime);
+			sendBroadcast(i);
+			
+			startUpdatingDisplay();
+			actionButton.setText(R.string.cancel_timer);
 		}
-	}
-	
-	private boolean setTimer()
-	{
-		//Hide the soft keyboard if it's showing
-		InputMethodManager manager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-		manager.hideSoftInputFromWindow(picker.getWindowToken(), 0);
-		
-		//Get the duration
-		picker.clearFocus(); //This forces the inner value to update, in case the user typed it in manually
-		int hours = picker.getCurrentHour();
-		int minutes = picker.getCurrentMinute();
-		
-		//Input is all set, so set the timer
-		long timeInMillis = ((hours * 3600) + (minutes * 60)) * 1000;
-		if(timeInMillis == 0)
-		{
-			return false;
-		}
-		
-		if(!tService.setTimer(timeInMillis))
-		{
-			Toast.makeText(this, "Timer could not be set: it is already running.", Toast.LENGTH_LONG).show();
-			return false;
-		}
-		
-		startUpdatingDisplay();
-		return true;
-	}
-	
-	private boolean pause()
-	{
-		if(!tService.pauseTimer())
-		{
-			Toast.makeText(this, "Timer could not be paused.", Toast.LENGTH_LONG).show();
-			return false;
-		}
-		return true;
-	}
-	
-	private boolean resume()
-	{
-		if(!tService.resumeTimer())
-		{
-			Toast.makeText(this, "Timer could not be resumed.", Toast.LENGTH_LONG).show();
-			return false;
-		}
-		
-		startUpdatingDisplay();
-		return true;
-	}
-	
-	private void reset()
-	{
-		tService.reset();
 	}
 	
 	private void startUpdatingDisplay()
 	{
-		timeView.setText(tService.getTimeLeftDisplay());
+		updatingDisplay = true;
+		displayTimeLeft();
 		timerHandler.removeCallbacks(updateTimeViewTask);
 		timerHandler.postDelayed(updateTimeViewTask, 100);
 	}
 	
-	private void displaySelectedTime()
+	private void displayTimeLeft()
 	{
-		String selectedTime = "";
-		picker.clearFocus(); //This forces the inner value to update, in case the user typed it in manually
-		int hour = picker.getCurrentHour();
-		int minute = picker.getCurrentMinute();
+		long timeLeftMillis = endTime - SystemClock.elapsedRealtime();
+		String timeLeftStr = "";
 		
-		if(hour < 10)
+		if(timeLeftMillis <= 0)
 		{
-			selectedTime += "0";
+			timeLeftStr = "00:00:00"; 
 		}
-		selectedTime += String.valueOf(hour);
-		selectedTime += ":";
-		
-		if(minute < 10)
+		else
 		{
-			selectedTime += "0";
+			long timeLeftInSecs = (timeLeftMillis / 1000);
+			
+			//This is a slight hack to handle the fact that it always rounds down. It makes the clock look much nicer this way.
+			timeLeftInSecs++;
+			
+			String hours = String.valueOf(timeLeftInSecs / (3600));
+			String minutes = String.valueOf((timeLeftInSecs % 3600) / 60);
+			String seconds = String.valueOf(timeLeftInSecs % 60);
+			
+			if(hours.length() == 1)
+			{
+				timeLeftStr += "0";
+			}
+			timeLeftStr += hours + ":";
+			
+			if(minutes.length() == 1)
+			{
+				timeLeftStr += "0";
+			}
+			timeLeftStr += minutes + ":";
+			
+			if(seconds.length() == 1)
+			{
+				timeLeftStr += "0";
+			}
+			timeLeftStr += seconds;
 		}
-		selectedTime += String.valueOf(minute);
-		selectedTime += ":00";
 		
-		timeView.setText(selectedTime);
+		timeView.setText(timeLeftStr);
 	}
 }

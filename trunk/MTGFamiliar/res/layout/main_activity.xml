@@ -100,7 +100,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
                 android:layout_weight="1"
-                android:drawableLeft="@drawable/card_search_icon"
+                android:drawableLeft="@drawable/trade_icon"
                 android:drawablePadding="15dp"
                 android:gravity="center_vertical"
                 android:text="@string/Trade"

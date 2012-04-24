@@ -107,7 +107,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:drawableTop="@drawable/card_search_icon"
+                    android:drawableTop="@drawable/trade_icon"
                     android:gravity="center_horizontal"
                     android:text="@string/Trade"
                     android:textSize="30dip" />

@@ -17,19 +17,20 @@
     android:orientation="vertical" >
 
     <!-- fake actionbar -->
+
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="left|center_vertical"
-        >
+        android:orientation="horizontal" >
+
         <ImageView
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:src="@drawable/icon"
-            android:scaleType="fitCenter"
             android:padding="4dp"
-            />
+            android:scaleType="fitCenter"
+            android:src="@drawable/icon" />
+
         <TextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
@@ -38,11 +39,11 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textSize="22dip" />
     </LinearLayout>
+
     <View
         android:layout_width="fill_parent"
         android:layout_height="2dp"
-        android:background="#33B5E5"
-        />
+        android:background="#33B5E5" />
 
     <ScrollView
         android:layout_width="fill_parent"
@@ -52,9 +53,9 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:padding="12dp"
             android:gravity="center"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:padding="12dp" >
 
             <LinearLayout
                 android:id="@+id/linearLayout3"
@@ -104,7 +105,9 @@
             <LinearLayout
                 android:id="@+id/linearLayout4"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dip"
+                android:orientation="horizontal" >
 
                 <TextView
                     android:id="@+id/rng"
@@ -139,6 +142,14 @@
                     android:gravity="center"
                     android:text="@string/roundtimer"
                     android:textSize="30dip" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout5"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dip"
+                android:orientation="horizontal" >
 
                 <TextView
                     android:id="@+id/randomCard"
@@ -150,6 +161,26 @@
                     android:drawableTop="@drawable/mojhosto_icon"
                     android:gravity="center"
                     android:text="@string/mojhosto_label"
+                    android:textSize="30dip" />
+
+                <TextView
+                    android:id="@+id/null1"
+                    style="@style/text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textSize="30dip" />
+
+                <TextView
+                    android:id="@+id/null2"
+                    style="@style/text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="1"
+                    android:gravity="center"
                     android:textSize="30dip" />
             </LinearLayout>
         </LinearLayout>

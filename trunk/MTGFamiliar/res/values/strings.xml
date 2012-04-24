@@ -233,13 +233,12 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
    - Various UI optimizations.
    -->
    <!-- 1.6 -->
-   - Check out the new homescreen widget.&lt;br />&lt;br />
+   - Added a new homescreen widget. Go put it in your launcher for super fast searching.&lt;br />&lt;br />
+   - Added a round timer. Now you\'ll know if you\'re about to go to time.&lt;br />&lt;br />
    - Added card trader screen. Compare prices on the fly!&lt;br />&lt;br />
    - Added "Timeshifted" rarity.&lt;br />&lt;br />
    - UI fixes for small screens.&lt;br />&lt;br />
-   - And maybe a round timer.&lt;br />&lt;br />
-   - And maybe result swiping.
-   
+   - Bugfixes.
    </string>
      	
     <string name="gatherer">Gatherer Page</string>

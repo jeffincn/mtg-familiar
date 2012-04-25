@@ -93,6 +93,14 @@ public class TransparentSearchActivity extends Activity {
 		appState.setState(0);
 	}
 
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		if (mDbHelper != null) {
+			mDbHelper.close();
+		}
+	}
+	
 	private void fillData(Cursor c) {
 
 		String[] from = { CardDbAdapter.KEY_NAME };

@@ -371,5 +371,5 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
 	    <string name="trader_change_set">Change Set</string>
 	    <string name="trader_remove">Remove</string>
 	    <string name="trader_default_number_of">1</string>
-    
+    <string name="type_card_first">Type in a card above first</string>
 </resources>

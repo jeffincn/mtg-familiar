@@ -251,6 +251,14 @@ public class RandomCardActivity extends FragmentActivity {
 	}
 
 	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		if (mDbAdapter != null) {
+			mDbAdapter.close();
+		}
+	}
+	
+	@Override
 	protected Dialog onCreateDialog(int id) {
 
 		Dialog d = null;

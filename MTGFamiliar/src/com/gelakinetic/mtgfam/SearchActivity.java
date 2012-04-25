@@ -390,6 +390,14 @@ public class SearchActivity extends FragmentActivity {
 		appState.setState(0);
 	}
 
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		if (mDbHelper != null) {
+			mDbHelper.close();
+		}
+	}
+	
 	private void doSearch(boolean isRandom) {
 		String name = namefield.getText().toString();
 		String text = textfield.getText().toString();

@@ -297,8 +297,10 @@ public class CardTradingActivity extends FragmentActivity {
 			}
 		});
 		builder.create().show();
-
-
+		
+		cards.deactivate();
+		cards.close();
+		mdbAdapter.close();
 	}
 
 	@Override

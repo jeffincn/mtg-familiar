@@ -34,7 +34,6 @@ public class AutocompleteCursorAdapter extends CursorAdapter {
 	public AutocompleteCursorAdapter(Context context, Cursor c) {
 		super(context, c);
 		mDbAdapter = new CardDbAdapter(context);
-		mDbAdapter.open();
 	}
 
 	@Override
@@ -68,7 +67,9 @@ public class AutocompleteCursorAdapter extends CursorAdapter {
 
 		Cursor cursor = null;
 		try {
+			mDbAdapter.open();
 			cursor = mDbAdapter.autoComplete(filter);
+			mDbAdapter.close();
 		}
 		catch (Exception e) {
 			return null;

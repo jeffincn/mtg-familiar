@@ -30,6 +30,7 @@ import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -39,6 +40,8 @@ import android.widget.EditText;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.ListView;
+import android.widget.Toast;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -72,6 +75,7 @@ public class CardTradingActivity extends FragmentActivity {
 	private ArrayList<HashMap<String, String>>	lTradeRight;
 
 	private CardDbAdapter												mdbAdapter;
+	private EditText	numberfield;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -86,6 +90,9 @@ public class CardTradingActivity extends FragmentActivity {
 		namefield = (AutoCompleteTextView) findViewById(R.id.namesearch);
 		namefield.setAdapter(new AutocompleteCursorAdapter(this, null));
 
+		numberfield = (EditText)findViewById(R.id.numberInput);
+		numberfield.setText("1");
+		
 		lTradeLeft = new ArrayList<HashMap<String, String>>();
 		bAddTradeLeft = (Button) findViewById(R.id.addCardLeft);
 		tradePriceLeft = (TextView) findViewById(R.id.priceTextLeft);
@@ -110,13 +117,17 @@ public class CardTradingActivity extends FragmentActivity {
 					data.put("setCode", "");
 					data.put("tcgName", "");
 					data.put("price", "loading");
-					data.put("numberOf", "1");
+					data.put("numberOf", numberfield.getText().toString());
 
 					lTradeLeft.add(data);
 					aaTradeLeft.notifyDataSetChanged();
 					FetchPriceTask loadPrice = new FetchPriceTask(data, aaTradeLeft);
 					loadPrice.execute();
 					namefield.setText("");
+					numberfield.setText("1");
+				}
+				else{
+					Toast.makeText(getApplicationContext(), getString(R.string.type_card_first), Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -129,13 +140,17 @@ public class CardTradingActivity extends FragmentActivity {
 					data.put("setCode", "");
 					data.put("tcgName", "");
 					data.put("price", "loading");
-					data.put("numberOf", "1");
+					data.put("numberOf", numberfield.getText().toString());
 
 					lTradeRight.add(data);
 					aaTradeRight.notifyDataSetChanged();
 					FetchPriceTask loadPrice = new FetchPriceTask(data, aaTradeRight);
 					loadPrice.execute();
 					namefield.setText("");
+					numberfield.setText("1");
+				}
+				else{
+					Toast.makeText(getApplicationContext(), getString(R.string.type_card_first), Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -529,4 +544,19 @@ public class CardTradingActivity extends FragmentActivity {
 		}
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+			case R.id.trader_menu_clear:
+				lTradeRight.clear();
+				aaTradeRight.notifyDataSetChanged();
+				lTradeLeft.clear();
+				aaTradeLeft.notifyDataSetChanged();
+				UpdateTotalPrices("both");
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
 }

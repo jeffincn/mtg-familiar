@@ -4,11 +4,29 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <AutoCompleteTextView
-        android:id="@+id/namesearch"
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/name" />
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/numberInput"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="number" >
+        </EditText>
+
+        <AutoCompleteTextView
+            android:id="@+id/namesearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/name" >
+
+            <requestFocus />
+        </AutoCompleteTextView>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,7 +45,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/addCardDown" />
-
+
             <TextView
                 android:id="@+id/priceTextLeft"
                 android:layout_width="wrap_content"
@@ -44,13 +62,15 @@
 
                 <!-- Preview: listitem=@layout/trader_row -->
             </ListView>
-        </LinearLayout>    <View
-        android:id="@+id/divider"
-        android:layout_height="fill_parent"
-        android:layout_width="1dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:background="#FFAAAAAA" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="1dp"
+            android:layout_height="fill_parent"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:background="#FFAAAAAA" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -63,7 +83,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/addCardDown" />
-
+
             <TextView
                 android:id="@+id/priceTextRight"
                 android:layout_width="wrap_content"

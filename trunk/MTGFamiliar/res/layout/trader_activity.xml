@@ -27,13 +27,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/addCardDown" />
-
+
             <TextView
                 android:id="@+id/priceTextLeft"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="@string/tradeDefaultPrice"
+                android:text="@string/trader_default_price"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <ListView
@@ -63,13 +63,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/addCardDown" />
-
+
             <TextView
                 android:id="@+id/priceTextRight"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="@string/tradeDefaultPrice"
+                android:text="@string/trader_default_price"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <ListView

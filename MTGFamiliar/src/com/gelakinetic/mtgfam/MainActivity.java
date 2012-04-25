@@ -31,12 +31,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.zip.GZIPInputStream;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.SharedPreferences;
@@ -57,7 +59,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends FragmentActivity implements Runnable {
-	private static final int	DBFROMAPK				= 0;
 	private static final int	OTAPATCH				= 1;
 	private static final int	APPLYINGPATCH		= 3;
 	private static final int	DBFROMWEB				= 4;
@@ -82,6 +83,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 	private TextView					nbplayerbutton;
 	private TextView					roundTimer;
 	private TextView					trader;
+	private Activity					me;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -89,6 +91,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 		setContentView(R.layout.main_activity);
 
 		mCtx = this;
+		me = this;
 
 		search = (TextView) findViewById(R.id.cardsearch);
 		rng = (TextView) findViewById(R.id.rng);
@@ -139,8 +142,8 @@ public class MainActivity extends FragmentActivity implements Runnable {
 				startActivity(i);
 			}
 		});
-		
-		//roundTimer.setVisibility(View.GONE);
+
+		// roundTimer.setVisibility(View.GONE);
 
 		trader.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -151,18 +154,12 @@ public class MainActivity extends FragmentActivity implements Runnable {
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-		if (CardDbAdapter.isDbOutOfDate((Context) this)) {
-			startThread(DBFROMAPK);
+		mDbHelper = new CardDbAdapter(this);
+		mDbHelper.open();
+		boolean autoupdate = preferences.getBoolean("autoupdate", true);
+		if (autoupdate) {
+			startThread(OTAPATCH);
 		}
-		else {
-			mDbHelper = new CardDbAdapter(this);
-			mDbHelper.open();
-			boolean autoupdate = preferences.getBoolean("autoupdate", true);
-			if (autoupdate) {
-				startThread(OTAPATCH);
-			}
-		}
-
 		try {
 			pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
 		}
@@ -182,7 +179,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 		startService(i);
 
 		MenuFragmentCompat.init(this, R.menu.main_menu, "main_menu_fragment");
-		
+
 		startService(new Intent(this, RoundTimerService.class));
 	}
 
@@ -296,23 +293,22 @@ public class MainActivity extends FragmentActivity implements Runnable {
 	}
 
 	public void startThread(int type) {
-		if (type == DBFROMAPK) {
-			dialog = new ProgressDialog(MainActivity.this);
-			dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			dialog.setMessage("Decompressing database.");
-			dialog.setCancelable(false);
-			dialog.show();
-			threadType = type;
-			Thread thread = new Thread(this);
-			thread.start();
-		}
-		else if (type == OTAPATCH) {
+		if (type == OTAPATCH) {
+
+			// lock the rotation
+			if (me.getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED) {
+				me.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+			}
+			else {
+				me.setRequestedOrientation(me.getRequestedOrientation());
+			}
+
 			// Only update the banning list if it hasn't been updated recently
 			int curTime = (int) (new Date().getTime() * .001);
 			int updatefrequency = Integer.valueOf(preferences.getString("updatefrequency", "3"));
 			int lastLegalityUpdate = preferences.getInt("lastLegalityUpdate", 0); // should
-																																						// be
-																																						// global
+			// be
+			// global
 
 			if ((curTime - lastLegalityUpdate) > (updatefrequency * 24 * 60 * 60)) {
 				dialog = new ProgressDialog(MainActivity.this);
@@ -324,6 +320,9 @@ public class MainActivity extends FragmentActivity implements Runnable {
 				threadType = type;
 				Thread thread = new Thread(this);
 				thread.start();
+			}
+			else {
+				me.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
 			}
 		}
 		else if (type == DBFROMWEB) {
@@ -342,11 +341,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 
 	public void run() {
 		try {
-			if (threadType == DBFROMAPK) {
-				CardDbAdapter.copyDB(mCtx);
-				handler.sendEmptyMessage(DBFROMAPK);
-			}
-			else if (threadType == OTAPATCH) {
+			if (threadType == OTAPATCH) {
 
 				if (mDbHelper == null) {
 					mDbHelper = new CardDbAdapter(this);
@@ -432,21 +427,9 @@ public class MainActivity extends FragmentActivity implements Runnable {
 																		}
 																	}
 																	break;
-																case DBFROMAPK:
-																	mDbHelper = new CardDbAdapter(mCtx);
-																	mDbHelper.open();
-																	if (dialog != null && dialog.isShowing()) {
-																		try {
-																			dialog.dismiss();
-																		}
-																		catch (Exception e) {
-																			;
-																		}
-																	}
-																	// startThread(OTAPATCH);
-																	break;
 																case OTAPATCH:
-																	// If it successfully updated, update the timestamp
+																	// If it successfully updated, update the
+																	// timestamp
 																	int curTime = (int) (new Date().getTime() * .001);
 																	SharedPreferences.Editor editor = preferences.edit();
 																	editor.putInt("lastLegalityUpdate", curTime);
@@ -460,6 +443,8 @@ public class MainActivity extends FragmentActivity implements Runnable {
 																			;
 																		}
 																	}
+																	// unlock rotation
+																	me.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
 																	break;
 																case APPLYINGPATCH:
 																	numCardsAdded = 0;

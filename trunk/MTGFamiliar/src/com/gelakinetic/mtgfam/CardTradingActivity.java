@@ -117,7 +117,12 @@ public class CardTradingActivity extends FragmentActivity {
 					data.put("setCode", "");
 					data.put("tcgName", "");
 					data.put("price", "loading");
-					data.put("numberOf", numberfield.getText().toString());
+					
+					String numberOfFromField = numberfield.getText().toString();
+					if (numberOfFromField.length() == 0) {
+						numberOfFromField = "1";
+					}
+					data.put("numberOf", numberOfFromField);
 
 					lTradeLeft.add(data);
 					aaTradeLeft.notifyDataSetChanged();
@@ -140,7 +145,12 @@ public class CardTradingActivity extends FragmentActivity {
 					data.put("setCode", "");
 					data.put("tcgName", "");
 					data.put("price", "loading");
-					data.put("numberOf", numberfield.getText().toString());
+					
+					String numberOfFromField = numberfield.getText().toString();
+					if (numberOfFromField.length() == 0) {
+						numberOfFromField = "1";
+					}
+					data.put("numberOf", numberOfFromField);
 
 					lTradeRight.add(data);
 					aaTradeRight.notifyDataSetChanged();

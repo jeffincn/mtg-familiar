@@ -19,17 +19,21 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -39,6 +43,8 @@ public class RoundTimerActivity extends FragmentActivity {
 	
 	public static String RESULT_FILTER = "com.gelakinetic.mtgfam.RESULT_FILTER";
 	public static String EXTRA_END_TIME = "EndTime";
+	
+	private static int RINGTONE_REQUEST_CODE = 17;
 	
 	private Handler timerHandler = new Handler();
 	private Runnable updateTimeViewTask = new Runnable() 
@@ -143,6 +149,48 @@ public class RoundTimerActivity extends FragmentActivity {
 	{
 		super.onDestroy();
 		unregisterReceiver(resultReceiver);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) 
+	{
+		// Handle item selection
+		switch (item.getItemId())
+		{
+			case R.id.set_timer_ringtone:
+				SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+				Uri soundFile = Uri.parse(settings.getString("timerSound", RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION).toString()));
+				
+				Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
+				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Alert Tone");
+				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, soundFile);
+				
+				startActivityForResult(intent, RINGTONE_REQUEST_CODE);
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+	
+	@Override
+	protected void onActivityResult(final int requestCode, final int resultCode, final Intent intent)
+	{
+		if(resultCode == Activity.RESULT_OK)
+		{
+			if(requestCode == RINGTONE_REQUEST_CODE)
+			{
+				Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+				
+				if (uri != null)
+				{
+					//Save it
+					SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(this).edit();
+					edit.putString("timerSound", uri.toString());
+					edit.commit();
+				}
+			}
+		}
 	}
 	
 	public void startCancelClick(View view)

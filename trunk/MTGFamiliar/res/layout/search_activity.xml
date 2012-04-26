@@ -34,7 +34,10 @@
                 android:hint="@string/name"
                 android:imeOptions="actionSearch"
                 android:inputType="text"
-                android:singleLine="true" />
+                android:singleLine="true" >
+
+                <requestFocus />
+            </AutoCompleteTextView>
 
             <!-- Modified version below by Reuben Kriegel -->
 
@@ -198,7 +201,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textSize="18dp"  />
+                android:textSize="18dp" />
 
             <LinearLayout
                 android:id="@+id/linearLayout2"
@@ -302,7 +305,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/formatsearch" 
+                    android:text="@string/formatsearch"
                     android:textSize="18dp" />
 
                 <Button
@@ -311,7 +314,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/searchrarity"
-                    android:textSize="18dp"  />
+                    android:textSize="18dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -349,6 +352,6 @@
         android:layout_height="wrap_content"
         android:layout_weight="0"
         android:text="@string/searchButton"
-        android:textSize="18dp"  />
+        android:textSize="18dp" />
 
 </LinearLayout>

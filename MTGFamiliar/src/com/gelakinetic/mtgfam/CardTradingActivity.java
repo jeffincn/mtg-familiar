@@ -76,6 +76,14 @@ public class CardTradingActivity extends FragmentActivity {
 
 	private CardDbAdapter												mdbAdapter;
 	private EditText	numberfield;
+	
+	public static final String ERROR_PREFIX = "E- ";
+	public static final String card_not_found = "Card Not Found";
+	public static final String mangled_url = "Mangled URL";
+	public static final String database_busy = "Database Busy";
+	public static final String card_dne = "Card Does Not Exist";
+	public static final String fetch_failed = "Fetch Failed";
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -399,23 +407,57 @@ public class CardTradingActivity extends FragmentActivity {
 		int totalPrice = 0;
 
 		for (HashMap<String, String> data : _trade) {
-			if (data.get("error") != null)
-				continue;
+			if (data.get("error") == null && data.get("price") != null){
 
-			String price = data.get("price");
+				String price = data.get("price");
+	
+				String dollar = price.substring(1, price.indexOf('.'));
+				String cents = price.substring(price.indexOf('.') + 1);
+	
+				int iDollar = Integer.parseInt(dollar) * 100;
+				int iCent = Integer.parseInt(cents);
+	
+				String numberOf = data.get("numberOf");
+				if (numberOf.length() == 0)
+					numberOf = "1";
+				int inumberOf = Integer.parseInt(numberOf);
+				
+				totalPrice += inumberOf * (iDollar + iCent);
+			}
+			else{
+				String price = data.get("price");
 
-			String dollar = price.substring(1, price.indexOf('.'));
-			String cents = price.substring(price.indexOf('.') + 1);
-
-			int iDollar = Integer.parseInt(dollar) * 100;
-			int iCent = Integer.parseInt(cents);
-
-			String numberOf = data.get("numberOf");
-			if (numberOf.length() == 0)
-				numberOf = "1";
-			int inumberOf = Integer.parseInt(numberOf);
-			
-			totalPrice += inumberOf * (iDollar + iCent);
+				// Remove the card from the list, unless it was just a fetch failed.
+				// Otherwise, the card does not exist, or there is a database problem
+				
+				if(price.compareTo(card_not_found) == 0){
+					_trade.remove(data);
+					aaTradeRight.notifyDataSetChanged();
+					aaTradeLeft.notifyDataSetChanged();
+					Toast.makeText(getApplicationContext(), data.get("name") + ": " + card_not_found, Toast.LENGTH_LONG).show();
+				}
+				else if(price.compareTo(mangled_url) == 0){
+					_trade.remove(data);
+					aaTradeRight.notifyDataSetChanged();
+					aaTradeLeft.notifyDataSetChanged();
+					Toast.makeText(getApplicationContext(), data.get("name") + ": " + mangled_url, Toast.LENGTH_LONG).show();
+				}
+				else if(price.compareTo(database_busy) == 0){
+					_trade.remove(data);
+					aaTradeRight.notifyDataSetChanged();
+					aaTradeLeft.notifyDataSetChanged();
+					Toast.makeText(getApplicationContext(), data.get("name") + ": " + database_busy, Toast.LENGTH_LONG).show();
+				}
+				else if(price.compareTo(card_dne) == 0){
+					_trade.remove(data);
+					aaTradeRight.notifyDataSetChanged();
+					aaTradeLeft.notifyDataSetChanged();
+					Toast.makeText(getApplicationContext(), data.get("name") + ": " + card_dne, Toast.LENGTH_LONG).show();
+				}
+				else if(price.compareTo(fetch_failed) == 0){
+					
+				}
+			}
 		}
 		return totalPrice;
 	}
@@ -453,16 +495,19 @@ public class CardTradingActivity extends FragmentActivity {
 					number = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NUMBER));
 				}
 				else {
-					price = "E- Card Does Not Exist";
+					price = ERROR_PREFIX + card_dne;
+					mdbAdapter.close();
 					return 1;
 				}
 			}
 			catch (SQLiteException e) {
-				price = "E- Card Not Found";
+				price = ERROR_PREFIX + card_not_found;
+				mdbAdapter.close();
 				return 1;
 			}
 			catch (IllegalStateException e) {
-				price = "E- Database Busy";
+				price = ERROR_PREFIX + database_busy;
+				mdbAdapter.close();
 				return 1;
 			}
 
@@ -480,16 +525,20 @@ public class CardTradingActivity extends FragmentActivity {
 			}
 			catch (MalformedURLException e) {
 				priceurl = null;
-				price = "E- Mangled URL";
+				price = ERROR_PREFIX + mangled_url;
+				mdbAdapter.close();
 				return 1;
 			}
 
 			price = fetchAveragePrice(priceurl);
 
-			if (price.contains("E-"))
+			if (price.contains(ERROR_PREFIX)){
+				mdbAdapter.close();
 				return 1;
-			else
+			}
+			else{
 				price = "$" + price;
+			}
 
 			card.deactivate();
 			card.close();
@@ -505,16 +554,16 @@ public class CardTradingActivity extends FragmentActivity {
 				data.put("tcgName", tcgName);
 				data.put("setCode", setCode);
 				data.put("price", price);
-				toNotify.notifyDataSetChanged();
-				UpdateTotalPrices();
+				data.remove("error"); // if the original fetch failed, but a subsequent one worked, clear the error flag
 			}
 			else if (result == 1) {
 				data.put("tcgName", "");
 				data.put("setCode", "");
 				data.put("price", price.substring(3));
 				data.put("error", "error");
-				toNotify.notifyDataSetChanged();
 			}
+			UpdateTotalPrices();
+			toNotify.notifyDataSetChanged();
 		}
 
 		String fetchAveragePrice(URL _priceURL) {
@@ -548,7 +597,7 @@ public class CardTradingActivity extends FragmentActivity {
 			}
 
 			if (XMLhandler == null || XMLhandler.link == null)
-				return "E- Fetch Failed";
+				return ERROR_PREFIX+fetch_failed;
 			else
 				return XMLhandler.avgprice;
 		}

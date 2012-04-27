@@ -435,13 +435,14 @@ public class CardDbAdapter {
 	 */
 	public Cursor fetchCardByName(String name) throws SQLException {
 		name = name.replace("'", "''");
-		String statement = "(" + KEY_NAME + " = '" + name + "')";
+		String sql = "SELECT " + DATABASE_TABLE_CARDS + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " +
+				DATABASE_TABLE_CARDS + "." + KEY_SET + ", " + DATABASE_TABLE_CARDS + "." + KEY_NUMBER + " FROM " + DATABASE_TABLE_CARDS +
+				" JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = " + DATABASE_TABLE_CARDS + "." + KEY_SET +
+				" WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + name + "' ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC";
 		Cursor mCursor = null;
 
 		try {
-			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_NAME, KEY_SET, KEY_TYPE, KEY_RARITY,
-					KEY_MANACOST, KEY_CMC, KEY_POWER, KEY_TOUGHNESS, KEY_LOYALTY, KEY_ABILITY, KEY_FLAVOR, KEY_ARTIST,
-					KEY_NUMBER, KEY_COLOR, KEY_MULTIVERSEID }, statement, null, null, null, KEY_NAME, null);
+			mCursor = mDb.rawQuery(sql, null);
 		}
 		catch (SQLiteException e) {
 			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();

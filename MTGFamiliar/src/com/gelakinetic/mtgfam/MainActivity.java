@@ -62,6 +62,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 	private static final int	OTAPATCH				= 1;
 	private static final int	APPLYINGPATCH		= 3;
 	private static final int	DBFROMWEB				= 4;
+	private static final int	DBFROMAPK				= 5;
 	private static final int	EXCEPTION				= 99;
 	private static final int	ABOUTDIALOG			= 0;
 	private static final int	CHANGELOGDIALOG	= 1;
@@ -392,7 +393,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 					editor.putString("date", "");
 					editor.commit();
 
-					parseJSON(new URL("https://sites.google.com/site/mtgfamiliar/patches/uptoISD.json.gzip"));
+					parseJSON(new URL("https://sites.google.com/site/mtgfamiliar/patches/UpToAVR.json.gzip"));
 					parseLegality(new URL("https://sites.google.com/site/mtgfamiliar/manifests/legality.json"));
 					parseTCGNames();
 				}
@@ -538,12 +539,12 @@ public class MainActivity extends FragmentActivity implements Runnable {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-			// case R.id.buildWebDB:
-			// startThread(DBFROMWEB);
-			// return true;
-			// case R.id.refreshDB:
-			// startThread(DBFROMAPK);
-			// return true;
+//			 case R.id.buildWebDB:
+//			 startThread(DBFROMWEB);
+//			 return true;
+//			 case R.id.refreshDB:
+//			 startThread(DBFROMAPK);
+//			 return true;
 
 			case R.id.checkUpdate:
 				// Set the last legality update time back to zero on a forced update

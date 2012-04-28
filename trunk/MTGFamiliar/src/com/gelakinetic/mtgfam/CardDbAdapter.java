@@ -64,7 +64,7 @@ public class CardDbAdapter {
 	private static final String		DATABASE_TABLE_LEGAL_SETS			= "legal_sets";
 	private static final String		DATABASE_TABLE_BANNED_CARDS		= "banned_cards";
 
-	public static final int				DATABASE_VERSION							= 15;
+	public static final int				DATABASE_VERSION							= 16;
 
 	public static final String		KEY_ID												= "_id";
 	public static final String		KEY_NAME											= SearchManager.SUGGEST_COLUMN_TEXT_1;							// "name";
@@ -205,8 +205,15 @@ public class CardDbAdapter {
 	public void dropCreateDB() {
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_CARDS);
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_SETS);
+		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_FORMATS);
+		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_LEGAL_SETS);
+		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_BANNED_CARDS);
+		
 		mDb.execSQL(DATABASE_CREATE_CARDS);
 		mDb.execSQL(DATABASE_CREATE_SETS);
+		mDb.execSQL(DATABASE_CREATE_FORMATS);
+		mDb.execSQL(DATABASE_CREATE_LEGAL_SETS);
+		mDb.execSQL(DATABASE_CREATE_BANNED_CARDS);
 	}
 
 	/**

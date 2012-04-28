@@ -2,7 +2,7 @@
     android:minWidth="294dp"
     android:minHeight="72dp"
     android:updatePeriodMillis="86400000"
-    android:previewImage="@drawable/icon"
-    android:initialLayout="@layout/mtgfamiliar_appwidget"
-    >
+    android:previewImage="@drawable/widget_preview_dark"
+    android:initialLayout="@layout/mtgfamiliar_appwidget">
+    
 </appwidget-provider>

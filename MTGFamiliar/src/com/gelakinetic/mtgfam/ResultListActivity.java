@@ -161,6 +161,7 @@ public class ResultListActivity extends FragmentActivity {
 					id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
 					i.putExtra("id", id);
 					i.putExtra(SearchActivity.RANDOM, isRandom);
+					i.putExtra("IsSingle", isSingle);
 					startActivityForResult(i, 0);
 				}
 			}
@@ -252,6 +253,7 @@ public class ResultListActivity extends FragmentActivity {
 		if (requestCode == 0) {
 
 			long id;
+			long lastID;
 			switch (resultCode) {
 				case CardViewActivity.RANDOMLEFT:
 					randomIndex--;
@@ -273,6 +275,56 @@ public class ResultListActivity extends FragmentActivity {
 					}
 					i = new Intent(mCtx, CardViewActivity.class);
 					c.moveToPosition(randomSequence[randomIndex]);
+					id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
+					i.putExtra("id", id);
+					i.putExtra(SearchActivity.RANDOM, isRandom);
+					startActivityForResult(i, 0);
+					break;
+				case CardViewActivity.SWIPELEFT:
+					lastID = data.getLongExtra("lastID", -1l);
+					
+					c.moveToFirst();
+					while(!c.isAfterLast()){
+						if (lastID == c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID))){
+							c.moveToPrevious();
+							
+							//In case the id was matched against the first item.
+							if (c.isBeforeFirst())
+								c.moveToLast();
+								
+							break;
+						}
+						else
+							c.moveToNext();
+					}
+					
+					
+					i = new Intent(mCtx, CardViewActivity.class);
+					id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
+					i.putExtra("id", id);
+					i.putExtra(SearchActivity.RANDOM, isRandom);
+					startActivityForResult(i, 0);
+					break;
+				case CardViewActivity.SWIPERIGHT:
+					lastID = data.getLongExtra("lastID", -1l);
+					
+					c.moveToFirst();
+					while(!c.isAfterLast()){
+						if (lastID == c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID))){
+							c.moveToNext();
+							
+							//In case the id was matched against the last item.
+							if (c.isAfterLast())
+								c.moveToFirst();
+								
+							break;
+						}
+						else
+							c.moveToNext();
+					}
+					
+					
+					i = new Intent(mCtx, CardViewActivity.class);
 					id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
 					i.putExtra("id", id);
 					i.putExtra(SearchActivity.RANDOM, isRandom);

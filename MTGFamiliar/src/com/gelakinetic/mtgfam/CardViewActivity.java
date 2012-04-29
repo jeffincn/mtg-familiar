@@ -58,8 +58,11 @@ import android.util.DisplayMetrics;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
+import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -81,6 +84,8 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 	protected static final int		RANDOMLEFT		= 2;
 	protected static final int		RANDOMRIGHT		= 3;
 	protected static final int		QUITTOSEARCH	= 4;
+	protected static final int 		SWIPELEFT		= 5;
+	protected static final int 		SWIPERIGHT		= 6;
 
 	protected static final String	NUMBER				= "number";
 	protected static final String	SET						= "set";
@@ -130,6 +135,7 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 	private String[]							legalities;
 	private String[]							formats;
 	private boolean								isRandom;
+	private boolean								isSingle;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -164,14 +170,57 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 		Bundle extras = getIntent().getExtras();
 		cardID = extras.getLong("id");
 		isRandom = extras.getBoolean(SearchActivity.RANDOM);
-
+		isSingle = extras.getBoolean("IsSingle", false);
+		
 		mDbHelper = new CardDbAdapter(this);
 		mDbHelper.open();
 
 		setInfoFromID(cardID);
-
+		
+		if(!isSingle){
+			gestureDetector = new GestureDetector(new MyGestureDetector());
+	        gestureListener = new View.OnTouchListener() {
+	            public boolean onTouch(View v, MotionEvent event) {
+	                return gestureDetector.onTouchEvent(event);
+	            }
+	        };
+	        
+	        View thisView = this.findViewById(R.id.ScrollView1); //TODO rename id in cardsearch
+	        thisView.setOnTouchListener(gestureListener);
+		}
 		MenuFragmentCompat.init(this, R.menu.card_menu, "card_view_menu_fragment");
 	}
+	
+	private static final int SWIPE_MIN_DISTANCE = 120;
+    private static final int SWIPE_MAX_OFF_PATH = 250;
+    private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+    private GestureDetector gestureDetector;
+    View.OnTouchListener gestureListener;
+    
+	class MyGestureDetector extends SimpleOnGestureListener {
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            try {
+                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
+                    return false;
+                if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+					Intent i = new Intent();
+					i.putExtra("lastID", cardID);
+					setResult(SWIPERIGHT, i);
+					finish();
+                }  else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+					Intent i = new Intent();
+					i.putExtra("lastID", cardID);
+					setResult(SWIPELEFT, i);
+					finish();
+                }
+            } catch (Exception e) {
+            }
+            return false;
+        }
+
+    }
+	
 
 	@Override
 	protected void onResume() {

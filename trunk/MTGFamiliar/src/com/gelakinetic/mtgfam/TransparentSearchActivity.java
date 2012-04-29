@@ -61,6 +61,7 @@ public class TransparentSearchActivity extends Activity {
 				Intent i = new Intent(mCtx, CardViewActivity.class);
 				i.putExtra("id", id);
 				i.putExtra(SearchActivity.RANDOM, false);
+				i.putExtra("IsSingle", true);
 				startActivityForResult(i, 0);
 			}
 		});

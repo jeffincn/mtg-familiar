@@ -130,7 +130,7 @@ public class CardTradingActivity extends FragmentActivity {
 					if (numberOfFromField.length() == 0) {
 						numberOfFromField = "1";
 					}
-					data.put("numberOf", numberOfFromField);
+					data.put("numberOf", numberOfFromField + "x");
 
 					lTradeLeft.add(data);
 					aaTradeLeft.notifyDataSetChanged();
@@ -158,7 +158,7 @@ public class CardTradingActivity extends FragmentActivity {
 					if (numberOfFromField.length() == 0) {
 						numberOfFromField = "1";
 					}
-					data.put("numberOf", numberOfFromField);
+					data.put("numberOf", numberOfFromField + "x");
 
 					lTradeRight.add(data);
 					aaTradeRight.notifyDataSetChanged();
@@ -210,7 +210,8 @@ public class CardTradingActivity extends FragmentActivity {
 		final ArrayList<HashMap<String, String>> lSide = (sideForDialog.equals("left") ? lTradeLeft : lTradeRight);
 		final SimpleAdapter aaSide = (sideForDialog.equals("left") ? aaTradeLeft : aaTradeRight);
 		//final ListView lview = (sideForDialog.equals("left") ? lvTradeLeft : lvTradeRight);
-		final String numberOfCards = lSide.get(position).get("numberOf");
+		String rawNumber = lSide.get(position).get("numberOf");
+		final String numberOfCards = rawNumber.length() == 0 ? "1" : rawNumber.substring(0, rawNumber.length() - 1);
 		switch (id) {
 			case DIALOG_UPDATE_CARD:
 				View view = LayoutInflater.from(mCtx).inflate(R.layout.trader_card_click_dialog, null);
@@ -234,29 +235,33 @@ public class CardTradingActivity extends FragmentActivity {
 
 					}
 					
-					public void beforeTextChanged(CharSequence s, int start, int count,
-							int after) {
+					public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 						
 					}
 					
 					public void afterTextChanged(Editable s) {
-						String text;
-						if (s.toString().length() == 0)
-							text = "1";
-						else
-							text = s.toString();
-						
-						lSide.get(position).put("numberOf", text);
-						aaSide.notifyDataSetChanged();
-//						if (text.equals("1")) {
-//							lview.getChildAt(position).findViewById(R.id.traderNumber).setVisibility(View.INVISIBLE);
-//							lview.getChildAt(position).findViewById(R.id.traderMultipler).setVisibility(View.INVISIBLE);
-//						}
-//						else {
-//							lview.getChildAt(position).findViewById(R.id.traderNumber).setVisibility(View.VISIBLE);
-//							lview.getChildAt(position).findViewById(R.id.traderMultipler).setVisibility(View.VISIBLE);
-//						}
-						UpdateTotalPrices(side);
+						String error = lSide.get(position).get("error"); 
+						if(error == null || error.length() == 0)
+						{
+							String text;
+							if (s.toString().length() == 0) {
+								text = "1";
+							}
+							else {
+								text = s.toString();
+							}
+							lSide.get(position).put("numberOf", text + "x");
+							aaSide.notifyDataSetChanged();
+	//						if (text.equals("1")) {
+	//							lview.getChildAt(position).findViewById(R.id.traderNumber).setVisibility(View.INVISIBLE);
+	//							lview.getChildAt(position).findViewById(R.id.traderMultipler).setVisibility(View.INVISIBLE);
+	//						}
+	//						else {
+	//							lview.getChildAt(position).findViewById(R.id.traderNumber).setVisibility(View.VISIBLE);
+	//							lview.getChildAt(position).findViewById(R.id.traderMultipler).setVisibility(View.VISIBLE);
+	//						}
+							UpdateTotalPrices(side);
+						}
 					}
 				});
 				
@@ -419,7 +424,13 @@ public class CardTradingActivity extends FragmentActivity {
 	
 				String numberOf = data.get("numberOf");
 				if (numberOf.length() == 0)
+				{
 					numberOf = "1";
+				}
+				else
+				{
+					numberOf = numberOf.substring(0, numberOf.length() - 1);
+				}
 				int inumberOf = Integer.parseInt(numberOf);
 				
 				totalPrice += inumberOf * (iDollar + iCent);
@@ -554,12 +565,17 @@ public class CardTradingActivity extends FragmentActivity {
 				data.put("tcgName", tcgName);
 				data.put("setCode", setCode);
 				data.put("price", price);
+				if(data.get("numberOf").length() == 0)
+				{
+					data.put("numberOf", "1x"); //If the previous fetch failed, we want to reset this to display 1x
+				}
 				data.remove("error"); // if the original fetch failed, but a subsequent one worked, clear the error flag
 			}
 			else if (result == 1) {
 				data.put("tcgName", "");
 				data.put("setCode", "");
 				data.put("price", price.substring(3));
+				data.put("numberOf", "");
 				data.put("error", "error");
 			}
 			UpdateTotalPrices();

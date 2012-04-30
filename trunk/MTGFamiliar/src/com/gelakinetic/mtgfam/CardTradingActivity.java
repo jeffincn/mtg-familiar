@@ -18,6 +18,19 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.gelakinetic.mtgfam;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -33,26 +46,15 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 public class CardTradingActivity extends FragmentActivity {
 	private Context															mCtx;
@@ -65,19 +67,18 @@ public class CardTradingActivity extends FragmentActivity {
 	private Button															bAddTradeLeft;
 	private TextView														tradePriceLeft;
 	private ListView														lvTradeLeft;
-	private SimpleAdapter												aaTradeLeft;
-	private ArrayList<HashMap<String, String>>	lTradeLeft;
+	private TradeListAdapter												aaTradeLeft;
+	private ArrayList<CardData>	lTradeLeft;
 
 	private Button															bAddTradeRight;
 	private TextView														tradePriceRight;
 	private ListView														lvTradeRight;
-	private SimpleAdapter												aaTradeRight;
-	private ArrayList<HashMap<String, String>>	lTradeRight;
+	private TradeListAdapter												aaTradeRight;
+	private ArrayList<CardData>	lTradeRight;
 
 	private CardDbAdapter												mdbAdapter;
 	private EditText	numberfield;
 	
-	public static final String ERROR_PREFIX = "E- ";
 	public static final String card_not_found = "Card Not Found";
 	public static final String mangled_url = "Mangled URL";
 	public static final String database_busy = "Database Busy";
@@ -101,36 +102,30 @@ public class CardTradingActivity extends FragmentActivity {
 		numberfield = (EditText)findViewById(R.id.numberInput);
 		numberfield.setText("1");
 		
-		lTradeLeft = new ArrayList<HashMap<String, String>>();
+		lTradeLeft = new ArrayList<CardData>();
 		bAddTradeLeft = (Button) findViewById(R.id.addCardLeft);
 		tradePriceLeft = (TextView) findViewById(R.id.priceTextLeft);
 		lvTradeLeft = (ListView) findViewById(R.id.tradeListLeft);
-		aaTradeLeft = new SimpleAdapter(mCtx, lTradeLeft, R.layout.trader_row, new String[] { "name", "tcgName", "price", "numberOf" },
-				new int[] { R.id.traderRowName, R.id.traderRowSet, R.id.traderRowPrice, R.id.traderNumber });
+		aaTradeLeft = new TradeListAdapter(mCtx, R.layout.trader_row, lTradeLeft);
 		lvTradeLeft.setAdapter(aaTradeLeft);
 
-		lTradeRight = new ArrayList<HashMap<String, String>>();
+		lTradeRight = new ArrayList<CardData>();
 		bAddTradeRight = (Button) findViewById(R.id.addCardRight);
 		tradePriceRight = (TextView) findViewById(R.id.priceTextRight);
 		lvTradeRight = (ListView) findViewById(R.id.tradeListRight);
-		aaTradeRight = new SimpleAdapter(mCtx, lTradeRight, R.layout.trader_row, new String[] { "name", "tcgName", "price", "numberOf" },
-				new int[] { R.id.traderRowName, R.id.traderRowSet, R.id.traderRowPrice, R.id.traderNumber });
+		aaTradeRight = new TradeListAdapter(mCtx, R.layout.trader_row, lTradeRight);
 		lvTradeRight.setAdapter(aaTradeRight);
 
 		bAddTradeLeft.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				if (namefield.getText().toString().length() > 0) {
-					HashMap<String, String> data = new HashMap<String, String>();
-					data.put("name", namefield.getText().toString());
-					data.put("setCode", "");
-					data.put("tcgName", "");
-					data.put("price", "loading");
-					
 					String numberOfFromField = numberfield.getText().toString();
 					if (numberOfFromField.length() == 0) {
 						numberOfFromField = "1";
 					}
-					data.put("numberOf", numberOfFromField + "x");
+					int numberOf = Integer.parseInt(numberOfFromField);
+
+					CardData data = new CardData(namefield.getText().toString(), "", "", numberOf, "loading");
 
 					lTradeLeft.add(data);
 					aaTradeLeft.notifyDataSetChanged();
@@ -148,17 +143,13 @@ public class CardTradingActivity extends FragmentActivity {
 		bAddTradeRight.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				if (namefield.getText().toString().length() > 0) {
-					HashMap<String, String> data = new HashMap<String, String>();
-					data.put("name", namefield.getText().toString());
-					data.put("setCode", "");
-					data.put("tcgName", "");
-					data.put("price", "loading");
-					
 					String numberOfFromField = numberfield.getText().toString();
 					if (numberOfFromField.length() == 0) {
 						numberOfFromField = "1";
 					}
-					data.put("numberOf", numberOfFromField + "x");
+					int numberOf = Integer.parseInt(numberOfFromField);
+
+					CardData data = new CardData(namefield.getText().toString(), "", "", numberOf, "loading");
 
 					lTradeRight.add(data);
 					aaTradeRight.notifyDataSetChanged();
@@ -207,17 +198,16 @@ public class CardTradingActivity extends FragmentActivity {
 		Dialog dialog;
 		final int position = positionForDialog;
 		final String side = (sideForDialog.equals("left") ? "left" : "right");
-		final ArrayList<HashMap<String, String>> lSide = (sideForDialog.equals("left") ? lTradeLeft : lTradeRight);
-		final SimpleAdapter aaSide = (sideForDialog.equals("left") ? aaTradeLeft : aaTradeRight);
+		final ArrayList<CardData> lSide = (sideForDialog.equals("left") ? lTradeLeft : lTradeRight);
+		final TradeListAdapter aaSide = (sideForDialog.equals("left") ? aaTradeLeft : aaTradeRight);
 		//final ListView lview = (sideForDialog.equals("left") ? lvTradeLeft : lvTradeRight);
-		String rawNumber = lSide.get(position).get("numberOf");
-		final String numberOfCards = rawNumber.length() == 0 ? "1" : rawNumber.substring(0, rawNumber.length() - 1);
+		final int numberOfCards = lSide.get(position).getNumberOf();
 		switch (id) {
 			case DIALOG_UPDATE_CARD:
 				View view = LayoutInflater.from(mCtx).inflate(R.layout.trader_card_click_dialog, null);
 				AlertDialog.Builder builder = new AlertDialog.Builder(CardTradingActivity.this);
 				builder
-				.setTitle(lSide.get(position).get("name"))
+				.setTitle(lSide.get(position).getName())
 				.setView(view);
 				
 				dialog = builder.create();
@@ -227,8 +217,9 @@ public class CardTradingActivity extends FragmentActivity {
 				Button changeSet = (Button)view.findViewById(R.id.traderDialogChangeSet);
 				EditText numberOf = (EditText)view.findViewById(R.id.traderDialogNumber);
 				
-				numberOf.setText(numberOfCards);
-				numberOf.setSelection(numberOfCards.length());
+				String numberOfStr = String.valueOf(numberOfCards);
+				numberOf.setText(numberOfStr);
+				numberOf.setSelection(numberOfStr.length());
 				numberOf.addTextChangedListener(new TextWatcher() {
 					
 					public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -240,28 +231,25 @@ public class CardTradingActivity extends FragmentActivity {
 					}
 					
 					public void afterTextChanged(Editable s) {
-						String error = lSide.get(position).get("error"); 
-						if(error == null || error.length() == 0)
-						{
-							String text;
-							if (s.toString().length() == 0) {
-								text = "1";
-							}
-							else {
-								text = s.toString();
-							}
-							lSide.get(position).put("numberOf", text + "x");
-							aaSide.notifyDataSetChanged();
-	//						if (text.equals("1")) {
-	//							lview.getChildAt(position).findViewById(R.id.traderNumber).setVisibility(View.INVISIBLE);
-	//							lview.getChildAt(position).findViewById(R.id.traderMultipler).setVisibility(View.INVISIBLE);
-	//						}
-	//						else {
-	//							lview.getChildAt(position).findViewById(R.id.traderNumber).setVisibility(View.VISIBLE);
-	//							lview.getChildAt(position).findViewById(R.id.traderMultipler).setVisibility(View.VISIBLE);
-	//						}
-							UpdateTotalPrices(side);
+						String text;
+						if (s.toString().length() == 0) {
+							text = "1";
 						}
+						else {
+							text = s.toString();
+						}
+						int numberOf = Integer.parseInt(text);
+						lSide.get(position).setNumberOf(numberOf);
+						aaSide.notifyDataSetChanged();
+//						if (text.equals("1")) {
+//							lview.getChildAt(position).findViewById(R.id.traderNumber).setVisibility(View.INVISIBLE);
+//							lview.getChildAt(position).findViewById(R.id.traderMultipler).setVisibility(View.INVISIBLE);
+//						}
+//						else {
+//							lview.getChildAt(position).findViewById(R.id.traderNumber).setVisibility(View.VISIBLE);
+//							lview.getChildAt(position).findViewById(R.id.traderMultipler).setVisibility(View.VISIBLE);
+//						}
+						UpdateTotalPrices(side);
 					}
 				});
 				
@@ -295,8 +283,8 @@ public class CardTradingActivity extends FragmentActivity {
 	}
 
 	protected void ChangeSet(final String _side, final int _position) {
-		HashMap<String, String> data = (_side.equals("left") ? lTradeLeft.get(_position) : lTradeRight.get(_position));
-		String name = data.get("name");
+		CardData data = (_side.equals("left") ? lTradeLeft.get(_position) : lTradeRight.get(_position));
+		String name = data.getName();
 		mdbAdapter.open();
 		Cursor cards = mdbAdapter.fetchCardByName(name);
 		ArrayList<String> sets = new ArrayList<String>();
@@ -316,17 +304,17 @@ public class CardTradingActivity extends FragmentActivity {
 		builder.setItems(aSets, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialogInterface, int item) {
 				if (_side.equals("left")) {
-					lTradeLeft.get(_position).put("setCode", aSetCodes[item]);
-					lTradeLeft.get(_position).put("tcgName", aSets[item]);
-					lTradeLeft.get(_position).put("price", "loading");
+					lTradeLeft.get(_position).setSetCode(aSetCodes[item]);
+					lTradeLeft.get(_position).setTcgName(aSets[item]);
+					lTradeLeft.get(_position).setPrice("loading");
 					aaTradeLeft.notifyDataSetChanged();
 					FetchPriceTask loadPrice = new FetchPriceTask(lTradeLeft.get(_position), aaTradeLeft);
 					loadPrice.execute();
 				}
 				else if (_side.equals("right")) {
-					lTradeRight.get(_position).put("setCode", aSetCodes[item]);
-					lTradeRight.get(_position).put("tcgName", aSets[item]);
-					lTradeRight.get(_position).put("price", "loading");
+					lTradeRight.get(_position).setSetCode(aSetCodes[item]);
+					lTradeRight.get(_position).setTcgName(aSets[item]);
+					lTradeRight.get(_position).setPrice("loading");
 					aaTradeRight.notifyDataSetChanged();
 					FetchPriceTask loadPrice = new FetchPriceTask(lTradeRight.get(_position), aaTradeRight);
 					loadPrice.execute();
@@ -352,14 +340,9 @@ public class CardTradingActivity extends FragmentActivity {
 
 		ArrayList<String> cardDataIn = savedInstanceState.getStringArrayList("tradeCards");
 		for (String card : cardDataIn) {
-			HashMap<String, String> data = new HashMap<String, String>();
-
 			String[] cardData = card.split("\\|");
-			data.put("name", cardData[1]);
-			data.put("setCode", cardData[2]);
-			data.put("tcgName", cardData[3]);
-			data.put("price", cardData[4]);
-			data.put("numberOf", cardData[5]);
+			int numberOf = Integer.parseInt(cardData[5]);
+			CardData data = new CardData(cardData[1], cardData[2], cardData[3], numberOf, cardData[4]);
 
 			if (cardData[0].equals("left"))
 				lTradeLeft.add(data);
@@ -377,12 +360,12 @@ public class CardTradingActivity extends FragmentActivity {
 		outState.putString("rightTotalPrice", (String) tradePriceRight.getText());
 
 		ArrayList<String> cardDataOut = new ArrayList<String>();
-		for (HashMap<String, String> data : lTradeLeft) {
-			String cardData = String.format("%s|%s|%s|%s|%s|%s", "left", data.get("name"), data.get("setCode"), data.get("tcgName"), data.get("price"), data.get("numberOf"));
+		for (CardData data : lTradeLeft) {
+			String cardData = String.format("%s|%s|%s|%s|%s|%s", "left", data.getName(), data.getSetCode(), data.getTcgName(), data.getPrice(), data.getNumberOf());
 			cardDataOut.add(cardData);
 		}
-		for (HashMap<String, String> data : lTradeRight) {
-			String cardData = String.format("%s|%s|%s|%s|%s|%s", "right", data.get("name"), data.get("set"), data.get("tcgName"), data.get("price"), data.get("numberOf"));
+		for (CardData data : lTradeRight) {
+			String cardData = String.format("%s|%s|%s|%s|%s|%s", "right", data.getName(), data.getSetCode(), data.getTcgName(), data.getPrice(), data.getNumberOf());
 			cardDataOut.add(cardData);
 		}
 		outState.putStringArrayList("tradeCards", cardDataOut);
@@ -408,13 +391,13 @@ public class CardTradingActivity extends FragmentActivity {
 		}
 	}
 
-	private int GetPricesFromTradeList(ArrayList<HashMap<String, String>> _trade) {
+	private int GetPricesFromTradeList(ArrayList<CardData> _trade) {
 		int totalPrice = 0;
 
-		for (HashMap<String, String> data : _trade) {
-			if (data.get("error") == null && data.get("price") != null){
+		for (CardData data : _trade) {
+			if (data.hasPrice()) {
 
-				String price = data.get("price");
+				String price = data.getPrice();
 	
 				String dollar = price.substring(1, price.indexOf('.'));
 				String cents = price.substring(price.indexOf('.') + 1);
@@ -422,21 +405,12 @@ public class CardTradingActivity extends FragmentActivity {
 				int iDollar = Integer.parseInt(dollar) * 100;
 				int iCent = Integer.parseInt(cents);
 	
-				String numberOf = data.get("numberOf");
-				if (numberOf.length() == 0)
-				{
-					numberOf = "1";
-				}
-				else
-				{
-					numberOf = numberOf.substring(0, numberOf.length() - 1);
-				}
-				int inumberOf = Integer.parseInt(numberOf);
+				int numberOf = data.getNumberOf();
 				
-				totalPrice += inumberOf * (iDollar + iCent);
+				totalPrice += numberOf * (iDollar + iCent);
 			}
-			else{
-				String price = data.get("price");
+			else {
+				String price = data.getPrice();
 
 				// Remove the card from the list, unless it was just a fetch failed.
 				// Otherwise, the card does not exist, or there is a database problem
@@ -445,25 +419,25 @@ public class CardTradingActivity extends FragmentActivity {
 					_trade.remove(data);
 					aaTradeRight.notifyDataSetChanged();
 					aaTradeLeft.notifyDataSetChanged();
-					Toast.makeText(getApplicationContext(), data.get("name") + ": " + card_not_found, Toast.LENGTH_LONG).show();
+					Toast.makeText(getApplicationContext(), data.getName() + ": " + card_not_found, Toast.LENGTH_LONG).show();
 				}
 				else if(price.compareTo(mangled_url) == 0){
 					_trade.remove(data);
 					aaTradeRight.notifyDataSetChanged();
 					aaTradeLeft.notifyDataSetChanged();
-					Toast.makeText(getApplicationContext(), data.get("name") + ": " + mangled_url, Toast.LENGTH_LONG).show();
+					Toast.makeText(getApplicationContext(), data.getName() + ": " + mangled_url, Toast.LENGTH_LONG).show();
 				}
 				else if(price.compareTo(database_busy) == 0){
 					_trade.remove(data);
 					aaTradeRight.notifyDataSetChanged();
 					aaTradeLeft.notifyDataSetChanged();
-					Toast.makeText(getApplicationContext(), data.get("name") + ": " + database_busy, Toast.LENGTH_LONG).show();
+					Toast.makeText(getApplicationContext(), data.getName() + ": " + database_busy, Toast.LENGTH_LONG).show();
 				}
 				else if(price.compareTo(card_dne) == 0){
 					_trade.remove(data);
 					aaTradeRight.notifyDataSetChanged();
 					aaTradeLeft.notifyDataSetChanged();
-					Toast.makeText(getApplicationContext(), data.get("name") + ": " + card_dne, Toast.LENGTH_LONG).show();
+					Toast.makeText(getApplicationContext(), data.getName() + ": " + card_dne, Toast.LENGTH_LONG).show();
 				}
 				else if(price.compareTo(fetch_failed) == 0){
 					
@@ -472,15 +446,107 @@ public class CardTradingActivity extends FragmentActivity {
 		}
 		return totalPrice;
 	}
+	
+	private class CardData	{
+		
+		private String name;
+		private String tcgName;
+		private String setCode;
+		private int numberOf;
+		private String price;
+		
+		private String priceRegex = "(^\\$[0-9]+\\.[0-9]{2}$)";
+		
+		public CardData(String name, String tcgName, String setCode, int numberOf, String price) {
+			this.name = name;
+			this.tcgName = tcgName;
+			this.setCode = setCode;
+			this.numberOf = numberOf;
+			this.price = price;
+		}
+		
+		public String getName() {
+			return this.name;
+		}
+		
+		public String getTcgName() {
+			return this.tcgName;
+		}
+		
+		public void setTcgName(String newTcgName) {
+			this.tcgName = newTcgName;
+		}
+		
+		public String getSetCode() {
+			return this.setCode;
+		}
+		
+		public void setSetCode(String newSetCode) {
+			this.setCode = newSetCode;
+		}
+		
+		public int getNumberOf() {
+			return this.numberOf;
+		}
+		
+		public void setNumberOf(int newNumber) {
+			this.numberOf = newNumber;
+		}
+		
+		public String getPrice() {
+			return this.price;
+		}
+		
+		public void setPrice(String newPrice) {
+			this.price = newPrice;
+		}
+		
+		public boolean hasPrice() {
+			return this.price.matches(priceRegex);
+		}
+	}
+	
+	private class TradeListAdapter extends ArrayAdapter<CardData> {
+
+		private int layoutResourceId;
+		private ArrayList<CardData> items;
+		
+		public TradeListAdapter(Context context, int textViewResourceId, ArrayList<CardData> items) {
+			super(context, textViewResourceId, items);
+			
+			this.layoutResourceId = textViewResourceId;
+			this.items = items;
+		}
+		
+		@Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+			View v = convertView;
+			if(v == null)
+			{
+				LayoutInflater inf = getLayoutInflater();
+				v = inf.inflate(layoutResourceId, null);
+			}
+			CardData data = items.get(position);
+			if(data != null)
+			{
+				((TextView)v.findViewById(R.id.traderRowName)).setText(data.getName());
+				((TextView)v.findViewById(R.id.traderRowSet)).setText(data.getTcgName());
+				((TextView)v.findViewById(R.id.traderNumber)).setText(data.hasPrice() ? data.getNumberOf() + "x" : "");
+				((TextView)v.findViewById(R.id.traderRowPrice)).setText(data.getPrice());
+			}
+			
+			return v;
+		}
+	}
 
 	private class FetchPriceTask extends AsyncTask<Void, Void, Integer> {
-		HashMap<String, String>	data;
-		SimpleAdapter						toNotify;
+		CardData	data;
+		TradeListAdapter						toNotify;
 		String								price	= "";
 		String								setCode		= "";
 		String 								tcgName ="";
 
-		public FetchPriceTask(HashMap<String, String> _data, SimpleAdapter _toNotify) {
+		public FetchPriceTask(CardData _data, TradeListAdapter _toNotify) {
 			data = _data;
 			toNotify = _toNotify;
 		}
@@ -492,32 +558,32 @@ public class CardTradingActivity extends FragmentActivity {
 			String cardName;
 			String number;
 			try {
-				card = mdbAdapter.fetchCardByName((String) data.get("name"));
+				card = mdbAdapter.fetchCardByName(data.getName());
 				if (card.moveToFirst()) {
 					cardName = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NAME));
-					if (data.get("setCode").equals("")) {
+					if (data.getSetCode().equals("")) {
 						setCode = card.getString(card.getColumnIndex(CardDbAdapter.KEY_SET));
 						tcgName = mdbAdapter.getTCGname(setCode);
 					}
 					else {
-						setCode = data.get("setCode");
-						tcgName = data.get("tcgName");
+						setCode = data.getSetCode();
+						tcgName = data.getTcgName();
 					}
 					number = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NUMBER));
 				}
 				else {
-					price = ERROR_PREFIX + card_dne;
+					price = card_dne;
 					mdbAdapter.close();
 					return 1;
 				}
 			}
 			catch (SQLiteException e) {
-				price = ERROR_PREFIX + card_not_found;
+				price = card_not_found;
 				mdbAdapter.close();
 				return 1;
 			}
 			catch (IllegalStateException e) {
-				price = ERROR_PREFIX + database_busy;
+				price = database_busy;
 				mdbAdapter.close();
 				return 1;
 			}
@@ -536,18 +602,18 @@ public class CardTradingActivity extends FragmentActivity {
 			}
 			catch (MalformedURLException e) {
 				priceurl = null;
-				price = ERROR_PREFIX + mangled_url;
+				price = mangled_url;
 				mdbAdapter.close();
 				return 1;
 			}
 
 			price = fetchAveragePrice(priceurl);
 
-			if (price.contains(ERROR_PREFIX)){
+			if (price.equals(fetch_failed)) {
 				mdbAdapter.close();
 				return 1;
 			}
-			else{
+			else {
 				price = "$" + price;
 			}
 
@@ -561,23 +627,10 @@ public class CardTradingActivity extends FragmentActivity {
 
 		@Override
 		protected void onPostExecute(Integer result) {
-			if (result == 0) {
-				data.put("tcgName", tcgName);
-				data.put("setCode", setCode);
-				data.put("price", price);
-				if(data.get("numberOf").length() == 0)
-				{
-					data.put("numberOf", "1x"); //If the previous fetch failed, we want to reset this to display 1x
-				}
-				data.remove("error"); // if the original fetch failed, but a subsequent one worked, clear the error flag
-			}
-			else if (result == 1) {
-				data.put("tcgName", "");
-				data.put("setCode", "");
-				data.put("price", price.substring(3));
-				data.put("numberOf", "");
-				data.put("error", "error");
-			}
+			data.setTcgName(tcgName);
+			data.setSetCode(setCode);
+			data.setPrice(price);
+				
 			UpdateTotalPrices();
 			toNotify.notifyDataSetChanged();
 		}
@@ -613,7 +666,7 @@ public class CardTradingActivity extends FragmentActivity {
 			}
 
 			if (XMLhandler == null || XMLhandler.link == null)
-				return ERROR_PREFIX+fetch_failed;
+				return fetch_failed;
 			else
 				return XMLhandler.avgprice;
 		}

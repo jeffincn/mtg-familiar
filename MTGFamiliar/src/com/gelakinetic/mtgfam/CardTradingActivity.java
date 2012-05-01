@@ -497,6 +497,7 @@ public class CardTradingActivity extends FragmentActivity {
 	private class CardData	{
 		
 		private String name;
+		private String number;
 		private String tcgName;
 		private String setCode;
 		private int numberOf;
@@ -506,6 +507,7 @@ public class CardTradingActivity extends FragmentActivity {
 		
 		public CardData(String name, String tcgName, String setCode, int numberOf, String price) {
 			this.name = name;
+			this.number = "";
 			this.tcgName = tcgName;
 			this.setCode = setCode;
 			this.numberOf = numberOf;
@@ -514,6 +516,14 @@ public class CardTradingActivity extends FragmentActivity {
 		
 		public String getName() {
 			return this.name;
+		}
+		
+		public String getNumber() {
+			return this.number;
+		}
+		
+		public void setNumber(String newNumber) {
+			this.number = newNumber;
 		}
 		
 		public String getTcgName() {
@@ -600,28 +610,41 @@ public class CardTradingActivity extends FragmentActivity {
 
 		@Override
 		protected Integer doInBackground(Void... params) {
-			mdbAdapter.open();
-			Cursor card;
 			String cardName;
 			String number;
 			try {
-				card = mdbAdapter.fetchCardByName(data.getName());
-				if (card.moveToFirst()) {
-					cardName = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NAME));
-					if (data.getSetCode().equals("")) {
-						setCode = card.getString(card.getColumnIndex(CardDbAdapter.KEY_SET));
-						tcgName = mdbAdapter.getTCGname(setCode);
+				cardName = data.getName();
+				number = data.getNumber();
+				setCode = data.getSetCode();
+				tcgName = data.getTcgName();
+				if(number.equals("") || setCode.equals("") || tcgName.equals("")) {
+					mdbAdapter.open();
+					Cursor card;
+					card = mdbAdapter.fetchCardByName(data.getName());
+					if (card.moveToFirst()) {
+						cardName = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NAME));
+						if (data.getSetCode().equals("")) {
+							setCode = card.getString(card.getColumnIndex(CardDbAdapter.KEY_SET));
+							tcgName = mdbAdapter.getTCGname(setCode);
+							
+							data.setSetCode(setCode);
+							data.setTcgName(tcgName);
+						}
+						
+						number = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NUMBER));
+						data.setNumber(number);
+						
+						card.deactivate();
+						card.close();
+						mdbAdapter.close();
 					}
 					else {
-						setCode = data.getSetCode();
-						tcgName = data.getTcgName();
+						price = card_dne;
+						card.deactivate();
+						card.close();
+						mdbAdapter.close();
+						return 1;
 					}
-					number = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NUMBER));
-				}
-				else {
-					price = card_dne;
-					mdbAdapter.close();
-					return 1;
 				}
 			}
 			catch (SQLiteException e) {
@@ -663,10 +686,6 @@ public class CardTradingActivity extends FragmentActivity {
 			else {
 				price = "$" + price;
 			}
-
-			card.deactivate();
-			card.close();
-			mdbAdapter.close();
 			return 0;
 		}
 

@@ -1122,6 +1122,8 @@ public class CardDbAdapter {
 					KEY_NAME_TCGPLAYER, null);
 			mCursor.moveToFirst();
 			name = mCursor.getString(mCursor.getColumnIndex(KEY_NAME_TCGPLAYER));
+			mCursor.deactivate();
+			mCursor.close();
 		}
 		catch (SQLiteException e) {
 			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();

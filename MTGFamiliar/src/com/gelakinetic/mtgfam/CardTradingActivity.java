@@ -277,12 +277,8 @@ public class CardTradingActivity extends FragmentActivity {
 						
 						//validate the price text
 						String userInputPrice = priceText.getText().toString();
-						userInputPrice = "$" + userInputPrice;
-						
-						if (!userInputPrice.matches(priceRegex)){
-							Toast.makeText(getApplicationContext(), price_invalid, Toast.LENGTH_LONG).show();
-							return;
-						}
+						double uIP = Double.parseDouble(userInputPrice);
+						userInputPrice = String.format("$%.2f", uIP);
 						
 						lSide.get(position).setNumberOf(Integer.parseInt(numberOf.getEditableText().toString()));
 						lSide.get(position).setPrice(userInputPrice);

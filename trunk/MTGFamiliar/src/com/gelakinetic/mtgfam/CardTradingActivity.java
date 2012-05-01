@@ -42,8 +42,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -92,7 +90,7 @@ public class CardTradingActivity extends FragmentActivity {
 	public static final String number_of_invalid = "Number of Cards Invalid";
 	public static final String price_invalid = "Price Invalid";
 	
-	private static final String priceRegex = "(^\\$[0-9]+\\.[0-9]{2}$)";
+//	private static final String priceRegex = "(^\\$[0-9]+\\.[0-9]{2}$)";
 
 	private static final int LOW_PRICE = 0;
 	private static final int AVG_PRICE = 1;
@@ -137,7 +135,7 @@ public class CardTradingActivity extends FragmentActivity {
 					}
 					int numberOf = Integer.parseInt(numberOfFromField);
 
-					CardData data = new CardData(namefield.getText().toString(), "", "", numberOf, "loading");
+					CardData data = new CardData(namefield.getText().toString(), "", "", numberOf, 0, "loading");
 
 					lTradeLeft.add(data);
 					aaTradeLeft.notifyDataSetChanged();
@@ -161,7 +159,7 @@ public class CardTradingActivity extends FragmentActivity {
 					}
 					int numberOf = Integer.parseInt(numberOfFromField);
 
-					CardData data = new CardData(namefield.getText().toString(), "", "", numberOf, "loading");
+					CardData data = new CardData(namefield.getText().toString(), "", "", numberOf, 0, "loading");
 
 					lTradeRight.add(data);
 					aaTradeRight.notifyDataSetChanged();
@@ -219,7 +217,7 @@ public class CardTradingActivity extends FragmentActivity {
 				final ArrayList<CardData> lSide = (sideForDialog.equals("left") ? lTradeLeft : lTradeRight);
 				final TradeListAdapter aaSide = (sideForDialog.equals("left") ? aaTradeLeft : aaTradeRight);
 				final int numberOfCards = lSide.get(position).getNumberOf();
-				final String priceOfCard = lSide.get(position).getPrice();
+				final String priceOfCard = lSide.get(position).getPriceString();
 				
 				View view = LayoutInflater.from(mCtx).inflate(R.layout.trader_card_click_dialog, null);
 				Button removeAll = (Button)view.findViewById(R.id.traderDialogRemove);
@@ -277,11 +275,17 @@ public class CardTradingActivity extends FragmentActivity {
 						
 						//validate the price text
 						String userInputPrice = priceText.getText().toString();
-						double uIP = Double.parseDouble(userInputPrice);
-						userInputPrice = String.format("$%.2f", uIP);
+						double uIP;
+						try {
+							uIP = Double.parseDouble(userInputPrice);
+							lSide.get(position).setMessage(""); //Clear the message so the user's specified price will display
+						}
+						catch (NumberFormatException e) {
+							uIP = 0;
+						}
 						
 						lSide.get(position).setNumberOf(Integer.parseInt(numberOf.getEditableText().toString()));
-						lSide.get(position).setPrice(userInputPrice);
+						lSide.get(position).setPrice((int)Math.round(uIP * 100));
 						aaSide.notifyDataSetChanged();
 						UpdateTotalPrices(side);
 						
@@ -303,14 +307,14 @@ public class CardTradingActivity extends FragmentActivity {
 								
 								//Update ALL the prices!
 								for(CardData data : lTradeLeft) {
-									data.setPrice("loading");
+									data.setMessage("loading");
 									FetchPriceTask task = new FetchPriceTask(data, aaTradeLeft);
 									task.execute();
 								}
 								aaTradeLeft.notifyDataSetChanged();
 								
 								for(CardData data : lTradeRight) {
-									data.setPrice("loading");
+									data.setMessage("loading");
 									FetchPriceTask task = new FetchPriceTask(data, aaTradeRight);
 									task.execute();
 								}
@@ -320,6 +324,8 @@ public class CardTradingActivity extends FragmentActivity {
 								SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(CardTradingActivity.this).edit();
 								edit.putString("tradePrice", String.valueOf(priceSetting));
 								edit.commit();
+								
+								removeDialog(DIALOG_PRICE_SETTING);
 							}
 						});
 				
@@ -357,7 +363,7 @@ public class CardTradingActivity extends FragmentActivity {
 				if (_side.equals("left")) {
 					lTradeLeft.get(_position).setSetCode(aSetCodes[item]);
 					lTradeLeft.get(_position).setTcgName(aSets[item]);
-					lTradeLeft.get(_position).setPrice("loading");
+					lTradeLeft.get(_position).setMessage("loading");
 					aaTradeLeft.notifyDataSetChanged();
 					FetchPriceTask loadPrice = new FetchPriceTask(lTradeLeft.get(_position), aaTradeLeft);
 					loadPrice.execute();
@@ -365,7 +371,7 @@ public class CardTradingActivity extends FragmentActivity {
 				else if (_side.equals("right")) {
 					lTradeRight.get(_position).setSetCode(aSetCodes[item]);
 					lTradeRight.get(_position).setTcgName(aSets[item]);
-					lTradeRight.get(_position).setPrice("loading");
+					lTradeRight.get(_position).setMessage("loading");
 					aaTradeRight.notifyDataSetChanged();
 					FetchPriceTask loadPrice = new FetchPriceTask(lTradeRight.get(_position), aaTradeRight);
 					loadPrice.execute();
@@ -389,7 +395,7 @@ public class CardTradingActivity extends FragmentActivity {
 		for (String card : cardDataIn) {
 			String[] cardData = card.split("\\|");
 			int numberOf = Integer.parseInt(cardData[5]);
-			CardData data = new CardData(cardData[1], cardData[2], cardData[3], numberOf, cardData[4]);
+			CardData data = new CardData(cardData[1], cardData[2], cardData[3], numberOf, Integer.parseInt(cardData[4]), "");
 
 			if (cardData[0].equals("left"))
 				lTradeLeft.add(data);
@@ -443,50 +449,39 @@ public class CardTradingActivity extends FragmentActivity {
 
 		for (CardData data : _trade) {
 			if (data.hasPrice()) {
-
-				String price = data.getPrice();
-	
-				String dollar = price.substring(1, price.indexOf('.'));
-				String cents = price.substring(price.indexOf('.') + 1);
-	
-				int iDollar = Integer.parseInt(dollar) * 100;
-				int iCent = Integer.parseInt(cents);
-	
-				int numberOf = data.getNumberOf();
-				
-				totalPrice += numberOf * (iDollar + iCent);
+				totalPrice += data.getNumberOf() * data.getPrice();
 			}
 			else {
-				String price = data.getPrice();
+				String message = data.getMessage();
 
 				// Remove the card from the list, unless it was just a fetch failed.
 				// Otherwise, the card does not exist, or there is a database problem
 				
-				if(price.compareTo(card_not_found) == 0){
+				if(message.compareTo(card_not_found) == 0){
 					_trade.remove(data);
 					aaTradeRight.notifyDataSetChanged();
 					aaTradeLeft.notifyDataSetChanged();
 					Toast.makeText(getApplicationContext(), data.getName() + ": " + card_not_found, Toast.LENGTH_LONG).show();
 				}
-				else if(price.compareTo(mangled_url) == 0){
+				else if(message.compareTo(mangled_url) == 0){
 					_trade.remove(data);
 					aaTradeRight.notifyDataSetChanged();
 					aaTradeLeft.notifyDataSetChanged();
 					Toast.makeText(getApplicationContext(), data.getName() + ": " + mangled_url, Toast.LENGTH_LONG).show();
 				}
-				else if(price.compareTo(database_busy) == 0){
+				else if(message.compareTo(database_busy) == 0){
 					_trade.remove(data);
 					aaTradeRight.notifyDataSetChanged();
 					aaTradeLeft.notifyDataSetChanged();
 					Toast.makeText(getApplicationContext(), data.getName() + ": " + database_busy, Toast.LENGTH_LONG).show();
 				}
-				else if(price.compareTo(card_dne) == 0){
+				else if(message.compareTo(card_dne) == 0){
 					_trade.remove(data);
 					aaTradeRight.notifyDataSetChanged();
 					aaTradeLeft.notifyDataSetChanged();
 					Toast.makeText(getApplicationContext(), data.getName() + ": " + card_dne, Toast.LENGTH_LONG).show();
 				}
-				else if(price.compareTo(fetch_failed) == 0){
+				else if(message.compareTo(fetch_failed) == 0){
 					
 				}
 			}
@@ -501,15 +496,17 @@ public class CardTradingActivity extends FragmentActivity {
 		private String tcgName;
 		private String setCode;
 		private int numberOf;
-		private String price;
+		private int price; //In cents
+		private String message;
 		
-		public CardData(String name, String tcgName, String setCode, int numberOf, String price) {
+		public CardData(String name, String tcgName, String setCode, int numberOf, int price, String message) {
 			this.name = name;
 			this.number = "";
 			this.tcgName = tcgName;
 			this.setCode = setCode;
 			this.numberOf = numberOf;
 			this.price = price;
+			this.message = message;
 		}
 		
 		public String getName() {
@@ -548,16 +545,28 @@ public class CardTradingActivity extends FragmentActivity {
 			this.numberOf = newNumber;
 		}
 		
-		public String getPrice() {
+		public int getPrice() {
 			return this.price;
 		}
 		
-		public void setPrice(String newPrice) {
+		public String getPriceString() {
+			return "$" + String.valueOf(this.price / 100) + "." + String.format("%02d", this.price % 100);
+		}
+		
+		public void setPrice(int newPrice) {
 			this.price = newPrice;
 		}
 		
+		public String getMessage() {
+			return this.message;
+		}
+		
+		public void setMessage(String newMessage) {
+			this.message = newMessage;
+		}
+		
 		public boolean hasPrice() {
-			return this.price.matches(priceRegex);
+			return this.message == null || this.message.length() == 0;
 		}
 	}
 	
@@ -587,7 +596,7 @@ public class CardTradingActivity extends FragmentActivity {
 				((TextView)v.findViewById(R.id.traderRowName)).setText(data.getName());
 				((TextView)v.findViewById(R.id.traderRowSet)).setText(data.getTcgName());
 				((TextView)v.findViewById(R.id.traderNumber)).setText(data.hasPrice() ? data.getNumberOf() + "x" : "");
-				((TextView)v.findViewById(R.id.traderRowPrice)).setText(data.getPrice());
+				((TextView)v.findViewById(R.id.traderRowPrice)).setText(data.hasPrice() ? data.getPriceString() : data.getMessage());
 			}
 			
 			return v;
@@ -675,14 +684,11 @@ public class CardTradingActivity extends FragmentActivity {
 				return 1;
 			}
 
-			price = fetchAveragePrice(priceurl);
+			price = fetchPrice(priceurl);
 
 			if (price.equals(fetch_failed)) {
 				mdbAdapter.close();
 				return 1;
-			}
-			else {
-				price = "$" + price;
 			}
 			return 0;
 		}
@@ -693,13 +699,23 @@ public class CardTradingActivity extends FragmentActivity {
 		protected void onPostExecute(Integer result) {
 			data.setTcgName(tcgName);
 			data.setSetCode(setCode);
-			data.setPrice(price);
+			double dPrice;
+			try {
+				dPrice = Double.parseDouble(price);
+				data.setMessage("");
+			}
+			catch (NumberFormatException e) {
+				//If this fails, it means price contains an error string, not a number
+				dPrice = 0;
+				data.setMessage(price);
+			}
+			data.setPrice((int)(dPrice * 100));
 				
 			UpdateTotalPrices();
 			toNotify.notifyDataSetChanged();
 		}
 
-		String fetchAveragePrice(URL _priceURL) {
+		String fetchPrice(URL _priceURL) {
 			TCGPlayerXMLHandler XMLhandler;
 			try {
 				// Get a SAXParser from the SAXPArserFactory.

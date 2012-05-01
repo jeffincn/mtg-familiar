@@ -374,4 +374,19 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
 	    <string name="trader_remove">Remove</string>
 	    <string name="trader_default_number_of">1x</string>
     <string name="type_card_first">Type in a card above first</string>
+    
+    <string name="trade_window_title">Trade Window</string>
+    <string name="trade_option_title">Price Setting</string>
+    <string name="trade_option_desc">The type of price to display in the trade activity</string>
+    <string-array name="trade_option_entries">
+        <item>Low</item>
+        <item>Average</item>
+        <item>High</item>
+    </string-array>
+    <string-array name="trade_option_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string name="trade_price_setting">Set Pricing Option</string>
 </resources>

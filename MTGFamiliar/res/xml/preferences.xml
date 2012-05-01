@@ -81,6 +81,18 @@
     		android:title="@string/ringtonetitle" />
     
     </PreferenceCategory>
+    
+    <PreferenceCategory android:title="@string/trade_window_title">
+        
+        <ListPreference
+            android:entries="@array/trade_option_entries"
+            android:entryValues="@array/trade_option_values"
+            android:defaultValue="1"
+            android:key="tradePrice"
+            android:title="@string/trade_option_title"
+            android:summary="@string/trade_option_desc" />
+        
+    </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/resultlisttitle" >
 

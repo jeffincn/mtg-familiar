@@ -27,5 +27,9 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:id="@+id/trader_menu_clear"
         android:icon="@android:drawable/ic_menu_close_clear_cancel"
         android:title="@string/clear"/>
+    <item
+        android:id="@+id/trader_menu_settings"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:title="@string/trade_price_setting" />
 
 </menu>

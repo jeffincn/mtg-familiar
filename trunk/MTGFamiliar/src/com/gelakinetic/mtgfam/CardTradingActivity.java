@@ -35,10 +35,12 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -59,6 +61,7 @@ import android.widget.Toast;
 public class CardTradingActivity extends FragmentActivity {
 	private Context															mCtx;
 	private final static int DIALOG_UPDATE_CARD					= 1;
+	private final static int DIALOG_PRICE_SETTING = 2;
 	private String sideForDialog;
 	private int positionForDialog;
 	
@@ -79,12 +82,17 @@ public class CardTradingActivity extends FragmentActivity {
 	private CardDbAdapter												mdbAdapter;
 	private EditText	numberfield;
 	
+	private int priceSetting;
+	
 	public static final String card_not_found = "Card Not Found";
 	public static final String mangled_url = "Mangled URL";
 	public static final String database_busy = "Database Busy";
 	public static final String card_dne = "Card Does Not Exist";
 	public static final String fetch_failed = "Fetch Failed";
 
+	private static final int LOW_PRICE = 0;
+	private static final int AVG_PRICE = 1;
+	private static final int HIGH_PRICE = 2;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -178,6 +186,9 @@ public class CardTradingActivity extends FragmentActivity {
 				showDialog(DIALOG_UPDATE_CARD);
 			}
 		});
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		priceSetting = Integer.parseInt(prefs.getString("tradePrice", String.valueOf(AVG_PRICE)));
 	}
 
 	@Override
@@ -196,16 +207,18 @@ public class CardTradingActivity extends FragmentActivity {
 	
 	protected Dialog onCreateDialog(int id) {
 		Dialog dialog;
-		final int position = positionForDialog;
-		final String side = (sideForDialog.equals("left") ? "left" : "right");
-		final ArrayList<CardData> lSide = (sideForDialog.equals("left") ? lTradeLeft : lTradeRight);
-		final TradeListAdapter aaSide = (sideForDialog.equals("left") ? aaTradeLeft : aaTradeRight);
-		//final ListView lview = (sideForDialog.equals("left") ? lvTradeLeft : lvTradeRight);
-		final int numberOfCards = lSide.get(position).getNumberOf();
+		AlertDialog.Builder builder;
 		switch (id) {
 			case DIALOG_UPDATE_CARD:
+				final int position = positionForDialog;
+				final String side = (sideForDialog.equals("left") ? "left" : "right");
+				final ArrayList<CardData> lSide = (sideForDialog.equals("left") ? lTradeLeft : lTradeRight);
+				final TradeListAdapter aaSide = (sideForDialog.equals("left") ? aaTradeLeft : aaTradeRight);
+				//final ListView lview = (sideForDialog.equals("left") ? lvTradeLeft : lvTradeRight);
+				final int numberOfCards = lSide.get(position).getNumberOf();
+				
 				View view = LayoutInflater.from(mCtx).inflate(R.layout.trader_card_click_dialog, null);
-				AlertDialog.Builder builder = new AlertDialog.Builder(CardTradingActivity.this);
+				builder = new AlertDialog.Builder(CardTradingActivity.this);
 				builder
 				.setTitle(lSide.get(position).getName())
 				.setView(view);
@@ -275,7 +288,41 @@ public class CardTradingActivity extends FragmentActivity {
 				});
 
 				dialog.show();
-				break;			
+				break;	
+			case DIALOG_PRICE_SETTING:
+				builder = new AlertDialog.Builder(this);
+				
+				builder.setTitle("Price Options");
+				builder.setSingleChoiceItems(new String[] {"Low", "Average", "High"}, priceSetting, new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								priceSetting = which;
+								dialog.dismiss();
+								
+								//Update ALL the prices!
+								for(CardData data : lTradeLeft) {
+									data.setPrice("loading");
+									FetchPriceTask task = new FetchPriceTask(data, aaTradeLeft);
+									task.execute();
+								}
+								aaTradeLeft.notifyDataSetChanged();
+								
+								for(CardData data : lTradeRight) {
+									data.setPrice("loading");
+									FetchPriceTask task = new FetchPriceTask(data, aaTradeRight);
+									task.execute();
+								}
+								aaTradeRight.notifyDataSetChanged();
+								
+								//And also update the preference
+								SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(CardTradingActivity.this).edit();
+								edit.putString("tradePrice", String.valueOf(priceSetting));
+								edit.commit();
+							}
+						});
+				
+				dialog = builder.create();
+				dialog.show();
+				break;
 			default:
 				dialog = null;
 		}
@@ -665,10 +712,20 @@ public class CardTradingActivity extends FragmentActivity {
 				XMLhandler = null;
 			}
 
-			if (XMLhandler == null || XMLhandler.link == null)
+			if (XMLhandler == null || XMLhandler.link == null) {
 				return fetch_failed;
-			else
-				return XMLhandler.avgprice;
+			}
+			else {
+				if(priceSetting == LOW_PRICE) {
+					return XMLhandler.lowprice;
+				}
+				else if(priceSetting == HIGH_PRICE) {
+					return XMLhandler.hiprice;	
+				}
+				else {
+					return XMLhandler.avgprice;
+				}
+			}
 		}
 	}
 
@@ -682,6 +739,9 @@ public class CardTradingActivity extends FragmentActivity {
 				lTradeLeft.clear();
 				aaTradeLeft.notifyDataSetChanged();
 				UpdateTotalPrices("both");
+				return true;
+			case R.id.trader_menu_settings:
+				showDialog(DIALOG_PRICE_SETTING);
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

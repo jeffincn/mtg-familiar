@@ -89,6 +89,10 @@ public class CardTradingActivity extends FragmentActivity {
 	public static final String database_busy = "Database Busy";
 	public static final String card_dne = "Card Does Not Exist";
 	public static final String fetch_failed = "Fetch Failed";
+	public static final String number_of_invalid = "Number of Cards Invalid";
+	public static final String price_invalid = "Price Invalid";
+	
+	private static final String priceRegex = "(^\\$[0-9]+\\.[0-9]{2}$)";
 
 	private static final int LOW_PRICE = 0;
 	private static final int AVG_PRICE = 1;
@@ -214,10 +218,17 @@ public class CardTradingActivity extends FragmentActivity {
 				final String side = (sideForDialog.equals("left") ? "left" : "right");
 				final ArrayList<CardData> lSide = (sideForDialog.equals("left") ? lTradeLeft : lTradeRight);
 				final TradeListAdapter aaSide = (sideForDialog.equals("left") ? aaTradeLeft : aaTradeRight);
-				//final ListView lview = (sideForDialog.equals("left") ? lvTradeLeft : lvTradeRight);
 				final int numberOfCards = lSide.get(position).getNumberOf();
+				final String priceOfCard = lSide.get(position).getPrice();
 				
 				View view = LayoutInflater.from(mCtx).inflate(R.layout.trader_card_click_dialog, null);
+				Button removeAll = (Button)view.findViewById(R.id.traderDialogRemove);
+				Button changeSet = (Button)view.findViewById(R.id.traderDialogChangeSet);
+				Button cancelbtn = (Button)view.findViewById(R.id.traderDialogCancel);
+				Button donebtn   = (Button)view.findViewById(R.id.traderDialogDone);
+				final EditText numberOf = (EditText)view.findViewById(R.id.traderDialogNumber);
+				final EditText priceText = (EditText)view.findViewById(R.id.traderDialogPrice);				
+				
 				builder = new AlertDialog.Builder(CardTradingActivity.this);
 				builder
 				.setTitle(lSide.get(position).getName())
@@ -225,46 +236,13 @@ public class CardTradingActivity extends FragmentActivity {
 				
 				dialog = builder.create();
 				
-				Button removeAll = (Button)view.findViewById(R.id.traderDialogRemove);
-				Button cancel = (Button)view.findViewById(R.id.traderDialogCancel);
-				Button changeSet = (Button)view.findViewById(R.id.traderDialogChangeSet);
-				EditText numberOf = (EditText)view.findViewById(R.id.traderDialogNumber);
-				
 				String numberOfStr = String.valueOf(numberOfCards);
 				numberOf.setText(numberOfStr);
 				numberOf.setSelection(numberOfStr.length());
-				numberOf.addTextChangedListener(new TextWatcher() {
-					
-					public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-					}
-					
-					public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-						
-					}
-					
-					public void afterTextChanged(Editable s) {
-						String text;
-						if (s.toString().length() == 0) {
-							text = "1";
-						}
-						else {
-							text = s.toString();
-						}
-						int numberOf = Integer.parseInt(text);
-						lSide.get(position).setNumberOf(numberOf);
-						aaSide.notifyDataSetChanged();
-//						if (text.equals("1")) {
-//							lview.getChildAt(position).findViewById(R.id.traderNumber).setVisibility(View.INVISIBLE);
-//							lview.getChildAt(position).findViewById(R.id.traderMultipler).setVisibility(View.INVISIBLE);
-//						}
-//						else {
-//							lview.getChildAt(position).findViewById(R.id.traderNumber).setVisibility(View.VISIBLE);
-//							lview.getChildAt(position).findViewById(R.id.traderMultipler).setVisibility(View.VISIBLE);
-//						}
-						UpdateTotalPrices(side);
-					}
-				});
+				
+				String priceNumberStr = priceOfCard.substring(1); //remove dollar sign
+				priceText.setText(priceNumberStr);
+				priceText.setSelection(priceNumberStr.length());
 				
 				removeAll.setOnClickListener(new OnClickListener() {
 					public void onClick(View v) {
@@ -281,11 +259,40 @@ public class CardTradingActivity extends FragmentActivity {
 						ChangeSet(side, position);
 					}
 				});
-				cancel.setOnClickListener(new OnClickListener() {
+				
+				cancelbtn.setOnClickListener( new OnClickListener() {
 					public void onClick(View v) {
 						removeDialog(DIALOG_UPDATE_CARD);
 					}
 				});
+				
+				donebtn.setOnClickListener(new OnClickListener() {
+					public void onClick(View v) {
+						
+						//validate number of cards text
+						if (numberOf.length() == 0){
+							Toast.makeText(getApplicationContext(), number_of_invalid, Toast.LENGTH_LONG).show();
+							return;
+						}
+						
+						//validate the price text
+						String userInputPrice = priceText.getText().toString();
+						userInputPrice = "$" + userInputPrice;
+						
+						if (!userInputPrice.matches(priceRegex)){
+							Toast.makeText(getApplicationContext(), price_invalid, Toast.LENGTH_LONG).show();
+							return;
+						}
+						
+						lSide.get(position).setNumberOf(Integer.parseInt(numberOf.getEditableText().toString()));
+						lSide.get(position).setPrice(userInputPrice);
+						aaSide.notifyDataSetChanged();
+						UpdateTotalPrices(side);
+						
+						removeDialog(DIALOG_UPDATE_CARD);
+					}
+				});
+				
 
 				dialog.show();
 				break;	
@@ -343,7 +350,8 @@ public class CardTradingActivity extends FragmentActivity {
 		}
 		cards.deactivate();
 		cards.close();
-
+		mdbAdapter.close();
+		
 		final String[] aSets = sets.toArray(new String[sets.size()]);
 		final String[] aSetCodes = setCodes.toArray(new String[setCodes.size()]);
 		AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
@@ -369,11 +377,7 @@ public class CardTradingActivity extends FragmentActivity {
 				return;
 			}
 		});
-		builder.create().show();
-		
-		cards.deactivate();
-		cards.close();
-		mdbAdapter.close();
+		builder.create().show();		
 	}
 
 	@Override
@@ -502,8 +506,6 @@ public class CardTradingActivity extends FragmentActivity {
 		private String setCode;
 		private int numberOf;
 		private String price;
-		
-		private String priceRegex = "(^\\$[0-9]+\\.[0-9]{2}$)";
 		
 		public CardData(String name, String tcgName, String setCode, int numberOf, String price) {
 			this.name = name;

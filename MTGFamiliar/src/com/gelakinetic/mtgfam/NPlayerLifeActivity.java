@@ -20,6 +20,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 package com.gelakinetic.mtgfam;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Vector;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -33,6 +34,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
@@ -44,6 +46,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -558,7 +561,10 @@ public class NPlayerLifeActivity extends FragmentActivity {
 		private Context											context;
 
 		public static final int							ABSOLUTE	= 0, RELATIVE = 1;
+		public static final int							CHANGING	= 2;
 
+		public static final int							NOTAREALUPDATE = 1;
+		
 		public HistoryAdapter(Context context, int initialValue) {
 			this.context = context;
 			list = new ArrayList<Vector<Integer>>();
@@ -590,9 +596,80 @@ public class NPlayerLifeActivity extends FragmentActivity {
 
 		public void update(int magnitude) {
 			delta += magnitude;
+			
+			Vector<Integer> vi = new Vector<Integer>();
+			Boolean addNewVi = true; 
+			for(Vector<Integer> testvi : list) {
+				try {
+					if (testvi.get(CHANGING).intValue() == NOTAREALUPDATE) {
+						vi = testvi;
+						addNewVi = false;
+						vi.clear();
+						break; //Short circuit, we have the changing row already no need to search the rest of the list. 
+					}
+				}
+				catch (ArrayIndexOutOfBoundsException e) {
+					continue;
+				}
+			}
+
+			int lastLifeTotal = initialValue;
+			if (list.size() != 0)
+			{
+				//I know this is a weird code block, but its basically finding the first non-changing history row.
+				//It does this by searching for the changing value, when the changing value doesn't exist, use that value.
+				for(Vector<Integer> testvi : list) {
+					try {
+						if (testvi.get(CHANGING).intValue() == NOTAREALUPDATE) {
+							continue;
+						}
+					}
+					catch (ArrayIndexOutOfBoundsException e) {
+						try {
+							lastLifeTotal = testvi.get(ABSOLUTE).intValue();
+						} 
+						catch (ArrayIndexOutOfBoundsException innerE) {
+							continue;
+						}
+						break; //Short circuit, we have the life total from the last committed update.
+					}
+				}
+			}
+			
+			vi.add(lastLifeTotal + delta);
+			vi.add(delta);
+			vi.add(NOTAREALUPDATE); 
+
+			if (addNewVi == true) {
+				count++;
+				list.add(0, vi);
+			}
+			//if the change is 0, remove the row from the list. 
+			if (vi.get(RELATIVE).intValue() == 0){
+				if (list.get(0).get(RELATIVE).intValue() == 0){
+					list.remove(0);
+					count--;
+				}
+			}
+			
+			notifyDataSetChanged();
 		}
 
 		public void commit() {
+			Iterator<Vector<Integer>> iterate = list.iterator();
+			while(iterate.hasNext()) {
+				try	{
+					if (iterate.next().get(CHANGING).intValue() == NOTAREALUPDATE) {
+						iterate.remove();
+						count--;
+					}
+				}
+				catch (ArrayIndexOutOfBoundsException e) {
+					continue;
+				}
+			}
+			
+			
 			int lastValue = initialValue;
 			if (delta == 0) {
 				return;
@@ -626,6 +703,16 @@ public class NPlayerLifeActivity extends FragmentActivity {
 			}
 			return (long) position;
 		}
+		
+		public int clearToPosition(int position) {
+			int returnValue = list.get(position).get(ABSOLUTE).intValue();
+			for(int idx = position - 1; idx >= 0; idx--) {
+				list.remove(idx);
+				count--;
+			}
+			notifyDataSetChanged();
+			return returnValue;
+		}
 
 		public View getView(int position, View convertView, ViewGroup parent) {
 			TextView relative, absolute;
@@ -647,6 +734,17 @@ public class NPlayerLifeActivity extends FragmentActivity {
 			}
 			relativeString += relativeValue;
 			relative.setText(relativeString);
+			
+			try {
+				if (row.get(CHANGING).intValue() == NOTAREALUPDATE) {
+					relative.setTextColor(Color.RED);
+					absolute.setTextColor(Color.RED);
+				}
+			}
+			catch (Exception e){
+				//No changes needed.
+			}
+
 			return v;
 		}
 	}
@@ -733,6 +831,27 @@ public class NPlayerLifeActivity extends FragmentActivity {
 			}
 			refreshTextViews();
 
+			history.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+				public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+						int arg2, long arg3) {
+					
+					int totalAtPosition;
+					switch (activeType) {
+						case LIFE:
+							totalAtPosition = lifeAdapter.clearToPosition(arg2);
+							life = totalAtPosition;
+							break;
+						case POISON:
+							totalAtPosition = poisonAdapter.clearToPosition(arg2);
+							poison = totalAtPosition;
+							break;
+					}
+					refreshTextViews();
+					return false;
+				}
+			});
+			
 			TVname.setOnClickListener(new View.OnClickListener() {
 
 				public void onClick(View v) {

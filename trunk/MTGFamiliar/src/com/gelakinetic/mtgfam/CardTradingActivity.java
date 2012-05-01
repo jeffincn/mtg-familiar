@@ -197,12 +197,6 @@ public class CardTradingActivity extends FragmentActivity {
 	protected void onResume() {
 		super.onResume();
 		
-		try {
-			removeDialog(DIALOG_UPDATE_CARD);
-		}
-		catch (IllegalArgumentException e) {
-		}
-		
 		MyApp appState = ((MyApp) getApplicationContext());
 		appState.setState(0);
 	}
@@ -293,7 +287,12 @@ public class CardTradingActivity extends FragmentActivity {
 					}
 				});
 				
-
+				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					public void onDismiss(DialogInterface dialog) {
+						removeDialog(DIALOG_UPDATE_CARD);
+					}
+				});
+				
 				dialog.show();
 				break;	
 			case DIALOG_PRICE_SETTING:
@@ -330,6 +329,13 @@ public class CardTradingActivity extends FragmentActivity {
 						});
 				
 				dialog = builder.create();
+
+				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					public void onDismiss(DialogInterface dialog) {
+						removeDialog(DIALOG_PRICE_SETTING);
+					}
+				});
+				
 				dialog.show();
 				break;
 			default:

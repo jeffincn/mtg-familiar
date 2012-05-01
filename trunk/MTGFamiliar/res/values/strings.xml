@@ -367,7 +367,7 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     </string-array>
 	    <string name="howlongistheround">How long is the round?\n(HH:MM)</string>
 	    <string name="Trade">Trade Cards</string>
-	    <string name="addCardDown">Add Card \u25BC</string>
+	    <string name="addCardDown">Add Card</string>
     	<string name="trader_default_price">$0.00</string>
 	    <string name="trader_done">Done</string>
 	    <string name="trader_change_set">Change Set</string>
@@ -389,4 +389,5 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
         <item>2</item>
     </string-array>
     <string name="trade_price_setting">Set Pricing Option</string>
+    <string name="trader_by">x</string>
 </resources>

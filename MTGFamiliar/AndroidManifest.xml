@@ -144,13 +144,10 @@
                 android:value=".ResultListActivity" />
         </activity>
         <activity
-            android:name=".TransparentSearchActivity"
+            android:name=".WidgetSearchActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             > <!-- android:theme="@style/Theme.HoloEverywhereDark" -->
-
-            <!-- android:theme="@style/Theme.Transparent" -->
-
 
             <!-- enable the search dialog to send searches to SearchableActivity -->
             <meta-data

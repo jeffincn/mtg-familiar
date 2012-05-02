@@ -16,36 +16,30 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class TransparentSearchActivity extends Activity {
+public class WidgetSearchActivity extends Activity {
 
 	public EditText						namefield;
 	private ImageView					searchButton;
 	private ListView					resultList;
 
 	private CardDbAdapter			mDbHelper;
-	private Cursor						c;
 
 	private Context						mCtx;
 	private ResultListAdapter	rla;
-	private Cursor						emptyCursor;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.transparent_search_activity);
+		setContentView(R.layout.widget_search_activity);
 
 		mCtx = this;
 
 		mDbHelper = new CardDbAdapter(this);
 		mDbHelper.open();
 
-		namefield = (EditText) findViewById(R.id.transparent_namefield);
+		namefield = (EditText) findViewById(R.id.widget_namefield);
 		searchButton = (ImageView) findViewById(R.id.search_button);
 		resultList = (ListView) findViewById(R.id.result_list);
-
-		emptyCursor = mDbHelper.Search("there is no way a card has this name", null, null, "wubrgl", 0, null,
-				CardDbAdapter.NOONECARES, null, CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, true,
-				new String[] { CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME }, true);
 
 		searchButton.setOnClickListener(new OnClickListener() {
 
@@ -72,9 +66,6 @@ public class TransparentSearchActivity extends Activity {
 				if (s.length() > 0) {
 					new AutocompleteQueryTask().execute(s.toString());
 				}
-				else {
-					fillData(emptyCursor);
-				}
 			}
 
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -86,11 +77,11 @@ public class TransparentSearchActivity extends Activity {
 			}
 		});
 	}
-	
+
 	@Override
-	protected void onResume(){
+	protected void onResume() {
 		super.onResume();
-		MyApp appState = ((MyApp)getApplicationContext());
+		MyApp appState = ((MyApp) getApplicationContext());
 		appState.setState(0);
 	}
 
@@ -101,7 +92,7 @@ public class TransparentSearchActivity extends Activity {
 			mDbHelper.close();
 		}
 	}
-	
+
 	private void fillData(Cursor c) {
 
 		String[] from = { CardDbAdapter.KEY_NAME };
@@ -146,9 +137,11 @@ public class TransparentSearchActivity extends Activity {
 	}
 
 	private class AutocompleteQueryTask extends AsyncTask<String, Void, Void> {
+
+		private Cursor	c;
+
 		@Override
 		protected Void doInBackground(String... params) {
-			// TODO Auto-generated method stub
 			c = mDbHelper.PrefixSearch(params[0], new String[] { CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME });
 			return null;
 		}

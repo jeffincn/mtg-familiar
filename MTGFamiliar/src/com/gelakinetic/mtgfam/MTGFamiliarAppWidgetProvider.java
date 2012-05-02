@@ -17,7 +17,7 @@ public class MTGFamiliarAppWidgetProvider extends AppWidgetProvider {
           int appWidgetId = appWidgetIds[i];
 
           // Create an Intent to launch ExampleActivity
-          Intent intentQuick = new Intent(context, TransparentSearchActivity.class);
+          Intent intentQuick = new Intent(context, WidgetSearchActivity.class);
           PendingIntent pendingIntentQuick = PendingIntent.getActivity(context, 0, intentQuick, 0);
 
           Intent intentMain = new Intent(context, MainActivity.class);
@@ -29,7 +29,7 @@ public class MTGFamiliarAppWidgetProvider extends AppWidgetProvider {
           // Get the layout for the App Widget and attach an on-click listener
           // to the button
           RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.mtgfamiliar_appwidget);
-          views.setOnClickPendingIntent(R.id.transparent_namefield, pendingIntentQuick);
+          views.setOnClickPendingIntent(R.id.widget_namefield, pendingIntentQuick);
 
           views.setOnClickPendingIntent(R.id.image_icon, pendingIntentMain);
 

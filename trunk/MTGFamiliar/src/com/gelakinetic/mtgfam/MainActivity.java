@@ -343,7 +343,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 	public void run() {
 		try {
 			if (threadType == OTAPATCH) {
-
+				// TODO check if this if statement is really necessary
 				if (mDbHelper == null) {
 					mDbHelper = new CardDbAdapter(this);
 					mDbHelper.open();
@@ -380,6 +380,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 			}
 			else if (threadType == DBFROMWEB) {
 				try {
+					// TODO check if this if statement is really necessary
 					if (mDbHelper == null) {
 						mDbHelper = new CardDbAdapter(this);
 						mDbHelper.open();

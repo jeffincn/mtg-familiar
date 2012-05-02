@@ -240,7 +240,7 @@ public class CardTradingActivity extends FragmentActivity {
 				numberOf.setText(numberOfStr);
 				numberOf.setSelection(numberOfStr.length());
 				
-				String priceNumberStr = priceOfCard.substring(1); //remove dollar sign
+				String priceNumberStr = lSide.get(position).hasPrice() ? priceOfCard.substring(1) : "";
 				priceText.setText(priceNumberStr);
 				priceText.setSelection(priceNumberStr.length());
 				

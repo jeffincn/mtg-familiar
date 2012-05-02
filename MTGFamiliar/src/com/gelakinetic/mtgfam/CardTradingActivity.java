@@ -104,7 +104,7 @@ public class CardTradingActivity extends FragmentActivity {
 		MenuFragmentCompat.init(this, R.menu.trader_menu, "trading_menu_fragment");
 
 		mCtx = this;
-		mdbAdapter = new CardDbAdapter(this);
+		mdbAdapter = new CardDbAdapter(this).open();
 
 		namefield = (AutoCompleteTextView) findViewById(R.id.namesearch);
 		namefield.setAdapter(new AutocompleteCursorAdapter(this, null));
@@ -199,6 +199,14 @@ public class CardTradingActivity extends FragmentActivity {
 		
 		MyApp appState = ((MyApp) getApplicationContext());
 		appState.setState(0);
+	}
+	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if(mdbAdapter != null) {
+			mdbAdapter.close();
+		}
 	}
 	
 	protected Dialog onCreateDialog(int id) {
@@ -347,7 +355,7 @@ public class CardTradingActivity extends FragmentActivity {
 	protected void ChangeSet(final String _side, final int _position) {
 		CardData data = (_side.equals("left") ? lTradeLeft.get(_position) : lTradeRight.get(_position));
 		String name = data.getName();
-		mdbAdapter.open();
+		
 		Cursor cards = mdbAdapter.fetchCardByName(name);
 		ArrayList<String> sets = new ArrayList<String>();
 		ArrayList<String> setCodes = new ArrayList<String>();
@@ -358,7 +366,6 @@ public class CardTradingActivity extends FragmentActivity {
 		}
 		cards.deactivate();
 		cards.close();
-		mdbAdapter.close();
 		
 		final String[] aSets = sets.toArray(new String[sets.size()]);
 		final String[] aSetCodes = setCodes.toArray(new String[setCodes.size()]);
@@ -420,11 +427,11 @@ public class CardTradingActivity extends FragmentActivity {
 
 		ArrayList<String> cardDataOut = new ArrayList<String>();
 		for (CardData data : lTradeLeft) {
-			String cardData = String.format("%s|%s|%s|%s|%s|%s", "left", data.getName(), data.getSetCode(), data.getTcgName(), data.getPrice(), data.getNumberOf());
+			String cardData = String.format("%s|%s|%s|%s|%s|%s", "left", data.getName(), data.getTcgName(), data.getSetCode(), data.getPrice(), data.getNumberOf());
 			cardDataOut.add(cardData);
 		}
 		for (CardData data : lTradeRight) {
-			String cardData = String.format("%s|%s|%s|%s|%s|%s", "right", data.getName(), data.getSetCode(), data.getTcgName(), data.getPrice(), data.getNumberOf());
+			String cardData = String.format("%s|%s|%s|%s|%s|%s", "right", data.getName(), data.getTcgName(), data.getSetCode(), data.getPrice(), data.getNumberOf());
 			cardDataOut.add(cardData);
 		}
 		outState.putStringArrayList("tradeCards", cardDataOut);
@@ -631,7 +638,6 @@ public class CardTradingActivity extends FragmentActivity {
 				setCode = data.getSetCode();
 				tcgName = data.getTcgName();
 				if(number.equals("") || setCode.equals("") || tcgName.equals("")) {
-					mdbAdapter.open();
 					Cursor card;
 					card = mdbAdapter.fetchCardByName(data.getName());
 					if (card.moveToFirst()) {
@@ -649,25 +655,21 @@ public class CardTradingActivity extends FragmentActivity {
 						
 						card.deactivate();
 						card.close();
-						mdbAdapter.close();
 					}
 					else {
 						price = card_dne;
 						card.deactivate();
 						card.close();
-						mdbAdapter.close();
 						return 1;
 					}
 				}
 			}
 			catch (SQLiteException e) {
 				price = card_not_found;
-				mdbAdapter.close();
 				return 1;
 			}
 			catch (IllegalStateException e) {
 				price = database_busy;
-				mdbAdapter.close();
 				return 1;
 			}
 
@@ -686,14 +688,12 @@ public class CardTradingActivity extends FragmentActivity {
 			catch (MalformedURLException e) {
 				priceurl = null;
 				price = mangled_url;
-				mdbAdapter.close();
 				return 1;
 			}
 
 			price = fetchPrice(priceurl);
 
 			if (price.equals(fetch_failed)) {
-				mdbAdapter.close();
 				return 1;
 			}
 			return 0;

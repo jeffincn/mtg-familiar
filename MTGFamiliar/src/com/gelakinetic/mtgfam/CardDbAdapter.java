@@ -342,8 +342,11 @@ public class CardDbAdapter {
 		String statement = "(" + KEY_CODE + " LIKE '%" + code + "%')";
 
 		Cursor c = null;
+		int count = 0;
 		try {
 			c = mDb.query(true, DATABASE_TABLE_SETS, new String[] { KEY_ID }, statement, null, null, null, KEY_NAME, null);
+			count = c.getCount();
+			c.close();
 		}
 		catch (SQLiteException e) {
 			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
@@ -352,10 +355,7 @@ public class CardDbAdapter {
 			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
 		}
 
-		if (c.getCount() > 0) {
-			return true;
-		}
-		return false;
+		return count > 0;
 	}
 
 	public String getCodeMtgi(String code) {
@@ -481,7 +481,9 @@ public class CardDbAdapter {
 
 		if (mCursor != null) {
 			mCursor.moveToFirst();
-			return mCursor.getLong(mCursor.getColumnIndex(CardDbAdapter.KEY_ID));
+			long id = mCursor.getLong(mCursor.getColumnIndex(CardDbAdapter.KEY_ID));
+			mCursor.close();
+			return id;
 		}
 		return -1;
 	}
@@ -1001,6 +1003,7 @@ public class CardDbAdapter {
 					null);
 			mCursor.moveToFirst();
 			ID = mCursor.getInt(mCursor.getColumnIndex(KEY_ID));
+			mCursor.close();
 		}
 		catch (SQLiteException e) {
 			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
@@ -1020,6 +1023,7 @@ public class CardDbAdapter {
 					null);
 			mCursor.moveToFirst();
 			name = mCursor.getString(mCursor.getColumnIndex(KEY_NAME));
+			mCursor.close();
 		}
 		catch (SQLiteException e) {
 			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
@@ -1330,6 +1334,7 @@ public class CardDbAdapter {
 					KEY_ID, null);
 			mCursor.moveToFirst();
 			name = mCursor.getString(mCursor.getColumnIndex(KEY_NAME));
+			mCursor.close();
 		}
 		catch (SQLiteException e) {
 			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();

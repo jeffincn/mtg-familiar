@@ -36,6 +36,7 @@
             android:key="picFirst"
             android:summary="@string/picfirstsummary"
             android:title="@string/picfirsttitle" />
+        <CheckBoxPreference android:key="scrollresults" android:title="@string/card_view_scroll" android:summary="@string/card_view_scroll_desc" android:defaultValue="false"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Dice" >

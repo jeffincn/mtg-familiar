@@ -58,11 +58,8 @@ import android.util.DisplayMetrics;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -177,50 +174,28 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 
 		setInfoFromID(cardID);
 		
-		if(!isSingle){
-			gestureDetector = new GestureDetector(new MyGestureDetector());
-	        gestureListener = new View.OnTouchListener() {
-	            public boolean onTouch(View v, MotionEvent event) {
-	                return gestureDetector.onTouchEvent(event);
-	            }
-	        };
-	        
-	        View thisView = this.findViewById(R.id.ScrollView1); //TODO rename id in cardsearch
-	        thisView.setOnTouchListener(gestureListener);
+		if(!isSingle && preferences.getBoolean("scrollresults", false)){
+				leftRandom.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						Intent i = new Intent();
+						i.putExtra("lastID", cardID);
+						setResult(SWIPELEFT, i);
+						finish();
+					}
+				});
+				rightRandom.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						Intent i = new Intent();
+						i.putExtra("lastID", cardID);
+						setResult(SWIPERIGHT, i);
+						finish();
+					}
+				});
+				leftRandom.setVisibility(View.VISIBLE);
+				rightRandom.setVisibility(View.VISIBLE);
 		}
 		MenuFragmentCompat.init(this, R.menu.card_menu, "card_view_menu_fragment");
 	}
-	
-	private static final int SWIPE_MIN_DISTANCE = 120;
-    private static final int SWIPE_MAX_OFF_PATH = 250;
-    private static final int SWIPE_THRESHOLD_VELOCITY = 200;
-    private GestureDetector gestureDetector;
-    View.OnTouchListener gestureListener;
-    
-	class MyGestureDetector extends SimpleOnGestureListener {
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            try {
-                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
-                    return false;
-                if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-					Intent i = new Intent();
-					i.putExtra("lastID", cardID);
-					setResult(SWIPERIGHT, i);
-					finish();
-                }  else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-					Intent i = new Intent();
-					i.putExtra("lastID", cardID);
-					setResult(SWIPELEFT, i);
-					finish();
-                }
-            } catch (Exception e) {
-            }
-            return false;
-        }
-
-    }
-	
 
 	@Override
 	protected void onResume() {

@@ -191,11 +191,26 @@ public class CardTradingActivity extends FragmentActivity {
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		priceSetting = Integer.parseInt(prefs.getString("tradePrice", String.valueOf(AVG_PRICE)));
+		
+		//Give this a default value so we don't get the null pointer-induced FC. It shouldn't matter what
+		//we set it to, as long as we set it, since we dismiss the dialog if it's showing in onResume().
+		sideForDialog = "left";
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
+		
+		try {
+			dismissDialog(DIALOG_UPDATE_CARD);
+		}
+		catch (IllegalArgumentException e) {
+		}
+		try {
+			dismissDialog(DIALOG_PRICE_SETTING);
+		}
+		catch (IllegalArgumentException e) {
+		}
 		
 		MyApp appState = ((MyApp) getApplicationContext());
 		appState.setState(0);

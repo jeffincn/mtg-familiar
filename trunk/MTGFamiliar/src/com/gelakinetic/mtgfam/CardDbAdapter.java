@@ -441,7 +441,7 @@ public class CardDbAdapter {
 	 *           if Card could not be found/retrieved
 	 */
 	public Cursor fetchCardByName(String name) throws SQLException {
-		name = name.replace("'", "''");
+		name = name.replace("'", "''").replace("æ", "Æ");
 		String sql = "SELECT " + DATABASE_TABLE_CARDS + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " +
 				DATABASE_TABLE_CARDS + "." + KEY_SET + ", " + DATABASE_TABLE_CARDS + "." + KEY_NUMBER + " FROM " + DATABASE_TABLE_CARDS +
 				" JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = " + DATABASE_TABLE_CARDS + "." + KEY_SET +
@@ -465,7 +465,7 @@ public class CardDbAdapter {
 	}
 
 	public long fetchIdByName(String name) throws SQLException {
-		name = name.replace("'", "''");
+		name = name.replace("'", "''").replace("æ", "Æ");
 		String statement = "(" + KEY_NAME + " = '" + name + "')";
 		Cursor mCursor = null;
 		try {
@@ -529,7 +529,7 @@ public class CardDbAdapter {
 		Cursor mCursor = null;
 
 		if (cardname != null)
-			cardname = cardname.replace("'", "''").trim();
+			cardname = cardname.replace("'", "''").replace("æ", "Æ").trim();
 
 		String sql = "SELECT MIN(" + KEY_ID + ") AS " + KEY_ID + ", " + KEY_NAME + " FROM " + DATABASE_TABLE_CARDS
 				+ " WHERE " + KEY_NAME + " LIKE '" + cardname + "%' GROUP BY " + KEY_NAME + " ORDER BY " + KEY_NAME;
@@ -557,7 +557,7 @@ public class CardDbAdapter {
 		Cursor mCursor = null;
 
 		if (cardname != null)
-			cardname = cardname.replace("'", "''").trim();
+			cardname = cardname.replace("'", "''").replace("æ", "Æ").trim();
 		if (cardtext != null)
 			cardtext = cardtext.replace("'", "''").trim();
 		if (cardtype != null)
@@ -958,7 +958,7 @@ public class CardDbAdapter {
 		Cursor mCursor = null;
 
 		if (cardname != null)
-			cardname = cardname.replace("'", "''").trim();
+			cardname = cardname.replace("'", "''").replace("æ", "Æ").trim();
 
 		String statement = " WHERE 1=1";
 
@@ -1086,7 +1086,7 @@ public class CardDbAdapter {
 	public static final int	RESTRICTED	= 2;
 
 	public int checkLegality(String mCardName, String format) {
-		mCardName = mCardName.replace("'", "''");
+		mCardName = mCardName.replace("'", "''").replace("æ", "Æ");
 		format = format.replace("'", "''"); // Just to be safe; remember Bobby
 		// Tables
 		try {

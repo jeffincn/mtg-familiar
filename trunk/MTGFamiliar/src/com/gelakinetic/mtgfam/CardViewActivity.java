@@ -133,6 +133,7 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 	private String[]							formats;
 	private boolean								isRandom;
 	private boolean								isSingle;
+	private int									multiverseId;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -200,10 +201,7 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		if (c != null) {
-			c.deactivate();
-			c.close();
-		}
+		
 		if (mDbHelper != null) {
 			mDbHelper.close();
 		}
@@ -433,6 +431,10 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 			leftRandom.setVisibility(View.VISIBLE);
 			rightRandom.setVisibility(View.VISIBLE);
 		}
+		
+		multiverseId = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_MULTIVERSEID));
+		
+		c.close();
 	}
 
 	Drawable drawable_from_url(String url, String src_name) throws java.net.MalformedURLException, java.io.IOException {
@@ -715,8 +717,7 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 			new FetchLegalityTask().execute((String[]) null);
 			return true;
 		case R.id.gatherer:
-			String url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid="
-					+ c.getInt(c.getColumnIndex(CardDbAdapter.KEY_MULTIVERSEID));
+			String url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multiverseId;
 			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 			startActivity(browserIntent);
 			return true;

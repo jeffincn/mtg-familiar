@@ -462,14 +462,27 @@ public class CardTradingActivity extends FragmentActivity {
 	private void UpdateTotalPrices(String _side) {
 		if (_side.equals("left") || _side.equals("both")) {
 			int totalPriceLeft = GetPricesFromTradeList(lTradeLeft);
+			int color = PriceListHasBadValues(lTradeLeft) ? mCtx.getResources().getColor(R.color.red) : mCtx.getResources().getColor(R.color.white);
 			String sTotalLeft = "$" + (totalPriceLeft / 100) + "." + String.format("%02d", (totalPriceLeft % 100));
 			tradePriceLeft.setText(sTotalLeft);
+			tradePriceLeft.setTextColor(color);
 		}
 		if (_side.equals("right") || _side.equals("both")) {
 			int totalPriceRight = GetPricesFromTradeList(lTradeRight);
+			int color = PriceListHasBadValues(lTradeRight) ? mCtx.getResources().getColor(R.color.red) : mCtx.getResources().getColor(R.color.white);
 			String sTotalRight = "$" + (totalPriceRight / 100) + "." + String.format("%02d", (totalPriceRight % 100));
 			tradePriceRight.setText(sTotalRight);
+			tradePriceRight.setTextColor(color);
 		}
+	}
+	
+	private boolean PriceListHasBadValues(ArrayList<CardData> trade) {
+		for (CardData data : trade) {
+			if(!data.hasPrice()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private int GetPricesFromTradeList(ArrayList<CardData> _trade) {
@@ -634,15 +647,15 @@ public class CardTradingActivity extends FragmentActivity {
 				priceField.setText(data.hasPrice() ? data.getPriceString() : data.getMessage());
 			
 				if (data.hasPrice()) {
-					nameField.setTextColor(mCtx.getResources().getColor(R.color.white));
-					setField.setTextColor(mCtx.getResources().getColor(R.color.light_gray));
-					numberField.setTextColor(mCtx.getResources().getColor(R.color.light_gray));
+//					nameField.setTextColor(mCtx.getResources().getColor(R.color.white));
+//					setField.setTextColor(mCtx.getResources().getColor(R.color.light_gray));
+//					numberField.setTextColor(mCtx.getResources().getColor(R.color.light_gray));
 					priceField.setTextColor(mCtx.getResources().getColor(R.color.light_gray));
 				}
 				else {
-					nameField.setTextColor(mCtx.getResources().getColor(R.color.red));
-					setField.setTextColor(mCtx.getResources().getColor(R.color.red));
-					numberField.setTextColor(mCtx.getResources().getColor(R.color.red));
+//					nameField.setTextColor(mCtx.getResources().getColor(R.color.red));
+//					setField.setTextColor(mCtx.getResources().getColor(R.color.red));
+//					numberField.setTextColor(mCtx.getResources().getColor(R.color.red));
 					priceField.setTextColor(mCtx.getResources().getColor(R.color.red));
 				}}
 			

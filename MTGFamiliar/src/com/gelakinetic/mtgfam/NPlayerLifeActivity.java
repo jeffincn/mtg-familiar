@@ -34,7 +34,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
@@ -735,10 +734,23 @@ public class NPlayerLifeActivity extends FragmentActivity {
 			relativeString += relativeValue;
 			relative.setText(relativeString);
 			
+			int color;
+			switch(activeType) {
+				case POISON:
+					//Positive poison is bad, so display red; otherwise show green
+					color = (relativeValue > 0) ? context.getResources().getInteger(R.color.red) : context.getResources().getInteger(R.color.green);
+					break;
+				case LIFE:
+				default:
+					//Negative life is bad, so display red; otherwise show green
+					color = (relativeValue < 0) ? context.getResources().getInteger(R.color.red) : context.getResources().getInteger(R.color.green);
+					break;
+			}
+			
 			try {
 				if (row.get(CHANGING).intValue() == NOTAREALUPDATE) {
-					relative.setTextColor(Color.RED);
-					absolute.setTextColor(Color.RED);
+					relative.setTextColor(color);
+					absolute.setTextColor(color);
 				}
 			}
 			catch (Exception e){

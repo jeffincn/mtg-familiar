@@ -390,4 +390,6 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     </string-array>
     <string name="trade_price_setting">Set Pricing Option</string>
     <string name="trader_by">x</string>
+    <string name="card_view_scroll">Scroll Results</string>
+    <string name="card_view_scroll_desc">Show buttons to scroll between search results.</string>
 </resources>

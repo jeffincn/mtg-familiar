@@ -135,7 +135,7 @@ public class CardTradingActivity extends FragmentActivity {
 					}
 					int numberOf = Integer.parseInt(numberOfFromField);
 
-					CardData data = new CardData(namefield.getText().toString(), "", "", numberOf, 0, "loading");
+					CardData data = new CardData(namefield.getText().toString(), "", "", numberOf, 0, "loading","");
 
 					lTradeLeft.add(0,data);
 					aaTradeLeft.notifyDataSetChanged();
@@ -159,7 +159,7 @@ public class CardTradingActivity extends FragmentActivity {
 					}
 					int numberOf = Integer.parseInt(numberOfFromField);
 
-					CardData data = new CardData(namefield.getText().toString(), "", "", numberOf, 0, "loading");
+					CardData data = new CardData(namefield.getText().toString(), "", "", numberOf, 0, "loading","");
 
 					lTradeRight.add(0,data);
 					aaTradeRight.notifyDataSetChanged();
@@ -417,15 +417,13 @@ public class CardTradingActivity extends FragmentActivity {
 		// textview
 		namefield.setText(savedInstanceState.getString("nameBox"));
 		tradePriceLeft.setText(savedInstanceState.getString("leftTotalPrice"));
-		tradePriceLeft.setTextColor(savedInstanceState.getInt("leftColor"));
 		tradePriceRight.setText(savedInstanceState.getString("rightTotalPrice"));
-		tradePriceRight.setTextColor(savedInstanceState.getInt("rightColor"));
 
 		ArrayList<String> cardDataIn = savedInstanceState.getStringArrayList("tradeCards");
 		for (String card : cardDataIn) {
 			String[] cardData = card.split("\\|");
-			int numberOf = Integer.parseInt(cardData[6]);
-			CardData data = new CardData(cardData[1], cardData[2], cardData[3], numberOf, Integer.parseInt(cardData[4]), cardData[5]);
+			int numberOf = Integer.parseInt(cardData[5]);
+			CardData data = new CardData(cardData[1], cardData[2], cardData[3], numberOf, Integer.parseInt(cardData[4]), cardData[6], cardData[7]);
 
 			if (cardData[0].equals("left"))
 				lTradeLeft.add(data);
@@ -434,25 +432,22 @@ public class CardTradingActivity extends FragmentActivity {
 		}
 		aaTradeLeft.notifyDataSetChanged();
 		aaTradeRight.notifyDataSetChanged();
+		UpdateTotalPrices("both");
 	}
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		outState.putString("nameBox", namefield.getText().toString());
 		outState.putString("leftTotalPrice", (String) tradePriceLeft.getText());
-		outState.putInt("leftColor", tradePriceLeft.getCurrentTextColor());
 		outState.putString("rightTotalPrice", (String) tradePriceRight.getText());
-		outState.putInt("rightColor", tradePriceRight.getCurrentTextColor());
 
 		ArrayList<String> cardDataOut = new ArrayList<String>();
 		for (CardData data : lTradeLeft) {
-			String cardData = String.format("%s|%s|%s|%s|%s|%s|%s", "left", data.getName(), data.getTcgName(), data.getSetCode(),
-					data.getPrice(), data.getMessage(), data.getNumberOf());
+			String cardData = String.format("%s|%s|%s|%s|%s|%s|%s|%s", "left", data.getName(), data.getTcgName(), data.getSetCode(), data.getPrice(), data.getNumberOf(), data.getMessage(), data.getNumber());
 			cardDataOut.add(cardData);
 		}
 		for (CardData data : lTradeRight) {
-			String cardData = String.format("%s|%s|%s|%s|%s|%s|%s", "right", data.getName(), data.getTcgName(), data.getSetCode(),
-					data.getPrice(), data.getMessage(), data.getNumberOf());
+			String cardData = String.format("%s|%s|%s|%s|%s|%s|%s|%s", "right", data.getName(), data.getTcgName(), data.getSetCode(), data.getPrice(), data.getNumberOf(), data.getMessage(), data.getNumber());
 			cardDataOut.add(cardData);
 		}
 		outState.putStringArrayList("tradeCards", cardDataOut);
@@ -494,7 +489,8 @@ public class CardTradingActivity extends FragmentActivity {
 	private int GetPricesFromTradeList(ArrayList<CardData> _trade) {
 		int totalPrice = 0;
 
-		for (CardData data : _trade) {
+		for (int i=0; i < _trade.size(); i++){//CardData data : _trade) {
+			CardData data = _trade.get(i);
 			if (data.hasPrice()) {
 				totalPrice += data.getNumberOf() * data.getPrice();
 			}
@@ -506,24 +502,28 @@ public class CardTradingActivity extends FragmentActivity {
 				
 				if(message.compareTo(card_not_found) == 0){
 					_trade.remove(data);
+					i--;
 					aaTradeRight.notifyDataSetChanged();
 					aaTradeLeft.notifyDataSetChanged();
 					Toast.makeText(getApplicationContext(), data.getName() + ": " + card_not_found, Toast.LENGTH_LONG).show();
 				}
 				else if(message.compareTo(mangled_url) == 0){
 					_trade.remove(data);
+					i--;
 					aaTradeRight.notifyDataSetChanged();
 					aaTradeLeft.notifyDataSetChanged();
 					Toast.makeText(getApplicationContext(), data.getName() + ": " + mangled_url, Toast.LENGTH_LONG).show();
 				}
 				else if(message.compareTo(database_busy) == 0){
 					_trade.remove(data);
+					i--;
 					aaTradeRight.notifyDataSetChanged();
 					aaTradeLeft.notifyDataSetChanged();
 					Toast.makeText(getApplicationContext(), data.getName() + ": " + database_busy, Toast.LENGTH_LONG).show();
 				}
 				else if(message.compareTo(card_dne) == 0){
 					_trade.remove(data);
+					i--;
 					aaTradeRight.notifyDataSetChanged();
 					aaTradeLeft.notifyDataSetChanged();
 					Toast.makeText(getApplicationContext(), data.getName() + ": " + card_dne, Toast.LENGTH_LONG).show();
@@ -546,9 +546,9 @@ public class CardTradingActivity extends FragmentActivity {
 		private int price; //In cents
 		private String message;
 		
-		public CardData(String name, String tcgName, String setCode, int numberOf, int price, String message) {
+		public CardData(String name, String tcgName, String setCode, int numberOf, int price, String message, String number) {
 			this.name = name;
-			this.number = "";
+			this.number = number;
 			this.tcgName = tcgName;
 			this.setCode = setCode;
 			this.numberOf = numberOf;

@@ -417,13 +417,15 @@ public class CardTradingActivity extends FragmentActivity {
 		// textview
 		namefield.setText(savedInstanceState.getString("nameBox"));
 		tradePriceLeft.setText(savedInstanceState.getString("leftTotalPrice"));
+		tradePriceLeft.setTextColor(savedInstanceState.getInt("leftColor"));
 		tradePriceRight.setText(savedInstanceState.getString("rightTotalPrice"));
+		tradePriceRight.setTextColor(savedInstanceState.getInt("rightColor"));
 
 		ArrayList<String> cardDataIn = savedInstanceState.getStringArrayList("tradeCards");
 		for (String card : cardDataIn) {
 			String[] cardData = card.split("\\|");
-			int numberOf = Integer.parseInt(cardData[5]);
-			CardData data = new CardData(cardData[1], cardData[2], cardData[3], numberOf, Integer.parseInt(cardData[4]), "");
+			int numberOf = Integer.parseInt(cardData[6]);
+			CardData data = new CardData(cardData[1], cardData[2], cardData[3], numberOf, Integer.parseInt(cardData[4]), cardData[5]);
 
 			if (cardData[0].equals("left"))
 				lTradeLeft.add(data);
@@ -438,15 +440,19 @@ public class CardTradingActivity extends FragmentActivity {
 	protected void onSaveInstanceState(Bundle outState) {
 		outState.putString("nameBox", namefield.getText().toString());
 		outState.putString("leftTotalPrice", (String) tradePriceLeft.getText());
+		outState.putInt("leftColor", tradePriceLeft.getCurrentTextColor());
 		outState.putString("rightTotalPrice", (String) tradePriceRight.getText());
+		outState.putInt("rightColor", tradePriceRight.getCurrentTextColor());
 
 		ArrayList<String> cardDataOut = new ArrayList<String>();
 		for (CardData data : lTradeLeft) {
-			String cardData = String.format("%s|%s|%s|%s|%s|%s", "left", data.getName(), data.getTcgName(), data.getSetCode(), data.getPrice(), data.getNumberOf());
+			String cardData = String.format("%s|%s|%s|%s|%s|%s|%s", "left", data.getName(), data.getTcgName(), data.getSetCode(),
+					data.getPrice(), data.getMessage(), data.getNumberOf());
 			cardDataOut.add(cardData);
 		}
 		for (CardData data : lTradeRight) {
-			String cardData = String.format("%s|%s|%s|%s|%s|%s", "right", data.getName(), data.getTcgName(), data.getSetCode(), data.getPrice(), data.getNumberOf());
+			String cardData = String.format("%s|%s|%s|%s|%s|%s|%s", "right", data.getName(), data.getTcgName(), data.getSetCode(),
+					data.getPrice(), data.getMessage(), data.getNumberOf());
 			cardDataOut.add(cardData);
 		}
 		outState.putStringArrayList("tradeCards", cardDataOut);

@@ -378,7 +378,7 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     
     <string name="trade_window_title">Trade Window</string>
     <string name="trade_option_title">Price Setting</string>
-    <string name="trade_option_desc">The type of price to display in the trade activity</string>
+    <string name="trade_option_desc">TCGplayer price to use when trading cards</string>
     <string-array name="trade_option_entries">
         <item>Low</item>
         <item>Average</item>

@@ -422,8 +422,8 @@ public class CardTradingActivity extends FragmentActivity {
 		ArrayList<String> cardDataIn = savedInstanceState.getStringArrayList("tradeCards");
 		for (String card : cardDataIn) {
 			String[] cardData = card.split("\\|");
-			int numberOf = Integer.parseInt(cardData[5]);
-			CardData data = new CardData(cardData[1], cardData[2], cardData[3], numberOf, Integer.parseInt(cardData[4]), cardData[6], cardData[7]);
+			int numberOf = Integer.parseInt(cardData[7]);
+			CardData data = new CardData(cardData[1], cardData[2], cardData[3], numberOf, Integer.parseInt(cardData[4]), cardData[5], cardData[6]);
 
 			if (cardData[0].equals("left"))
 				lTradeLeft.add(data);
@@ -443,11 +443,13 @@ public class CardTradingActivity extends FragmentActivity {
 
 		ArrayList<String> cardDataOut = new ArrayList<String>();
 		for (CardData data : lTradeLeft) {
-			String cardData = String.format("%s|%s|%s|%s|%s|%s|%s|%s", "left", data.getName(), data.getTcgName(), data.getSetCode(), data.getPrice(), data.getNumberOf(), data.getMessage(), data.getNumber());
+			String cardData = String.format("%s|%s|%s|%s|%s|%s|%s|%s", "left", data.getName(), data.getTcgName(),
+					data.getSetCode(), data.getPrice(), data.getMessage(), data.getNumber(), data.getNumberOf());
 			cardDataOut.add(cardData);
 		}
 		for (CardData data : lTradeRight) {
-			String cardData = String.format("%s|%s|%s|%s|%s|%s|%s|%s", "right", data.getName(), data.getTcgName(), data.getSetCode(), data.getPrice(), data.getNumberOf(), data.getMessage(), data.getNumber());
+			String cardData = String.format("%s|%s|%s|%s|%s|%s|%s|%s", "right", data.getName(), data.getTcgName(),
+					data.getSetCode(), data.getPrice(), data.getMessage(), data.getNumber(), data.getNumberOf());
 			cardDataOut.add(cardData);
 		}
 		outState.putStringArrayList("tradeCards", cardDataOut);

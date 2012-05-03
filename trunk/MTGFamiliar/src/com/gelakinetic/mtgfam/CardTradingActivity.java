@@ -137,7 +137,7 @@ public class CardTradingActivity extends FragmentActivity {
 
 					CardData data = new CardData(namefield.getText().toString(), "", "", numberOf, 0, "loading");
 
-					lTradeLeft.add(data);
+					lTradeLeft.add(0,data);
 					aaTradeLeft.notifyDataSetChanged();
 					FetchPriceTask loadPrice = new FetchPriceTask(data, aaTradeLeft);
 					loadPrice.execute();
@@ -161,7 +161,7 @@ public class CardTradingActivity extends FragmentActivity {
 
 					CardData data = new CardData(namefield.getText().toString(), "", "", numberOf, 0, "loading");
 
-					lTradeRight.add(data);
+					lTradeRight.add(0,data);
 					aaTradeRight.notifyDataSetChanged();
 					FetchPriceTask loadPrice = new FetchPriceTask(data, aaTradeRight);
 					loadPrice.execute();
@@ -587,10 +587,12 @@ public class CardTradingActivity extends FragmentActivity {
 
 		private int layoutResourceId;
 		private ArrayList<CardData> items;
+		private Context mCtx;
 		
 		public TradeListAdapter(Context context, int textViewResourceId, ArrayList<CardData> items) {
 			super(context, textViewResourceId, items);
 			
+			this.mCtx = context;
 			this.layoutResourceId = textViewResourceId;
 			this.items = items;
 		}
@@ -606,11 +608,28 @@ public class CardTradingActivity extends FragmentActivity {
 			CardData data = items.get(position);
 			if(data != null)
 			{
-				((TextView)v.findViewById(R.id.traderRowName)).setText(data.getName());
-				((TextView)v.findViewById(R.id.traderRowSet)).setText(data.getTcgName());
-				((TextView)v.findViewById(R.id.traderNumber)).setText(data.hasPrice() ? data.getNumberOf() + "x" : "");
-				((TextView)v.findViewById(R.id.traderRowPrice)).setText(data.hasPrice() ? data.getPriceString() : data.getMessage());
-			}
+				TextView nameField = (TextView)v.findViewById(R.id.traderRowName);
+				TextView setField = (TextView)v.findViewById(R.id.traderRowSet);
+				TextView numberField = (TextView)v.findViewById(R.id.traderNumber);
+				TextView priceField = (TextView)v.findViewById(R.id.traderRowPrice);
+				
+				nameField.setText(data.getName());
+				setField.setText(data.getTcgName());
+				numberField.setText(data.hasPrice() ? data.getNumberOf() + "x" : "");
+				priceField.setText(data.hasPrice() ? data.getPriceString() : data.getMessage());
+			
+				if (data.hasPrice()) {
+					nameField.setTextColor(mCtx.getResources().getColor(R.color.white));
+					setField.setTextColor(mCtx.getResources().getColor(R.color.light_gray));
+					numberField.setTextColor(mCtx.getResources().getColor(R.color.light_gray));
+					priceField.setTextColor(mCtx.getResources().getColor(R.color.light_gray));
+				}
+				else {
+					nameField.setTextColor(mCtx.getResources().getColor(R.color.red));
+					setField.setTextColor(mCtx.getResources().getColor(R.color.red));
+					numberField.setTextColor(mCtx.getResources().getColor(R.color.red));
+					priceField.setTextColor(mCtx.getResources().getColor(R.color.red));
+				}}
 			
 			return v;
 		}

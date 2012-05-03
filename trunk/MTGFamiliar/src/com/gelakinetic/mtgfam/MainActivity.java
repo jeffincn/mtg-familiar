@@ -62,7 +62,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 	private static final int	OTAPATCH				= 1;
 	private static final int	APPLYINGPATCH		= 3;
 	private static final int	DBFROMWEB				= 4;
-	private static final int	DBFROMAPK				= 5;
+//private static final int	DBFROMAPK				= 5;
 	private static final int	EXCEPTION				= 99;
 	private static final int	ABOUTDIALOG			= 0;
 	private static final int	CHANGELOGDIALOG	= 1;

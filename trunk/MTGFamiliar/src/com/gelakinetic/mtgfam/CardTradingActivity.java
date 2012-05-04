@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -89,8 +91,6 @@ public class CardTradingActivity extends FragmentActivity {
 	public static final String fetch_failed = "Fetch Failed";
 	public static final String number_of_invalid = "Number of Cards Invalid";
 	public static final String price_invalid = "Price Invalid";
-	
-//	private static final String priceRegex = "(^\\$[0-9]+\\.[0-9]{2}$)";
 
 	private static final int LOW_PRICE = 0;
 	private static final int AVG_PRICE = 1;
@@ -372,11 +372,12 @@ public class CardTradingActivity extends FragmentActivity {
 		String name = data.getName();
 		
 		Cursor cards = mdbAdapter.fetchCardByName(name);
-		ArrayList<String> sets = new ArrayList<String>();
-		ArrayList<String> setCodes = new ArrayList<String>();
+		Set<String> sets = new LinkedHashSet<String>();
+		Set<String> setCodes = new LinkedHashSet<String>();
 		while (!cards.isAfterLast()) {
-			sets.add(mdbAdapter.getTCGname(cards.getString(cards.getColumnIndex(CardDbAdapter.KEY_SET))));
-			setCodes.add(cards.getString(cards.getColumnIndex(CardDbAdapter.KEY_SET)));
+			if (sets.add(mdbAdapter.getTCGname(cards.getString(cards.getColumnIndex(CardDbAdapter.KEY_SET))))) {
+				setCodes.add(cards.getString(cards.getColumnIndex(CardDbAdapter.KEY_SET)));
+			}
 			cards.moveToNext();
 		}
 		cards.deactivate();
@@ -425,10 +426,22 @@ public class CardTradingActivity extends FragmentActivity {
 			int numberOf = Integer.parseInt(cardData[7]);
 			CardData data = new CardData(cardData[1], cardData[2], cardData[3], numberOf, Integer.parseInt(cardData[4]), cardData[5], cardData[6]);
 
-			if (cardData[0].equals("left"))
+			if (cardData[0].equals("left")) {
 				lTradeLeft.add(data);
-			else if (cardData[0].equals("right"))
+				
+				if (data.getMessage().equals("loading")) {
+					FetchPriceTask loadPrice = new FetchPriceTask(data, aaTradeLeft);
+					loadPrice.execute();
+				}
+			}
+			else if (cardData[0].equals("right")) {
 				lTradeRight.add(data);
+				
+				if (data.getMessage().equals("loading")) {
+					FetchPriceTask loadPrice = new FetchPriceTask(data, aaTradeRight);
+					loadPrice.execute();
+				}
+			}
 		}
 		aaTradeLeft.notifyDataSetChanged();
 		aaTradeRight.notifyDataSetChanged();

@@ -24,7 +24,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -34,12 +36,15 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -91,6 +96,7 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 	private static final int			GETLEGALITY		= 0;
 	private static final int			GETPRICE			= 1;
 	private static final int			GETIMAGE			= 2;
+	private static final int			CHANGESET			= 3;
 	private static final int			MAINPAGE			= 0;
 	private static final int			DIALOG				= 1;
 	private String								NO_ERROR			= "no_error";
@@ -134,6 +140,8 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 	private boolean								isRandom;
 	private boolean								isSingle;
 	private int									multiverseId;
+	private boolean 							newImage;
+	private boolean 							newPriceData;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -435,6 +443,9 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 		multiverseId = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_MULTIVERSEID));
 		
 		c.close();
+		
+		newImage = true;
+		newPriceData = true;
 	}
 
 	Drawable drawable_from_url(String url, String src_name) throws java.net.MalformedURLException, java.io.IOException {
@@ -494,10 +505,6 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 			image = (ImageView) dialog.findViewById(R.id.cardimage);
 			loadTo = DIALOG;
 
-			threadtype = PICLOAD;
-			Thread thread = new Thread(this);
-			thread.start();
-
 			return dialog;
 		} else if (id == GETLEGALITY) {
 			if (formats == null)
@@ -525,7 +532,8 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 			ListView lv = (ListView) dialog.findViewById(R.id.legallist);
 			lv.setAdapter(adapter);
 			return dialog;
-		} else if (id == GETPRICE) { // price
+		}
+		else if (id == GETPRICE) { // price
 			Dialog dialog = new Dialog(this);
 			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
@@ -536,18 +544,68 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 			h = (TextView) dialog.findViewById(R.id.high);
 			pricelink = (TextView) dialog.findViewById(R.id.pricelink);
 
-			l.setText("Loading");
-			m.setText("Loading");
-			h.setText("Loading");
-			pricelink.setText("");
-
-			threadtype = PRICELOAD;
-			Thread thread = new Thread(this);
-			thread.start();
-
 			return dialog;
 		}
+		else if (id == CHANGESET) {
+			try {
+				Cursor c = mDbHelper.fetchCardByName(cardName);
+				Set<String> sets = new LinkedHashSet<String>();
+				Set<Long> cardIds = new LinkedHashSet<Long>();
+				while (!c.isAfterLast()) {
+					if (sets.add(mDbHelper.getTCGname(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET))))) {
+						cardIds.add(c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID)));
+					}
+					c.moveToNext();
+				}
+				c.deactivate();
+				c.close();
+				
+				final String[] aSets = sets.toArray(new String[sets.size()]);
+				final Long[] aIds = cardIds.toArray(new Long[cardIds.size()]);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle("Pick a Set");
+				builder.setItems(aSets, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialogInterface, int item) {
+						setInfoFromID(aIds[item]);
+					}
+				});
+				return builder.create();
+			}
+			catch (SQLException e) {
+				//Should we do something here?
+			}
+		}
 		return null;
+	}
+	
+	@Override
+	protected void onPrepareDialog(int id, Dialog dialog) {
+		switch(id) {
+		case GETIMAGE:
+			if(newImage) {
+				image.setImageResource(R.drawable.loading);
+				
+				threadtype = PICLOAD;
+				Thread thread = new Thread(this);
+				thread.start();
+				
+				newImage = false;
+			}
+			break;
+		case GETPRICE:
+			if(newPriceData) {
+				l.setText("Loading");
+				m.setText("Loading");
+				h.setText("Loading");
+				pricelink.setText("");
+
+				threadtype = PRICELOAD;
+				Thread thread = new Thread(this);
+				thread.start();
+				
+				newPriceData = false;
+			}
+		}
 	}
 
 	public void run() {
@@ -592,50 +650,50 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 	}
 
 	private Handler		handler	= new Handler() {
-															@Override
-															public void handleMessage(Message msg) {
-																switch (msg.what) {
-																case PICLOAD:
-																	if (loadTo == MAINPAGE) {
-																		if (failedLoad) {
-																			cardpic.setVisibility(View.GONE);
-																			name.setVisibility(View.VISIBLE);
-																			cost.setVisibility(View.VISIBLE);
-																			type.setVisibility(View.VISIBLE);
-																			set.setVisibility(View.VISIBLE);
-																			ability.setVisibility(View.VISIBLE);
-																			pt.setVisibility(View.VISIBLE);
-																			flavor.setVisibility(View.VISIBLE);
-																			artist.setVisibility(View.VISIBLE);
-																		} else {
-																			cardpic.setImageDrawable(d);
-																		}
-																	} else if (loadTo == DIALOG) {
-																		image.setImageDrawable(d);
-																	}
-																	break;
-																case PRICELOAD:
-																	if (priceErrType.equals(NO_INTERNET)) {
-																		l.setText("No");
-																		m.setText("Internet");
-																		h.setText("Connection");
-																	} else if (XMLhandler == null || XMLhandler.link == null) {
-																		l.setText("Price");
-																		m.setText("Fetch");
-																		h.setText("Failed");
-																	} else {
-																		l.setText("$" + XMLhandler.lowprice);
-																		m.setText("$" + XMLhandler.avgprice);
-																		h.setText("$" + XMLhandler.hiprice);
+		@Override
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case PICLOAD:
+				if (loadTo == MAINPAGE) {
+					if (failedLoad) {
+						cardpic.setVisibility(View.GONE);
+						name.setVisibility(View.VISIBLE);
+						cost.setVisibility(View.VISIBLE);
+						type.setVisibility(View.VISIBLE);
+						set.setVisibility(View.VISIBLE);
+						ability.setVisibility(View.VISIBLE);
+						pt.setVisibility(View.VISIBLE);
+						flavor.setVisibility(View.VISIBLE);
+						artist.setVisibility(View.VISIBLE);
+					} else {
+						cardpic.setImageDrawable(d);
+					}
+				} else if (loadTo == DIALOG) {
+					image.setImageDrawable(d);
+				}
+				break;
+			case PRICELOAD:
+				if (priceErrType.equals(NO_INTERNET)) {
+					l.setText("No");
+					m.setText("Internet");
+					h.setText("Connection");
+				} else if (XMLhandler == null || XMLhandler.link == null) {
+					l.setText("Price");
+					m.setText("Fetch");
+					h.setText("Failed");
+				} else {
+					l.setText("$" + XMLhandler.lowprice);
+					m.setText("$" + XMLhandler.avgprice);
+					h.setText("$" + XMLhandler.hiprice);
 
-																		pricelink.setMovementMethod(LinkMovementMethod.getInstance());
-																		pricelink.setText(Html.fromHtml("<a href=\"" + XMLhandler.link + "\">"
-																				+ getString(R.string.tcgplayerlink) + "</a>"));
-																	}
-																	break;
-																}
-															}
-														};
+					pricelink.setMovementMethod(LinkMovementMethod.getInstance());
+					pricelink.setText(Html.fromHtml("<a href=\"" + XMLhandler.link + "\">"
+							+ getString(R.string.tcgplayerlink) + "</a>"));
+				}
+				break;
+			}
+		}
+	};
 	private TextView	copyView;
 
 	void fetchPrices() {
@@ -712,6 +770,9 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 			return true;
 		case R.id.price:
 			showDialog(GETPRICE);
+			return true;
+		case R.id.changeset:
+			showDialog(CHANGESET);
 			return true;
 		case R.id.legality:
 			new FetchLegalityTask().execute((String[]) null);

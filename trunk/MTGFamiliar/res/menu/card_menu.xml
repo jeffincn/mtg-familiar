@@ -29,6 +29,9 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:id="@+id/price"
         android:title="@string/price"/>
     <item
+        android:id="@+id/changeset"
+        android:title="@string/changeset" />
+    <item
         android:id="@+id/legality"
         android:title="@string/legality"/>
     <item

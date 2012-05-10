@@ -138,6 +138,7 @@
     <string name="cmc">CMC</string>
     <string name="image">Card Image</string>
     <string name="price">Card Price</string>
+    <string name="changeset">Change Set</string>
     <string name="cardsearch">Card Search</string>
     <string name="lifecounter">Life Counter</string>
     <string name="manapool">Mana Pool</string>

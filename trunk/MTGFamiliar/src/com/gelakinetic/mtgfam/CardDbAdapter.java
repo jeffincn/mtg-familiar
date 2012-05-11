@@ -63,8 +63,9 @@ public class CardDbAdapter {
 	public static final String		DATABASE_TABLE_FORMATS				= "formats";
 	private static final String		DATABASE_TABLE_LEGAL_SETS			= "legal_sets";
 	private static final String		DATABASE_TABLE_BANNED_CARDS		= "banned_cards";
+	private static final String		DATABASE_TABLE_SAVED_TRADES		= "saved_trades";
 
-	public static final int				DATABASE_VERSION							= 16;
+	public static final int				DATABASE_VERSION							= 17;
 
 	public static final String		KEY_ID												= "_id";
 	public static final String		KEY_NAME											= SearchManager.SUGGEST_COLUMN_TEXT_1;							// "name";
@@ -95,6 +96,10 @@ public class CardDbAdapter {
 
 	public static final String		KEY_FORMAT										= "format";
 	public static final String		KEY_LEGALITY									= "legality";
+
+	public static final String		KEY_SIDE											= "side";
+	public static final int				LEFT													= 0;
+	public static final int				RIGHT													= 1;
 
 	private DatabaseHelper				mDbHelper;
 	private SQLiteDatabase				mDb;
@@ -133,6 +138,12 @@ public class CardDbAdapter {
 																																	+ KEY_NAME + " text not null, " + KEY_LEGALITY
 																																	+ " integer not null, " + KEY_FORMAT
 																																	+ " text not null);";
+
+	private static final String		DATABASE_CREATE_SAVED_TRADES	= "create table " + DATABASE_TABLE_SAVED_TRADES + "("
+																																	+ KEY_ID + " integer primary key autoincrement, "
+																																	+ KEY_MULTIVERSEID + " integer not null, " + KEY_SIDE
+																																	+ " integer not null, " + KEY_NAME + " text not null"
+																																	+ KEY_NUMBER + " integer not null);";
 
 	private final Context					mCtx;
 
@@ -208,12 +219,14 @@ public class CardDbAdapter {
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_FORMATS);
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_LEGAL_SETS);
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_BANNED_CARDS);
-		
+		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_SAVED_TRADES);
+
 		mDb.execSQL(DATABASE_CREATE_CARDS);
 		mDb.execSQL(DATABASE_CREATE_SETS);
 		mDb.execSQL(DATABASE_CREATE_FORMATS);
 		mDb.execSQL(DATABASE_CREATE_LEGAL_SETS);
 		mDb.execSQL(DATABASE_CREATE_BANNED_CARDS);
+		mDb.execSQL(DATABASE_CREATE_SAVED_TRADES);
 	}
 
 	/**
@@ -442,10 +455,11 @@ public class CardDbAdapter {
 	 */
 	public Cursor fetchCardByName(String name) throws SQLException {
 		name = name.replace("'", "''").replace("æ", "Æ");
-		String sql = "SELECT " + DATABASE_TABLE_CARDS + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " +
-				DATABASE_TABLE_CARDS + "." + KEY_SET + ", " + DATABASE_TABLE_CARDS + "." + KEY_NUMBER + " FROM " + DATABASE_TABLE_CARDS +
-				" JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = " + DATABASE_TABLE_CARDS + "." + KEY_SET +
-				" WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + name + "' ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC";
+		String sql = "SELECT " + DATABASE_TABLE_CARDS + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", "
+				+ DATABASE_TABLE_CARDS + "." + KEY_SET + ", " + DATABASE_TABLE_CARDS + "." + KEY_NUMBER + " FROM "
+				+ DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = "
+				+ DATABASE_TABLE_CARDS + "." + KEY_SET + " WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + name
+				+ "' ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC";
 		Cursor mCursor = null;
 
 		try {
@@ -931,14 +945,15 @@ public class CardDbAdapter {
 			}
 			sel += ", " + DATABASE_TABLE_SETS + "." + KEY_DATE;
 
-			String sql = "SELECT * FROM (SELECT " + sel + " FROM " + tbl + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_CARDS
-					+ "." + KEY_SET + " = " + DATABASE_TABLE_SETS + "." + KEY_CODE + statement;
+			String sql = "SELECT * FROM (SELECT " + sel + " FROM " + tbl + " JOIN " + DATABASE_TABLE_SETS + " ON "
+					+ DATABASE_TABLE_CARDS + "." + KEY_SET + " = " + DATABASE_TABLE_SETS + "." + KEY_CODE + statement;
 
 			if (consolidate) {
 				sql += " ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + ") GROUP BY " + KEY_NAME + " ORDER BY " + KEY_NAME;
 			}
 			else {
-				sql += " ORDER BY " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC)";
+				sql += " ORDER BY " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " + DATABASE_TABLE_SETS + "." + KEY_DATE
+						+ " DESC)";
 			}
 			mCursor = mDb.rawQuery(sql, null);
 		}
@@ -976,8 +991,8 @@ public class CardDbAdapter {
 			}
 			sel += ", " + DATABASE_TABLE_SETS + "." + KEY_DATE;
 
-			String sql = "SELECT * FROM (SELECT " + sel + " FROM " + DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_CARDS
-					+ "." + KEY_SET + " = " + DATABASE_TABLE_SETS + "." + KEY_CODE + statement;
+			String sql = "SELECT * FROM (SELECT " + sel + " FROM " + DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS
+					+ " ON " + DATABASE_TABLE_CARDS + "." + KEY_SET + " = " + DATABASE_TABLE_SETS + "." + KEY_CODE + statement;
 
 			sql += " ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + ") GROUP BY " + KEY_NAME + " ORDER BY " + KEY_NAME;
 			mCursor = mDb.rawQuery(sql, null);
@@ -1068,6 +1083,31 @@ public class CardDbAdapter {
 		return mDb.insert(DATABASE_TABLE_BANNED_CARDS, null, initialValues);
 	}
 
+	public long addTradeCard(int multiverseID, int number, int side, String name) {
+		ContentValues initialValues = new ContentValues();
+		initialValues.put(KEY_NAME, name);
+		initialValues.put(KEY_MULTIVERSEID, multiverseID);
+		initialValues.put(KEY_NUMBER, number);
+		initialValues.put(KEY_SIDE, side);
+		return mDb.insert(DATABASE_TABLE_SAVED_TRADES, null, initialValues);
+	}
+
+	public Cursor fetchAllSavedTrades() {
+		String sql = "select " + KEY_ID + ", " + KEY_NAME + " from " + DATABASE_TABLE_SAVED_TRADES + " group by "
+				+ KEY_NAME;
+		return mDb.rawQuery(sql, null);
+	}
+
+	public Cursor fetchSavedTrade(String name) {
+		String sql = "select " + KEY_ID + ", " + KEY_NAME + ", " + KEY_MULTIVERSEID + ", " + KEY_NUMBER + ", " + KEY_SIDE
+				+ " from " + DATABASE_TABLE_SAVED_TRADES + " where " + KEY_NAME + " = '" + name + "'";
+		return mDb.rawQuery(sql, null);
+	}
+
+	public int removeSavedTrade(String name) {
+		return mDb.delete(DATABASE_TABLE_SAVED_TRADES, KEY_NAME + " = '" + name + "'", null);
+	}
+
 	public Cursor fetchAllFormats() {
 		try {
 			return mDb.query(DATABASE_TABLE_FORMATS, new String[] { KEY_ID, KEY_NAME, }, null, null, null, null, KEY_NAME);
@@ -1092,13 +1132,13 @@ public class CardDbAdapter {
 		try {
 			// The new way (single query per type, should be much faster) - Alex
 			String sql = "SELECT COALESCE(CASE (SELECT " + KEY_SET + " FROM " + DATABASE_TABLE_CARDS + " WHERE " + KEY_NAME
-					+ " = '" + mCardName + "') WHEN 'UG' THEN 1 WHEN 'UNH' THEN 1 ELSE NULL END, " 
-					+ "CASE (SELECT 1 FROM " + DATABASE_TABLE_CARDS + " c INNER JOIN "
-					+ DATABASE_TABLE_LEGAL_SETS + " ls ON ls." + KEY_SET + " = c." + KEY_SET + " WHERE ls." + KEY_FORMAT + " = '"
-					+ format + "' AND c." + KEY_NAME + " = '" + mCardName + "') WHEN 1 THEN NULL ELSE CASE WHEN '" + format
-					+ "' = 'Legacy' " + "THEN NULL WHEN '" + format + "' = 'Vintage' THEN NULL ELSE 1 END END, (SELECT "
-					+ KEY_LEGALITY + " from " + DATABASE_TABLE_BANNED_CARDS + " WHERE " + KEY_NAME + " = '" + mCardName
-					+ "' AND " + KEY_FORMAT + " = '" + format + "'), 0) AS " + KEY_LEGALITY;
+					+ " = '" + mCardName + "') WHEN 'UG' THEN 1 WHEN 'UNH' THEN 1 ELSE NULL END, " + "CASE (SELECT 1 FROM "
+					+ DATABASE_TABLE_CARDS + " c INNER JOIN " + DATABASE_TABLE_LEGAL_SETS + " ls ON ls." + KEY_SET + " = c."
+					+ KEY_SET + " WHERE ls." + KEY_FORMAT + " = '" + format + "' AND c." + KEY_NAME + " = '" + mCardName
+					+ "') WHEN 1 THEN NULL ELSE CASE WHEN '" + format + "' = 'Legacy' " + "THEN NULL WHEN '" + format
+					+ "' = 'Vintage' THEN NULL ELSE 1 END END, (SELECT " + KEY_LEGALITY + " from " + DATABASE_TABLE_BANNED_CARDS
+					+ " WHERE " + KEY_NAME + " = '" + mCardName + "' AND " + KEY_FORMAT + " = '" + format + "'), 0) AS "
+					+ KEY_LEGALITY;
 
 			Cursor c = null;
 			c = mDb.rawQuery(sql, null);
@@ -1329,6 +1369,69 @@ public class CardDbAdapter {
 		Cursor mCursor = null;
 		String name = null;
 		String statement = "(" + KEY_ID + " = " + id + ")";
+		try {
+			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID, KEY_NAME }, statement, null, null, null,
+					KEY_ID, null);
+			mCursor.moveToFirst();
+			name = mCursor.getString(mCursor.getColumnIndex(KEY_NAME));
+			mCursor.close();
+		}
+		catch (SQLiteException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		catch (IllegalStateException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+
+		return name;
+	}
+
+	public int fetchMultiverseID(String name, String setCode) {
+		Cursor mCursor = null;
+		int mID = -1;
+		String statement = "(" + KEY_NAME + " = '" + name + "' AND " + KEY_SET + " = '" + setCode + "')";
+		try {
+			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID, KEY_MULTIVERSEID }, statement, null, null, null,
+					KEY_ID, null);
+			mCursor.moveToFirst();
+			mID = mCursor.getInt(mCursor.getColumnIndex(KEY_MULTIVERSEID));
+			mCursor.close();
+		}
+		catch (SQLiteException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		catch (IllegalStateException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+
+		return mID;
+	}
+
+	public String getSetFromMultiverseId(int id) {
+		Cursor mCursor = null;
+		String name = null;
+		String statement = "(" + KEY_MULTIVERSEID + " = " + id + ")";
+		try {
+			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID, KEY_SET }, statement, null, null, null,
+					KEY_ID, null);
+			mCursor.moveToFirst();
+			name = mCursor.getString(mCursor.getColumnIndex(KEY_SET));
+			mCursor.close();
+		}
+		catch (SQLiteException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		catch (IllegalStateException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+
+		return name;
+	}
+	
+	public String getNameFromMultiverseId(long id) {
+		Cursor mCursor = null;
+		String name = null;
+		String statement = "(" + KEY_MULTIVERSEID + " = " + id + ")";
 		try {
 			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID, KEY_NAME }, statement, null, null, null,
 					KEY_ID, null);

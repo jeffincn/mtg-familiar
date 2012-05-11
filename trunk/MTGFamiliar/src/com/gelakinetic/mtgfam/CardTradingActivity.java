@@ -59,42 +59,45 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class CardTradingActivity extends FragmentActivity {
-	private Context															mCtx;
-	private final static int DIALOG_UPDATE_CARD					= 1;
-	private final static int DIALOG_PRICE_SETTING = 2;
-	private String sideForDialog;
-	private int positionForDialog;
-	
-	private AutoCompleteTextView								namefield;
+	private Context								mCtx;
+	private final static int			DIALOG_UPDATE_CARD		= 1;
+	private final static int			DIALOG_PRICE_SETTING	= 2;
+	private final static int			DIALOG_SAVE_TRADE			= 3;
+	private final static int			DIALOG_LOAD_TRADE			= 4;
+	private String								sideForDialog;
+	private int										positionForDialog;
 
-	private Button															bAddTradeLeft;
-	private TextView														tradePriceLeft;
-	private ListView														lvTradeLeft;
-	private TradeListAdapter												aaTradeLeft;
-	private ArrayList<CardData>	lTradeLeft;
+	private AutoCompleteTextView	namefield;
 
-	private Button															bAddTradeRight;
-	private TextView														tradePriceRight;
-	private ListView														lvTradeRight;
-	private TradeListAdapter												aaTradeRight;
-	private ArrayList<CardData>	lTradeRight;
+	private Button								bAddTradeLeft;
+	private TextView							tradePriceLeft;
+	private ListView							lvTradeLeft;
+	private TradeListAdapter			aaTradeLeft;
+	private ArrayList<CardData>		lTradeLeft;
 
-	private CardDbAdapter												mdbAdapter;
-	private EditText	numberfield;
-	
-	private int priceSetting;
-	
-	public static final String card_not_found = "Card Not Found";
-	public static final String mangled_url = "Mangled URL";
-	public static final String database_busy = "Database Busy";
-	public static final String card_dne = "Card Does Not Exist";
-	public static final String fetch_failed = "Fetch Failed";
-	public static final String number_of_invalid = "Number of Cards Invalid";
-	public static final String price_invalid = "Price Invalid";
+	private Button								bAddTradeRight;
+	private TextView							tradePriceRight;
+	private ListView							lvTradeRight;
+	private TradeListAdapter			aaTradeRight;
+	private ArrayList<CardData>		lTradeRight;
 
-	private static final int LOW_PRICE = 0;
-	private static final int AVG_PRICE = 1;
-	private static final int HIGH_PRICE = 2;
+	private CardDbAdapter					mdbAdapter;
+	private EditText							numberfield;
+
+	private int										priceSetting;
+	private Cursor								trades;
+
+	public static final String		card_not_found				= "Card Not Found";
+	public static final String		mangled_url						= "Mangled URL";
+	public static final String		database_busy					= "Database Busy";
+	public static final String		card_dne							= "Card Does Not Exist";
+	public static final String		fetch_failed					= "Fetch Failed";
+	public static final String		number_of_invalid			= "Number of Cards Invalid";
+	public static final String		price_invalid					= "Price Invalid";
+
+	private static final int			LOW_PRICE							= 0;
+	private static final int			AVG_PRICE							= 1;
+	private static final int			HIGH_PRICE						= 2;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -109,9 +112,9 @@ public class CardTradingActivity extends FragmentActivity {
 		namefield = (AutoCompleteTextView) findViewById(R.id.namesearch);
 		namefield.setAdapter(new AutocompleteCursorAdapter(this, null));
 
-		numberfield = (EditText)findViewById(R.id.numberInput);
+		numberfield = (EditText) findViewById(R.id.numberInput);
 		numberfield.setText("1");
-		
+
 		lTradeLeft = new ArrayList<CardData>();
 		bAddTradeLeft = (Button) findViewById(R.id.addCardLeft);
 		tradePriceLeft = (TextView) findViewById(R.id.priceTextLeft);
@@ -135,16 +138,16 @@ public class CardTradingActivity extends FragmentActivity {
 					}
 					int numberOf = Integer.parseInt(numberOfFromField);
 
-					CardData data = new CardData(namefield.getText().toString(), "", "", numberOf, 0, "loading","");
+					CardData data = new CardData(namefield.getText().toString(), "", "", numberOf, 0, "loading", "");
 
-					lTradeLeft.add(0,data);
+					lTradeLeft.add(0, data);
 					aaTradeLeft.notifyDataSetChanged();
 					FetchPriceTask loadPrice = new FetchPriceTask(data, aaTradeLeft);
 					loadPrice.execute();
 					namefield.setText("");
 					numberfield.setText("1");
 				}
-				else{
+				else {
 					Toast.makeText(getApplicationContext(), getString(R.string.type_card_first), Toast.LENGTH_SHORT).show();
 				}
 			}
@@ -159,16 +162,16 @@ public class CardTradingActivity extends FragmentActivity {
 					}
 					int numberOf = Integer.parseInt(numberOfFromField);
 
-					CardData data = new CardData(namefield.getText().toString(), "", "", numberOf, 0, "loading","");
+					CardData data = new CardData(namefield.getText().toString(), "", "", numberOf, 0, "loading", "");
 
-					lTradeRight.add(0,data);
+					lTradeRight.add(0, data);
 					aaTradeRight.notifyDataSetChanged();
 					FetchPriceTask loadPrice = new FetchPriceTask(data, aaTradeRight);
 					loadPrice.execute();
 					namefield.setText("");
 					numberfield.setText("1");
 				}
-				else{
+				else {
 					Toast.makeText(getApplicationContext(), getString(R.string.type_card_first), Toast.LENGTH_SHORT).show();
 				}
 			}
@@ -188,19 +191,21 @@ public class CardTradingActivity extends FragmentActivity {
 				showDialog(DIALOG_UPDATE_CARD);
 			}
 		});
-		
+
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		priceSetting = Integer.parseInt(prefs.getString("tradePrice", String.valueOf(AVG_PRICE)));
-		
-		//Give this a default value so we don't get the null pointer-induced FC. It shouldn't matter what
-		//we set it to, as long as we set it, since we dismiss the dialog if it's showing in onResume().
+
+		// Give this a default value so we don't get the null pointer-induced FC. It
+		// shouldn't matter what
+		// we set it to, as long as we set it, since we dismiss the dialog if it's
+		// showing in onResume().
 		sideForDialog = "left";
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
+
 		try {
 			dismissDialog(DIALOG_UPDATE_CARD);
 		}
@@ -211,19 +216,29 @@ public class CardTradingActivity extends FragmentActivity {
 		}
 		catch (IllegalArgumentException e) {
 		}
-		
+		try {
+			dismissDialog(DIALOG_SAVE_TRADE);
+		}
+		catch (IllegalArgumentException e) {
+		}
+		try {
+			dismissDialog(DIALOG_LOAD_TRADE);
+		}
+		catch (IllegalArgumentException e) {
+		}
+
 		MyApp appState = ((MyApp) getApplicationContext());
 		appState.setState(0);
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		if(mdbAdapter != null) {
+		if (mdbAdapter != null) {
 			mdbAdapter.close();
 		}
 	}
-	
+
 	protected Dialog onCreateDialog(int id) {
 		Dialog dialog;
 		AlertDialog.Builder builder;
@@ -235,122 +250,124 @@ public class CardTradingActivity extends FragmentActivity {
 				final TradeListAdapter aaSide = (sideForDialog.equals("left") ? aaTradeLeft : aaTradeRight);
 				final int numberOfCards = lSide.get(position).getNumberOf();
 				final String priceOfCard = lSide.get(position).getPriceString();
-				
+
 				View view = LayoutInflater.from(mCtx).inflate(R.layout.trader_card_click_dialog, null);
-				Button removeAll = (Button)view.findViewById(R.id.traderDialogRemove);
-				Button changeSet = (Button)view.findViewById(R.id.traderDialogChangeSet);
-				Button cancelbtn = (Button)view.findViewById(R.id.traderDialogCancel);
-				Button donebtn   = (Button)view.findViewById(R.id.traderDialogDone);
-				final EditText numberOf = (EditText)view.findViewById(R.id.traderDialogNumber);
-				final EditText priceText = (EditText)view.findViewById(R.id.traderDialogPrice);				
-				
+				Button removeAll = (Button) view.findViewById(R.id.traderDialogRemove);
+				Button changeSet = (Button) view.findViewById(R.id.traderDialogChangeSet);
+				Button cancelbtn = (Button) view.findViewById(R.id.traderDialogCancel);
+				Button donebtn = (Button) view.findViewById(R.id.traderDialogDone);
+				final EditText numberOf = (EditText) view.findViewById(R.id.traderDialogNumber);
+				final EditText priceText = (EditText) view.findViewById(R.id.traderDialogPrice);
+
 				builder = new AlertDialog.Builder(CardTradingActivity.this);
-				builder
-				.setTitle(lSide.get(position).getName())
-				.setView(view);
-				
+				builder.setTitle(lSide.get(position).getName()).setView(view);
+
 				dialog = builder.create();
-				
+
 				String numberOfStr = String.valueOf(numberOfCards);
 				numberOf.setText(numberOfStr);
 				numberOf.setSelection(numberOfStr.length());
-				
+
 				String priceNumberStr = lSide.get(position).hasPrice() ? priceOfCard.substring(1) : "";
 				priceText.setText(priceNumberStr);
 				priceText.setSelection(priceNumberStr.length());
-				
+
 				removeAll.setOnClickListener(new OnClickListener() {
 					public void onClick(View v) {
 						lSide.remove(position);
 						aaSide.notifyDataSetChanged();
-						UpdateTotalPrices(side);						
+						UpdateTotalPrices(side);
 						removeDialog(DIALOG_UPDATE_CARD);
 					}
 				});
-				
+
 				changeSet.setOnClickListener(new OnClickListener() {
 					public void onClick(View v) {
 						removeDialog(DIALOG_UPDATE_CARD);
 						ChangeSet(side, position);
 					}
 				});
-				
-				cancelbtn.setOnClickListener( new OnClickListener() {
+
+				cancelbtn.setOnClickListener(new OnClickListener() {
 					public void onClick(View v) {
 						removeDialog(DIALOG_UPDATE_CARD);
 					}
 				});
-				
+
 				donebtn.setOnClickListener(new OnClickListener() {
 					public void onClick(View v) {
-						
-						//validate number of cards text
-						if (numberOf.length() == 0){
+
+						// validate number of cards text
+						if (numberOf.length() == 0) {
 							Toast.makeText(getApplicationContext(), number_of_invalid, Toast.LENGTH_LONG).show();
 							return;
 						}
-						
-						//validate the price text
+
+						// validate the price text
 						String userInputPrice = priceText.getText().toString();
 						double uIP;
 						try {
 							uIP = Double.parseDouble(userInputPrice);
-							lSide.get(position).setMessage(""); //Clear the message so the user's specified price will display
+							lSide.get(position).setMessage(""); // Clear the message so the
+																									// user's specified price will
+																									// display
 						}
 						catch (NumberFormatException e) {
 							uIP = 0;
 						}
-						
+
 						lSide.get(position).setNumberOf(Integer.parseInt(numberOf.getEditableText().toString()));
-						lSide.get(position).setPrice((int)Math.round(uIP * 100));
+						lSide.get(position).setPrice((int) Math.round(uIP * 100));
 						aaSide.notifyDataSetChanged();
 						UpdateTotalPrices(side);
-						
+
 						removeDialog(DIALOG_UPDATE_CARD);
 					}
 				});
-				
+
 				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 					public void onDismiss(DialogInterface dialog) {
 						removeDialog(DIALOG_UPDATE_CARD);
 					}
 				});
-				
+
 				dialog.show();
-				break;	
+				break;
 			case DIALOG_PRICE_SETTING:
 				builder = new AlertDialog.Builder(this);
-				
+
 				builder.setTitle("Price Options");
-				builder.setSingleChoiceItems(new String[] {"Low", "Average", "High"}, priceSetting, new DialogInterface.OnClickListener() {
+				builder.setSingleChoiceItems(new String[] { "Low", "Average", "High" }, priceSetting,
+						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int which) {
 								priceSetting = which;
 								dialog.dismiss();
-								
-								//Update ALL the prices!
-								for(CardData data : lTradeLeft) {
+
+								// Update ALL the prices!
+								for (CardData data : lTradeLeft) {
 									data.setMessage("loading");
 									FetchPriceTask task = new FetchPriceTask(data, aaTradeLeft);
 									task.execute();
 								}
 								aaTradeLeft.notifyDataSetChanged();
-								
-								for(CardData data : lTradeRight) {
+
+								for (CardData data : lTradeRight) {
 									data.setMessage("loading");
 									FetchPriceTask task = new FetchPriceTask(data, aaTradeRight);
 									task.execute();
 								}
 								aaTradeRight.notifyDataSetChanged();
-								
-								//And also update the preference
-								SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(CardTradingActivity.this).edit();
+
+								// And also update the preference
+								SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(CardTradingActivity.this)
+										.edit();
 								edit.putString("tradePrice", String.valueOf(priceSetting));
 								edit.commit();
-								
+
 								removeDialog(DIALOG_PRICE_SETTING);
 							}
 						});
-				
+
 				dialog = builder.create();
 
 				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -358,8 +375,100 @@ public class CardTradingActivity extends FragmentActivity {
 						removeDialog(DIALOG_PRICE_SETTING);
 					}
 				});
-				
+
 				dialog.show();
+				break;
+			case DIALOG_SAVE_TRADE:
+				builder = new AlertDialog.Builder(this);
+
+				builder.setTitle("Save The Trade");
+				builder.setMessage("Enter the trade's name");
+
+				// Set an EditText view to get user input
+				final EditText input = new EditText(this);
+				builder.setView(input);
+
+				builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String tradeName = input.getText().toString();
+						
+						// Overwrite any previous trades with the same name
+						mdbAdapter.removeSavedTrade(tradeName);
+						
+						for (CardData cd : lTradeLeft) {
+							mdbAdapter.addTradeCard(cd.getMultiverseID(), cd.getNumberOf(), CardDbAdapter.LEFT, tradeName);
+						}
+						for (CardData cd : lTradeRight) {
+							mdbAdapter.addTradeCard(cd.getMultiverseID(), cd.getNumberOf(), CardDbAdapter.RIGHT, tradeName);
+						}
+					}
+				});
+
+				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						// Canceled.
+					}
+				});
+
+				dialog = builder.create();
+
+				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					public void onDismiss(DialogInterface dialog) {
+						removeDialog(DIALOG_SAVE_TRADE);
+					}
+				});
+				break;
+			case DIALOG_LOAD_TRADE:
+
+				trades = mdbAdapter.fetchAllSavedTrades();
+				builder = new AlertDialog.Builder(this);
+				builder.setCursor(trades, new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface di, int which) {
+						// TODO Auto-generated method stub
+						trades.moveToPosition(which);
+						String tradeName = trades.getString(trades.getColumnIndex(CardDbAdapter.KEY_NAME));
+						Cursor cardsToAdd = mdbAdapter.fetchSavedTrade(tradeName);
+						cardsToAdd.moveToFirst();
+
+						lTradeLeft.clear();
+						lTradeRight.clear();
+
+						while (!cardsToAdd.isAfterLast()) {
+							int mID = cardsToAdd.getInt(cardsToAdd.getColumnIndex(CardDbAdapter.KEY_MULTIVERSEID));
+							int side = cardsToAdd.getInt(cardsToAdd.getColumnIndex(CardDbAdapter.KEY_SIDE));
+							int numberOf = cardsToAdd.getInt(cardsToAdd.getColumnIndex(CardDbAdapter.KEY_NUMBER));
+
+							String cardName = mdbAdapter.getNameFromMultiverseId(mID);
+							String cardSet = mdbAdapter.getSetFromMultiverseId(mID);
+
+							CardData cd = new CardData(cardName, mdbAdapter.getTCGname(cardSet), cardSet, numberOf, 0, "loading", Integer.toString(numberOf));
+							if (side == CardDbAdapter.LEFT) {
+								lTradeLeft.add(0,cd);
+								FetchPriceTask loadPrice = new FetchPriceTask(lTradeLeft.get(0), aaTradeLeft);
+								loadPrice.execute();
+							}
+							else if (side == CardDbAdapter.RIGHT) {
+								lTradeRight.add(0,cd);
+								FetchPriceTask loadPrice = new FetchPriceTask(lTradeRight.get(0), aaTradeRight);
+								loadPrice.execute();
+							}
+							cardsToAdd.moveToNext();
+						}
+
+						aaTradeLeft.notifyDataSetChanged();
+						aaTradeRight.notifyDataSetChanged();
+					}
+				}, CardDbAdapter.KEY_NAME);
+
+				dialog = builder.create();
+
+				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					public void onDismiss(DialogInterface dialog) {
+						removeDialog(DIALOG_LOAD_TRADE);
+					}
+				});
 				break;
 			default:
 				dialog = null;
@@ -370,7 +479,7 @@ public class CardTradingActivity extends FragmentActivity {
 	protected void ChangeSet(final String _side, final int _position) {
 		CardData data = (_side.equals("left") ? lTradeLeft.get(_position) : lTradeRight.get(_position));
 		String name = data.getName();
-		
+
 		Cursor cards = mdbAdapter.fetchCardByName(name);
 		Set<String> sets = new LinkedHashSet<String>();
 		Set<String> setCodes = new LinkedHashSet<String>();
@@ -382,7 +491,7 @@ public class CardTradingActivity extends FragmentActivity {
 		}
 		cards.deactivate();
 		cards.close();
-		
+
 		final String[] aSets = sets.toArray(new String[sets.size()]);
 		final String[] aSetCodes = setCodes.toArray(new String[setCodes.size()]);
 		AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
@@ -408,7 +517,7 @@ public class CardTradingActivity extends FragmentActivity {
 				return;
 			}
 		});
-		builder.create().show();		
+		builder.create().show();
 	}
 
 	@Override
@@ -424,11 +533,12 @@ public class CardTradingActivity extends FragmentActivity {
 		for (String card : cardDataIn) {
 			String[] cardData = card.split("\\|");
 			int numberOf = Integer.parseInt(cardData[7]);
-			CardData data = new CardData(cardData[1], cardData[2], cardData[3], numberOf, Integer.parseInt(cardData[4]), cardData[5], cardData[6]);
+			CardData data = new CardData(cardData[1], cardData[2], cardData[3], numberOf, Integer.parseInt(cardData[4]),
+					cardData[5], cardData[6]);
 
 			if (cardData[0].equals("left")) {
 				lTradeLeft.add(data);
-				
+
 				if (data.getMessage().equals("loading")) {
 					FetchPriceTask loadPrice = new FetchPriceTask(data, aaTradeLeft);
 					loadPrice.execute();
@@ -436,7 +546,7 @@ public class CardTradingActivity extends FragmentActivity {
 			}
 			else if (cardData[0].equals("right")) {
 				lTradeRight.add(data);
-				
+
 				if (data.getMessage().equals("loading")) {
 					FetchPriceTask loadPrice = new FetchPriceTask(data, aaTradeRight);
 					loadPrice.execute();
@@ -474,27 +584,29 @@ public class CardTradingActivity extends FragmentActivity {
 	private void UpdateTotalPrices() {
 		UpdateTotalPrices("both");
 	}
-	
+
 	private void UpdateTotalPrices(String _side) {
 		if (_side.equals("left") || _side.equals("both")) {
 			int totalPriceLeft = GetPricesFromTradeList(lTradeLeft);
-			int color = PriceListHasBadValues(lTradeLeft) ? mCtx.getResources().getColor(R.color.red) : mCtx.getResources().getColor(R.color.white);
+			int color = PriceListHasBadValues(lTradeLeft) ? mCtx.getResources().getColor(R.color.red) : mCtx.getResources()
+					.getColor(R.color.white);
 			String sTotalLeft = "$" + (totalPriceLeft / 100) + "." + String.format("%02d", (totalPriceLeft % 100));
 			tradePriceLeft.setText(sTotalLeft);
 			tradePriceLeft.setTextColor(color);
 		}
 		if (_side.equals("right") || _side.equals("both")) {
 			int totalPriceRight = GetPricesFromTradeList(lTradeRight);
-			int color = PriceListHasBadValues(lTradeRight) ? mCtx.getResources().getColor(R.color.red) : mCtx.getResources().getColor(R.color.white);
+			int color = PriceListHasBadValues(lTradeRight) ? mCtx.getResources().getColor(R.color.red) : mCtx.getResources()
+					.getColor(R.color.white);
 			String sTotalRight = "$" + (totalPriceRight / 100) + "." + String.format("%02d", (totalPriceRight % 100));
 			tradePriceRight.setText(sTotalRight);
 			tradePriceRight.setTextColor(color);
 		}
 	}
-	
+
 	private boolean PriceListHasBadValues(ArrayList<CardData> trade) {
 		for (CardData data : trade) {
-			if(!data.hasPrice()) {
+			if (!data.hasPrice()) {
 				return true;
 			}
 		}
@@ -504,7 +616,7 @@ public class CardTradingActivity extends FragmentActivity {
 	private int GetPricesFromTradeList(ArrayList<CardData> _trade) {
 		int totalPrice = 0;
 
-		for (int i=0; i < _trade.size(); i++){//CardData data : _trade) {
+		for (int i = 0; i < _trade.size(); i++) {// CardData data : _trade) {
 			CardData data = _trade.get(i);
 			if (data.hasPrice()) {
 				totalPrice += data.getNumberOf() * data.getPrice();
@@ -514,182 +626,181 @@ public class CardTradingActivity extends FragmentActivity {
 
 				// Remove the card from the list, unless it was just a fetch failed.
 				// Otherwise, the card does not exist, or there is a database problem
-				
-				if(message.compareTo(card_not_found) == 0){
+
+				if (message.compareTo(card_not_found) == 0) {
 					_trade.remove(data);
 					i--;
 					aaTradeRight.notifyDataSetChanged();
 					aaTradeLeft.notifyDataSetChanged();
 					Toast.makeText(getApplicationContext(), data.getName() + ": " + card_not_found, Toast.LENGTH_LONG).show();
 				}
-				else if(message.compareTo(mangled_url) == 0){
+				else if (message.compareTo(mangled_url) == 0) {
 					_trade.remove(data);
 					i--;
 					aaTradeRight.notifyDataSetChanged();
 					aaTradeLeft.notifyDataSetChanged();
 					Toast.makeText(getApplicationContext(), data.getName() + ": " + mangled_url, Toast.LENGTH_LONG).show();
 				}
-				else if(message.compareTo(database_busy) == 0){
+				else if (message.compareTo(database_busy) == 0) {
 					_trade.remove(data);
 					i--;
 					aaTradeRight.notifyDataSetChanged();
 					aaTradeLeft.notifyDataSetChanged();
 					Toast.makeText(getApplicationContext(), data.getName() + ": " + database_busy, Toast.LENGTH_LONG).show();
 				}
-				else if(message.compareTo(card_dne) == 0){
+				else if (message.compareTo(card_dne) == 0) {
 					_trade.remove(data);
 					i--;
 					aaTradeRight.notifyDataSetChanged();
 					aaTradeLeft.notifyDataSetChanged();
 					Toast.makeText(getApplicationContext(), data.getName() + ": " + card_dne, Toast.LENGTH_LONG).show();
 				}
-				else if(message.compareTo(fetch_failed) == 0){
-					
+				else if (message.compareTo(fetch_failed) == 0) {
+
 				}
 			}
 		}
 		return totalPrice;
 	}
-	
-	private class CardData	{
-		
-		private String name;
-		private String number;
-		private String tcgName;
-		private String setCode;
-		private int numberOf;
-		private int price; //In cents
-		private String message;
-		
+
+	private class CardData {
+
+		private String	name;
+		private String	number;
+		private String	tcgName;
+		private String	setCode;
+		private int			numberOf;
+		private int			price;		// In cents
+		private String	message;
+
 		public CardData(String name, String tcgName, String setCode, int numberOf, int price, String message, String number) {
 			this.name = name;
 			this.number = number;
-			this.tcgName = tcgName;
 			this.setCode = setCode;
+			if(setCode.length() > 0){
+				
+			}
+			this.tcgName = tcgName;
 			this.numberOf = numberOf;
 			this.price = price;
 			this.message = message;
 		}
-		
+
+		public int getMultiverseID() {
+			return mdbAdapter.fetchMultiverseID(name, setCode);
+		}
+
 		public String getName() {
 			return this.name;
 		}
-		
+
 		public String getNumber() {
 			return this.number;
 		}
-		
+
 		public void setNumber(String newNumber) {
 			this.number = newNumber;
 		}
-		
+
 		public String getTcgName() {
 			return this.tcgName;
 		}
-		
+
 		public void setTcgName(String newTcgName) {
 			this.tcgName = newTcgName;
 		}
-		
+
 		public String getSetCode() {
 			return this.setCode;
 		}
-		
+
 		public void setSetCode(String newSetCode) {
 			this.setCode = newSetCode;
 		}
-		
+
 		public int getNumberOf() {
 			return this.numberOf;
 		}
-		
+
 		public void setNumberOf(int newNumber) {
 			this.numberOf = newNumber;
 		}
-		
+
 		public int getPrice() {
 			return this.price;
 		}
-		
+
 		public String getPriceString() {
 			return "$" + String.valueOf(this.price / 100) + "." + String.format("%02d", this.price % 100);
 		}
-		
+
 		public void setPrice(int newPrice) {
 			this.price = newPrice;
 		}
-		
+
 		public String getMessage() {
 			return this.message;
 		}
-		
+
 		public void setMessage(String newMessage) {
 			this.message = newMessage;
 		}
-		
+
 		public boolean hasPrice() {
 			return this.message == null || this.message.length() == 0;
 		}
 	}
-	
+
 	private class TradeListAdapter extends ArrayAdapter<CardData> {
 
-		private int layoutResourceId;
-		private ArrayList<CardData> items;
-		private Context mCtx;
-		
+		private int									layoutResourceId;
+		private ArrayList<CardData>	items;
+		private Context							mCtx;
+
 		public TradeListAdapter(Context context, int textViewResourceId, ArrayList<CardData> items) {
 			super(context, textViewResourceId, items);
-			
+
 			this.mCtx = context;
 			this.layoutResourceId = textViewResourceId;
 			this.items = items;
 		}
-		
+
 		@Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+		public View getView(int position, View convertView, ViewGroup parent) {
 			View v = convertView;
-			if(v == null)
-			{
+			if (v == null) {
 				LayoutInflater inf = getLayoutInflater();
 				v = inf.inflate(layoutResourceId, null);
 			}
 			CardData data = items.get(position);
-			if(data != null)
-			{
-				TextView nameField = (TextView)v.findViewById(R.id.traderRowName);
-				TextView setField = (TextView)v.findViewById(R.id.traderRowSet);
-				TextView numberField = (TextView)v.findViewById(R.id.traderNumber);
-				TextView priceField = (TextView)v.findViewById(R.id.traderRowPrice);
-				
+			if (data != null) {
+				TextView nameField = (TextView) v.findViewById(R.id.traderRowName);
+				TextView setField = (TextView) v.findViewById(R.id.traderRowSet);
+				TextView numberField = (TextView) v.findViewById(R.id.traderNumber);
+				TextView priceField = (TextView) v.findViewById(R.id.traderRowPrice);
+
 				nameField.setText(data.getName());
 				setField.setText(data.getTcgName());
 				numberField.setText(data.hasPrice() ? data.getNumberOf() + "x" : "");
 				priceField.setText(data.hasPrice() ? data.getPriceString() : data.getMessage());
-			
+
 				if (data.hasPrice()) {
-//					nameField.setTextColor(mCtx.getResources().getColor(R.color.white));
-//					setField.setTextColor(mCtx.getResources().getColor(R.color.light_gray));
-//					numberField.setTextColor(mCtx.getResources().getColor(R.color.light_gray));
 					priceField.setTextColor(mCtx.getResources().getColor(R.color.light_gray));
 				}
 				else {
-//					nameField.setTextColor(mCtx.getResources().getColor(R.color.red));
-//					setField.setTextColor(mCtx.getResources().getColor(R.color.red));
-//					numberField.setTextColor(mCtx.getResources().getColor(R.color.red));
 					priceField.setTextColor(mCtx.getResources().getColor(R.color.red));
-				}}
-			
+				}
+			}
 			return v;
 		}
 	}
 
 	private class FetchPriceTask extends AsyncTask<Void, Void, Integer> {
-		CardData	data;
-		TradeListAdapter						toNotify;
-		String								price	= "";
-		String								setCode		= "";
-		String 								tcgName ="";
+		CardData					data;
+		TradeListAdapter	toNotify;
+		String						price		= "";
+		String						setCode	= "";
+		String						tcgName	= "";
 
 		public FetchPriceTask(CardData _data, TradeListAdapter _toNotify) {
 			data = _data;
@@ -705,7 +816,7 @@ public class CardTradingActivity extends FragmentActivity {
 				number = data.getNumber();
 				setCode = data.getSetCode();
 				tcgName = data.getTcgName();
-				if(number.equals("") || setCode.equals("") || tcgName.equals("")) {
+				if (number.equals("") || setCode.equals("") || tcgName.equals("")) {
 					Cursor card;
 					card = mdbAdapter.fetchCardByName(data.getName());
 					if (card.moveToFirst()) {
@@ -713,14 +824,14 @@ public class CardTradingActivity extends FragmentActivity {
 						if (data.getSetCode().equals("")) {
 							setCode = card.getString(card.getColumnIndex(CardDbAdapter.KEY_SET));
 							tcgName = mdbAdapter.getTCGname(setCode);
-							
+
 							data.setSetCode(setCode);
 							data.setTcgName(tcgName);
 						}
-						
+
 						number = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NUMBER));
 						data.setNumber(number);
-						
+
 						card.deactivate();
 						card.close();
 					}
@@ -744,7 +855,7 @@ public class CardTradingActivity extends FragmentActivity {
 			URL priceurl = null;
 
 			try {
-				if (number.contains("b")) {
+				if (number.contains("b") && CardViewActivity.isTransformable(number, data.setCode)) {
 					priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p="
 							+ mdbAdapter.getTransformName(setCode, number.replace("b", "a"))).replace(" ", "%20").replace("Æ", "Ae"));
 				}
@@ -779,12 +890,12 @@ public class CardTradingActivity extends FragmentActivity {
 				data.setMessage("");
 			}
 			catch (NumberFormatException e) {
-				//If this fails, it means price contains an error string, not a number
+				// If this fails, it means price contains an error string, not a number
 				dPrice = 0;
 				data.setMessage(price);
 			}
-			data.setPrice((int)(dPrice * 100));
-				
+			data.setPrice((int) (dPrice * 100));
+
 			UpdateTotalPrices();
 			toNotify.notifyDataSetChanged();
 		}
@@ -823,11 +934,11 @@ public class CardTradingActivity extends FragmentActivity {
 				return fetch_failed;
 			}
 			else {
-				if(priceSetting == LOW_PRICE) {
+				if (priceSetting == LOW_PRICE) {
 					return XMLhandler.lowprice;
 				}
-				else if(priceSetting == HIGH_PRICE) {
-					return XMLhandler.hiprice;	
+				else if (priceSetting == HIGH_PRICE) {
+					return XMLhandler.hiprice;
 				}
 				else {
 					return XMLhandler.avgprice;
@@ -849,6 +960,12 @@ public class CardTradingActivity extends FragmentActivity {
 				return true;
 			case R.id.trader_menu_settings:
 				showDialog(DIALOG_PRICE_SETTING);
+				return true;
+			case R.id.trader_menu_save:
+				showDialog(DIALOG_SAVE_TRADE);
+				return true;
+			case R.id.trader_menu_load:
+				showDialog(DIALOG_LOAD_TRADE);
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

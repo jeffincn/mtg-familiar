@@ -1091,21 +1091,57 @@ public class CardDbAdapter {
 		initialValues.put(KEY_SIDE, side);
 		return mDb.insert(DATABASE_TABLE_SAVED_TRADES, null, initialValues);
 	}
-
-	public Cursor fetchAllSavedTrades() {
-		String sql = "select " + KEY_ID + ", " + KEY_NAME + " from " + DATABASE_TABLE_SAVED_TRADES + " group by "
-				+ KEY_NAME;
-		return mDb.rawQuery(sql, null);
+	
+	public void addTradeCard(String cardName, String setCode, int number, int side, String tradeName) {
+		String sql = "INSERT INTO " + DATABASE_TABLE_SAVED_TRADES + " (" + KEY_MULTIVERSEID + ", " + KEY_SIDE + ", " + KEY_NAME + ", " + KEY_NUMBER + ") SELECT " + 
+				KEY_MULTIVERSEID + ", " + side + ", '" + tradeName.replace("'", "''") + "', " + number + " FROM " + DATABASE_TABLE_CARDS + " WHERE " + KEY_NAME + 
+				" = '" + cardName.replace("'", "''") + "' AND expansion = '" + setCode.replace("'", "''") + "'";
+		mDb.execSQL(sql);
 	}
 
-	public Cursor fetchSavedTrade(String name) {
-		String sql = "select " + KEY_ID + ", " + KEY_NAME + ", " + KEY_MULTIVERSEID + ", " + KEY_NUMBER + ", " + KEY_SIDE
-				+ " from " + DATABASE_TABLE_SAVED_TRADES + " where " + KEY_NAME + " = '" + name + "'";
-		return mDb.rawQuery(sql, null);
+	public Cursor fetchAllSavedTrades() {
+		try {
+			String sql = "SELECT " + KEY_ID + ", " + KEY_NAME + " FROM " + DATABASE_TABLE_SAVED_TRADES + " GROUP BY " + KEY_NAME;
+			return mDb.rawQuery(sql, null);
+		}
+		catch (SQLiteException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		catch (IllegalStateException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		return null;
+	}
+
+	public Cursor fetchSavedTrade(String tradeName) {
+		try {
+			String sql = "SELECT " + DATABASE_TABLE_SAVED_TRADES + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " + DATABASE_TABLE_SETS + "." + KEY_NAME_TCGPLAYER +
+					", " + DATABASE_TABLE_CARDS + "." + KEY_SET + ", " + DATABASE_TABLE_SAVED_TRADES + "." + KEY_NUMBER + ", " + DATABASE_TABLE_SAVED_TRADES + "." + KEY_SIDE + 
+					" FROM " + DATABASE_TABLE_SAVED_TRADES + " INNER JOIN " + DATABASE_TABLE_CARDS + " ON " + DATABASE_TABLE_CARDS + "." + KEY_MULTIVERSEID + " = " + 
+					DATABASE_TABLE_SAVED_TRADES + "." + KEY_MULTIVERSEID + " INNER JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = " + 
+					DATABASE_TABLE_CARDS + "." + KEY_SET + " WHERE " + DATABASE_TABLE_SAVED_TRADES + "." + KEY_NAME + " = '" + tradeName.replace("'", "''") + "'";
+			return mDb.rawQuery(sql, null);
+		}
+		catch (SQLiteException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		catch (IllegalStateException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		return null;
 	}
 
 	public int removeSavedTrade(String name) {
-		return mDb.delete(DATABASE_TABLE_SAVED_TRADES, KEY_NAME + " = '" + name + "'", null);
+		try {
+			return mDb.delete(DATABASE_TABLE_SAVED_TRADES, KEY_NAME + " = '" + name.replace("'", "''") + "'", null);
+		}
+		catch (SQLiteException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		catch (IllegalStateException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		return 0;
 	}
 
 	public Cursor fetchAllFormats() {
@@ -1127,10 +1163,9 @@ public class CardDbAdapter {
 
 	public int checkLegality(String mCardName, String format) {
 		mCardName = mCardName.replace("'", "''").replace("æ", "Æ");
-		format = format.replace("'", "''"); // Just to be safe; remember Bobby
-		// Tables
+		format = format.replace("'", "''"); //Just to be safe; remember Bobby Tables
 		try {
-			// The new way (single query per type, should be much faster) - Alex
+			//The new way (single query per type, should be much faster) - Alex
 			String sql = "SELECT COALESCE(CASE (SELECT " + KEY_SET + " FROM " + DATABASE_TABLE_CARDS + " WHERE " + KEY_NAME
 					+ " = '" + mCardName + "') WHEN 'UG' THEN 1 WHEN 'UNH' THEN 1 ELSE NULL END, " + "CASE (SELECT 1 FROM "
 					+ DATABASE_TABLE_CARDS + " c INNER JOIN " + DATABASE_TABLE_LEGAL_SETS + " ls ON ls." + KEY_SET + " = c."

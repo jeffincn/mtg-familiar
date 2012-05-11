@@ -64,6 +64,7 @@ public class CardTradingActivity extends FragmentActivity {
 	private final static int			DIALOG_PRICE_SETTING	= 2;
 	private final static int			DIALOG_SAVE_TRADE			= 3;
 	private final static int			DIALOG_LOAD_TRADE			= 4;
+	private final static int			DIALOG_DELETE_TRADE			= 5;
 	private String								sideForDialog;
 	private int										positionForDialog;
 
@@ -85,7 +86,8 @@ public class CardTradingActivity extends FragmentActivity {
 	private EditText							numberfield;
 
 	private int										priceSetting;
-	private Cursor								trades;
+	
+	private String currentTrade;
 
 	public static final String		card_not_found				= "Card Not Found";
 	public static final String		mangled_url						= "Mangled URL";
@@ -200,6 +202,9 @@ public class CardTradingActivity extends FragmentActivity {
 		// we set it to, as long as we set it, since we dismiss the dialog if it's
 		// showing in onResume().
 		sideForDialog = "left";
+		
+		//Default this to an empty string so we never get NPEs from it
+		currentTrade = "";
 	}
 
 	@Override
@@ -381,11 +386,12 @@ public class CardTradingActivity extends FragmentActivity {
 			case DIALOG_SAVE_TRADE:
 				builder = new AlertDialog.Builder(this);
 
-				builder.setTitle("Save The Trade");
+				builder.setTitle("Save Trade");
 				builder.setMessage("Enter the trade's name");
 
 				// Set an EditText view to get user input
 				final EditText input = new EditText(this);
+				input.setText(currentTrade);
 				builder.setView(input);
 
 				builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
@@ -396,11 +402,13 @@ public class CardTradingActivity extends FragmentActivity {
 						mdbAdapter.removeSavedTrade(tradeName);
 						
 						for (CardData cd : lTradeLeft) {
-							mdbAdapter.addTradeCard(cd.getMultiverseID(), cd.getNumberOf(), CardDbAdapter.LEFT, tradeName);
+							mdbAdapter.addTradeCard(cd.getName(), cd.getSetCode(), cd.getNumberOf(), CardDbAdapter.LEFT, tradeName);
 						}
 						for (CardData cd : lTradeRight) {
-							mdbAdapter.addTradeCard(cd.getMultiverseID(), cd.getNumberOf(), CardDbAdapter.RIGHT, tradeName);
+							mdbAdapter.addTradeCard(cd.getName(), cd.getSetCode(), cd.getNumberOf(), CardDbAdapter.RIGHT, tradeName);
 						}
+						
+						currentTrade = tradeName;
 					}
 				});
 
@@ -419,31 +427,39 @@ public class CardTradingActivity extends FragmentActivity {
 				});
 				break;
 			case DIALOG_LOAD_TRADE:
-
-				trades = mdbAdapter.fetchAllSavedTrades();
+				Cursor trades = mdbAdapter.fetchAllSavedTrades();
+				trades.moveToFirst();
+				int nameIndex = trades.getColumnIndex(CardDbAdapter.KEY_NAME);
+				final String[] tradeNames = new String[trades.getCount()];
+				for (int i = 0; i < tradeNames.length; i++) {
+					tradeNames[i] = trades.getString(nameIndex);
+					trades.moveToNext();
+				}
+				trades.close();
+				
 				builder = new AlertDialog.Builder(this);
-				builder.setCursor(trades, new DialogInterface.OnClickListener() {
-
-					@Override
+				builder.setTitle("Select A Trade");
+				builder.setNegativeButton("Cancel",  new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						// Canceled.
+					}
+				});
+				builder.setItems(tradeNames, new DialogInterface.OnClickListener() { 
 					public void onClick(DialogInterface di, int which) {
-						// TODO Auto-generated method stub
-						trades.moveToPosition(which);
-						String tradeName = trades.getString(trades.getColumnIndex(CardDbAdapter.KEY_NAME));
-						Cursor cardsToAdd = mdbAdapter.fetchSavedTrade(tradeName);
+						Cursor cardsToAdd = mdbAdapter.fetchSavedTrade(tradeNames[which]);
 						cardsToAdd.moveToFirst();
 
 						lTradeLeft.clear();
 						lTradeRight.clear();
 
 						while (!cardsToAdd.isAfterLast()) {
-							int mID = cardsToAdd.getInt(cardsToAdd.getColumnIndex(CardDbAdapter.KEY_MULTIVERSEID));
+							String cardName = cardsToAdd.getString(cardsToAdd.getColumnIndex(CardDbAdapter.KEY_NAME));
+							String tcgName = cardsToAdd.getString(cardsToAdd.getColumnIndex(CardDbAdapter.KEY_NAME_TCGPLAYER));
+							String cardSet = cardsToAdd.getString(cardsToAdd.getColumnIndex(CardDbAdapter.KEY_SET));
 							int side = cardsToAdd.getInt(cardsToAdd.getColumnIndex(CardDbAdapter.KEY_SIDE));
 							int numberOf = cardsToAdd.getInt(cardsToAdd.getColumnIndex(CardDbAdapter.KEY_NUMBER));
 
-							String cardName = mdbAdapter.getNameFromMultiverseId(mID);
-							String cardSet = mdbAdapter.getSetFromMultiverseId(mID);
-
-							CardData cd = new CardData(cardName, mdbAdapter.getTCGname(cardSet), cardSet, numberOf, 0, "loading", Integer.toString(numberOf));
+							CardData cd = new CardData(cardName, tcgName, cardSet, numberOf, 0, "loading", Integer.toString(numberOf));
 							if (side == CardDbAdapter.LEFT) {
 								lTradeLeft.add(0,cd);
 								FetchPriceTask loadPrice = new FetchPriceTask(lTradeLeft.get(0), aaTradeLeft);
@@ -456,17 +472,53 @@ public class CardTradingActivity extends FragmentActivity {
 							}
 							cardsToAdd.moveToNext();
 						}
+						
+						cardsToAdd.close();
+						
+						currentTrade = tradeNames[which];
 
 						aaTradeLeft.notifyDataSetChanged();
 						aaTradeRight.notifyDataSetChanged();
 					}
-				}, CardDbAdapter.KEY_NAME);
+				});
 
 				dialog = builder.create();
 
 				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 					public void onDismiss(DialogInterface dialog) {
 						removeDialog(DIALOG_LOAD_TRADE);
+					}
+				});
+				break;
+			case DIALOG_DELETE_TRADE:
+				Cursor tradesD = mdbAdapter.fetchAllSavedTrades();
+				tradesD.moveToFirst();
+				int nameIndexD = tradesD.getColumnIndex(CardDbAdapter.KEY_NAME);
+				final String[] tradeNamesD = new String[tradesD.getCount()];
+				for (int i = 0; i < tradeNamesD.length; i++) {
+					tradeNamesD[i] = tradesD.getString(nameIndexD);
+					tradesD.moveToNext();
+				}
+				tradesD.close();
+				
+				builder = new AlertDialog.Builder(this);
+				builder.setTitle("Delete A Trade");
+				builder.setNegativeButton("Cancel",  new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						// Canceled.
+					}
+				});
+				builder.setItems(tradeNamesD, new DialogInterface.OnClickListener() { 
+					public void onClick(DialogInterface di, int which) {
+						mdbAdapter.removeSavedTrade(tradeNamesD[which]);
+					}
+				});
+
+				dialog = builder.create();
+
+				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					public void onDismiss(DialogInterface dialog) {
+						removeDialog(DIALOG_DELETE_TRADE);
 					}
 				});
 				break;
@@ -528,6 +580,7 @@ public class CardTradingActivity extends FragmentActivity {
 		namefield.setText(savedInstanceState.getString("nameBox"));
 		tradePriceLeft.setText(savedInstanceState.getString("leftTotalPrice"));
 		tradePriceRight.setText(savedInstanceState.getString("rightTotalPrice"));
+		currentTrade = savedInstanceState.getString("currentTrade");
 
 		ArrayList<String> cardDataIn = savedInstanceState.getStringArrayList("tradeCards");
 		for (String card : cardDataIn) {
@@ -563,6 +616,7 @@ public class CardTradingActivity extends FragmentActivity {
 		outState.putString("nameBox", namefield.getText().toString());
 		outState.putString("leftTotalPrice", (String) tradePriceLeft.getText());
 		outState.putString("rightTotalPrice", (String) tradePriceRight.getText());
+		outState.putString("currentTrade", currentTrade);
 
 		ArrayList<String> cardDataOut = new ArrayList<String>();
 		for (CardData data : lTradeLeft) {
@@ -684,10 +738,6 @@ public class CardTradingActivity extends FragmentActivity {
 			this.numberOf = numberOf;
 			this.price = price;
 			this.message = message;
-		}
-
-		public int getMultiverseID() {
-			return mdbAdapter.fetchMultiverseID(name, setCode);
 		}
 
 		public String getName() {
@@ -966,6 +1016,9 @@ public class CardTradingActivity extends FragmentActivity {
 				return true;
 			case R.id.trader_menu_load:
 				showDialog(DIALOG_LOAD_TRADE);
+				return true;
+			case R.id.trader_menu_delete:
+				showDialog(DIALOG_DELETE_TRADE);
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

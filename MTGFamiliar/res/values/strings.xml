@@ -401,4 +401,5 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
 
     <string name="save_trade">Save Trade</string>
     <string name="load_trade">Load Trade</string>
+    <string name="delete_trade">Delete Trade</string>
 </resources>

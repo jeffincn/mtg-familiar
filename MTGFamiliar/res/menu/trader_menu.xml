@@ -30,6 +30,9 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:id="@+id/trader_menu_load"
         android:title="@string/load_trade"/>
     <item
+        android:id="@+id/trader_menu_delete"
+        android:title="@string/delete_trade" />
+    <item
         android:id="@+id/trader_menu_clear"
         android:icon="@android:drawable/ic_menu_close_clear_cancel"
         android:title="@string/clear"/>

@@ -24,6 +24,12 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:actionViewClass="android.widget.SearchView"
         android:icon="@android:drawable/ic_menu_search"/>
     <item
+        android:id="@+id/trader_menu_save"
+        android:title="@string/save_trade"/>
+    <item
+        android:id="@+id/trader_menu_load"
+        android:title="@string/load_trade"/>
+    <item
         android:id="@+id/trader_menu_clear"
         android:icon="@android:drawable/ic_menu_close_clear_cancel"
         android:title="@string/clear"/>

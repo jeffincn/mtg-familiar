@@ -233,7 +233,7 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
    - Various database bugfixes.&lt;br />&lt;br />
    - Various UI optimizations. 
    -->
-   <!-- 1.6 -->
+   <!-- 1.6 
    - Added a new homescreen widget. Go put it in your launcher for super fast searching.&lt;br />&lt;br />
    - Added a round timer. Now you\'ll know if you\'re about to go to time.&lt;br />&lt;br />
    - Added card trader screen. Compare prices on the fly!&lt;br />&lt;br />
@@ -241,6 +241,10 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
    - Added "Timeshifted" rarity.&lt;br />&lt;br />
    - UI fixes for small screens.&lt;br />&lt;br />
    - Bugfixes.
+   -->
+   <!--  1.7 -->
+   - You can now save and load trades.&lt;br />&lt;br />
+   - Bugfixes.&lt;br />&lt;br />
    </string>
      	
     <string name="gatherer">Gatherer Page</string>
@@ -394,4 +398,7 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     <string name="trader_by">x</string>
     <string name="card_view_scroll">Scroll Results</string>
     <string name="card_view_scroll_desc">Show buttons to scroll between search results.</string>
+
+    <string name="save_trade">Save Trade</string>
+    <string name="load_trade">Load Trade</string>
 </resources>

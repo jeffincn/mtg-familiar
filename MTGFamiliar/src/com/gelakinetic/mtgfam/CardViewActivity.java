@@ -359,7 +359,7 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 			pt.setText("");
 		}
 
-		if (number.contains("a") || number.contains("b")) {
+		if (isTransformable(number, c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)))){
 			transform.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					if (number.contains("a")) {
@@ -446,6 +446,16 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 		
 		newImage = true;
 		newPriceData = true;
+	}
+
+	public static boolean isTransformable(String number, String set) {
+		// TODO Auto-generated method stub
+		if(number.contains("a") || number.contains("b")){
+			if(set.compareTo("ISD")==0 || set.compareTo("DKA") == 0){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	Drawable drawable_from_url(String url, String src_name) throws java.net.MalformedURLException, java.io.IOException {

@@ -1321,7 +1321,7 @@ public class CardDbAdapter {
 	 * @return Cursor over all words that match, or null if none found.
 	 */
 	public Cursor getWordMatches(String query, String[] columns) {
-		String selection = KEY_NAME + " LIKE '" + query + "%'";
+		String selection = KEY_NAME + " LIKE '" + query.replace("'", "''").replace("æ", "Æ").trim() + "%'";
 		String[] selectionArgs = null;
 
 		return query(selection, selectionArgs, columns);

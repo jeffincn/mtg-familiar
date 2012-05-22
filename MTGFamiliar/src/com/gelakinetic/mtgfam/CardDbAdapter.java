@@ -64,6 +64,7 @@ public class CardDbAdapter {
 	private static final String		DATABASE_TABLE_LEGAL_SETS			= "legal_sets";
 	private static final String		DATABASE_TABLE_BANNED_CARDS		= "banned_cards";
 	private static final String		DATABASE_TABLE_SAVED_TRADES		= "saved_trades";
+	private static final String 	DATABASE_TABLE_RULES = "rules";
 
 	public static final int				DATABASE_VERSION							= 17;
 
@@ -100,6 +101,12 @@ public class CardDbAdapter {
 	public static final String		KEY_SIDE											= "side";
 	public static final int				LEFT													= 0;
 	public static final int				RIGHT													= 1;
+	
+	public static final String		KEY_CATEGORY = "category";
+	public static final String		KEY_SUBCATEGORY = "subcategory";
+	public static final String		KEY_ENTRY = "entry";
+	public static final String		KEY_RULE_TEXT = "rule_text";
+	public static final String		KEY_POSITION = "position";
 
 	private DatabaseHelper				mDbHelper;
 	private SQLiteDatabase				mDb;
@@ -142,8 +149,16 @@ public class CardDbAdapter {
 	private static final String		DATABASE_CREATE_SAVED_TRADES	= "create table " + DATABASE_TABLE_SAVED_TRADES + "("
 																																	+ KEY_ID + " integer primary key autoincrement, "
 																																	+ KEY_MULTIVERSEID + " integer not null, " + KEY_SIDE
-																																	+ " integer not null, " + KEY_NAME + " text not null"
+																																	+ " integer not null, " + KEY_NAME + " text not null, "
 																																	+ KEY_NUMBER + " integer not null);";
+	
+	private static final String		DATABASE_CREATE_RULES 			= "create table " + DATABASE_TABLE_RULES + "("
+																																	+ KEY_ID + " integer primary key autoincrement, "
+																																	+ KEY_CATEGORY + " integer not null, "
+																																	+ KEY_SUBCATEGORY + " integer null, "
+																																	+ KEY_ENTRY + " text null, "
+																																	+ KEY_RULE_TEXT + " text not null, "
+																																	+ KEY_POSITION + " integer null);";
 
 	private final Context					mCtx;
 
@@ -220,6 +235,7 @@ public class CardDbAdapter {
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_LEGAL_SETS);
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_BANNED_CARDS);
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_SAVED_TRADES);
+		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_RULES);
 
 		mDb.execSQL(DATABASE_CREATE_CARDS);
 		mDb.execSQL(DATABASE_CREATE_SETS);
@@ -227,6 +243,7 @@ public class CardDbAdapter {
 		mDb.execSQL(DATABASE_CREATE_LEGAL_SETS);
 		mDb.execSQL(DATABASE_CREATE_BANNED_CARDS);
 		mDb.execSQL(DATABASE_CREATE_SAVED_TRADES);
+		mDb.execSQL(DATABASE_CREATE_RULES);
 	}
 
 	/**
@@ -1218,6 +1235,35 @@ public class CardDbAdapter {
 		try {
 			return mDb.query(true, DATABASE_TABLE_CARDS, new String[] { /* KEY_ID, */KEY_NAME }, null, null, null, null,
 					KEY_NAME, null);
+		}
+		catch (SQLiteException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		catch (IllegalStateException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		return null;
+	}
+	
+	public Cursor getRules(int category, int subcategory) {
+		try {
+			if(category == -1) {
+				//No category specified; return the main categories
+				String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_SUBCATEGORY + " IS NULL";
+				return mDb.rawQuery(sql, null);
+			}
+			else if(subcategory == -1) {
+				//No subcategory specified; return the subcategories under the given category
+				String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_CATEGORY + " = " + String.valueOf(category) + 
+						" AND " + KEY_SUBCATEGORY + " IS NOT NULL AND " + KEY_ENTRY + " IS NULL";
+				return mDb.rawQuery(sql, null);
+			}
+			else {
+				//Both specified; return the rules under the given subcategory
+				String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_CATEGORY + " = " + String.valueOf(category) + 
+						" AND " + KEY_SUBCATEGORY + " = " + String.valueOf(subcategory) + " AND " + KEY_ENTRY + " IS NOT NULL";
+				return mDb.rawQuery(sql, null);
+			}
 		}
 		catch (SQLiteException e) {
 			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();

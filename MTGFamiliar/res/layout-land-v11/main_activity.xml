@@ -129,17 +129,19 @@
                 android:textSize="30dip" />
 
             <TextView
-                android:id="@+id/null1"
+                android:id="@+id/rules"
                 style="@style/text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_weight="1"
+                android:drawableTop="@drawable/card_search_icon"
                 android:gravity="center"
+                android:text="@string/rules"
                 android:textSize="30dip" />
 
             <TextView
-                android:id="@+id/null2"
+                android:id="@+id/null1"
                 style="@style/text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

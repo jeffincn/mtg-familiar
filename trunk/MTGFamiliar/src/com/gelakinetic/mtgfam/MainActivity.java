@@ -78,6 +78,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 	private String						stacktrace;
 	private PackageInfo				pInfo;
 	private TextView					search;
+	private TextView					rules;
 	private TextView					rng;
 	private TextView					manapool;
 	private TextView					randomCard;
@@ -95,6 +96,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 		me = this;
 
 		search = (TextView) findViewById(R.id.cardsearch);
+		rules = (TextView) findViewById(R.id.rules);
 		rng = (TextView) findViewById(R.id.rng);
 		manapool = (TextView) findViewById(R.id.manapool);
 		randomCard = (TextView) findViewById(R.id.randomCard);
@@ -115,6 +117,15 @@ public class MainActivity extends FragmentActivity implements Runnable {
 				startActivity(i);
 			}
 		});
+		
+		rules.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Intent i = new Intent(mCtx, RulesActivity.class);
+				startActivity(i);
+			}
+		});
+		
+		//rules.setVisibility(View.GONE);
 
 		rng.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {

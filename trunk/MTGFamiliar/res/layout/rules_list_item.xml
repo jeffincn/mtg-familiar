@@ -23,6 +23,12 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     android:orientation="vertical" >
     
     <TextView
+        android:id="@+id/rules_item_header"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="25dp" />
+    
+    <TextView
         android:id="@+id/rules_item_text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -31,17 +37,5 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <View
         android:layout_width="fill_parent"
         android:layout_height="5dp" />
-    
-    <TextView
-        android:id="@+id/rules_item_category"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone" />
-    
-    <TextView
-        android:id="@+id/rules_item_subcategory"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone" />
 
 </LinearLayout>

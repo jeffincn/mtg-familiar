@@ -338,6 +338,7 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     <string name="life_clear_dialog_message">Clear life totals or players?\nMana pool will also be cleared.</string>
     <string name="life_clear_dialog_players_life_button">Both</string>
     <string name="life_clear_dialog_life_button">Life</string>
+    <string name="dialog_ok">OK</string>
     <string name="dialog_cancel">Cancel</string>
     <string name="rt_defaulttime_title">Default Round Length</string>
     <string name="rt_defaulttime_desc">Set the default length for the round timer</string>
@@ -403,4 +404,8 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     <string name="save_trade">Save Trade</string>
     <string name="load_trade">Load Trade</string>
     <string name="delete_trade">Delete Trade</string>
+    
+    <string name="rules_search">Keyword Search</string>
+    <string name="rules_exit">Exit Rules</string>
+    <string name="rules_search_title">Enter Keyword(s)</string>
 </resources>

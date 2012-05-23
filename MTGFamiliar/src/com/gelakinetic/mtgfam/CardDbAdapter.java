@@ -1282,10 +1282,13 @@ public class CardDbAdapter {
 	 **/
 	public Cursor getRulesByKeyword(String keyword) {
 		try {
-			keyword = "'%" + keyword.replace("'", "''") + "%'";
-			String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_RULE_TEXT + " LIKE " + keyword + " AND " +
-					KEY_ENTRY + " IS NOT NULL";
-			return mDb.rawQuery(sql, null);
+			//Don't let them pass in an empty string; it'll return ALL the rules
+			if(keyword != null && !keyword.trim().equals("")) {
+				keyword = "'%" + keyword.replace("'", "''") + "%'";
+				String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_RULE_TEXT + " LIKE " + keyword + " AND " +
+						KEY_ENTRY + " IS NOT NULL";
+				return mDb.rawQuery(sql, null);
+			}
 		}
 		catch (SQLiteException e) {
 			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();

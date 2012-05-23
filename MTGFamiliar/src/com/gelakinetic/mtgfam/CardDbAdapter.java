@@ -1273,6 +1273,28 @@ public class CardDbAdapter {
 		}
 		return null;
 	}
+	
+	/**
+	 * Returns a cursor containing all rule entries that contain the given word or phrase.
+	 * This method will automatically wrap the keyword parameter in wildcards.
+	 * @param keyword The word or phrase to search for.
+	 * @return A cursor containing all rule entries that contain the given word or phrase.
+	 **/
+	public Cursor getRulesByKeyword(String keyword) {
+		try {
+			keyword = "'%" + keyword.replace("'", "''") + "%'";
+			String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_RULE_TEXT + " LIKE " + keyword + " AND " +
+					KEY_ENTRY + " IS NOT NULL";
+			return mDb.rawQuery(sql, null);
+		}
+		catch (SQLiteException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		catch (IllegalStateException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		return null;		
+	}
 
 	public SQLiteDatabase getReadableDatabase() {
 		return mDb;

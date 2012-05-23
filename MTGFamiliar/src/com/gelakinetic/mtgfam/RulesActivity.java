@@ -19,22 +19,31 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam;
 
+import java.util.ArrayList;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.widget.TextView.BufferType;
 import android.widget.Toast;
 
 public class RulesActivity extends FragmentActivity {
@@ -45,11 +54,15 @@ public class RulesActivity extends FragmentActivity {
 	public static String KEYWORD_KEY = "keyword";
 	
 	private static final int SEARCH = 0;
-	private static final int QUIT_TO_MAIN = 1;
+	private static final int RESULT_NORMAL = 1;
+	private static final int RESULT_QUIT_TO_MAIN = 2;
+	private static final int ARBITRARY_REQUEST_CODE = 23;
 	
 	private CardDbAdapter mDbHelper;
 	private ListView list;
-	private Cursor ruleCursor;
+	private RulesListAdapter adapter;
+	private ArrayList<RuleItem> rules;
+	private String keyword;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -63,7 +76,6 @@ public class RulesActivity extends FragmentActivity {
 		
 		Bundle extras = getIntent().getExtras();
 		int category, subcategory, position;
-		String keyword;
 		if(extras == null) {
 			category = -1;
 			subcategory = -1;
@@ -78,45 +90,37 @@ public class RulesActivity extends FragmentActivity {
 		}
 		
 		list = (ListView)findViewById(R.id.rules_list);
+		rules = new ArrayList<RuleItem>();
 		boolean clickable;
+		Cursor c;
 		
 		if(keyword == null) {
-			ruleCursor = mDbHelper.getRules(category, subcategory);
+			c = mDbHelper.getRules(category, subcategory);
 			clickable = subcategory == -1;
 		}
 		else {
-			ruleCursor = mDbHelper.getRulesByKeyword(keyword);
+			c = mDbHelper.getRulesByKeyword(keyword);
 			clickable = false;
 		}
-		if(ruleCursor != null && ruleCursor.getCount() > 0) {
-			ruleCursor.moveToFirst();
-			list.setAdapter(new SimpleCursorAdapter(this, R.layout.rules_list_item, ruleCursor, 
-					new String[] { CardDbAdapter.KEY_RULE_TEXT, CardDbAdapter.KEY_CATEGORY, CardDbAdapter.KEY_SUBCATEGORY }, 
-					new int[] { R.id.rules_item_text, R.id.rules_item_category, R.id.rules_item_subcategory }));
+		if(c != null && c.getCount() > 0) {
+			c.moveToFirst();
+			while(!c.isAfterLast()) {
+				rules.add(new RuleItem(c.getInt(c.getColumnIndex(CardDbAdapter.KEY_CATEGORY)), c.getInt(c.getColumnIndex(CardDbAdapter.KEY_SUBCATEGORY)),
+						c.getString(c.getColumnIndex(CardDbAdapter.KEY_ENTRY)), c.getString(c.getColumnIndex(CardDbAdapter.KEY_RULE_TEXT))));
+				c.moveToNext();
+			}
+			c.close();
+			adapter = new RulesListAdapter(this, R.layout.rules_list_item, rules);
+			list.setAdapter(adapter);
 			
 			if(clickable) {
 				list.setOnItemClickListener(new OnItemClickListener() {
 					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-						String category = ((TextView)view.findViewById(R.id.rules_item_category)).getText().toString();
-						String subcategory = ((TextView)view.findViewById(R.id.rules_item_subcategory)).getText().toString();
-						int catInt, subcatInt;
-						try {
-							catInt = Integer.parseInt(category);
-						}
-						catch (NumberFormatException e) {
-							catInt = -1;
-						}
-						try {
-							subcatInt = Integer.parseInt(subcategory);
-						}
-						catch (NumberFormatException e) {
-							subcatInt = -1;
-						}
-						
+						RuleItem item = rules.get(position);
 						Intent i = new Intent(RulesActivity.this, RulesActivity.class);
-						i.putExtra(CATEGORY_KEY, catInt);
-						i.putExtra(SUBCATEGORY_KEY, subcatInt);
-						startActivity(i);
+						i.putExtra(CATEGORY_KEY, item.getCategory());
+						i.putExtra(SUBCATEGORY_KEY, item.getSubcategory());
+						startActivityForResult(i, ARBITRARY_REQUEST_CODE);
 					}
 				});
 			}
@@ -127,24 +131,14 @@ public class RulesActivity extends FragmentActivity {
 		}
 		
 		list.setSelection(position);
-	}
-	
-	@Override
-	public void onResume() {
-		super.onResume();
-		if(((MyApp)getApplicationContext()).getState() == QUIT_TO_MAIN) {
-			this.finish();
-			return;
-		}
+		
+		setResult(RESULT_NORMAL);
 	}
 	
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		
-		if(ruleCursor != null) {
-			ruleCursor.close();
-		}
 		if(mDbHelper != null) {
 			mDbHelper.close();
 		}
@@ -164,7 +158,7 @@ public class RulesActivity extends FragmentActivity {
 					String keyword = input.getText().toString();
 					Intent i = new Intent(RulesActivity.this, RulesActivity.class);
 					i.putExtra(KEYWORD_KEY, keyword);
-					startActivity(i);
+					startActivityForResult(i, ARBITRARY_REQUEST_CODE);
 				}
 			});
 			builder.setNegativeButton(R.string.dialog_cancel, new OnClickListener() {
@@ -179,6 +173,16 @@ public class RulesActivity extends FragmentActivity {
 	}
 	
 	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(requestCode == ARBITRARY_REQUEST_CODE) {
+			if(resultCode == RESULT_QUIT_TO_MAIN) {
+				setResult(RESULT_QUIT_TO_MAIN);
+				finish();
+			}
+		}
+	}
+	
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
 			case R.id.rules_menu_search:
@@ -186,11 +190,97 @@ public class RulesActivity extends FragmentActivity {
 				showDialog(SEARCH);
 				return true;
 			case R.id.rules_menu_exit:
-				((MyApp)getApplicationContext()).setState(QUIT_TO_MAIN);
-				this.finish();
+				setResult(RESULT_QUIT_TO_MAIN);
+				finish();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
+		}
+	}
+	
+	private SpannableString formatText(String input) {
+		SpannableString result = new SpannableString(input);
+		
+		//First, handle the keyword highlighting (if applicable)
+		if(keyword != null) {
+			String loweredInput = input.toLowerCase();
+			String loweredKeyword = keyword.toLowerCase();
+			int index = loweredInput.indexOf(loweredKeyword);
+			while(index != -1) {
+				int end = index + keyword.length();
+				result.setSpan(new StyleSpan(Typeface.BOLD), index, end, 0);
+				index = loweredInput.indexOf(loweredKeyword, end);
+			}
+		}
+		
+		return result;
+	}
+	
+	private class RuleItem {
+		private int category;
+		private int subcategory;
+		private String entry;
+		private String rulesText;
+		
+		public RuleItem(int category, int subcategory, String entry, String rulesText) {
+			this.category = category;
+			this.subcategory = subcategory;
+			this.entry = entry;
+			this.rulesText = rulesText;
+		}
+		
+		public int getCategory() {
+			return this.category;
+		}
+		
+		public int getSubcategory() {
+			return this.subcategory;
+		}
+		
+		public String getRulesText() {
+			return this.rulesText;
+		}
+		
+		public String getHeader() {
+			if(this.subcategory == -1) {
+				return String.valueOf(this.category) + ".";
+			}
+			else if(this.entry == null) {
+				return String.valueOf((this.category * 100) + this.subcategory) + ".";
+			}
+			else {
+				return String.valueOf((this.category * 100 + this.subcategory)) + "." + this.entry;
+			}
+		}
+	}
+	
+	private class RulesListAdapter extends ArrayAdapter<RuleItem> {
+		private int layoutResourceId;
+		private ArrayList<RuleItem> items;
+
+		public RulesListAdapter(Context context, int textViewResourceId, ArrayList<RuleItem> items) {
+			super(context, textViewResourceId, items);
+
+			this.layoutResourceId = textViewResourceId;
+			this.items = items;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View v = convertView;
+			if (v == null) {
+				LayoutInflater inf = getLayoutInflater();
+				v = inf.inflate(layoutResourceId, null);
+			}
+			RuleItem data = items.get(position);
+			if (data != null) {
+				TextView rulesHeader = (TextView)v.findViewById(R.id.rules_item_header);
+				TextView rulesText = (TextView)v.findViewById(R.id.rules_item_text);
+
+				rulesHeader.setText(data.getHeader());
+				rulesText.setText(formatText(data.getRulesText()), BufferType.SPANNABLE);
+			}
+			return v;
 		}
 	}
 }

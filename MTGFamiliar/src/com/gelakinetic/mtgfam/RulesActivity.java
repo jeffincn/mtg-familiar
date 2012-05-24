@@ -20,6 +20,8 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 package com.gelakinetic.mtgfam;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -32,9 +34,11 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.text.Html.ImageGetter;
 import android.text.Html;
+import android.text.Html.ImageGetter;
 import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
@@ -62,11 +66,15 @@ public class RulesActivity extends FragmentActivity {
 	private static final int RESULT_QUIT_TO_MAIN = 2;
 	private static final int ARBITRARY_REQUEST_CODE = 23;
 	
+	private static final String LINK_REGEX = "([1-9]{1}[0-9]{2}\\.?([a-z0-9]{1,2})?\\.?)";
+	
 	private CardDbAdapter mDbHelper;
 	private ImageGetter imgGetter;
 	private ListView list;
 	private RulesListAdapter adapter;
 	private ArrayList<RuleItem> rules;
+	private int category;
+	private int subcategory;
 	private String keyword;
 	
 	@Override
@@ -82,7 +90,7 @@ public class RulesActivity extends FragmentActivity {
 		imgGetter = ImageGetterHelper.GlyphGetter(getResources());
 		
 		Bundle extras = getIntent().getExtras();
-		int category, subcategory, position;
+		int position;
 		if(extras == null) {
 			category = -1;
 			subcategory = -1;
@@ -106,7 +114,7 @@ public class RulesActivity extends FragmentActivity {
 			clickable = subcategory == -1;
 		}
 		else {
-			c = mDbHelper.getRulesByKeyword(keyword);
+			c = mDbHelper.getRulesByKeyword(keyword, category, subcategory);
 			clickable = false;
 		}
 		if(c != null && c.getCount() > 0) {
@@ -176,6 +184,8 @@ public class RulesActivity extends FragmentActivity {
 					else {
 						Intent i = new Intent(RulesActivity.this, RulesActivity.class);
 						i.putExtra(KEYWORD_KEY, keyword);
+						i.putExtra(CATEGORY_KEY, category);
+						i.putExtra(SUBCATEGORY_KEY, subcategory);
 						startActivityForResult(i, ARBITRARY_REQUEST_CODE);
 					}
 				}
@@ -259,7 +269,40 @@ public class RulesActivity extends FragmentActivity {
 		}
 		
 		//Finally, handle hyperlinking
-		//TODO - Actually implement this
+		Matcher m = Pattern.compile(LINK_REGEX).matcher(cs);
+		while(m.find()) {
+			try {
+				String[] tokens = cs.subSequence(m.start(), m.end()).toString().split("(\\.)");
+				int firstInt = Integer.parseInt(tokens[0]);
+				final int linkCat = firstInt / 100;
+				final int linkSub = firstInt % 100;
+				int position = 0;
+				if(tokens.length > 1) {
+					position = mDbHelper.getRulePosition(linkCat, linkSub, tokens[1]);
+				}
+				final int linkPosition = position;
+				result.setSpan(new ClickableSpan() {
+					@Override
+					public void onClick(View widget) {
+						if(linkCat == category && linkSub == subcategory) {
+							//We're already on the page for this link; just reposition
+							list.setSelection(linkPosition);
+						}
+						else {
+							//We're not on the right page, so open a new activity instance
+							Intent i = new Intent(RulesActivity.this, RulesActivity.class);
+							i.putExtra(CATEGORY_KEY, linkCat);
+							i.putExtra(SUBCATEGORY_KEY, linkSub);
+							i.putExtra(POSITION_KEY, linkPosition);
+							startActivityForResult(i, ARBITRARY_REQUEST_CODE);
+						}
+					}
+				}, m.start(), m.end(), 0);
+			}
+			catch(Exception e) {
+				//Eat any exceptions; they'll just cause the link to not appear 
+			}
+		}
 		
 		return result;
 	}
@@ -283,6 +326,10 @@ public class RulesActivity extends FragmentActivity {
 		
 		public int getSubcategory() {
 			return this.subcategory;
+		}
+		
+		public String getEntry() {
+			return this.entry;
 		}
 		
 		public String getRulesText() {
@@ -327,6 +374,9 @@ public class RulesActivity extends FragmentActivity {
 
 				rulesHeader.setText(data.getHeader());
 				rulesText.setText(formatText(data.getRulesText()), BufferType.SPANNABLE);
+				if(data.getEntry() != null) {
+					rulesText.setMovementMethod(LinkMovementMethod.getInstance());
+				}
 			}
 			return v;
 		}

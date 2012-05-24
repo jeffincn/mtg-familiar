@@ -1280,14 +1280,31 @@ public class CardDbAdapter {
 	 * @param keyword The word or phrase to search for.
 	 * @return A cursor containing all rule entries that contain the given word or phrase.
 	 **/
-	public Cursor getRulesByKeyword(String keyword) {
+	public Cursor getRulesByKeyword(String keyword, int category, int subcategory) {
 		try {
 			//Don't let them pass in an empty string; it'll return ALL the rules
 			if(keyword != null && !keyword.trim().equals("")) {
 				keyword = "'%" + keyword.replace("'", "''") + "%'";
-				String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_RULE_TEXT + " LIKE " + keyword + " AND " +
-						KEY_ENTRY + " IS NOT NULL";
-				return mDb.rawQuery(sql, null);
+				
+				if(category == -1) {
+					//No category; we're searching from the main page, so no restrictions
+					String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_RULE_TEXT + " LIKE " + keyword + " AND " +
+							KEY_ENTRY + " IS NOT NULL";
+					return mDb.rawQuery(sql, null);
+				}
+				else if(subcategory == -1) {
+					//No subcategory; we're searching from a category page, so restrict within that
+					String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_RULE_TEXT + " LIKE " + keyword + " AND " +
+							KEY_ENTRY + " IS NOT NULL AND " + KEY_CATEGORY + " = " + String.valueOf(category);
+					return mDb.rawQuery(sql, null);
+				}
+				else {
+					//We're searching within a subcategory, so restrict within that
+					String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_RULE_TEXT + " LIKE " + keyword + " AND " +
+							KEY_ENTRY + " IS NOT NULL AND " + KEY_CATEGORY + " = " + String.valueOf(category) + " AND " + 
+							KEY_SUBCATEGORY + " = " + String.valueOf(subcategory);
+					return mDb.rawQuery(sql, null);
+				}
 			}
 		}
 		catch (SQLiteException e) {
@@ -1297,6 +1314,30 @@ public class CardDbAdapter {
 			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
 		}
 		return null;		
+	}
+	
+	public int getRulePosition(int category, int subcategory, String entry) {
+		try {
+			if(entry != null) {
+				String sql = "SELECT " + KEY_POSITION + " FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_CATEGORY + " = " + 
+						String.valueOf(category) + " AND " + KEY_SUBCATEGORY + " = " + String.valueOf(subcategory) + " AND " +
+						KEY_ENTRY + " = '" + entry.replace("'", "''") + "'";
+				Cursor c = mDb.rawQuery(sql, null);
+				if(c != null) {
+					c.moveToFirst();
+					int result = c.getInt(c.getColumnIndex(KEY_POSITION));
+					c.close();
+					return result;
+				}
+			}
+		}
+		catch (SQLiteException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		catch (IllegalStateException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		return 0;
 	}
 
 	public SQLiteDatabase getReadableDatabase() {

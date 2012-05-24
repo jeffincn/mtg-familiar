@@ -66,7 +66,7 @@ public class CardDbAdapter {
 	private static final String		DATABASE_TABLE_SAVED_TRADES		= "saved_trades";
 	private static final String 	DATABASE_TABLE_RULES = "rules";
 
-	public static final int				DATABASE_VERSION							= 18;
+	public static final int				DATABASE_VERSION							= 19;
 
 	public static final String		KEY_ID												= "_id";
 	public static final String		KEY_NAME											= SearchManager.SUGGEST_COLUMN_TEXT_1;							// "name";
@@ -1249,13 +1249,13 @@ public class CardDbAdapter {
 		try {
 			if(category == -1) {
 				//No category specified; return the main categories
-				String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_SUBCATEGORY + " IS NULL";
+				String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_SUBCATEGORY + " = -1";
 				return mDb.rawQuery(sql, null);
 			}
 			else if(subcategory == -1) {
 				//No subcategory specified; return the subcategories under the given category
 				String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_CATEGORY + " = " + String.valueOf(category) + 
-						" AND " + KEY_SUBCATEGORY + " IS NOT NULL AND " + KEY_ENTRY + " IS NULL";
+						" AND " + KEY_SUBCATEGORY + " > -1 AND " + KEY_ENTRY + " IS NULL";
 				return mDb.rawQuery(sql, null);
 			}
 			else {

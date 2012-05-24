@@ -28,10 +28,12 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -199,16 +201,41 @@ public class RulesActivity extends FragmentActivity {
 	}
 	
 	private SpannableString formatText(String input) {
-		SpannableString result = new SpannableString(input);
+		SpannableString result = new SpannableString(input.replace("_", ""));
+		int index;
 		
-		//First, handle the keyword highlighting (if applicable)
+		//First, handle italicizing any words/phrases surrounded by underscores
+		ArrayList<Integer> starts = new ArrayList<Integer>();
+		ArrayList<Integer> ends = new ArrayList<Integer>();
+		boolean start = true;
+		index = input.indexOf("_");
+		while(index != -1) {
+			if(start) {
+				starts.add(index);
+				start = false;
+			}
+			else {
+				ends.add(index - 1);
+				start = true;
+			}
+			index = input.indexOf("_", index + 1);
+		}
+		
+		if(starts.size() == ends.size()) {
+			//In case we had some weirdness and not all pairs match, we won't bother italicizing
+			for(int i = 0; i < starts.size(); i++) {
+				result.setSpan(new StyleSpan(Typeface.ITALIC), starts.get(i) - 2 * i, ends.get(i) - 2 * i, 0);
+			}
+		}
+		
+		//Next, handle the keyword highlighting (if applicable)
 		if(keyword != null) {
-			String loweredInput = input.toLowerCase();
+			String loweredInput = input.replace("_", "").toLowerCase();
 			String loweredKeyword = keyword.toLowerCase();
-			int index = loweredInput.indexOf(loweredKeyword);
+			index = loweredInput.indexOf(loweredKeyword);
 			while(index != -1) {
 				int end = index + keyword.length();
-				result.setSpan(new StyleSpan(Typeface.BOLD), index, end, 0);
+				result.setSpan(new ForegroundColorSpan(Color.YELLOW), index, end, 0); //StyleSpan(Typeface.BOLD)
 				index = loweredInput.indexOf(loweredKeyword, end);
 			}
 		}

@@ -535,10 +535,10 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 				String date = null, ruling;
 				while ((line = dis.readLine()) != null) {
 					if(line.contains("rulingDate") && line.contains("</td>")){
-						date = line.split(">")[1].split("<")[0];
+						date = (line.replace("<autocard>","").replace("</autocard>","")).split(">")[1].split("<")[0];
 					}
 					if(line.contains("rulingText") && line.contains("</td>")){
-						ruling = line.split(">")[1].split("<")[0];
+						ruling = (line.replace("<autocard>","").replace("</autocard>","")).split(">")[1].split("<")[0];
 						Ruling r = new Ruling(date, ruling);
 						ar.add(r);
 					}
@@ -686,10 +686,14 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 			String message="";
 			for(Ruling r : ar)
 			{
-				message += (r.toString()+'\n'+'\n');
+				message += (r.toString()+"<br><br>");
 			}
 			
-			builder.setMessage(message);
+			message = message.replace("{", "<img src=\"").replace("}", "\"/>");
+
+			CharSequence messageGlyph = Html.fromHtml(message, imgGetter, null);
+			
+			builder.setMessage(messageGlyph);
 			return builder.create();
 		}
 		return null;

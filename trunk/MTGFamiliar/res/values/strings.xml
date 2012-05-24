@@ -244,8 +244,10 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
    - Bugfixes.
    -->
    <!--  1.7 -->
+   - Searchable, linked comprehensive rules are now included.&lt;br />&lt;br />
+   - Card rulings can now be pulled up for each card.&lt;br />&lt;br />
    - You can now save and load trades.&lt;br />&lt;br />
-   - Bugfixes.&lt;br />&lt;br />
+   - Bugfixes and optimizations.
    </string>
      	
     <string name="gatherer">Gatherer Page</string>

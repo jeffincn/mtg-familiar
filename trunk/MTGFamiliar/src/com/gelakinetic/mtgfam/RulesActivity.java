@@ -143,6 +143,13 @@ public class RulesActivity extends FragmentActivity {
 	}
 	
 	@Override
+	protected void onResume() {
+		super.onResume();
+		MyApp appState = ((MyApp) getApplicationContext());
+		appState.setState(0);
+	}
+	
+	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		

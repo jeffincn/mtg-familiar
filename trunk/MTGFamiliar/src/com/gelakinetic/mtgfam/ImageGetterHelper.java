@@ -29,6 +29,7 @@ public class ImageGetterHelper {
 		return new ImageGetter() {
 			public Drawable getDrawable(String source) {
 				Drawable d = null;
+				source = source.replace("/", "");
 
 				int[] drawableNums = { R.drawable.zero, R.drawable.one, R.drawable.two, R.drawable.three, R.drawable.four,
 						R.drawable.five, R.drawable.six, R.drawable.seven, R.drawable.eight, R.drawable.nine, R.drawable.ten,
@@ -56,67 +57,67 @@ public class ImageGetterHelper {
 				else if (source.equalsIgnoreCase("q")) {
 					d = r.getDrawable(R.drawable.untap);
 				}
-				else if (source.equalsIgnoreCase("wu")) {
+				else if (source.equalsIgnoreCase("wu") || source.equalsIgnoreCase("uw")) {
 					d = r.getDrawable(R.drawable.wu);
 				}
-				else if (source.equalsIgnoreCase("ub")) {
+				else if (source.equalsIgnoreCase("ub") || source.equalsIgnoreCase("bu")) {
 					d = r.getDrawable(R.drawable.ub);
 				}
-				else if (source.equalsIgnoreCase("br")) {
+				else if (source.equalsIgnoreCase("br") || source.equalsIgnoreCase("rb")) {
 					d = r.getDrawable(R.drawable.br);
 				}
-				else if (source.equalsIgnoreCase("rg")) {
+				else if (source.equalsIgnoreCase("rg") || source.equalsIgnoreCase("gr")) {
 					d = r.getDrawable(R.drawable.rg);
 				}
-				else if (source.equalsIgnoreCase("gw")) {
+				else if (source.equalsIgnoreCase("gw") || source.equalsIgnoreCase("wg")) {
 					d = r.getDrawable(R.drawable.gw);
 				}
-				else if (source.equalsIgnoreCase("wb")) {
+				else if (source.equalsIgnoreCase("wb") || source.equalsIgnoreCase("bw")) {
 					d = r.getDrawable(R.drawable.wb);
 				}
-				else if (source.equalsIgnoreCase("bg")) {
+				else if (source.equalsIgnoreCase("bg") || source.equalsIgnoreCase("gb")) {
 					d = r.getDrawable(R.drawable.bg);
 				}
-				else if (source.equalsIgnoreCase("gu")) {
+				else if (source.equalsIgnoreCase("gu") || source.equalsIgnoreCase("ug")) {
 					d = r.getDrawable(R.drawable.gu);
 				}
-				else if (source.equalsIgnoreCase("ur")) {
+				else if (source.equalsIgnoreCase("ur") || source.equalsIgnoreCase("ru")) {
 					d = r.getDrawable(R.drawable.ur);
 				}
-				else if (source.equalsIgnoreCase("rw")) {
+				else if (source.equalsIgnoreCase("rw") || source.equalsIgnoreCase("wr")) {
 					d = r.getDrawable(R.drawable.rw);
 				}
-				else if (source.equalsIgnoreCase("2w")) {
+				else if (source.equalsIgnoreCase("2w") || source.equalsIgnoreCase("w2")) {
 					d = r.getDrawable(R.drawable.w2);
 				}
-				else if (source.equalsIgnoreCase("2u")) {
+				else if (source.equalsIgnoreCase("2u") || source.equalsIgnoreCase("u2")) {
 					d = r.getDrawable(R.drawable.u2);
 				}
-				else if (source.equalsIgnoreCase("2b")) {
+				else if (source.equalsIgnoreCase("2b") || source.equalsIgnoreCase("b2")) {
 					d = r.getDrawable(R.drawable.b2);
 				}
-				else if (source.equalsIgnoreCase("2r")) {
+				else if (source.equalsIgnoreCase("2r") || source.equalsIgnoreCase("r2")) {
 					d = r.getDrawable(R.drawable.r2);
 				}
-				else if (source.equalsIgnoreCase("2g")) {
+				else if (source.equalsIgnoreCase("2g") || source.equalsIgnoreCase("g2")) {
 					d = r.getDrawable(R.drawable.g2);
 				}
 				else if (source.equalsIgnoreCase("s")) {
 					d = r.getDrawable(R.drawable.s);
 				}
-				else if (source.equalsIgnoreCase("pw")) {
+				else if (source.equalsIgnoreCase("pw") || source.equalsIgnoreCase("wp")) {
 					d = r.getDrawable(R.drawable.pw);
 				}
-				else if (source.equalsIgnoreCase("pu")) {
+				else if (source.equalsIgnoreCase("pu") || source.equalsIgnoreCase("up")) {
 					d = r.getDrawable(R.drawable.pu);
 				}
-				else if (source.equalsIgnoreCase("pb")) {
+				else if (source.equalsIgnoreCase("pb") || source.equalsIgnoreCase("bp")) {
 					d = r.getDrawable(R.drawable.pb);
 				}
-				else if (source.equalsIgnoreCase("pr")) {
+				else if (source.equalsIgnoreCase("pr") || source.equalsIgnoreCase("rp")) {
 					d = r.getDrawable(R.drawable.pr);
 				}
-				else if (source.equalsIgnoreCase("pg")) {
+				else if (source.equalsIgnoreCase("pg") || source.equalsIgnoreCase("gp")) {
 					d = r.getDrawable(R.drawable.pg);
 				}
 				else if (source.equalsIgnoreCase("p")) {
@@ -131,10 +132,10 @@ public class ImageGetterHelper {
 				else if (source.equalsIgnoreCase("1000000")) {
 					d = r.getDrawable(R.drawable.million);
 				}
-				else if (source.equalsIgnoreCase("hr")) {
+				else if (source.equalsIgnoreCase("hr") || source.equalsIgnoreCase("rh")) {
 					d = r.getDrawable(R.drawable.hr);
 				}
-				else if (source.equalsIgnoreCase("hw")) {
+				else if (source.equalsIgnoreCase("hw") || source.equalsIgnoreCase("wh")) {
 					d = r.getDrawable(R.drawable.hw);
 				}
 				else if (source.equalsIgnoreCase("c")) {

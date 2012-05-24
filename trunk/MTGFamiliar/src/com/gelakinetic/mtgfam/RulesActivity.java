@@ -32,6 +32,8 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.text.Html.ImageGetter;
+import android.text.Html;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
@@ -61,6 +63,7 @@ public class RulesActivity extends FragmentActivity {
 	private static final int ARBITRARY_REQUEST_CODE = 23;
 	
 	private CardDbAdapter mDbHelper;
+	private ImageGetter imgGetter;
 	private ListView list;
 	private RulesListAdapter adapter;
 	private ArrayList<RuleItem> rules;
@@ -75,6 +78,8 @@ public class RulesActivity extends FragmentActivity {
 		
 		mDbHelper = new CardDbAdapter(this);
 		mDbHelper.open();
+		
+		imgGetter = ImageGetterHelper.GlyphGetter(getResources());
 		
 		Bundle extras = getIntent().getExtras();
 		int category, subcategory, position;
@@ -157,10 +162,15 @@ public class RulesActivity extends FragmentActivity {
 			builder.setView(input);
 			builder.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					String keyword = input.getText().toString();
-					Intent i = new Intent(RulesActivity.this, RulesActivity.class);
-					i.putExtra(KEYWORD_KEY, keyword);
-					startActivityForResult(i, ARBITRARY_REQUEST_CODE);
+					String keyword = input.getText().toString().trim();
+					if(keyword.length() < 3) {
+						Toast.makeText(RulesActivity.this, "Your search term must be at least 3 characters long.", Toast.LENGTH_LONG).show();
+					}
+					else {
+						Intent i = new Intent(RulesActivity.this, RulesActivity.class);
+						i.putExtra(KEYWORD_KEY, keyword);
+						startActivityForResult(i, ARBITRARY_REQUEST_CODE);
+					}
 				}
 			});
 			builder.setNegativeButton(R.string.dialog_cancel, new OnClickListener() {
@@ -188,7 +198,6 @@ public class RulesActivity extends FragmentActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
 			case R.id.rules_menu_search:
-				//Toast.makeText(this, "Search", Toast.LENGTH_LONG).show();
 				showDialog(SEARCH);
 				return true;
 			case R.id.rules_menu_exit:
@@ -201,7 +210,8 @@ public class RulesActivity extends FragmentActivity {
 	}
 	
 	private SpannableString formatText(String input) {
-		SpannableString result = new SpannableString(input.replace("_", ""));
+		CharSequence cs = Html.fromHtml(input.replace("_", "").replace("{", "<img src=\"").replace("}", "\"/>"), imgGetter, null); 
+		SpannableString result = new SpannableString(cs);
 		int index;
 		
 		//First, handle italicizing any words/phrases surrounded by underscores
@@ -229,16 +239,20 @@ public class RulesActivity extends FragmentActivity {
 		}
 		
 		//Next, handle the keyword highlighting (if applicable)
-		if(keyword != null) {
+		//Don't do it if it's null or if it contains { or } (they get replaced by images)
+		if(keyword != null && !keyword.contains("{") && !keyword.contains("}")) {
 			String loweredInput = input.replace("_", "").toLowerCase();
 			String loweredKeyword = keyword.toLowerCase();
 			index = loweredInput.indexOf(loweredKeyword);
 			while(index != -1) {
 				int end = index + keyword.length();
-				result.setSpan(new ForegroundColorSpan(Color.YELLOW), index, end, 0); //StyleSpan(Typeface.BOLD)
+				result.setSpan(new ForegroundColorSpan(Color.YELLOW), index, end, 0);
 				index = loweredInput.indexOf(loweredKeyword, end);
 			}
 		}
+		
+		//Finally, handle hyperlinking
+		//TODO - Actually implement this
 		
 		return result;
 	}

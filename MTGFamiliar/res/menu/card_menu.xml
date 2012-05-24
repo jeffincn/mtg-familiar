@@ -40,5 +40,6 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <item
         android:id="@+id/quittosearch"
         android:title="@string/quittosearch"/>
+    <item android:id="@+id/cardrulings" android:title="@string/card_rulings"></item>
     
 </menu>

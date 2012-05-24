@@ -19,7 +19,10 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -38,6 +41,7 @@ import org.xml.sax.XMLReader;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -74,6 +78,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 // I don't like doing this, but we've gotta stick with the old clipboard
 @SuppressWarnings("deprecation")
@@ -97,6 +102,7 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 	private static final int			GETPRICE			= 1;
 	private static final int			GETIMAGE			= 2;
 	private static final int			CHANGESET			= 3;
+	private static final int			CARDRULINGS		= 4;
 	private static final int			MAINPAGE			= 0;
 	private static final int			DIALOG				= 1;
 	private String								NO_ERROR			= "no_error";
@@ -142,12 +148,16 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 	private int									multiverseId;
 	private boolean 							newImage;
 	private boolean 							newPriceData;
+	public ArrayList<Ruling>	ar;
+	private Context	mCtx;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.card_view_activity);
 
+		mCtx = this;
+		
 		name = (TextView) findViewById(R.id.name);
 		cost = (TextView) findViewById(R.id.cost);
 		type = (TextView) findViewById(R.id.type);
@@ -449,7 +459,6 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 	}
 
 	public static boolean isTransformable(String number, String set) {
-		// TODO Auto-generated method stub
 		if(number.contains("a") || number.contains("b")){
 			if(set.compareTo("ISD")==0 || set.compareTo("DKA") == 0){
 				return true;
@@ -504,6 +513,84 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 
 	}
 
+	private class FetchRulingsTask extends AsyncTask<String, Integer, Long> {
+
+		private boolean error = false;
+		
+		@Override
+		protected Long doInBackground(String... params) {
+
+			URL url;
+			InputStream is = null;
+			DataInputStream dis;
+			String line;
+
+			ar = new ArrayList<Ruling>();
+			
+			try {
+				url = new URL("http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multiverseId);
+				is = url.openStream(); // throws an IOException
+				dis = new DataInputStream(new BufferedInputStream(is));
+
+				String date = null, ruling;
+				while ((line = dis.readLine()) != null) {
+					if(line.contains("rulingDate") && line.contains("</td>")){
+						date = line.split(">")[1].split("<")[0];
+					}
+					if(line.contains("rulingText") && line.contains("</td>")){
+						ruling = line.split(">")[1].split("<")[0];
+						Ruling r = new Ruling(date, ruling);
+						ar.add(r);
+					}
+				}
+			}
+			catch (MalformedURLException mue) {
+				//mue.printStackTrace();
+				error = true;
+			}
+			catch (IOException ioe) {
+				error = true;				
+			}
+			finally {
+				try {
+					if(is != null){
+						is.close();
+					}
+				}
+				catch (IOException ioe) {
+					error = true;
+				}
+			}
+			
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Long result) {
+			progDialog.dismiss();
+			if(!error){
+				showDialog(CARDRULINGS);
+			}
+			else{
+				Toast.makeText(mCtx, "No Internet Connection", Toast.LENGTH_SHORT).show();
+			}
+		}
+
+	}
+
+	private static class Ruling{
+		public String date, ruling;
+		public Ruling(String d, String r)
+		{
+			date = d;
+			ruling = r;
+		}
+		
+		public String toString(){
+			return date + ": " + ruling;
+		}
+	}
+	
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		if (id == GETIMAGE) {
@@ -584,6 +671,26 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 			catch (SQLException e) {
 				//Should we do something here?
 			}
+		}
+		else if(id == CARDRULINGS){
+			
+			if(ar.size() == 0)
+			{
+				Toast.makeText(this, "No Rulings For This Card", Toast.LENGTH_SHORT).show();
+				return null;
+			}
+			
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle("Card Rulings");
+
+			String message="";
+			for(Ruling r : ar)
+			{
+				message += (r.toString()+'\n'+'\n');
+			}
+			
+			builder.setMessage(message);
+			return builder.create();
 		}
 		return null;
 	}
@@ -705,6 +812,7 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 		}
 	};
 	private TextView	copyView;
+	private ProgressDialog	progDialog;
 
 	void fetchPrices() {
 		try {
@@ -791,6 +899,11 @@ public class CardViewActivity extends FragmentActivity implements Runnable {
 			String url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multiverseId;
 			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 			startActivity(browserIntent);
+			return true;
+		case R.id.cardrulings:
+			progDialog = ProgressDialog.show(this, "", "Loading. Please wait...", true);
+			progDialog.show();
+			new FetchRulingsTask().execute((String[]) null);
 			return true;
 		case R.id.quittosearch:
 			MyApp appState = ((MyApp) getApplicationContext());

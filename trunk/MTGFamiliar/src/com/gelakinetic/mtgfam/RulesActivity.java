@@ -272,7 +272,21 @@ public class RulesActivity extends FragmentActivity {
 		}
 		
 		//Finally, handle hyperlinking
-		Matcher m = Pattern.compile("([1-9]{1}[0-9]{2}\\.?([a-z0-9]{1,2})?(-[a-z]{1})?\\.?)").matcher(cs);
+		
+		/* 
+		 * A breakdown of the regex for Adam:
+		 * [1-9]{1}: first character is between 1 and 9
+		 * [0-9]{2}: followed by two characters between 0 and 9 (i.e. a 3-digit number)
+		 * (...)?: maybe followed by the group:
+		 * \\.: period
+		 * ([a-z0-9]{1,2}(-[a-z]{1})?)?: maybe followed by one or two alphanumeric characters, which are maybe followed by a hyphen and an alphabetical character
+		 * \\.?: maybe followed by another period
+		 * 
+		 * I realize this isn't completely easy to read, but it might at least help make some sense of the regex so
+		 * I'm not just waving my hands and shouting "WIZAAAAAARDS!". I still reserve the right to do that, though.
+		 * - Alex
+		 */
+		Matcher m = Pattern.compile("([1-9]{1}[0-9]{2}(\\.([a-z0-9]{1,2}(-[a-z]{1})?)?\\.?)?)").matcher(cs);
 		while(m.find()) {
 			try {
 				String[] tokens = cs.subSequence(m.start(), m.end()).toString().split("(\\.)");

@@ -66,8 +66,6 @@ public class RulesActivity extends FragmentActivity {
 	private static final int RESULT_QUIT_TO_MAIN = 2;
 	private static final int ARBITRARY_REQUEST_CODE = 23;
 	
-	private static final String LINK_REGEX = "([1-9]{1}[0-9]{2}\\.?([a-z0-9]{1,2})?\\.?)";
-	
 	private CardDbAdapter mDbHelper;
 	private ImageGetter imgGetter;
 	private ListView list;
@@ -229,7 +227,7 @@ public class RulesActivity extends FragmentActivity {
 	private SpannableString formatText(String input) {
 		CharSequence cs = Html.fromHtml(input.replace("_", "").replace("{", "<img src=\"").replace("}", "\"/>"), imgGetter, null); 
 		SpannableString result = new SpannableString(cs);
-		int index;
+		int index, offset;
 		
 		//First, handle italicizing any words/phrases surrounded by underscores
 		ArrayList<Integer> starts = new ArrayList<Integer>();
@@ -248,10 +246,14 @@ public class RulesActivity extends FragmentActivity {
 			index = input.indexOf("_", index + 1);
 		}
 		
+		int startpoint, endpoint;
 		if(starts.size() == ends.size()) {
 			//In case we had some weirdness and not all pairs match, we won't bother italicizing
 			for(int i = 0; i < starts.size(); i++) {
-				result.setSpan(new StyleSpan(Typeface.ITALIC), starts.get(i) - 2 * i, ends.get(i) - 2 * i, 0);
+				startpoint = starts.get(i) - 2 * i; //2 * i handles the offset for removing underscores
+				endpoint = ends.get(i) - 2 * i;
+				offset = computeOffset(input, startpoint); //And this handles the offset for replacing mana symbol codes
+				result.setSpan(new StyleSpan(Typeface.ITALIC), startpoint - offset, endpoint - offset, 0);
 			}
 		}
 		
@@ -263,13 +265,14 @@ public class RulesActivity extends FragmentActivity {
 			index = loweredInput.indexOf(loweredKeyword);
 			while(index != -1) {
 				int end = index + keyword.length();
-				result.setSpan(new ForegroundColorSpan(Color.YELLOW), index, end, 0);
+				offset = computeOffset(loweredInput, index);
+				result.setSpan(new ForegroundColorSpan(Color.YELLOW), index - offset, end - offset, 0);
 				index = loweredInput.indexOf(loweredKeyword, end);
 			}
 		}
 		
 		//Finally, handle hyperlinking
-		Matcher m = Pattern.compile(LINK_REGEX).matcher(cs);
+		Matcher m = Pattern.compile("([1-9]{1}[0-9]{2}\\.?([a-z0-9]{1,2})?(-[a-z]{1})?\\.?)").matcher(cs);
 		while(m.find()) {
 			try {
 				String[] tokens = cs.subSequence(m.start(), m.end()).toString().split("(\\.)");
@@ -278,7 +281,12 @@ public class RulesActivity extends FragmentActivity {
 				final int linkSub = firstInt % 100;
 				int position = 0;
 				if(tokens.length > 1) {
-					position = mDbHelper.getRulePosition(linkCat, linkSub, tokens[1]);
+					String entry = tokens[1];
+					int dashIndex = entry.indexOf("-");
+					if(dashIndex >= 0) {
+						entry = entry.substring(0, dashIndex);
+					}
+					position = mDbHelper.getRulePosition(linkCat, linkSub, entry);
 				}
 				final int linkPosition = position;
 				result.setSpan(new ClickableSpan() {
@@ -305,6 +313,27 @@ public class RulesActivity extends FragmentActivity {
 		}
 		
 		return result;
+	}
+	
+	private int computeOffset(String target, int endpoint) {
+		if(endpoint > target.length()) {
+			endpoint = target.length();
+		}
+		int offset = 0;
+		
+		if(target != null) {
+			int index = target.indexOf("{");
+			int second = 0;
+			while(index >= 0 && index < endpoint) {
+				second = target.indexOf("}", index);
+				if(second >= 0) {
+					offset += (second - index);
+				}
+				index = target.indexOf("{", second);
+			}
+		}
+		
+		return offset;
 	}
 	
 	private class RuleItem {

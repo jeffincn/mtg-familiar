@@ -20,7 +20,8 @@
         android:id="@+id/linearLayout7"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" android:baselineAligned="false">
+        android:baselineAligned="false"
+        android:orientation="vertical" >
 
         <LinearLayout
             android:id="@+id/linearLayout1"
@@ -142,21 +143,32 @@
                     style="@style/CardViewText"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1" android:layout_marginBottom="0dip" android:layout_marginLeft="3dip" android:layout_marginRight="3dip" android:layout_marginTop="3dip" android:text="Zoltan Boros &amp; Gabor Szikzsai &amp; Blah Blah &amp; Foo Foo &amp; Sneef Sneef"/>
+                    android:layout_marginBottom="0dip"
+                    android:layout_marginLeft="3dip"
+                    android:layout_marginRight="3dip"
+                    android:layout_marginTop="3dip"
+                    android:layout_weight="1"
+                    android:text="Zoltan Boros &amp; Gabor Szikzsai &amp; Blah Blah &amp; Foo Foo &amp; Sneef Sneef" />
 
                 <TextView
                     android:id="@+id/pt"
                     style="@style/CardViewText"
                     android:layout_width="wrap_content"
-                    android:text="*/1+*" android:layout_marginBottom="0dip" android:layout_marginLeft="3dip" android:layout_marginRight="3dip" android:layout_marginTop="3dip" android:layout_height="fill_parent" android:gravity="bottom|right"/>
+                    android:layout_height="fill_parent"
+                    android:layout_marginBottom="0dip"
+                    android:layout_marginLeft="3dip"
+                    android:layout_marginRight="3dip"
+                    android:layout_marginTop="3dip"
+                    android:gravity="bottom|right"
+                    android:text="*/1+*" />
             </LinearLayout>
 
             <ImageView
                 android:id="@+id/cardpic"
-                android:layout_width="wrap_content"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|center"
-                android:src="@drawable/loading" />
+                android:adjustViewBounds="true" />
 
             <Button
                 android:id="@+id/transformbutton"

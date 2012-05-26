@@ -59,7 +59,6 @@ import android.text.ClipboardManager;
 import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.text.method.LinkMovementMethod;
-import android.util.DisplayMetrics;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
@@ -505,7 +504,7 @@ public class CardViewActivity extends FragmentActivity {
 				picurl = picurl.toLowerCase();
 
 				URL u = new URL(picurl);
-				cardPicture = new BitmapDrawable(mCtx.getResources(), u.openStream());
+				cardPicture = new BitmapDrawable(u.openStream());
 
 				Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 				int newHeight;

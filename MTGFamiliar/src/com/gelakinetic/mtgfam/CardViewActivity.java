@@ -116,6 +116,7 @@ public class CardViewActivity extends FragmentActivity {
 	private Button							leftRandom;
 	private Button							rightRandom;
 	private ImageView						cardpic;
+	private ImageView						DialogImageView;
 
 	// Stuff for AsyncTasks
 	private BitmapDrawable			cardPicture;
@@ -138,15 +139,11 @@ public class CardViewActivity extends FragmentActivity {
 	private boolean							isRandom;
 	private boolean							isSingle;
 	private boolean							scroll_results;
-	private ImageView	DialogImageView;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.card_view_activity);
-
-		// this is really important in order to save the state across screen
-		// configuration changes for example
 
 		mCtx = this;
 
@@ -198,6 +195,31 @@ public class CardViewActivity extends FragmentActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		try {
+			dismissDialog(GETLEGALITY);
+		}
+		catch (IllegalArgumentException e) {
+		}
+		try {
+			dismissDialog(GETPRICE);
+		}
+		catch (IllegalArgumentException e) {
+		}
+		try {
+			dismissDialog(GETIMAGE);
+		}
+		catch (IllegalArgumentException e) {
+		}
+		try {
+			dismissDialog(CHANGESET);
+		}
+		catch (IllegalArgumentException e) {
+		}
+		try {
+			dismissDialog(CARDRULINGS);
+		}
+		catch (IllegalArgumentException e) {
+		}
 		MyApp appState = ((MyApp) getApplicationContext());
 		if (appState.getState() == QUITTOSEARCH) {
 			this.finish();
@@ -214,9 +236,9 @@ public class CardViewActivity extends FragmentActivity {
 	}
 
 	private void setInfoFromID(long id) {
-		
+
 		cardPicture = null;
-		
+
 		Cursor c = mDbHelper.fetchCard(id, null);
 		c.moveToFirst();
 
@@ -460,7 +482,12 @@ public class CardViewActivity extends FragmentActivity {
 
 		@Override
 		protected void onPostExecute(Long result) {
-			progDialog.dismiss();
+			try {
+				progDialog.dismiss();
+			}
+			catch (IllegalArgumentException e) {
+			}
+
 			showDialog(GETLEGALITY);
 		}
 
@@ -534,7 +561,11 @@ public class CardViewActivity extends FragmentActivity {
 
 		@Override
 		protected void onPostExecute(Long result) {
-			progDialog.dismiss();
+			try {
+				progDialog.dismiss();
+			}
+			catch (IllegalArgumentException e) {
+			}
 			if (!error) {
 				if (loadTo == DIALOG) {
 					showDialog(GETIMAGE);
@@ -614,7 +645,12 @@ public class CardViewActivity extends FragmentActivity {
 
 		@Override
 		protected void onPostExecute(Long result) {
-			progDialog.dismiss();
+			try {
+				progDialog.dismiss();
+			}
+			catch (IllegalArgumentException e) {
+			}
+
 			if (!error) {
 				showDialog(GETPRICE);
 			}
@@ -678,7 +714,11 @@ public class CardViewActivity extends FragmentActivity {
 
 		@Override
 		protected void onPostExecute(Long result) {
-			progDialog.dismiss();
+			try {
+				progDialog.dismiss();
+			}
+			catch (IllegalArgumentException e) {
+			}
 
 			if (rulingsArrayList.size() == 0) {
 				Toast.makeText(mCtx, "No Rulings For This Card", Toast.LENGTH_SHORT).show();
@@ -710,8 +750,14 @@ public class CardViewActivity extends FragmentActivity {
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
+		Dialog dialog;
 		if (id == GETIMAGE) {
-			Dialog dialog = new Dialog(this);
+
+			if (cardPicture == null) {
+				return null;
+			}
+
+			dialog = new Dialog(this);
 			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 			dialog.setContentView(R.layout.image_dialog);
@@ -722,10 +768,11 @@ public class CardViewActivity extends FragmentActivity {
 			return dialog;
 		}
 		else if (id == GETLEGALITY) {
-			if (formats == null)
+			if (formats == null) {
 				return null;
+			}
 
-			Dialog dialog = new Dialog(this);
+			dialog = new Dialog(this);
 			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 			dialog.setContentView(R.layout.legality_dialog);
@@ -749,7 +796,12 @@ public class CardViewActivity extends FragmentActivity {
 			return dialog;
 		}
 		else if (id == GETPRICE) { // price
-			Dialog dialog = new Dialog(this);
+
+			if (XMLhandler == null) {
+				return null;
+			}
+
+			dialog = new Dialog(this);
 			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 			dialog.setContentView(R.layout.price_dialog);
@@ -790,13 +842,18 @@ public class CardViewActivity extends FragmentActivity {
 						setInfoFromID(aIds[item]);
 					}
 				});
-				return builder.create();
+				dialog = builder.create();
+				return dialog;
 			}
 			catch (SQLException e) {
 				// Should we do something here?
 			}
 		}
 		else if (id == CARDRULINGS) {
+
+			if (rulingsArrayList == null) {
+				return null;
+			}
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle("Card Rulings");
@@ -811,7 +868,8 @@ public class CardViewActivity extends FragmentActivity {
 			CharSequence messageGlyph = Html.fromHtml(message, imgGetter, null);
 
 			builder.setMessage(messageGlyph);
-			return builder.create();
+			dialog = builder.create();
+			return dialog;
 		}
 		return null;
 	}
@@ -895,7 +953,7 @@ public class CardViewActivity extends FragmentActivity {
 	protected void onPrepareDialog(int id, Dialog dialog) {
 		switch (id) {
 			case GETIMAGE:
-				if(DialogImageView != null){
+				if (DialogImageView != null) {
 					DialogImageView.setImageDrawable(cardPicture);
 				}
 				break;

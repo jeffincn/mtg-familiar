@@ -32,6 +32,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.provider.Settings.System;
 import android.support.v4.app.FragmentActivity;
 import android.view.MenuItem;
 import android.view.View;
@@ -165,6 +166,8 @@ public class RoundTimerActivity extends FragmentActivity {
 				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
 				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Alert Tone");
 				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, soundFile);
+				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, System.DEFAULT_NOTIFICATION_URI);
+				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false);
 				
 				startActivityForResult(intent, RINGTONE_REQUEST_CODE);
 				return true;

@@ -60,6 +60,7 @@ public class RulesActivity extends FragmentActivity {
 	public static String SUBCATEGORY_KEY = "subcategory";
 	public static String POSITION_KEY = "position";
 	public static String KEYWORD_KEY = "keyword";
+	public static String GLOSSARY_KEY = "glossary";
 	
 	private static final int SEARCH = 0;
 	private static final int RESULT_NORMAL = 1;
@@ -70,7 +71,7 @@ public class RulesActivity extends FragmentActivity {
 	private ImageGetter imgGetter;
 	private ListView list;
 	private RulesListAdapter adapter;
-	private ArrayList<RuleItem> rules;
+	private ArrayList<DisplayItem> rules;
 	private int category;
 	private int subcategory;
 	private String keyword;
@@ -89,25 +90,32 @@ public class RulesActivity extends FragmentActivity {
 		
 		Bundle extras = getIntent().getExtras();
 		int position;
+		boolean isGlossary;
 		if(extras == null) {
 			category = -1;
 			subcategory = -1;
 			position = 0;
 			keyword = null;
+			isGlossary = false;
 		}
 		else {
 			category = extras.getInt(CATEGORY_KEY, -1);
 			subcategory = extras.getInt(SUBCATEGORY_KEY, -1);
 			position = extras.getInt(POSITION_KEY, 0);
 			keyword = extras.getString(KEYWORD_KEY);
+			isGlossary = extras.getBoolean(GLOSSARY_KEY, false);
 		}
 		
 		list = (ListView)findViewById(R.id.rules_list);
-		rules = new ArrayList<RuleItem>();
+		rules = new ArrayList<DisplayItem>();
 		boolean clickable;
 		Cursor c;
 		
-		if(keyword == null) {
+		if(isGlossary) {
+			c = mDbHelper.getGlossaryTerms();
+			clickable = false;
+		}
+		else if(keyword == null) {
 			c = mDbHelper.getRules(category, subcategory);
 			clickable = subcategory == -1;
 		}
@@ -118,21 +126,39 @@ public class RulesActivity extends FragmentActivity {
 		if(c != null && c.getCount() > 0) {
 			c.moveToFirst();
 			while(!c.isAfterLast()) {
-				rules.add(new RuleItem(c.getInt(c.getColumnIndex(CardDbAdapter.KEY_CATEGORY)), c.getInt(c.getColumnIndex(CardDbAdapter.KEY_SUBCATEGORY)),
-						c.getString(c.getColumnIndex(CardDbAdapter.KEY_ENTRY)), c.getString(c.getColumnIndex(CardDbAdapter.KEY_RULE_TEXT))));
+				if(isGlossary) {
+					rules.add(new GlossaryItem(c.getString(c.getColumnIndex(CardDbAdapter.KEY_TERM)),
+							c.getString(c.getColumnIndex(CardDbAdapter.KEY_DEFINITION))));
+				}
+				else {
+					rules.add(new RuleItem(c.getInt(c.getColumnIndex(CardDbAdapter.KEY_CATEGORY)), c.getInt(c.getColumnIndex(CardDbAdapter.KEY_SUBCATEGORY)),
+							c.getString(c.getColumnIndex(CardDbAdapter.KEY_ENTRY)), c.getString(c.getColumnIndex(CardDbAdapter.KEY_RULE_TEXT))));
+				}
 				c.moveToNext();
 			}
 			c.close();
+			if(!isGlossary && category == -1 && keyword == null) {
+				//If it's the initial rules page, add a Glossary link to the end
+				rules.add(new GlossaryItem("10.", "Glossary", true));
+			}
 			adapter = new RulesListAdapter(this, R.layout.rules_list_item, rules);
 			list.setAdapter(adapter);
 			
 			if(clickable) {
+				//This only happens for rule items with no subcategory, so the cast should be safe
 				list.setOnItemClickListener(new OnItemClickListener() {
 					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-						RuleItem item = rules.get(position);
+						DisplayItem item = rules.get(position);
 						Intent i = new Intent(RulesActivity.this, RulesActivity.class);
-						i.putExtra(CATEGORY_KEY, item.getCategory());
-						i.putExtra(SUBCATEGORY_KEY, item.getSubcategory());
+						if(RuleItem.class.isInstance(item)) {
+							RuleItem ri = (RuleItem)item;
+							i.putExtra(CATEGORY_KEY, ri.getCategory());
+							i.putExtra(SUBCATEGORY_KEY, ri.getSubcategory());
+						}
+						else if(GlossaryItem.class.isInstance(item)) {
+							i.putExtra(GLOSSARY_KEY, true);
+						}
+						//The else case shouldn't happen, but meh
 						startActivityForResult(i, ARBITRARY_REQUEST_CODE);
 					}
 				});
@@ -350,7 +376,13 @@ public class RulesActivity extends FragmentActivity {
 		return offset;
 	}
 	
-	private class RuleItem {
+	private abstract class DisplayItem {
+		public abstract String getText();
+		public abstract String getHeader();
+		public abstract boolean isClickable();
+	}
+	
+	private class RuleItem extends DisplayItem {
 		private int category;
 		private int subcategory;
 		private String entry;
@@ -371,11 +403,11 @@ public class RulesActivity extends FragmentActivity {
 			return this.subcategory;
 		}
 		
-		public String getEntry() {
-			return this.entry;
-		}
+//		public String getEntry() {
+//			return this.entry;
+//		}
 		
-		public String getRulesText() {
+		public String getText() {
 			return this.rulesText;
 		}
 		
@@ -390,13 +422,47 @@ public class RulesActivity extends FragmentActivity {
 				return String.valueOf((this.category * 100 + this.subcategory)) + "." + this.entry;
 			}
 		}
+		
+		public boolean isClickable() {
+			return this.entry == null || this.entry.length() == 0;
+		}
 	}
 	
-	private class RulesListAdapter extends ArrayAdapter<RuleItem> {
+	private class GlossaryItem extends DisplayItem {
+		private String term;
+		private String definition;
+		private boolean clickable;
+		
+		public GlossaryItem(String term, String definition) {
+			this.term = term;
+			this.definition = definition;
+			this.clickable = false;
+		}
+		
+		public GlossaryItem(String term, String definition, boolean clickable) {
+			this.term = term;
+			this.definition = definition;
+			this.clickable = clickable;
+		}
+		
+		public String getText() {
+			return this.definition;
+		}
+		
+		public String getHeader() {
+			return this.term;
+		}
+		
+		public boolean isClickable() {
+			return this.clickable;
+		}
+	}
+	
+	private class RulesListAdapter extends ArrayAdapter<DisplayItem> {
 		private int layoutResourceId;
-		private ArrayList<RuleItem> items;
+		private ArrayList<DisplayItem> items;
 
-		public RulesListAdapter(Context context, int textViewResourceId, ArrayList<RuleItem> items) {
+		public RulesListAdapter(Context context, int textViewResourceId, ArrayList<DisplayItem> items) {
 			super(context, textViewResourceId, items);
 
 			this.layoutResourceId = textViewResourceId;
@@ -410,14 +476,14 @@ public class RulesActivity extends FragmentActivity {
 				LayoutInflater inf = getLayoutInflater();
 				v = inf.inflate(layoutResourceId, null);
 			}
-			RuleItem data = items.get(position);
+			DisplayItem data = items.get(position);
 			if (data != null) {
 				TextView rulesHeader = (TextView)v.findViewById(R.id.rules_item_header);
 				TextView rulesText = (TextView)v.findViewById(R.id.rules_item_text);
 
 				rulesHeader.setText(data.getHeader());
-				rulesText.setText(formatText(data.getRulesText()), BufferType.SPANNABLE);
-				if(data.getEntry() != null) {
+				rulesText.setText(formatText(data.getText()), BufferType.SPANNABLE);
+				if(!data.isClickable()) {
 					rulesText.setMovementMethod(LinkMovementMethod.getInstance());
 				}
 			}

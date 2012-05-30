@@ -65,8 +65,9 @@ public class CardDbAdapter {
 	private static final String		DATABASE_TABLE_BANNED_CARDS		= "banned_cards";
 	private static final String		DATABASE_TABLE_SAVED_TRADES		= "saved_trades";
 	private static final String 	DATABASE_TABLE_RULES = "rules";
+	private static final String		DATABASE_TABLE_GLOSSARY = "glossary";
 
-	public static final int				DATABASE_VERSION							= 19;
+	public static final int				DATABASE_VERSION							= 21;
 
 	public static final String		KEY_ID												= "_id";
 	public static final String		KEY_NAME											= SearchManager.SUGGEST_COLUMN_TEXT_1;							// "name";
@@ -107,6 +108,9 @@ public class CardDbAdapter {
 	public static final String		KEY_ENTRY = "entry";
 	public static final String		KEY_RULE_TEXT = "rule_text";
 	public static final String		KEY_POSITION = "position";
+	
+	public static final String		KEY_TERM = "term";
+	public static final String		KEY_DEFINITION = "definition";
 
 	private DatabaseHelper				mDbHelper;
 	private SQLiteDatabase				mDb;
@@ -159,6 +163,11 @@ public class CardDbAdapter {
 																																	+ KEY_ENTRY + " text null, "
 																																	+ KEY_RULE_TEXT + " text not null, "
 																																	+ KEY_POSITION + " integer null);";
+	
+	private static final String 	DATABASE_CREATE_GLOSSARY		= "create table " + DATABASE_TABLE_GLOSSARY + "(" 
+																																	+ KEY_ID + " integer primary key autoincrement, "
+																																	+ KEY_TERM + " text not null, " 
+																																	+ KEY_DEFINITION + " text not null);";
 
 	private final Context					mCtx;
 
@@ -236,6 +245,7 @@ public class CardDbAdapter {
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_BANNED_CARDS);
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_SAVED_TRADES);
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_RULES);
+		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_GLOSSARY);
 
 		mDb.execSQL(DATABASE_CREATE_CARDS);
 		mDb.execSQL(DATABASE_CREATE_SETS);
@@ -244,6 +254,7 @@ public class CardDbAdapter {
 		mDb.execSQL(DATABASE_CREATE_BANNED_CARDS);
 		mDb.execSQL(DATABASE_CREATE_SAVED_TRADES);
 		mDb.execSQL(DATABASE_CREATE_RULES);
+		mDb.execSQL(DATABASE_CREATE_GLOSSARY);
 	}
 
 	/**
@@ -1338,6 +1349,20 @@ public class CardDbAdapter {
 			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
 		}
 		return 0;
+	}
+	
+	public Cursor getGlossaryTerms() {
+		try {
+			String sql = "SELECT * FROM " + DATABASE_TABLE_GLOSSARY;
+			return mDb.rawQuery(sql, null);
+		}
+		catch (SQLiteException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		catch (IllegalStateException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		return null;
 	}
 
 	public SQLiteDatabase getReadableDatabase() {

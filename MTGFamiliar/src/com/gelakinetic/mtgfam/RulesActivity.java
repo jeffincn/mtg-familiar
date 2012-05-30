@@ -20,6 +20,8 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 package com.gelakinetic.mtgfam;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,6 +52,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SectionIndexer;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
 import android.widget.Toast;
@@ -403,10 +406,6 @@ public class RulesActivity extends FragmentActivity {
 			return this.subcategory;
 		}
 		
-//		public String getEntry() {
-//			return this.entry;
-//		}
-		
 		public String getText() {
 			return this.rulesText;
 		}
@@ -458,15 +457,46 @@ public class RulesActivity extends FragmentActivity {
 		}
 	}
 	
-	private class RulesListAdapter extends ArrayAdapter<DisplayItem> {
+	private class RulesListAdapter extends ArrayAdapter<DisplayItem> implements SectionIndexer {
 		private int layoutResourceId;
 		private ArrayList<DisplayItem> items;
+		
+		private HashMap<String, Integer> alphaIndex;
+		private String[] sections;
 
 		public RulesListAdapter(Context context, int textViewResourceId, ArrayList<DisplayItem> items) {
 			super(context, textViewResourceId, items);
 
 			this.layoutResourceId = textViewResourceId;
 			this.items = items;
+			
+			boolean isGlossary = true;
+			for(DisplayItem item : items) {
+				if(RuleItem.class.isInstance(item)) {
+					isGlossary = false;
+					break;
+				}
+			}
+			
+			if(isGlossary) {
+				this.alphaIndex = new HashMap<String, Integer>();
+				for(int i = 0; i < items.size(); i++) {
+					String first = items.get(i).getHeader().substring(0, 1).toUpperCase();
+					if(!this.alphaIndex.containsKey(first)) {
+						this.alphaIndex.put(first, i);
+					}
+				}
+				
+				ArrayList<String> letters = new ArrayList<String>(this.alphaIndex.keySet());
+				Collections.sort(letters); //This should do nothing in practice, but just to be safe
+				
+				sections = new String[letters.size()];
+				letters.toArray(sections);
+			}
+			else {
+				this.alphaIndex = null;
+				this.sections = null;
+			}
 		}
 
 		@Override
@@ -488,6 +518,33 @@ public class RulesActivity extends FragmentActivity {
 				}
 			}
 			return v;
+		}
+
+		public int getPositionForSection(int section) {
+			if(this.alphaIndex == null) {
+				return 0;
+			}
+			else {
+				return this.alphaIndex.get(this.sections[section]);
+			}
+		}
+
+		public int getSectionForPosition(int position) {
+			if(this.alphaIndex == null) {
+				return 0;
+			}
+			else {
+				return 1;
+			}
+		}
+
+		public Object[] getSections() {
+			if(this.alphaIndex == null) {
+				return null;
+			}
+			else {
+				return sections;	
+			}
 		}
 	}
 }

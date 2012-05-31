@@ -39,6 +39,8 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.TextToSpeech.OnInitListener;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -48,20 +50,24 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class NPlayerLifeActivity extends FragmentActivity {
+public class NPlayerLifeActivity extends FragmentActivity implements OnInitListener {
 
 	private static final int								DIALOG_RESET_CONFIRM	= 0;
 	private static final int								DIALOG_REMOVE_PLAYER	= 1;
 	private static final int								DIALOG_SET_NAME				= 2;
+	private static final int 								DIALOG_INSTALL_TTS		= 3;
 	private static final int								LIFE									= 0;
 	private static final int								POISON								= 1;
+	private static final int								TTS_CHECK_CODE			= 23;
 	public static final int									INITIAL_LIFE					= 20;
 	public static final int									INITIAL_POISON				= 0;
 	public static final int									TERMINAL_LIFE					= 0;
@@ -106,6 +112,9 @@ public class NPlayerLifeActivity extends FragmentActivity {
 	private int															numPlayers						= 0;
 	private int															listSizeHeight;
 	private int															listSizeWidth;
+	
+	private TextToSpeech tts;
+	private boolean ttsInitialized = false;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -204,12 +213,19 @@ public class NPlayerLifeActivity extends FragmentActivity {
 		setType(LIFE);
 
 		MenuFragmentCompat.init(this, R.menu.life_counter_menu, "life_counter_menu_fragment");
+		
+		Intent i = new Intent();
+		i.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+		startActivityForResult(i, TTS_CHECK_CODE);
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		scheduler.shutdown();
+		if(tts != null) {
+			tts.shutdown();
+		}
 	}
 
 	@Override
@@ -451,12 +467,59 @@ public class NPlayerLifeActivity extends FragmentActivity {
 						}).create();
 
 				break;
+			case DIALOG_INSTALL_TTS:
+				if(!preferences.getBoolean("ttsdontask", false)) {
+					factory = LayoutInflater.from(this);
+					final View dialogView = factory.inflate(R.layout.install_tts_dialog, null);
+					builder = new AlertDialog.Builder(this);
+					builder.setTitle(R.string.install_tts_title);
+					builder.setView(dialogView);
+					builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							CheckBox cbx = (CheckBox)dialogView.findViewById(R.id.install_tts_checkbox);
+							if(cbx.isChecked()) {
+								editor.putBoolean("ttsdontask", true);
+								editor.commit();
+							}
+							
+							Intent installIntent = new Intent();
+				            installIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+				            startActivity(installIntent);
+						}
+					});
+					builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							CheckBox cbx = (CheckBox)dialogView.findViewById(R.id.install_tts_checkbox);
+							if(cbx.isChecked()) {
+								editor.putBoolean("ttsdontask", true);
+								editor.commit();
+							}
+						}
+					});
+					dialog = builder.create();
+				}
+				else {
+					dialog = null;
+				}
+				break;
 			default:
 				dialog = null;
 		}
 		return dialog;
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(requestCode == TTS_CHECK_CODE) {
+			if(resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+				tts = new TextToSpeech(this, this);
+			}
+			else {
+				showDialog(DIALOG_INSTALL_TTS);
+			}
+		}
+	}
+	
 	private void update() {
 		switch (activeType) {
 			case LIFE:
@@ -1018,6 +1081,40 @@ public class NPlayerLifeActivity extends FragmentActivity {
 			this.layout = layout;
 		}
 	}
+	
+	private void announceLifeTotals() {
+		if(ttsInitialized) {
+			boolean first = true;
+			for(Player p : players) {
+				//Format: "{name} has {quantity} {life | poison counters}", depending on the current mode
+				String sentence = "";
+				sentence += p.name;
+				sentence += " has ";
+				
+				if(activeType == LIFE) {
+					sentence += String.valueOf(p.life);
+					sentence += " life";
+				}
+				else {
+					sentence += String.valueOf(p.poison);
+					sentence += " poison counters";
+				}
+				
+				if(first) {
+					//Flush on the first one, so we interrupt if it's already going
+					tts.speak(sentence, TextToSpeech.QUEUE_FLUSH, null);
+					first = false;
+				}
+				else {
+					//Otherwise, add to the queue
+					tts.speak(sentence, TextToSpeech.QUEUE_ADD, null);
+				}
+			}
+		}
+		else {
+			Toast.makeText(this, "You do not have text-to-speech installed", Toast.LENGTH_LONG).show();
+		}
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -1031,8 +1128,18 @@ public class NPlayerLifeActivity extends FragmentActivity {
 			case R.id.remove_player:
 				showDialog(DIALOG_REMOVE_PLAYER);
 				return true;
+			case R.id.announce_life:
+				announceLifeTotals();
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	@Override
+	public void onInit(int status) {
+		if(status == TextToSpeech.SUCCESS) {
+			ttsInitialized = true;
 		}
 	}
 }

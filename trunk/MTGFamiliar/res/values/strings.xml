@@ -312,6 +312,7 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     Good luck, and have fun!</string>
     <string name="addplayer">Add a Player</string>
     <string name="removeplayer">Remove a Player</string>
+    <string name="announcelife">Announce Life Totals</string>
     <string name="quittosearch">Exit Results</string>
     <string name="consolidate">Consolidate Search Results</string>
     <string name="consolidatetext">Only show the most recent printing of a card</string>
@@ -411,4 +412,12 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     <string name="rules_exit">Exit Rules</string>
     <string name="rules_search_title">Enter Keyword(s)</string>
     <string name="card_rulings">Card Rulings</string>
+    
+    <string name="install_tts_title">Text-to-Speech</string>
+    <string name="install_tts">Do you want to install text-to-speech?</string>
+    <string name="install_tts_checkbox">Do not ask me again</string>
+    
+    <string name="tts_pref_section">Text-to-Speech</string>
+    <string name="tts_pref_title">Do Not Prompt</string>
+    <string name="tts_pref_desc">Never show the prompt on the life counter if TTS is not installed</string>
 </resources>

@@ -43,6 +43,7 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -1086,7 +1087,7 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 		if(ttsInitialized) {
 			boolean first = true;
 			for(Player p : players) {
-				//Format: "{name} has {quantity} {life | poison counters}", depending on the current mode
+				//Format: "{name} has {quantity} {life | poison counter(s)}", depending on the current mode
 				String sentence = "";
 				sentence += p.name;
 				sentence += " has ";
@@ -1097,7 +1098,10 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 				}
 				else {
 					sentence += String.valueOf(p.poison);
-					sentence += " poison counters";
+					sentence += " poison counter";
+					if(p.poison != 1) {
+						sentence += "s";
+					}
 				}
 				
 				if(first) {
@@ -1135,8 +1139,13 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 				return super.onOptionsItemSelected(item);
 		}
 	}
-
+	
 	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.getItem(3).setVisible(ttsInitialized);
+	    return true;
+	}
+
 	public void onInit(int status) {
 		if(status == TextToSpeech.SUCCESS) {
 			ttsInitialized = true;

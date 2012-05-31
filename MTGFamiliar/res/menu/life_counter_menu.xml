@@ -31,5 +31,9 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:id="@+id/remove_player"
         android:icon="@drawable/menu_minus"
         android:title="@string/removeplayer"/>
+    
+    <item
+        android:id="@+id/announce_life"
+        android:title="@string/announcelife" />
 
 </menu>

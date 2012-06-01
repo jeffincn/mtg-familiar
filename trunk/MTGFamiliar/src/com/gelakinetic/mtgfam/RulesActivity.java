@@ -149,7 +149,9 @@ public class RulesActivity extends FragmentActivity {
             if(category >= 0 && subcategory < 0) {
                 listItemResource = R.layout.rules_list_subcategory_item;
             }
-            else if(isGlossary || subcategory >= 0 || keyword != null) {
+            //These cases can't be exclusive; otherwise keyword search from anything but
+            //a subcategory will use the wrong layout
+            if(isGlossary || subcategory >= 0 || keyword != null) {
                 listItemResource = R.layout.rules_list_detail_item;
             }
 			adapter = new RulesListAdapter(this, listItemResource, rules);

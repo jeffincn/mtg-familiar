@@ -1142,7 +1142,7 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 	
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.getItem(3).setVisible(ttsInitialized);
+        menu.findItem(R.id.announce_life).setVisible(ttsInitialized);
 	    return true;
 	}
 

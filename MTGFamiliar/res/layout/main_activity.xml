@@ -137,6 +137,20 @@
                 android:gravity="center_vertical"
                 android:text="@string/roundtimer"
                 android:textSize="30dip" />
+            
+            <TextView
+                android:id="@+id/rules"
+                style="@style/text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/rules_icon"
+                android:drawablePadding="15dp"
+                android:gravity="center_vertical"
+                android:text="@string/rules"
+                android:textSize="30dip" />
 
             <TextView
                 android:id="@+id/randomCard"
@@ -150,20 +164,6 @@
                 android:drawablePadding="15dp"
                 android:gravity="center_vertical"
                 android:text="@string/mojhosto_label"
-                android:textSize="30dip" />
-            
-            <TextView
-                android:id="@+id/rules"
-                style="@style/text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:drawableLeft="@drawable/card_search_icon"
-                android:drawablePadding="15dp"
-                android:gravity="center_vertical"
-                android:text="@string/rules"
                 android:textSize="30dip" />
         </LinearLayout>
     </ScrollView>

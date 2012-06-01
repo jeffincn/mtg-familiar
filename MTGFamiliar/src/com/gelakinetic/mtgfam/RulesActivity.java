@@ -148,7 +148,7 @@ public class RulesActivity extends FragmentActivity {
             if(category >= 0 && subcategory < 0) {
                 listItemResource = R.layout.rules_list_subcategory_item;
             }
-            else if(isGlossary || subcategory >= 0) {
+            else if(isGlossary || subcategory >= 0 || keyword != null) {
                 listItemResource = R.layout.rules_list_detail_item;
             }
 

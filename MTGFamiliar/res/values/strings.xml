@@ -410,7 +410,8 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     
     <string name="rules_search">Keyword Search</string>
     <string name="rules_exit">Exit Rules</string>
-    <string name="rules_search_title">Enter Keyword(s)</string>
+    <string name="rules_search_title">Search All Rules</string>
+    <string name="rules_search_cat_title">Within Category</string>
     <string name="card_rulings">Card Rulings</string>
     
     <string name="install_tts_title">Text-to-Speech</string>

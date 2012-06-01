@@ -43,6 +43,7 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -142,19 +143,9 @@ public class RulesActivity extends FragmentActivity {
 			c.close();
 			if(!isGlossary && category == -1 && keyword == null) {
 				//If it's the initial rules page, add a Glossary link to the end
-				rules.add(new GlossaryItem("10.", "Glossary", true));
+				rules.add(new GlossaryItem("Glossary", "", true));
 			}
-            int listItemResource = R.layout.rules_list_item;
-            if(category >= 0 && subcategory < 0) {
-                listItemResource = R.layout.rules_list_subcategory_item;
-            }
-            else if(isGlossary || subcategory >= 0 || keyword != null) {
-                listItemResource = R.layout.rules_list_detail_item;
-            }
-
-            if(!isGlossary && subcategory < 0) {
-            }
-			adapter = new RulesListAdapter(this, listItemResource, rules);
+			adapter = new RulesListAdapter(this, R.layout.rules_list_item, rules);
 			list.setAdapter(adapter);
 			
 			if(clickable) {
@@ -209,7 +200,20 @@ public class RulesActivity extends FragmentActivity {
 		
 		if(id == SEARCH) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle(R.string.rules_search_title);
+			String title;
+			if(this.category == -1) {
+				title = getString(R.string.rules_search_title);
+			}
+			else {
+				title = getString(R.string.rules_search_cat_title) + " ";
+				if(subcategory == -1) {
+					title += String.valueOf(category);
+				}
+				else {
+					title += String.valueOf((category * 100) + subcategory);
+				}
+			}
+			builder.setTitle(title);
 			final EditText input = new EditText(this);
 			builder.setView(input);
 			builder.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
@@ -263,10 +267,20 @@ public class RulesActivity extends FragmentActivity {
 		}
 	}
 	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if(keyCode == KeyEvent.KEYCODE_SEARCH) {
+			showDialog(SEARCH);
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+	
 	private SpannableString formatText(String input) {
+		String simpleInput = input.replace("_", "").toLowerCase();
 		CharSequence cs = Html.fromHtml(input.replace("_", "").replace("{", "<img src=\"").replace("}", "\"/>"), imgGetter, null); 
 		SpannableString result = new SpannableString(cs);
-		int index, offset;
+		int index;
 		
 		//First, handle italicizing any words/phrases surrounded by underscores
 		ArrayList<Integer> starts = new ArrayList<Integer>();
@@ -290,23 +304,36 @@ public class RulesActivity extends FragmentActivity {
 			//In case we had some weirdness and not all pairs match, we won't bother italicizing
 			for(int i = 0; i < starts.size(); i++) {
 				startpoint = starts.get(i) - 2 * i; //2 * i handles the offset for removing underscores
+				startpoint -= computeOffset(input, startpoint);
 				endpoint = ends.get(i) - 2 * i;
-				offset = computeOffset(input, startpoint); //And this handles the offset for replacing mana symbol codes
-				result.setSpan(new StyleSpan(Typeface.ITALIC), startpoint - offset, endpoint - offset, 0);
+				endpoint -= computeOffset(input, endpoint);
+				result.setSpan(new StyleSpan(Typeface.ITALIC), startpoint, endpoint, 0);
 			}
+		}
+		
+		//Then, handle italicizing all examples
+		//Note: Examples always end the entry, so if we find "Example:", we can italicize to the end safely
+		index = simpleInput.indexOf("example:");
+		if(index != -1) {
+			startpoint = index;
+			startpoint -= computeOffset(simpleInput, startpoint);
+			endpoint = simpleInput.length() - 1;
+			endpoint -= computeOffset(simpleInput, endpoint);
+			result.setSpan(new StyleSpan(Typeface.ITALIC), startpoint, endpoint, 0);
 		}
 		
 		//Next, handle the keyword highlighting (if applicable)
 		//Don't do it if it's null or if it contains { or } (they get replaced by images)
 		if(keyword != null && !keyword.contains("{") && !keyword.contains("}")) {
-			String loweredInput = input.replace("_", "").toLowerCase();
 			String loweredKeyword = keyword.toLowerCase();
-			index = loweredInput.indexOf(loweredKeyword);
+			index = simpleInput.indexOf(loweredKeyword);
 			while(index != -1) {
-				int end = index + keyword.length();
-				offset = computeOffset(loweredInput, index);
-				result.setSpan(new ForegroundColorSpan(Color.YELLOW), index - offset, end - offset, 0);
-				index = loweredInput.indexOf(loweredKeyword, end);
+				startpoint = index;
+				startpoint -= computeOffset(simpleInput, startpoint);
+				endpoint = index + keyword.length();
+				endpoint -= computeOffset(simpleInput, endpoint);
+				result.setSpan(new ForegroundColorSpan(Color.YELLOW), startpoint, endpoint, 0);
+				index = simpleInput.indexOf(loweredKeyword, index + keyword.length());
 			}
 		}
 		
@@ -384,6 +411,12 @@ public class RulesActivity extends FragmentActivity {
 				}
 				index = target.indexOf("{", second);
 			}
+			
+			index = target.indexOf("<br>");
+			while(index >= 0 && index < endpoint) {
+				offset += 3; //"<br>" (4 characters) is replaced with '\n' (1 character), hence the adjustment of 3
+				index = target.indexOf("<br>", index + 1);
+			}
 		}
 		
 		return offset;
@@ -417,15 +450,23 @@ public class RulesActivity extends FragmentActivity {
 		}
 		
 		public String getText() {
-			return this.rulesText;
+			if(this.subcategory == -1) {
+				return "";
+			}
+			else if(this.entry == null) {
+				return "";
+			}
+			else {
+				return this.rulesText;
+			}
 		}
 		
 		public String getHeader() {
 			if(this.subcategory == -1) {
-				return String.valueOf(this.category) + ".";
+				return String.valueOf(this.category) + ". " + this.rulesText;
 			}
 			else if(this.entry == null) {
-				return String.valueOf((this.category * 100) + this.subcategory) + ".";
+				return String.valueOf((this.category * 100) + this.subcategory) + ". " + this.rulesText;
 			}
 			else {
 				return String.valueOf((this.category * 100 + this.subcategory)) + "." + this.entry;
@@ -520,13 +561,20 @@ public class RulesActivity extends FragmentActivity {
 			if (data != null) {
 				TextView rulesHeader = (TextView)v.findViewById(R.id.rules_item_header);
 				TextView rulesText = (TextView)v.findViewById(R.id.rules_item_text);
+				
+				String header = data.getHeader();
+				String text = data.getText();
 
-				rulesHeader.setText(data.getHeader());
-				rulesText.setText(formatText(data.getText()), BufferType.SPANNABLE);
+				rulesHeader.setText(header);
+				if(text.equals("")) {
+					rulesText.setVisibility(View.GONE);
+				}
+				else {
+					rulesText.setVisibility(View.VISIBLE);
+					rulesText.setText(formatText(text), BufferType.SPANNABLE);
+				}
 				if(!data.isClickable()) {
 					rulesText.setMovementMethod(LinkMovementMethod.getInstance());
-                    rulesText.setClickable(false);
-                    rulesText.setLongClickable(false);
 				}
 			}
 			return v;

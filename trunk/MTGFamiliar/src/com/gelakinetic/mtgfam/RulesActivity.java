@@ -145,7 +145,14 @@ public class RulesActivity extends FragmentActivity {
 				//If it's the initial rules page, add a Glossary link to the end
 				rules.add(new GlossaryItem("Glossary", "", true));
 			}
-			adapter = new RulesListAdapter(this, R.layout.rules_list_item, rules);
+            int listItemResource = R.layout.rules_list_item;
+            if(category >= 0 && subcategory < 0) {
+                listItemResource = R.layout.rules_list_subcategory_item;
+            }
+            else if(isGlossary || subcategory >= 0 || keyword != null) {
+                listItemResource = R.layout.rules_list_detail_item;
+            }
+			adapter = new RulesListAdapter(this, listItemResource, rules);
 			list.setAdapter(adapter);
 			
 			if(clickable) {
@@ -450,28 +457,44 @@ public class RulesActivity extends FragmentActivity {
 		}
 		
 		public String getText() {
-			if(this.subcategory == -1) {
-				return "";
-			}
-			else if(this.entry == null) {
-				return "";
-			}
-			else {
-				return this.rulesText;
-			}
+			return this.rulesText;
 		}
 		
 		public String getHeader() {
 			if(this.subcategory == -1) {
-				return String.valueOf(this.category) + ". " + this.rulesText;
+				return String.valueOf(this.category) + ".";
 			}
 			else if(this.entry == null) {
-				return String.valueOf((this.category * 100) + this.subcategory) + ". " + this.rulesText;
+				return String.valueOf((this.category * 100) + this.subcategory) + ".";
 			}
 			else {
 				return String.valueOf((this.category * 100 + this.subcategory)) + "." + this.entry;
 			}
 		}
+		
+		//public String getText() {
+			//if(this.subcategory == -1) {
+				//return "";
+			//}
+			//else if(this.entry == null) {
+				//return "";
+			//}
+			//else {
+				//return this.rulesText;
+			//}
+		//}
+		//
+		//public String getHeader() {
+			//if(this.subcategory == -1) {
+				//return String.valueOf(this.category) + ". " + this.rulesText;
+			//}
+			//else if(this.entry == null) {
+				//return String.valueOf((this.category * 100) + this.subcategory) + ". " + this.rulesText;
+			//}
+			//else {
+				//return String.valueOf((this.category * 100 + this.subcategory)) + "." + this.entry;
+			//}
+		//}
 		
 		public boolean isClickable() {
 			return this.entry == null || this.entry.length() == 0;

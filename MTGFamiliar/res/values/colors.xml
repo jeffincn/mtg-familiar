@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright 2011 Adam Feinstein
+Copyright 2011 Adam Feinstein, Michael Shick
 
 This file is part of MTG Familiar.
 
@@ -31,5 +31,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <color name="dark_gray">#383838</color>
     <color name="red">#FF0000</color>
     <color name="green">#00FF00</color>
+
+    <color name="holo_blue">#33B5E5</color>
     
 </resources>

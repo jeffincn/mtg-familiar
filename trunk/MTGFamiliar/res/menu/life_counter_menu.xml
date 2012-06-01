@@ -22,18 +22,22 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
           android:icon="@android:drawable/ic_menu_search"
           android:actionViewClass="android.widget.SearchView"
           />
+    
+      <!-- moved this to the top since otherwise the plus and minus aren't on the same row
+           with only three icons -->
     <item
-        android:id="@+id/add_player"
-        android:icon="@drawable/menu_plus"
-        android:title="@string/addplayer"></item>
+        android:id="@+id/announce_life"
+        android:icon="@drawable/menu_speech"
+        android:title="@string/announcelife" />
 
     <item
         android:id="@+id/remove_player"
         android:icon="@drawable/menu_minus"
         android:title="@string/removeplayer"/>
-    
+
     <item
-        android:id="@+id/announce_life"
-        android:title="@string/announcelife" />
+        android:id="@+id/add_player"
+        android:icon="@drawable/menu_plus"
+        android:title="@string/addplayer"></item>
 
 </menu>

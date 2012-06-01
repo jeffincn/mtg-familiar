@@ -112,6 +112,7 @@ public class RandomCardActivity extends FragmentActivity {
 				int pos = rand.nextInt(doods.getCount());
 				doods.moveToPosition(pos);
 				name = doods.getString(doods.getColumnIndex(CardDbAdapter.KEY_NAME));
+				doods.close();
 
 				Intent i = new Intent(mCtx, ResultListActivity.class);
 				i.putExtra("id", mDbAdapter.fetchIdByName(name));
@@ -138,6 +139,7 @@ public class RandomCardActivity extends FragmentActivity {
 				int pos = rand.nextInt(equipment.getCount());
 				equipment.moveToPosition(pos);
 				name = equipment.getString(equipment.getColumnIndex(CardDbAdapter.KEY_NAME));
+				equipment.close();
 
 				Intent i = new Intent(mCtx, ResultListActivity.class);
 				i.putExtra("id", mDbAdapter.fetchIdByName(name));
@@ -173,6 +175,7 @@ public class RandomCardActivity extends FragmentActivity {
 					names[i] = instants.getString(instants.getColumnIndex(CardDbAdapter.KEY_NAME));
 					intent.putExtra("id" + i, mDbAdapter.fetchIdByName(names[i]));
 				}
+				instants.close();
 
 				startActivityForResult(intent, 0);
 			}
@@ -206,6 +209,7 @@ public class RandomCardActivity extends FragmentActivity {
 					names[i] = sorceries.getString(sorceries.getColumnIndex(CardDbAdapter.KEY_NAME));
 					intent.putExtra("id" + i, mDbAdapter.fetchIdByName(names[i]));
 				}
+				sorceries.close();
 
 				startActivityForResult(intent, 0);
 			}

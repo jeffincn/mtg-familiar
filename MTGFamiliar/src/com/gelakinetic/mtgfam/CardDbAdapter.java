@@ -1351,6 +1351,28 @@ public class CardDbAdapter {
 		return 0;
 	}
 	
+	public String getCategoryName(int category, int subcategory) {
+		try {
+			String sql = "SELECT " + KEY_RULE_TEXT + " FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_CATEGORY + " = " + 
+					String.valueOf(category) + " AND " + KEY_SUBCATEGORY + " = " + String.valueOf(subcategory) + " AND " +
+					KEY_ENTRY + " IS NULL";
+			Cursor c = mDb.rawQuery(sql, null);
+			if(c != null) {
+				c.moveToFirst();
+				String result = c.getString(c.getColumnIndex(KEY_RULE_TEXT));
+				c.close();
+				return result;
+			}
+		}
+		catch (SQLiteException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		catch (IllegalStateException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		return "";
+	}
+	
 	public Cursor getGlossaryTerms() {
 		try {
 			String sql = "SELECT * FROM " + DATABASE_TABLE_GLOSSARY;

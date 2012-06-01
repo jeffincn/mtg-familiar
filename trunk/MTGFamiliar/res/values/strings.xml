@@ -411,8 +411,9 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     
     <string name="rules_search">Keyword Search</string>
     <string name="rules_exit">Exit Rules</string>
-    <string name="rules_search_title">Search All Rules</string>
-    <string name="rules_search_cat_title">Search Within: Category</string>
+    <string name="rules_search_title">Keyword Search</string>
+    <string name="rules_search_all">Search all rules for:</string>
+    <string name="rules_search_cat">Search within %s for:</string>
     <string name="card_rulings">Card Rulings</string>
     
     <string name="install_tts_title">Text-to-Speech</string>

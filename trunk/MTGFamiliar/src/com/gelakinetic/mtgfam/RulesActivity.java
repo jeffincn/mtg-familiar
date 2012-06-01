@@ -127,58 +127,65 @@ public class RulesActivity extends FragmentActivity {
 			c = mDbHelper.getRulesByKeyword(keyword, category, subcategory);
 			clickable = false;
 		}
-		if(c != null && c.getCount() > 0) {
-			c.moveToFirst();
-			while(!c.isAfterLast()) {
-				if(isGlossary) {
-					rules.add(new GlossaryItem(c.getString(c.getColumnIndex(CardDbAdapter.KEY_TERM)),
-							c.getString(c.getColumnIndex(CardDbAdapter.KEY_DEFINITION))));
-				}
-				else {
-					rules.add(new RuleItem(c.getInt(c.getColumnIndex(CardDbAdapter.KEY_CATEGORY)), c.getInt(c.getColumnIndex(CardDbAdapter.KEY_SUBCATEGORY)),
-							c.getString(c.getColumnIndex(CardDbAdapter.KEY_ENTRY)), c.getString(c.getColumnIndex(CardDbAdapter.KEY_RULE_TEXT))));
-				}
-				c.moveToNext();
-			}
-			c.close();
-			if(!isGlossary && category == -1 && keyword == null) {
-				//If it's the initial rules page, add a Glossary link to the end
-				rules.add(new GlossaryItem("Glossary", "", true));
-			}
-            int listItemResource = R.layout.rules_list_item;
-            if(category >= 0 && subcategory < 0) {
-                listItemResource = R.layout.rules_list_subcategory_item;
-            }
-            //These cases can't be exclusive; otherwise keyword search from anything but
-            //a subcategory will use the wrong layout
-            if(isGlossary || subcategory >= 0 || keyword != null) {
-                listItemResource = R.layout.rules_list_detail_item;
-            }
-			adapter = new RulesListAdapter(this, listItemResource, rules);
-			list.setAdapter(adapter);
-			
-			if(clickable) {
-				//This only happens for rule items with no subcategory, so the cast should be safe
-				list.setOnItemClickListener(new OnItemClickListener() {
-					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-						DisplayItem item = rules.get(position);
-						Intent i = new Intent(RulesActivity.this, RulesActivity.class);
-						if(RuleItem.class.isInstance(item)) {
-							RuleItem ri = (RuleItem)item;
-							i.putExtra(CATEGORY_KEY, ri.getCategory());
-							i.putExtra(SUBCATEGORY_KEY, ri.getSubcategory());
-						}
-						else if(GlossaryItem.class.isInstance(item)) {
-							i.putExtra(GLOSSARY_KEY, true);
-						}
-						//The else case shouldn't happen, but meh
-						startActivityForResult(i, ARBITRARY_REQUEST_CODE);
+		if(c != null) {
+			if(c.getCount() > 0) {
+				c.moveToFirst();
+				while(!c.isAfterLast()) {
+					if(isGlossary) {
+						rules.add(new GlossaryItem(c.getString(c.getColumnIndex(CardDbAdapter.KEY_TERM)),
+								c.getString(c.getColumnIndex(CardDbAdapter.KEY_DEFINITION))));
 					}
-				});
+					else {
+						rules.add(new RuleItem(c.getInt(c.getColumnIndex(CardDbAdapter.KEY_CATEGORY)), c.getInt(c.getColumnIndex(CardDbAdapter.KEY_SUBCATEGORY)),
+								c.getString(c.getColumnIndex(CardDbAdapter.KEY_ENTRY)), c.getString(c.getColumnIndex(CardDbAdapter.KEY_RULE_TEXT))));
+					}
+					c.moveToNext();
+				}
+				c.close();
+				if(!isGlossary && category == -1 && keyword == null) {
+					//If it's the initial rules page, add a Glossary link to the end
+					rules.add(new GlossaryItem("Glossary", "", true));
+				}
+	            int listItemResource = R.layout.rules_list_item;
+	            if(category >= 0 && subcategory < 0) {
+	                listItemResource = R.layout.rules_list_subcategory_item;
+	            }
+	            //These cases can't be exclusive; otherwise keyword search from anything but
+	            //a subcategory will use the wrong layout
+	            if(isGlossary || subcategory >= 0 || keyword != null) {
+	                listItemResource = R.layout.rules_list_detail_item;
+	            }
+				adapter = new RulesListAdapter(this, listItemResource, rules);
+				list.setAdapter(adapter);
+				
+				if(clickable) {
+					//This only happens for rule items with no subcategory, so the cast should be safe
+					list.setOnItemClickListener(new OnItemClickListener() {
+						public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+							DisplayItem item = rules.get(position);
+							Intent i = new Intent(RulesActivity.this, RulesActivity.class);
+							if(RuleItem.class.isInstance(item)) {
+								RuleItem ri = (RuleItem)item;
+								i.putExtra(CATEGORY_KEY, ri.getCategory());
+								i.putExtra(SUBCATEGORY_KEY, ri.getSubcategory());
+							}
+							else if(GlossaryItem.class.isInstance(item)) {
+								i.putExtra(GLOSSARY_KEY, true);
+							}
+							//The else case shouldn't happen, but meh
+							startActivityForResult(i, ARBITRARY_REQUEST_CODE);
+						}
+					});
+				}
+			}
+			else {
+				c.close();
+				Toast.makeText(this, "No results found.", Toast.LENGTH_SHORT).show();
+				this.finish();
 			}
 		}
 		else {
-			Toast.makeText(this, "No results found.", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "No results found.", Toast.LENGTH_SHORT).show();
 			this.finish();
 		}
 		
@@ -209,22 +216,18 @@ public class RulesActivity extends FragmentActivity {
 		
 		if(id == SEARCH) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			String title;
+			builder.setTitle(R.string.rules_search_title);
+			String header;
 			if(this.category == -1) {
-				title = getString(R.string.rules_search_title);
+				header = getString(R.string.rules_search_all);
 			}
 			else {
-				title = getString(R.string.rules_search_cat_title) + " ";
-				if(subcategory == -1) {
-					title += String.valueOf(category);
-				}
-				else {
-					title += String.valueOf((category * 100) + subcategory);
-				}
+				header = String.format(getString(R.string.rules_search_cat), mDbHelper.getCategoryName(category, subcategory));
 			}
-			builder.setTitle(title);
-			final EditText input = new EditText(this);
-			builder.setView(input);
+			View v = getLayoutInflater().inflate(R.layout.rules_search_dialog, null);
+			((TextView)v.findViewById(R.id.keyword_search_desc)).setText(header);
+			final EditText input = (EditText)v.findViewById(R.id.keyword_search_field);
+			builder.setView(v);
 			builder.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					String keyword = input.getText().toString().trim();

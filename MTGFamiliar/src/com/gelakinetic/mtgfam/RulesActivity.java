@@ -575,6 +575,8 @@ public class RulesActivity extends FragmentActivity {
 				}
 				if(!data.isClickable()) {
 					rulesText.setMovementMethod(LinkMovementMethod.getInstance());
+                    rulesText.setClickable(false);
+                    rulesText.setLongClickable(false);
 				}
 			}
 			return v;

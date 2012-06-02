@@ -33,21 +33,24 @@ import java.util.zip.GZIPInputStream;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.app.FragmentActivity;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -67,6 +70,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 	private static final int	ABOUTDIALOG			= 0;
 	private static final int	CHANGELOGDIALOG	= 1;
 	private static final int	DONATEDIALOG		= 2;
+	private static final int	TTS_CHECK_CODE	= 23;
 	private Context						mCtx;
 	private CardDbAdapter			mDbHelper;
 	private ProgressDialog		dialog;
@@ -191,8 +195,10 @@ public class MainActivity extends FragmentActivity implements Runnable {
 		startService(i);
 
 		MenuFragmentCompat.init(this, R.menu.main_menu, "main_menu_fragment");
-
-		startService(new Intent(this, RoundTimerService.class));
+		
+		Intent tts = new Intent();
+		tts.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+		startActivityForResult(tts, TTS_CHECK_CODE);
 	}
 
 	@Override
@@ -222,6 +228,35 @@ public class MainActivity extends FragmentActivity implements Runnable {
 		super.onDestroy();
 		if (mDbHelper != null) {
 			mDbHelper.close();
+		}
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(requestCode == TTS_CHECK_CODE) {
+			if(resultCode != TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+				if(!preferences.getBoolean("ttsdontask", false)) {
+					//So we don't display this dialog again and bother the user
+					SharedPreferences.Editor edit = preferences.edit();
+					edit.putBoolean("ttsdontask", true);
+					edit.commit();
+					
+					//Then display a dialog informing them of TTS
+					AlertDialog dialog = new Builder(this)
+					.setTitle("Text-to-Speech")
+					.setMessage("This application has text-to-speech capability for some of its features, but you don't " + 
+							"seem to have it installed. If you want to install it, use the \"Install Text-to-Speech\" link " + 
+							"in the settings menu.")
+					.setPositiveButton("OK", new OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							//Do nothing, just dismiss
+						}
+					})
+					.create();
+					
+					dialog.show();
+				}
+			}
 		}
 	}
 

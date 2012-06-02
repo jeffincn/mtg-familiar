@@ -19,10 +19,16 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.TextToSpeech.OnInitListener;
 
-public class RoundTimerService extends Service {
+public class RoundTimerService extends Service implements OnInitListener {
 	
 	private static String ALARM_FILTER = "com.gelakinetic.mtgfam.ALARM_FILTER";
+	private static String FINAL_DAY_FILTER = "com.gelakinetic.mtgfam.FINAL_DAY_FILTER";
+	private static String FIFTEEN_FILTER = "com.gelakinetic.mtgfam.FIFTEEN_FILTER";
+	private static String TEN_FILTER = "com.gelakinetic.mtgfam.TEN_FILTER";
+	private static String FIVE_FILTER = "com.gelakinetic.mtgfam.FIVE_FILTER";
 	public static String REQUEST_FILTER = "com.gelakinetic.mtgfam.REQUEST_FILTER";
 	public static String START_FILTER = "com.gelakinetic.mtgfam.START_FILTER";
 	public static String CANCEL_FILTER = "com.gelakinetic.mtgfam.CANCEL_FILTER";
@@ -34,6 +40,8 @@ public class RoundTimerService extends Service {
 	private long endTime;
 	private Uri soundFile;
 	private MediaPlayer player;
+	private TextToSpeech tts;
+	private boolean ttsInitialized = false;
 
 	private NotificationManager nm;
 	private AlarmManager alarm;
@@ -42,6 +50,45 @@ public class RoundTimerService extends Service {
 	private String titleText = "Round Timer";
 	private String timerStartText = "The round will end at %1$tl:%1$tM %1$Tp.";
 	private String timerEndText = "The round has ended.";
+	
+	private BroadcastReceiver finalDayReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if(ttsInitialized) {
+				tts.speak("Night of the final day: twelve hours remain", TextToSpeech.QUEUE_FLUSH, null);
+			}
+		}
+	};
+	
+	private BroadcastReceiver fifteenReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(RoundTimerService.this);
+			if(ttsInitialized && settings.getBoolean("fifteenMinutePref", false)) {
+				tts.speak("The round will end in fifteen minutes", TextToSpeech.QUEUE_FLUSH, null);
+			}
+		}
+	};
+	
+	private BroadcastReceiver tenReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(RoundTimerService.this);
+			if(ttsInitialized && settings.getBoolean("tenMinutePref", false)) {
+				tts.speak("The round will end in ten minutes", TextToSpeech.QUEUE_FLUSH, null);
+			}
+		}
+	};
+	
+	private BroadcastReceiver fiveReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(RoundTimerService.this);
+			if(ttsInitialized && settings.getBoolean("fiveMinutePref", false)) {
+				tts.speak("The round will end in five minutes", TextToSpeech.QUEUE_FLUSH, null);
+			}
+		}
+	};
 	
 	private BroadcastReceiver alarmReceiver = new BroadcastReceiver() {
 		@Override
@@ -80,8 +127,46 @@ public class RoundTimerService extends Service {
 		public void onReceive(Context context, Intent intent) {
 			endTime = intent.getLongExtra(RoundTimerActivity.EXTRA_END_TIME, SystemClock.elapsedRealtime());
 			
-			Intent i = new Intent(ALARM_FILTER);
-			PendingIntent pi = PendingIntent.getBroadcast(RoundTimerService.this, 0, i, 0);
+			Intent i;
+			PendingIntent pi;
+			
+			long finalDay = endTime - (12 * 60 * 60 * 1000);
+			long fifteen = endTime - (15 * 60 * 1000);
+			long ten = endTime - (10 * 60 * 1000);
+			long five = endTime - (5 * 60 * 1000);
+			long now = SystemClock.elapsedRealtime();
+			
+			if(finalDay > now) {
+				//NIGHT OF THE FINAL DAY
+				i = new Intent(FINAL_DAY_FILTER);
+				pi = PendingIntent.getBroadcast(RoundTimerService.this, 0, i, 0);
+				alarm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, finalDay, pi);
+			}
+			
+			if(fifteen > now) {
+				//15-minute warning
+				i = new Intent(FIFTEEN_FILTER);
+				pi = PendingIntent.getBroadcast(RoundTimerService.this, 0, i, 0);
+				alarm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, fifteen, pi);
+			}
+			
+			if(ten > now) {
+				//10-minute warning
+				i = new Intent(TEN_FILTER);
+				pi = PendingIntent.getBroadcast(RoundTimerService.this, 0, i, 0);
+				alarm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, ten, pi);
+			}
+			
+			if(five > now) {
+				//5-minute warning
+				i = new Intent(FIVE_FILTER);
+				pi = PendingIntent.getBroadcast(RoundTimerService.this, 0, i, 0);
+				alarm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, five, pi);
+			}
+			
+			//Round end
+			i = new Intent(ALARM_FILTER);
+			pi = PendingIntent.getBroadcast(RoundTimerService.this, 0, i, 0);
 			alarm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, endTime, pi);
 			
 			showRunningNotification();
@@ -93,8 +178,27 @@ public class RoundTimerService extends Service {
 		public void onReceive(Context context, Intent intent) {
 			endTime = SystemClock.elapsedRealtime();
 			
-			Intent i = new Intent(ALARM_FILTER);
-			PendingIntent pi = PendingIntent.getBroadcast(RoundTimerService.this, 0, i, 0);
+			Intent i;
+			PendingIntent pi;
+			
+			i = new Intent(FINAL_DAY_FILTER);
+			pi = PendingIntent.getBroadcast(RoundTimerService.this, 0, i, 0);
+			alarm.cancel(pi);
+			
+			i = new Intent(FIFTEEN_FILTER);
+			pi = PendingIntent.getBroadcast(RoundTimerService.this, 0, i, 0);
+			alarm.cancel(pi);
+			
+			i = new Intent(TEN_FILTER);
+			pi = PendingIntent.getBroadcast(RoundTimerService.this, 0, i, 0);
+			alarm.cancel(pi);
+			
+			i = new Intent(FIVE_FILTER);
+			pi = PendingIntent.getBroadcast(RoundTimerService.this, 0, i, 0);
+			alarm.cancel(pi);
+			
+			i = new Intent(ALARM_FILTER);
+			pi = PendingIntent.getBroadcast(RoundTimerService.this, 0, i, 0);
 			alarm.cancel(pi);
 			
 			nm.cancel(NOTIFICATION_ID);
@@ -118,6 +222,10 @@ public class RoundTimerService extends Service {
 	{
 		super.onCreate();
 		
+		registerReceiver(finalDayReceiver, new IntentFilter(FINAL_DAY_FILTER));
+		registerReceiver(fifteenReceiver, new IntentFilter(FIFTEEN_FILTER));
+		registerReceiver(tenReceiver, new IntentFilter(TEN_FILTER));
+		registerReceiver(fiveReceiver, new IntentFilter(FIVE_FILTER));
 		registerReceiver(alarmReceiver, new IntentFilter(ALARM_FILTER));
 		registerReceiver(requestReceiver, new IntentFilter(REQUEST_FILTER));
 		registerReceiver(startReceiver, new IntentFilter(START_FILTER));
@@ -130,16 +238,26 @@ public class RoundTimerService extends Service {
 		
 		Intent notificationIntent = new Intent(c, RoundTimerActivity.class);
 		contentIntent = PendingIntent.getActivity(c, 0, notificationIntent, 0);
+		
+		tts = new TextToSpeech(this, this);
 	}
 	
 	@Override
 	public void onDestroy()
 	{
 		super.onDestroy();
+		unregisterReceiver(finalDayReceiver);
+		unregisterReceiver(fifteenReceiver);
+		unregisterReceiver(tenReceiver);
+		unregisterReceiver(fiveReceiver);
 		unregisterReceiver(alarmReceiver);
 		unregisterReceiver(requestReceiver);
 		unregisterReceiver(startReceiver);
 		unregisterReceiver(cancelReceiver);
+		
+		if(ttsInitialized) {
+			tts.shutdown();
+		}
 	}
 
 	@Override
@@ -173,5 +291,12 @@ public class RoundTimerService extends Service {
 		nm.cancel(NOTIFICATION_ID);
 		
 		nm.notify(NOTIFICATION_ID, n);
+	}
+
+	@Override
+	public void onInit(int status) {
+		if(status == TextToSpeech.SUCCESS) {
+			ttsInitialized = true;
+		}
 	}
 }

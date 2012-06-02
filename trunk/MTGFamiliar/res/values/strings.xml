@@ -421,6 +421,10 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     <string name="install_tts_checkbox">Do not ask me again</string>
     
     <string name="tts_pref_section">Text-to-Speech</string>
-    <string name="tts_pref_title">Do Not Prompt</string>
-    <string name="tts_pref_desc">Never show the prompt on the life counter if TTS is not installed</string>
+    <string name="tts_pref_install_title">Install Text-to-Speech</string>
+    <string name="tts_pref_install_desc">Clicking here will take you to the text-to-speech install page in the Google Play Store</string>
+    
+    <string name="tts_pref_fifteen_minutes">Fifteen-Minute Warning</string>
+    <string name="tts_pref_ten_minutes">Ten-Minute Warning</string>
+    <string name="tts_pref_five_minutes">Five-Minute Warning</string>
 </resources>

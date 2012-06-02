@@ -126,11 +126,28 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/tts_pref_section">
         
+        <Preference 
+            android:title="@string/tts_pref_install_title"
+            android:summary="@string/tts_pref_install_desc" >
+        
+            <intent android:action="android.speech.tts.engine.INSTALL_TTS_DATA" />
+            
+        </Preference>
+        
         <CheckBoxPreference 
-            android:defaultValue="false"
-            android:key="ttsdontask"
-            android:title="@string/tts_pref_title"
-            android:summary="@string/tts_pref_desc" />
+            android:key="fifteenMinutePref"
+            android:title="@string/tts_pref_fifteen_minutes"
+            android:defaultValue="false" />
+        
+        <CheckBoxPreference 
+            android:key="tenMinutePref"
+            android:title="@string/tts_pref_ten_minutes"
+            android:defaultValue="false" />
+        
+        <CheckBoxPreference     
+            android:key="fiveMinutePref"
+            android:title="@string/tts_pref_five_minutes"
+            android:defaultValue="false" />
         
     </PreferenceCategory>
     <!--

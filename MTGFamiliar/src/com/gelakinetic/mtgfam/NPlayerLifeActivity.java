@@ -51,7 +51,6 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -65,10 +64,8 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 	private static final int								DIALOG_RESET_CONFIRM	= 0;
 	private static final int								DIALOG_REMOVE_PLAYER	= 1;
 	private static final int								DIALOG_SET_NAME				= 2;
-	private static final int 								DIALOG_INSTALL_TTS		= 3;
 	private static final int								LIFE									= 0;
 	private static final int								POISON								= 1;
-	private static final int								TTS_CHECK_CODE			= 23;
 	public static final int									INITIAL_LIFE					= 20;
 	public static final int									INITIAL_POISON				= 0;
 	public static final int									TERMINAL_LIFE					= 0;
@@ -215,9 +212,7 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 
 		MenuFragmentCompat.init(this, R.menu.life_counter_menu, "life_counter_menu_fragment");
 		
-		Intent i = new Intent();
-		i.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
-		startActivityForResult(i, TTS_CHECK_CODE);
+		tts = new TextToSpeech(this, this);
 	}
 
 	@Override
@@ -468,57 +463,10 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 						}).create();
 
 				break;
-			case DIALOG_INSTALL_TTS:
-				if(!preferences.getBoolean("ttsdontask", false)) {
-					factory = LayoutInflater.from(this);
-					final View dialogView = factory.inflate(R.layout.install_tts_dialog, null);
-					builder = new AlertDialog.Builder(this);
-					builder.setTitle(R.string.install_tts_title);
-					builder.setView(dialogView);
-					builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							CheckBox cbx = (CheckBox)dialogView.findViewById(R.id.install_tts_checkbox);
-							if(cbx.isChecked()) {
-								editor.putBoolean("ttsdontask", true);
-								editor.commit();
-							}
-							
-							Intent installIntent = new Intent();
-				            installIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
-				            startActivity(installIntent);
-						}
-					});
-					builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							CheckBox cbx = (CheckBox)dialogView.findViewById(R.id.install_tts_checkbox);
-							if(cbx.isChecked()) {
-								editor.putBoolean("ttsdontask", true);
-								editor.commit();
-							}
-						}
-					});
-					dialog = builder.create();
-				}
-				else {
-					dialog = null;
-				}
-				break;
 			default:
 				dialog = null;
 		}
 		return dialog;
-	}
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if(requestCode == TTS_CHECK_CODE) {
-			if(resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
-				tts = new TextToSpeech(this, this);
-			}
-			else {
-				showDialog(DIALOG_INSTALL_TTS);
-			}
-		}
 	}
 	
 	private void update() {

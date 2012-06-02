@@ -27,7 +27,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:inputType="textPersonName"
+        android:inputType="textCapSentences"
         android:singleLine="true" >
 
         <requestFocus />

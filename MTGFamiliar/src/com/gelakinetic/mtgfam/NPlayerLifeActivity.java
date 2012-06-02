@@ -455,7 +455,11 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 								if (nameInput == null) {
 									return;
 								}
-								playerToHaveNameChanged.setName(nameInput.getText().toString());
+								String newName = nameInput.getText().toString();
+								if (newName.equals("")) {
+									return;
+								}
+								playerToHaveNameChanged.setName(newName);
 							}
 						}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {

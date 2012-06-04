@@ -19,27 +19,33 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <item android:id="@+id/action_search"
-          android:icon="@android:drawable/ic_menu_search"
+        android:icon="@drawable/menu_search"
           android:actionViewClass="android.widget.SearchView"
           />
     <item
         android:id="@+id/image"
-        android:title="@string/image"/>
+        android:title="@string/image"
+        android:icon="@drawable/menu_card_image"/>
     <item
         android:id="@+id/price"
+        android:icon="@drawable/menu_price"
         android:title="@string/price"/>
     <item
         android:id="@+id/changeset"
+        android:icon="@drawable/menu_change_set"
         android:title="@string/changeset" />
     <item
         android:id="@+id/legality"
+        android:icon="@drawable/menu_rules"
         android:title="@string/legality"/>
     <item
         android:id="@+id/gatherer"
+        android:icon="@drawable/menu_to_source"
         android:title="@string/gatherer"/>
     <item
         android:id="@+id/quittosearch"
+        android:icon="@drawable/menu_cancel"
         android:title="@string/quittosearch"/>
-    <item android:id="@+id/cardrulings" android:title="@string/card_rulings"></item>
+    <item android:id="@+id/cardrulings" android:icon="@drawable/menu_rules" android:title="@string/card_rulings"></item>
     
 </menu>

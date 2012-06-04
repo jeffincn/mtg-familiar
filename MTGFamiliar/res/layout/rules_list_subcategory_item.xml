@@ -26,10 +26,10 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <TextView
         android:id="@+id/rules_item_header"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginRight="6dp"
         android:textColor="@color/holo_blue"
-        android:textSize="25dp" android:gravity="center_vertical"/>
+        android:textSize="25dp" />
     
     <TextView
         android:id="@+id/rules_item_text"

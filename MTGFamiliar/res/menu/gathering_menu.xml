@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+        <item
+        android:id="@+id/action_search"
+        android:actionViewClass="android.widget.SearchView"
+        android:icon="@android:drawable/ic_menu_search"/>
+    <item android:id="@+id/add_player" android:icon="@drawable/menu_plus" android:title="@string/addplayer"></item>
+    <item android:id="@+id/remove_player" android:icon="@drawable/menu_minus" android:title="@string/removeplayer"></item>
+    <item android:id="@+id/save_gathering" android:icon="@android:drawable/ic_menu_save" android:title="@string/gathering_menu_save"></item>
+    <item android:id="@+id/load_gathering" android:icon="@android:drawable/ic_menu_save" android:title="@string/gathering_menu_load"></item>
+    
+
+</menu>

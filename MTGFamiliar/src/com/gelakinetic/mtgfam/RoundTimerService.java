@@ -293,7 +293,7 @@ public class RoundTimerService extends Service implements OnInitListener {
 		nm.notify(NOTIFICATION_ID, n);
 	}
 
-	@Override
+	//@Override
 	public void onInit(int status) {
 		if(status == TextToSpeech.SUCCESS) {
 			ttsInitialized = true;

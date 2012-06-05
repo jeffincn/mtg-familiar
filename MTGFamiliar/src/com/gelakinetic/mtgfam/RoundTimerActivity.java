@@ -38,6 +38,7 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.Settings.System;
 import android.support.v4.app.FragmentActivity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -48,6 +49,7 @@ import android.widget.TimePicker;
 public class RoundTimerActivity extends FragmentActivity {
 	
 	public static String RESULT_FILTER = "com.gelakinetic.mtgfam.RESULT_FILTER";
+	public static String TTS_FILTER = "com.gelakinetic.mtgfam.TTS_FILTER";
 	public static String EXTRA_END_TIME = "EndTime";
 	
 	private static int RINGTONE_REQUEST_CODE = 17;
@@ -79,12 +81,20 @@ public class RoundTimerActivity extends FragmentActivity {
 	
 	private long endTime;
 	private boolean updatingDisplay;
+	private boolean hasTts = false;
 	
 	private BroadcastReceiver resultReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			endTime = intent.getLongExtra(RoundTimerService.EXTRA_END_TIME, SystemClock.elapsedRealtime());
 			startUpdatingDisplay();
+		}
+	};
+	
+	private BroadcastReceiver ttsReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			hasTts = intent.getBooleanExtra(RoundTimerService.EXTRA_HAS_TTS, false);
 		}
 	};
 	
@@ -96,6 +106,7 @@ public class RoundTimerActivity extends FragmentActivity {
 		//this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		
 		registerReceiver(resultReceiver, new IntentFilter(RESULT_FILTER));
+		registerReceiver(ttsReceiver, new IntentFilter(TTS_FILTER));
 		
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		
@@ -129,6 +140,9 @@ public class RoundTimerActivity extends FragmentActivity {
 		Intent i = new Intent(RoundTimerService.REQUEST_FILTER);
 		sendBroadcast(i);
 		updatingDisplay = true; //So onResume() doesn't start the updates before we get the response broadcast
+		
+		i = new Intent(RoundTimerService.HAS_TTS_FILTER); //Find out if the phone has TTS
+		sendBroadcast(i);
 	}
 	
 	@Override
@@ -157,6 +171,13 @@ public class RoundTimerActivity extends FragmentActivity {
 	{
 		super.onDestroy();
 		unregisterReceiver(resultReceiver);
+		unregisterReceiver(ttsReceiver);
+	}
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.set_timer_warnings).setVisible(hasTts);
+	    return true;
 	}
 	
 	@Override
@@ -190,23 +211,14 @@ public class RoundTimerActivity extends FragmentActivity {
 	public Dialog onCreateDialog(int id) {
 		Dialog dialog = null;
 		if(id == DIALOG_SET_WARNINGS) {
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-			boolean fifteen = prefs.getBoolean("fifteenMinutePref", false);
-			boolean ten = prefs.getBoolean("tenMinutePref", false);
-			boolean five = prefs.getBoolean("fiveMinutePref", false);
-			
 			final View v = View.inflate(this, R.layout.timer_warning_dialog, null);
 			final CheckBox chkFifteen = (CheckBox)v.findViewById(R.id.timer_pref_fifteen);
 			final CheckBox chkTen = (CheckBox)v.findViewById(R.id.timer_pref_ten);
 			final CheckBox chkFive = (CheckBox)v.findViewById(R.id.timer_pref_five);
-			chkFifteen.setChecked(fifteen);
-			chkTen.setChecked(ten);
-			chkFive.setChecked(five);
 			
 			dialog = new AlertDialog.Builder(this)
 				.setView(v)
 				.setTitle(R.string.rt_warning_dialog_title)
-				.setCancelable(false)
 				.setPositiveButton("OK", new OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
 						SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(RoundTimerActivity.this).edit();
@@ -219,6 +231,20 @@ public class RoundTimerActivity extends FragmentActivity {
 				.create();
 		}
 		return dialog;
+	}
+	
+	@Override
+	protected void onPrepareDialog(int id, Dialog dialog) {
+		if(id == DIALOG_SET_WARNINGS) {
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+			boolean fifteen = prefs.getBoolean("fifteenMinutePref", false);
+			boolean ten = prefs.getBoolean("tenMinutePref", false);
+			boolean five = prefs.getBoolean("fiveMinutePref", false);
+			
+			((CheckBox)dialog.findViewById(R.id.timer_pref_fifteen)).setChecked(fifteen);
+			((CheckBox)dialog.findViewById(R.id.timer_pref_ten)).setChecked(ten);
+			((CheckBox)dialog.findViewById(R.id.timer_pref_five)).setChecked(five);
+		}
 	}
 	
 	@Override

@@ -248,6 +248,9 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
    - Searchable, linked comprehensive rules are now included.&lt;br />&lt;br />
    - Card rulings can now be pulled up for each card.&lt;br />&lt;br />
    - You can now save and load trades.&lt;br />&lt;br />
+   - The life counter can announce life totals.&lt;br />&lt;br />
+   - Round timer now has 5/10/15 minute warnings, accessible in the preferences.&lt;br />&lt;br />
+   - Fancy new menu icons.&lt;br />&lt;br />
    - Bugfixes and optimizations.
    </string>
      	
@@ -427,4 +430,6 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     <string name="tts_pref_fifteen_minutes">Fifteen-Minute Warning</string>
     <string name="tts_pref_ten_minutes">Ten-Minute Warning</string>
     <string name="tts_pref_five_minutes">Five-Minute Warning</string>
+
+    <string name="rulestitle">Card Rulings</string>
 </resources>

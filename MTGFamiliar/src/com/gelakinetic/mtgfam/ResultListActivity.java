@@ -381,9 +381,6 @@ public class ResultListActivity extends FragmentActivity {
 				randomFromMenu = true;
 				startRandom();
 				return true;
-			case R.id.preferences:
-				startActivity(new Intent().setClass(this, PreferencesActivity.class));
-				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}

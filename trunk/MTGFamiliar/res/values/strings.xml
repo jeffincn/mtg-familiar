@@ -350,6 +350,8 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     <string name="rt_defaulttime_title">Default Round Length</string>
     <string name="rt_defaulttime_desc">Set the default length for the round timer</string>
     <string name="rt_set_timer_ringtone">Set Timer Ringtone</string>
+    <string name="rt_set_warnings">Set Warnings</string>
+    <string name="rt_warning_dialog_title">Spoken Warnings</string>
     <string-array name="rt_defaulttimes">
     	<item>30 minutes</item>
         <item>35 minutes</item>

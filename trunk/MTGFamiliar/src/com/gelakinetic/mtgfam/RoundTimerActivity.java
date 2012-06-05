@@ -20,8 +20,12 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 package com.gelakinetic.mtgfam;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -37,6 +41,7 @@ import android.support.v4.app.FragmentActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -46,6 +51,8 @@ public class RoundTimerActivity extends FragmentActivity {
 	public static String EXTRA_END_TIME = "EndTime";
 	
 	private static int RINGTONE_REQUEST_CODE = 17;
+	
+	private static int DIALOG_SET_WARNINGS = 0;
 	
 	private Handler timerHandler = new Handler();
 	private Runnable updateTimeViewTask = new Runnable() 
@@ -171,9 +178,47 @@ public class RoundTimerActivity extends FragmentActivity {
 				
 				startActivityForResult(intent, RINGTONE_REQUEST_CODE);
 				return true;
+			case R.id.set_timer_warnings:
+				showDialog(DIALOG_SET_WARNINGS);
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
+	}
+	
+	@Override
+	public Dialog onCreateDialog(int id) {
+		Dialog dialog = null;
+		if(id == DIALOG_SET_WARNINGS) {
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+			boolean fifteen = prefs.getBoolean("fifteenMinutePref", false);
+			boolean ten = prefs.getBoolean("tenMinutePref", false);
+			boolean five = prefs.getBoolean("fiveMinutePref", false);
+			
+			final View v = View.inflate(this, R.layout.timer_warning_dialog, null);
+			final CheckBox chkFifteen = (CheckBox)v.findViewById(R.id.timer_pref_fifteen);
+			final CheckBox chkTen = (CheckBox)v.findViewById(R.id.timer_pref_ten);
+			final CheckBox chkFive = (CheckBox)v.findViewById(R.id.timer_pref_five);
+			chkFifteen.setChecked(fifteen);
+			chkTen.setChecked(ten);
+			chkFive.setChecked(five);
+			
+			dialog = new AlertDialog.Builder(this)
+				.setView(v)
+				.setTitle(R.string.rt_warning_dialog_title)
+				.setCancelable(false)
+				.setPositiveButton("OK", new OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(RoundTimerActivity.this).edit();
+						edit.putBoolean("fifteenMinutePref", chkFifteen.isChecked());
+						edit.putBoolean("tenMinutePref", chkTen.isChecked());
+						edit.putBoolean("fiveMinutePref", chkFive.isChecked());
+						edit.commit();
+					}
+				})
+				.create();
+		}
+		return dialog;
 	}
 	
 	@Override

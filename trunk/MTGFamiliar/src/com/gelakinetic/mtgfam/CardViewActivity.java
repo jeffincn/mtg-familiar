@@ -21,10 +21,13 @@ package com.gelakinetic.mtgfam;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -50,7 +53,6 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -495,14 +497,17 @@ public class CardViewActivity extends FragmentActivity {
 
 	private class FetchPictureTask extends AsyncTask<String, Integer, Long> {
 
-		private boolean	error;
+		private String	error;
 
 		@Override
 		protected Long doInBackground(String... params) {
-			error = false;
+			error = null;
 			try {
 				String picurl;
-				if (setCode.equals("PCP")) {
+				if (setCode.equals("PP2")) {
+					picurl = "http://magiccards.info/extras/plane/planechase-2012-edition/" + cardName.replace(" ", "-").replace("'", "").replace("Æ", "Ae") + ".jpg";
+				}
+				else if (setCode.equals("PCP")) {
 					cardName = cardName.replace("Æ", "Ae");
 					if (cardName.equalsIgnoreCase("tazeem")) {
 						cardName = "tazeem-release-promo";
@@ -549,13 +554,24 @@ public class CardViewActivity extends FragmentActivity {
 				cardPicture = new BitmapDrawable(mCtx.getResources(), Bitmap.createScaledBitmap(cardPicture.getBitmap(),
 						newWidth, newHeight, true));
 			}
+			catch (FileNotFoundException e){
+				// internet works, image not found
+				error = "Image Not Found";
+			}
+			catch (ConnectException e){
+				// no internet
+				error = "No Internet Connection";
+			}
+			catch (UnknownHostException e){
+				// no internet
+				error = "No Internet Connection";
+			}
+			catch (MalformedURLException e) {
+				error = "MalformedURLException";
+			}
 			catch (IOException e) {
-				error = true;
+				error = "No Internet Connection";
 			}
-			catch (Exception e) {
-				error = true;
-			}
-
 			return null;
 		}
 
@@ -566,7 +582,7 @@ public class CardViewActivity extends FragmentActivity {
 			}
 			catch (IllegalArgumentException e) {
 			}
-			if (!error) {
+			if (error == null) {
 				if (loadTo == DIALOG) {
 					showDialog(GETIMAGE);
 				}
@@ -575,7 +591,7 @@ public class CardViewActivity extends FragmentActivity {
 				}
 			}
 			else {
-				Toast.makeText(mCtx, "No Internet Connection", Toast.LENGTH_SHORT).show();
+				Toast.makeText(mCtx, error, Toast.LENGTH_SHORT).show();
 				if (loadTo == MAINPAGE) {
 					cardpic.setVisibility(View.GONE);
 					name.setVisibility(View.VISIBLE);
@@ -593,11 +609,11 @@ public class CardViewActivity extends FragmentActivity {
 
 	private class FetchPriceTask extends AsyncTask<String, Integer, Long> {
 
-		private boolean	error;
+		private String	error;
 
 		@Override
 		protected Long doInBackground(String... params) {
-			error = false;
+			error = null;
 			URL priceurl;
 			try {
 				String tcgname = mDbHelper.getTCGname(setCode);
@@ -624,20 +640,28 @@ public class CardViewActivity extends FragmentActivity {
 				xr.parse(new InputSource(priceurl.openStream()));
 				// Parsing has finished.
 			}
+			catch (FileNotFoundException e){
+				// internet works, price not found
+				error = "Card Price Not Found";
+			}
+			catch (ConnectException e){
+				// no internet
+				error = "No Internet Connection";
+			}
 			catch (MalformedURLException e) {
-				error = true;
+				error = "MalformedURLException";
 				XMLhandler = null;
 			}
 			catch (IOException e) {
-				error = true;
+				error = "No Internet Connection";
 				XMLhandler = null;
 			}
 			catch (SAXException e) {
-				error = true;
+				error = "SAXException";
 				XMLhandler = null;
 			}
 			catch (ParserConfigurationException e) {
-				error = true;
+				error = "ParserConfigurationException";
 				XMLhandler = null;
 			}
 			return null;
@@ -651,11 +675,16 @@ public class CardViewActivity extends FragmentActivity {
 			catch (IllegalArgumentException e) {
 			}
 
-			if (!error) {
+			if(XMLhandler != null && XMLhandler.hiprice == null && error == null)
+			{
+				Toast.makeText(mCtx, "Card Price Not Found", Toast.LENGTH_SHORT).show();				
+				return;
+			}
+			if (error == null) {
 				showDialog(GETPRICE);
 			}
 			else {
-				Toast.makeText(mCtx, "No Internet Connection", Toast.LENGTH_SHORT).show();
+				Toast.makeText(mCtx, error, Toast.LENGTH_SHORT).show();
 			}
 		}
 	}
@@ -855,8 +884,13 @@ public class CardViewActivity extends FragmentActivity {
 				return null;
 			}
 
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle("Card Rulings");
+			dialog = new Dialog(this);
+			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+			dialog.setContentView(R.layout.rulings_dialog);
+
+			TextView textViewRules = (TextView) dialog.findViewById(R.id.rules);
+			TextView textViewUrl = (TextView) dialog.findViewById(R.id.url);
 
 			String message = "";
 			for (Ruling r : rulingsArrayList) {
@@ -867,8 +901,12 @@ public class CardViewActivity extends FragmentActivity {
 
 			CharSequence messageGlyph = Html.fromHtml(message, imgGetter, null);
 
-			builder.setMessage(messageGlyph);
-			dialog = builder.create();
+			textViewRules.setText(messageGlyph);
+
+			textViewUrl.setMovementMethod(LinkMovementMethod.getInstance());
+			textViewUrl.setText(Html.fromHtml("<a href=http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid="
+					+ multiverseId + ">Gatherer Page</a>"));
+
 			return dialog;
 		}
 		return null;
@@ -928,11 +966,6 @@ public class CardViewActivity extends FragmentActivity {
 				progDialog = ProgressDialog.show(this, "", "Loading. Please wait...", true);
 				progDialog.show();
 				new FetchLegalityTask().execute((String[]) null);
-				return true;
-			case R.id.gatherer:
-				String url = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multiverseId;
-				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-				startActivity(browserIntent);
 				return true;
 			case R.id.cardrulings:
 				progDialog = ProgressDialog.show(this, "", "Loading. Please wait...", true);

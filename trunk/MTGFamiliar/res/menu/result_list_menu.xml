@@ -27,9 +27,4 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:icon="@drawable/menu_random"
         android:title="@string/randomButton"></item>
 
-    <item
-        android:id="@+id/preferences"
-        android:icon="@drawable/menu_settings"
-        android:title="@string/preferences"/>
-
 </menu>

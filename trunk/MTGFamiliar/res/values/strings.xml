@@ -432,6 +432,12 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     <string name="tts_pref_fifteen_minutes">Fifteen-Minute Warning</string>
     <string name="tts_pref_ten_minutes">Ten-Minute Warning</string>
     <string name="tts_pref_five_minutes">Five-Minute Warning</string>
-
     <string name="rulestitle">Card Rulings</string>
+    <string name="gathering_name_hint">Gathering\'s Name</string>
+    <string name="gathering_default_name">Default Name</string>
+    <string name="gathering_custom_name">Custom Name</string>
+    <string name="gathering_default_life">Starting Life</string>
+    <string name="gathering_default_life_num">20</string>
+    <string name="gathering_menu_save">Set and Save Gathering</string>
+    <string name="gathering_menu_load">Load Gathering</string>
 </resources>

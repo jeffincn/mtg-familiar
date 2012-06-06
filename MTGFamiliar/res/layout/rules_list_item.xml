@@ -30,6 +30,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:layout_height="wrap_content"
         android:layout_marginRight="6dp"
         android:textColor="@color/holo_blue"
+        android:textSize="28dp"
          />
 
     <!-- android:textSize="28dp" -->
@@ -40,6 +41,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:padding="8dp"
+        android:textSize="28dp"
          />
 
 </LinearLayout>

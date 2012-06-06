@@ -266,8 +266,8 @@ public class Main implements ActionListener {
 					card2.put("flavor", "");
 					card1.put("artist", artists[0]);
 					card2.put("artist", artists[1]);
-					card1.put("number", c.getString("number"));
-					card2.put("number", c.getString("number"));
+					card1.put("number", c.getString("number") + "a");
+					card2.put("number", c.getString("number") + "b");
 					card1.put("color", colors[0]);
 					card2.put("color", colors[1]);
 					card1.put("id", mID);

@@ -64,10 +64,10 @@ public class CardDbAdapter {
 	private static final String		DATABASE_TABLE_LEGAL_SETS			= "legal_sets";
 	private static final String		DATABASE_TABLE_BANNED_CARDS		= "banned_cards";
 	private static final String		DATABASE_TABLE_SAVED_TRADES		= "saved_trades";
-	private static final String 	DATABASE_TABLE_RULES = "rules";
-	private static final String		DATABASE_TABLE_GLOSSARY = "glossary";
+	private static final String		DATABASE_TABLE_RULES					= "rules";
+	private static final String		DATABASE_TABLE_GLOSSARY				= "glossary";
 
-	public static final int				DATABASE_VERSION							= 23;
+	public static final int				DATABASE_VERSION							= 24;
 
 	public static final String		KEY_ID												= "_id";
 	public static final String		KEY_NAME											= SearchManager.SUGGEST_COLUMN_TEXT_1;							// "name";
@@ -102,15 +102,15 @@ public class CardDbAdapter {
 	public static final String		KEY_SIDE											= "side";
 	public static final int				LEFT													= 0;
 	public static final int				RIGHT													= 1;
-	
-	public static final String		KEY_CATEGORY = "category";
-	public static final String		KEY_SUBCATEGORY = "subcategory";
-	public static final String		KEY_ENTRY = "entry";
-	public static final String		KEY_RULE_TEXT = "rule_text";
-	public static final String		KEY_POSITION = "position";
-	
-	public static final String		KEY_TERM = "term";
-	public static final String		KEY_DEFINITION = "definition";
+
+	public static final String		KEY_CATEGORY									= "category";
+	public static final String		KEY_SUBCATEGORY								= "subcategory";
+	public static final String		KEY_ENTRY											= "entry";
+	public static final String		KEY_RULE_TEXT									= "rule_text";
+	public static final String		KEY_POSITION									= "position";
+
+	public static final String		KEY_TERM											= "term";
+	public static final String		KEY_DEFINITION								= "definition";
 
 	private DatabaseHelper				mDbHelper;
 	private SQLiteDatabase				mDb;
@@ -153,21 +153,21 @@ public class CardDbAdapter {
 	private static final String		DATABASE_CREATE_SAVED_TRADES	= "create table " + DATABASE_TABLE_SAVED_TRADES + "("
 																																	+ KEY_ID + " integer primary key autoincrement, "
 																																	+ KEY_MULTIVERSEID + " integer not null, " + KEY_SIDE
-																																	+ " integer not null, " + KEY_NAME + " text not null, "
-																																	+ KEY_NUMBER + " integer not null);";
-	
-	private static final String		DATABASE_CREATE_RULES 			= "create table " + DATABASE_TABLE_RULES + "("
-																																	+ KEY_ID + " integer primary key autoincrement, "
+																																	+ " integer not null, " + KEY_NAME
+																																	+ " text not null, " + KEY_NUMBER
+																																	+ " integer not null);";
+
+	private static final String		DATABASE_CREATE_RULES					= "create table " + DATABASE_TABLE_RULES + "(" + KEY_ID
+																																	+ " integer primary key autoincrement, "
 																																	+ KEY_CATEGORY + " integer not null, "
-																																	+ KEY_SUBCATEGORY + " integer null, "
-																																	+ KEY_ENTRY + " text null, "
-																																	+ KEY_RULE_TEXT + " text not null, "
+																																	+ KEY_SUBCATEGORY + " integer null, " + KEY_ENTRY
+																																	+ " text null, " + KEY_RULE_TEXT + " text not null, "
 																																	+ KEY_POSITION + " integer null);";
-	
-	private static final String 	DATABASE_CREATE_GLOSSARY		= "create table " + DATABASE_TABLE_GLOSSARY + "(" 
+
+	private static final String		DATABASE_CREATE_GLOSSARY			= "create table " + DATABASE_TABLE_GLOSSARY + "("
 																																	+ KEY_ID + " integer primary key autoincrement, "
-																																	+ KEY_TERM + " text not null, " 
-																																	+ KEY_DEFINITION + " text not null);";
+																																	+ KEY_TERM + " text not null, " + KEY_DEFINITION
+																																	+ " text not null);";
 
 	private final Context					mCtx;
 
@@ -1119,17 +1119,19 @@ public class CardDbAdapter {
 		initialValues.put(KEY_SIDE, side);
 		return mDb.insert(DATABASE_TABLE_SAVED_TRADES, null, initialValues);
 	}
-	
+
 	public void addTradeCard(String cardName, String setCode, int number, int side, String tradeName) {
-		String sql = "INSERT INTO " + DATABASE_TABLE_SAVED_TRADES + " (" + KEY_MULTIVERSEID + ", " + KEY_SIDE + ", " + KEY_NAME + ", " + KEY_NUMBER + ") SELECT " + 
-				KEY_MULTIVERSEID + ", " + side + ", '" + tradeName.replace("'", "''") + "', " + number + " FROM " + DATABASE_TABLE_CARDS + " WHERE " + KEY_NAME + 
-				" = '" + cardName.replace("'", "''") + "' AND expansion = '" + setCode.replace("'", "''") + "'";
+		String sql = "INSERT INTO " + DATABASE_TABLE_SAVED_TRADES + " (" + KEY_MULTIVERSEID + ", " + KEY_SIDE + ", "
+				+ KEY_NAME + ", " + KEY_NUMBER + ") SELECT " + KEY_MULTIVERSEID + ", " + side + ", '"
+				+ tradeName.replace("'", "''") + "', " + number + " FROM " + DATABASE_TABLE_CARDS + " WHERE " + KEY_NAME
+				+ " = '" + cardName.replace("'", "''") + "' AND expansion = '" + setCode.replace("'", "''") + "'";
 		mDb.execSQL(sql);
 	}
 
 	public Cursor fetchAllSavedTrades() {
 		try {
-			String sql = "SELECT " + KEY_ID + ", " + KEY_NAME + " FROM " + DATABASE_TABLE_SAVED_TRADES + " GROUP BY " + KEY_NAME;
+			String sql = "SELECT " + KEY_ID + ", " + KEY_NAME + " FROM " + DATABASE_TABLE_SAVED_TRADES + " GROUP BY "
+					+ KEY_NAME;
 			return mDb.rawQuery(sql, null);
 		}
 		catch (SQLiteException e) {
@@ -1143,11 +1145,14 @@ public class CardDbAdapter {
 
 	public Cursor fetchSavedTrade(String tradeName) {
 		try {
-			String sql = "SELECT " + DATABASE_TABLE_SAVED_TRADES + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " + DATABASE_TABLE_SETS + "." + KEY_NAME_TCGPLAYER +
-					", " + DATABASE_TABLE_CARDS + "." + KEY_SET + ", " + DATABASE_TABLE_SAVED_TRADES + "." + KEY_NUMBER + ", " + DATABASE_TABLE_SAVED_TRADES + "." + KEY_SIDE + 
-					" FROM " + DATABASE_TABLE_SAVED_TRADES + " INNER JOIN " + DATABASE_TABLE_CARDS + " ON " + DATABASE_TABLE_CARDS + "." + KEY_MULTIVERSEID + " = " + 
-					DATABASE_TABLE_SAVED_TRADES + "." + KEY_MULTIVERSEID + " INNER JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = " + 
-					DATABASE_TABLE_CARDS + "." + KEY_SET + " WHERE " + DATABASE_TABLE_SAVED_TRADES + "." + KEY_NAME + " = '" + tradeName.replace("'", "''") + "'";
+			String sql = "SELECT " + DATABASE_TABLE_SAVED_TRADES + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "."
+					+ KEY_NAME + ", " + DATABASE_TABLE_SETS + "." + KEY_NAME_TCGPLAYER + ", " + DATABASE_TABLE_CARDS + "."
+					+ KEY_SET + ", " + DATABASE_TABLE_SAVED_TRADES + "." + KEY_NUMBER + ", " + DATABASE_TABLE_SAVED_TRADES + "."
+					+ KEY_SIDE + " FROM " + DATABASE_TABLE_SAVED_TRADES + " INNER JOIN " + DATABASE_TABLE_CARDS + " ON "
+					+ DATABASE_TABLE_CARDS + "." + KEY_MULTIVERSEID + " = " + DATABASE_TABLE_SAVED_TRADES + "."
+					+ KEY_MULTIVERSEID + " INNER JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE
+					+ " = " + DATABASE_TABLE_CARDS + "." + KEY_SET + " WHERE " + DATABASE_TABLE_SAVED_TRADES + "." + KEY_NAME
+					+ " = '" + tradeName.replace("'", "''") + "'";
 			return mDb.rawQuery(sql, null);
 		}
 		catch (SQLiteException e) {
@@ -1191,9 +1196,10 @@ public class CardDbAdapter {
 
 	public int checkLegality(String mCardName, String format) {
 		mCardName = mCardName.replace("'", "''").replace("æ", "Æ");
-		format = format.replace("'", "''"); //Just to be safe; remember Bobby Tables
+		format = format.replace("'", "''"); // Just to be safe; remember Bobby
+																				// Tables
 		try {
-			//The new way (single query per type, should be much faster) - Alex
+			// The new way (single query per type, should be much faster) - Alex
 			String sql = "SELECT COALESCE(CASE (SELECT " + KEY_SET + " FROM " + DATABASE_TABLE_CARDS + " WHERE " + KEY_NAME
 					+ " = '" + mCardName + "') WHEN 'UG' THEN 1 WHEN 'UNH' THEN 1 ELSE NULL END, " + "CASE (SELECT 1 FROM "
 					+ DATABASE_TABLE_CARDS + " c INNER JOIN " + DATABASE_TABLE_LEGAL_SETS + " ls ON ls." + KEY_SET + " = c."
@@ -1255,24 +1261,26 @@ public class CardDbAdapter {
 		}
 		return null;
 	}
-	
+
 	public Cursor getRules(int category, int subcategory) {
 		try {
-			if(category == -1) {
-				//No category specified; return the main categories
+			if (category == -1) {
+				// No category specified; return the main categories
 				String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_SUBCATEGORY + " = -1";
 				return mDb.rawQuery(sql, null);
 			}
-			else if(subcategory == -1) {
-				//No subcategory specified; return the subcategories under the given category
-				String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_CATEGORY + " = " + String.valueOf(category) + 
-						" AND " + KEY_SUBCATEGORY + " > -1 AND " + KEY_ENTRY + " IS NULL";
+			else if (subcategory == -1) {
+				// No subcategory specified; return the subcategories under the given
+				// category
+				String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_CATEGORY + " = "
+						+ String.valueOf(category) + " AND " + KEY_SUBCATEGORY + " > -1 AND " + KEY_ENTRY + " IS NULL";
 				return mDb.rawQuery(sql, null);
 			}
 			else {
-				//Both specified; return the rules under the given subcategory
-				String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_CATEGORY + " = " + String.valueOf(category) + 
-						" AND " + KEY_SUBCATEGORY + " = " + String.valueOf(subcategory) + " AND " + KEY_ENTRY + " IS NOT NULL";
+				// Both specified; return the rules under the given subcategory
+				String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_CATEGORY + " = "
+						+ String.valueOf(category) + " AND " + KEY_SUBCATEGORY + " = " + String.valueOf(subcategory) + " AND "
+						+ KEY_ENTRY + " IS NOT NULL";
 				return mDb.rawQuery(sql, null);
 			}
 		}
@@ -1284,36 +1292,41 @@ public class CardDbAdapter {
 		}
 		return null;
 	}
-	
+
 	/**
-	 * Returns a cursor containing all rule entries that contain the given word or phrase.
-	 * This method will automatically wrap the keyword parameter in wildcards.
-	 * @param keyword The word or phrase to search for.
-	 * @return A cursor containing all rule entries that contain the given word or phrase.
+	 * Returns a cursor containing all rule entries that contain the given word or
+	 * phrase. This method will automatically wrap the keyword parameter in
+	 * wildcards.
+	 * 
+	 * @param keyword
+	 *          The word or phrase to search for.
+	 * @return A cursor containing all rule entries that contain the given word or
+	 *         phrase.
 	 **/
 	public Cursor getRulesByKeyword(String keyword, int category, int subcategory) {
 		try {
-			//Don't let them pass in an empty string; it'll return ALL the rules
-			if(keyword != null && !keyword.trim().equals("")) {
+			// Don't let them pass in an empty string; it'll return ALL the rules
+			if (keyword != null && !keyword.trim().equals("")) {
 				keyword = "'%" + keyword.replace("'", "''") + "%'";
-				
-				if(category == -1) {
-					//No category; we're searching from the main page, so no restrictions
-					String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_RULE_TEXT + " LIKE " + keyword + " AND " +
-							KEY_ENTRY + " IS NOT NULL";
+
+				if (category == -1) {
+					// No category; we're searching from the main page, so no restrictions
+					String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_RULE_TEXT + " LIKE " + keyword
+							+ " AND " + KEY_ENTRY + " IS NOT NULL";
 					return mDb.rawQuery(sql, null);
 				}
-				else if(subcategory == -1) {
-					//No subcategory; we're searching from a category page, so restrict within that
-					String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_RULE_TEXT + " LIKE " + keyword + " AND " +
-							KEY_ENTRY + " IS NOT NULL AND " + KEY_CATEGORY + " = " + String.valueOf(category);
+				else if (subcategory == -1) {
+					// No subcategory; we're searching from a category page, so restrict
+					// within that
+					String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_RULE_TEXT + " LIKE " + keyword
+							+ " AND " + KEY_ENTRY + " IS NOT NULL AND " + KEY_CATEGORY + " = " + String.valueOf(category);
 					return mDb.rawQuery(sql, null);
 				}
 				else {
-					//We're searching within a subcategory, so restrict within that
-					String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_RULE_TEXT + " LIKE " + keyword + " AND " +
-							KEY_ENTRY + " IS NOT NULL AND " + KEY_CATEGORY + " = " + String.valueOf(category) + " AND " + 
-							KEY_SUBCATEGORY + " = " + String.valueOf(subcategory);
+					// We're searching within a subcategory, so restrict within that
+					String sql = "SELECT * FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_RULE_TEXT + " LIKE " + keyword
+							+ " AND " + KEY_ENTRY + " IS NOT NULL AND " + KEY_CATEGORY + " = " + String.valueOf(category) + " AND "
+							+ KEY_SUBCATEGORY + " = " + String.valueOf(subcategory);
 					return mDb.rawQuery(sql, null);
 				}
 			}
@@ -1324,17 +1337,17 @@ public class CardDbAdapter {
 		catch (IllegalStateException e) {
 			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
 		}
-		return null;		
+		return null;
 	}
-	
+
 	public int getRulePosition(int category, int subcategory, String entry) {
 		try {
-			if(entry != null) {
-				String sql = "SELECT " + KEY_POSITION + " FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_CATEGORY + " = " + 
-						String.valueOf(category) + " AND " + KEY_SUBCATEGORY + " = " + String.valueOf(subcategory) + " AND " +
-						KEY_ENTRY + " = '" + entry.replace("'", "''") + "'";
+			if (entry != null) {
+				String sql = "SELECT " + KEY_POSITION + " FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_CATEGORY + " = "
+						+ String.valueOf(category) + " AND " + KEY_SUBCATEGORY + " = " + String.valueOf(subcategory) + " AND "
+						+ KEY_ENTRY + " = '" + entry.replace("'", "''") + "'";
 				Cursor c = mDb.rawQuery(sql, null);
-				if(c != null) {
+				if (c != null) {
 					c.moveToFirst();
 					int result = c.getInt(c.getColumnIndex(KEY_POSITION));
 					c.close();
@@ -1350,14 +1363,14 @@ public class CardDbAdapter {
 		}
 		return 0;
 	}
-	
+
 	public String getCategoryName(int category, int subcategory) {
 		try {
-			String sql = "SELECT " + KEY_RULE_TEXT + " FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_CATEGORY + " = " + 
-					String.valueOf(category) + " AND " + KEY_SUBCATEGORY + " = " + String.valueOf(subcategory) + " AND " +
-					KEY_ENTRY + " IS NULL";
+			String sql = "SELECT " + KEY_RULE_TEXT + " FROM " + DATABASE_TABLE_RULES + " WHERE " + KEY_CATEGORY + " = "
+					+ String.valueOf(category) + " AND " + KEY_SUBCATEGORY + " = " + String.valueOf(subcategory) + " AND "
+					+ KEY_ENTRY + " IS NULL";
 			Cursor c = mDb.rawQuery(sql, null);
-			if(c != null) {
+			if (c != null) {
 				c.moveToFirst();
 				String result = c.getString(c.getColumnIndex(KEY_RULE_TEXT));
 				c.close();
@@ -1372,7 +1385,7 @@ public class CardDbAdapter {
 		}
 		return "";
 	}
-	
+
 	public Cursor getGlossaryTerms() {
 		try {
 			String sql = "SELECT * FROM " + DATABASE_TABLE_GLOSSARY;
@@ -1585,8 +1598,8 @@ public class CardDbAdapter {
 		int mID = -1;
 		String statement = "(" + KEY_NAME + " = '" + name + "' AND " + KEY_SET + " = '" + setCode + "')";
 		try {
-			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID, KEY_MULTIVERSEID }, statement, null, null, null,
-					KEY_ID, null);
+			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, new String[] { KEY_ID, KEY_MULTIVERSEID }, statement, null, null,
+					null, KEY_ID, null);
 			mCursor.moveToFirst();
 			mID = mCursor.getInt(mCursor.getColumnIndex(KEY_MULTIVERSEID));
 			mCursor.close();
@@ -1621,7 +1634,7 @@ public class CardDbAdapter {
 
 		return name;
 	}
-	
+
 	public String getNameFromMultiverseId(long id) {
 		Cursor mCursor = null;
 		String name = null;
@@ -1641,5 +1654,62 @@ public class CardDbAdapter {
 		}
 
 		return name;
+	}
+
+	public boolean isSplitCard(long multiverseId) {
+		Cursor mCursor = null;
+		String statement = "SELECT " + KEY_NAME + " from " + DATABASE_TABLE_CARDS + " WHERE " + KEY_MULTIVERSEID + " = "
+				+ multiverseId;
+
+		try {
+			mCursor = mDb.rawQuery(statement, null);
+			int numRows = mCursor.getCount();
+			mCursor.close();
+
+			if (numRows == 1) {
+				return false;
+			}
+			else if (numRows == 2) {
+				return true;
+			}
+		}
+		catch (SQLiteException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		catch (IllegalStateException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		return false;
+	}
+
+	public String getSplitName(int multiverseId) {
+		Cursor mCursor = null;
+		String statement = "SELECT " + KEY_NAME + ", " + KEY_NUMBER + " from " + DATABASE_TABLE_CARDS + " WHERE "
+				+ KEY_MULTIVERSEID + " = " + multiverseId + " ORDER BY " + KEY_NUMBER + " ASC";
+
+		try {
+			mCursor = mDb.rawQuery(statement, null);
+
+			if (mCursor.getCount() == 2) {
+				mCursor.moveToFirst();
+				String retVal = mCursor.getString(mCursor.getColumnIndex(KEY_NAME));
+				retVal += " // ";
+				mCursor.moveToNext();
+				retVal += mCursor.getString(mCursor.getColumnIndex(KEY_NAME));
+				mCursor.close();
+				return retVal;
+			}
+			else {
+				mCursor.close();
+				return null;
+			}
+		}
+		catch (SQLiteException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		catch (IllegalStateException e) {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		return null;
 	}
 }

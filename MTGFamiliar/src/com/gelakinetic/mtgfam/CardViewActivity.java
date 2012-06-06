@@ -438,15 +438,15 @@ public class CardViewActivity extends FragmentActivity {
 		c.close();
 	}
 
-	public static boolean isTransformable(String number, String set) {
+	public static boolean isTransformable(String number, String setCode) {
 		if (number.contains("a") || number.contains("b")) {
-			if (set.compareTo("ISD") == 0 || set.compareTo("DKA") == 0) {
+			if (setCode.compareTo("ISD") == 0 || setCode.compareTo("DKA") == 0) {
 				return true;
 			}
 		}
 		return false;
 	}
-
+	
 	private class FetchLegalityTask extends AsyncTask<String, Integer, Long> {
 
 		@Override
@@ -617,14 +617,18 @@ public class CardViewActivity extends FragmentActivity {
 			URL priceurl;
 			try {
 				String tcgname = mDbHelper.getTCGname(setCode);
-				if (number.contains("b")) {
-					priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p="
-							+ mDbHelper.getTransformName(setCode, number.replace("b", "a"))).replace(" ", "%20").replace("Æ", "Ae"));
+				String tcgCardName;
+				if (isTransformable(number, setCode) && number.contains("b")) {
+					tcgCardName = mDbHelper.getTransformName(setCode, number.replace("b", "a"));
+				}
+				else if(mDbHelper.isSplitCard(multiverseId)){
+					tcgCardName = mDbHelper.getSplitName(multiverseId);
 				}
 				else {
-					priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p="
-							+ cardName).replace(" ", "%20").replace("Æ", "Ae"));
+					tcgCardName = cardName;
 				}
+				tcgCardName = tcgCardName.replace(" ", "%20").replace("Æ", "Ae");
+				priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p=" + tcgCardName));
 
 				// Get a SAXParser from the SAXPArserFactory.
 				SAXParserFactory spf = SAXParserFactory.newInstance();

@@ -364,7 +364,7 @@ public class RulesActivity extends FragmentActivity {
 		 * A breakdown of the regex for Adam: [1-9]{1}: first character is between 1
 		 * and 9 [0-9]{2}: followed by two characters between 0 and 9 (i.e. a
 		 * 3-digit number) (...)?: maybe followed by the group: \\.: period
-		 * ([a-z0-9]{1,2}(-[a-z]{1})?)?: maybe followed by one or two alphanumeric
+		 * ([a-z0-9]{1,3}(-[a-z]{1})?)?: maybe followed by one to three alphanumeric
 		 * characters, which are maybe followed by a hyphen and an alphabetical
 		 * character \\.?: maybe followed by another period
 		 * 
@@ -372,7 +372,7 @@ public class RulesActivity extends FragmentActivity {
 		 * make some sense of the regex so I'm not just waving my hands and shouting
 		 * "WIZAAAAAARDS!". I still reserve the right to do that, though. - Alex
 		 */
-		Matcher m = Pattern.compile("([1-9]{1}[0-9]{2}(\\.([a-z0-9]{1,2}(-[a-z]{1})?)?\\.?)?)").matcher(cs);
+		Matcher m = Pattern.compile("([1-9]{1}[0-9]{2}(\\.([a-z0-9]{1,3}(-[a-z]{1})?)?\\.?)?)").matcher(cs);
 		while (m.find()) {
 			try {
 				String[] tokens = cs.subSequence(m.start(), m.end()).toString().split("(\\.)");
@@ -392,18 +392,12 @@ public class RulesActivity extends FragmentActivity {
 				result.setSpan(new ClickableSpan() {
 					@Override
 					public void onClick(View widget) {
-						if (linkCat == category && linkSub == subcategory) {
-							// We're already on the page for this link; just reposition
-							list.setSelection(linkPosition);
-						}
-						else {
-							// We're not on the right page, so open a new activity instance
-							Intent i = new Intent(RulesActivity.this, RulesActivity.class);
-							i.putExtra(CATEGORY_KEY, linkCat);
-							i.putExtra(SUBCATEGORY_KEY, linkSub);
-							i.putExtra(POSITION_KEY, linkPosition);
-							startActivityForResult(i, ARBITRARY_REQUEST_CODE);
-						}
+						//Open a new activity instance
+						Intent i = new Intent(RulesActivity.this, RulesActivity.class);
+						i.putExtra(CATEGORY_KEY, linkCat);
+						i.putExtra(SUBCATEGORY_KEY, linkSub);
+						i.putExtra(POSITION_KEY, linkPosition);
+						startActivityForResult(i, ARBITRARY_REQUEST_CODE);
 					}
 				}, m.start(), m.end(), 0);
 			}

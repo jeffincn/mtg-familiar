@@ -32,8 +32,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.text.Html;
@@ -41,8 +39,6 @@ import android.text.Html.ImageGetter;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -60,25 +56,31 @@ import android.widget.Toast;
 
 public class RulesActivity extends FragmentActivity {
 
-	public static String						CATEGORY_KEY						= "category";
-	public static String						SUBCATEGORY_KEY					= "subcategory";
-	public static String						POSITION_KEY						= "position";
-	public static String						KEYWORD_KEY							= "keyword";
-	public static String						GLOSSARY_KEY						= "glossary";
+	public static String CATEGORY_KEY = "category";
+	public static String SUBCATEGORY_KEY = "subcategory";
+	public static String POSITION_KEY = "position";
+	public static String KEYWORD_KEY = "keyword";
+	public static String GLOSSARY_KEY = "glossary";
 
-	private static final int				SEARCH									= 0;
-	private static final int				RESULT_NORMAL						= 1;
-	private static final int				RESULT_QUIT_TO_MAIN			= 2;
-	private static final int				ARBITRARY_REQUEST_CODE	= 23;
+	private static final int SEARCH = 0;
+	private static final int RESULT_NORMAL = 1;
+	private static final int RESULT_QUIT_TO_MAIN = 2;
+	private static final int ARBITRARY_REQUEST_CODE = 23;
 
-	private CardDbAdapter						mDbHelper;
-	private ImageGetter							imgGetter;
-	private ListView								list;
-	private RulesListAdapter				adapter;
-	private ArrayList<DisplayItem>	rules;
-	private int											category;
-	private int											subcategory;
-	private String									keyword;
+	private CardDbAdapter mDbHelper;
+	private ImageGetter imgGetter;
+	private ListView list;
+	private RulesListAdapter adapter;
+	private ArrayList<DisplayItem> rules;
+	private int category;
+	private int subcategory;
+	private String keyword;
+	
+	private Pattern underscorePattern;
+	private Pattern examplePattern;
+	private Pattern glyphPattern;
+	private Pattern keywordPattern;
+	private Pattern linkPattern;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -193,6 +195,34 @@ public class RulesActivity extends FragmentActivity {
 		}
 
 		list.setSelection(position);
+		
+		// Explanations for these regexes are available upon request.
+		// - Alex
+		underscorePattern = Pattern.compile("_(.+?)_");
+		examplePattern = Pattern.compile("(Example:.+)$");
+		glyphPattern = Pattern.compile("\\{([a-zA-Z0-9/]{1,3})\\}");
+		if(keyword != null && !keyword.contains("{") && !keyword.contains("}")) {
+			keywordPattern = Pattern.compile("(" + Pattern.quote(keyword) + ")", Pattern.CASE_INSENSITIVE);
+		}
+		else {
+			keywordPattern = null;
+		}
+
+		/*
+		 * Regex breakdown for Adam: 
+		 * [1-9]{1}: first character is between 1 and 9 
+		 * [0-9]{2}: followed by two characters between 0 and 9 (i.e. a 3-digit number)
+		 * (...)?: maybe followed by the group: 
+		 * \\.: period
+		 * ([a-z0-9]{1,3}(-[a-z]{1})?)?: maybe followed by one to three alphanumeric characters,
+		 * 		which are maybe followed by a hyphen and an alphabetical character 
+		 * \\.?: maybe followed by another period
+		 * 
+		 * I realize this isn't completely easy to read, but it might at least help make some sense of the regex so 
+		 * I'm not just waving my hands and shouting "WIZAAAAAARDS!". I still reserve the right to do that, though.
+		 *  - Alex
+		 */
+		linkPattern = Pattern.compile("([1-9]{1}[0-9]{2}(\\.([a-z0-9]{1,3}(-[a-z]{1})?)?\\.?)?)");
 
 		setResult(RESULT_NORMAL);
 	}
@@ -293,86 +323,19 @@ public class RulesActivity extends FragmentActivity {
 	}
 
 	private SpannableString formatText(String input) {
-		String simpleInput = input.replace("_", "").toLowerCase();
-		CharSequence cs = Html.fromHtml(input.replace("_", "").replace("{", "<img src=\"").replace("}", "\"/>"), imgGetter,
-				null);
+		String encodedInput = input;
+		encodedInput = underscorePattern.matcher(encodedInput).replaceAll("\\<i\\>$1\\</i\\>");
+		encodedInput = examplePattern.matcher(encodedInput).replaceAll("\\<i\\>$1\\</i\\>");
+		encodedInput = glyphPattern.matcher(encodedInput).replaceAll("\\<img src=\"$1\"/\\>");
+		if(keywordPattern != null) {
+			encodedInput = keywordPattern.matcher(encodedInput).replaceAll("\\<font color=\"yellow\"\\>$1\\</font\\>");
+		}
+		encodedInput = encodedInput.replace("{", "").replace("}", "");
+		
+		CharSequence cs = Html.fromHtml(encodedInput, imgGetter, null);
 		SpannableString result = new SpannableString(cs);
-		int index;
 
-		// First, handle italicizing any words/phrases surrounded by underscores
-		ArrayList<Integer> starts = new ArrayList<Integer>();
-		ArrayList<Integer> ends = new ArrayList<Integer>();
-		boolean start = true;
-		index = input.indexOf("_");
-		while (index != -1) {
-			if (start) {
-				starts.add(index);
-				start = false;
-			}
-			else {
-				ends.add(index - 1);
-				start = true;
-			}
-			index = input.indexOf("_", index + 1);
-		}
-
-		int startpoint, endpoint;
-		if (starts.size() == ends.size()) {
-			// In case we had some weirdness and not all pairs match, we won't bother
-			// italicizing
-			for (int i = 0; i < starts.size(); i++) {
-				startpoint = starts.get(i) - 2 * i; // 2 * i handles the offset for
-																						// removing underscores
-				startpoint -= computeOffset(input, startpoint);
-				endpoint = ends.get(i) - 2 * i;
-				endpoint -= computeOffset(input, endpoint);
-				result.setSpan(new StyleSpan(Typeface.ITALIC), startpoint, endpoint, 0);
-			}
-		}
-
-		// Then, handle italicizing all examples
-		// Note: Examples always end the entry, so if we find "Example:", we can
-		// italicize to the end safely
-		index = simpleInput.indexOf("example:");
-		if (index != -1) {
-			startpoint = index;
-			startpoint -= computeOffset(simpleInput, startpoint);
-			endpoint = simpleInput.length() - 1;
-			endpoint -= computeOffset(simpleInput, endpoint);
-			result.setSpan(new StyleSpan(Typeface.ITALIC), startpoint, endpoint, 0);
-		}
-
-		// Next, handle the keyword highlighting (if applicable)
-		// Don't do it if it's null or if it contains { or } (they get replaced by
-		// images)
-		if (keyword != null && !keyword.contains("{") && !keyword.contains("}")) {
-			String loweredKeyword = keyword.toLowerCase();
-			index = simpleInput.indexOf(loweredKeyword);
-			while (index != -1) {
-				startpoint = index;
-				startpoint -= computeOffset(simpleInput, startpoint);
-				endpoint = index + keyword.length();
-				endpoint -= computeOffset(simpleInput, endpoint);
-				result.setSpan(new ForegroundColorSpan(Color.YELLOW), startpoint, endpoint, 0);
-				index = simpleInput.indexOf(loweredKeyword, index + keyword.length());
-			}
-		}
-
-		// Finally, handle hyperlinking
-
-		/*
-		 * A breakdown of the regex for Adam: [1-9]{1}: first character is between 1
-		 * and 9 [0-9]{2}: followed by two characters between 0 and 9 (i.e. a
-		 * 3-digit number) (...)?: maybe followed by the group: \\.: period
-		 * ([a-z0-9]{1,3}(-[a-z]{1})?)?: maybe followed by one to three alphanumeric
-		 * characters, which are maybe followed by a hyphen and an alphabetical
-		 * character \\.?: maybe followed by another period
-		 * 
-		 * I realize this isn't completely easy to read, but it might at least help
-		 * make some sense of the regex so I'm not just waving my hands and shouting
-		 * "WIZAAAAAARDS!". I still reserve the right to do that, though. - Alex
-		 */
-		Matcher m = Pattern.compile("([1-9]{1}[0-9]{2}(\\.([a-z0-9]{1,3}(-[a-z]{1})?)?\\.?)?)").matcher(cs);
+		Matcher m = linkPattern.matcher(cs);
 		while (m.find()) {
 			try {
 				String[] tokens = cs.subSequence(m.start(), m.end()).toString().split("(\\.)");
@@ -409,34 +372,6 @@ public class RulesActivity extends FragmentActivity {
 		return result;
 	}
 
-	private int computeOffset(String target, int endpoint) {
-		if (endpoint > target.length()) {
-			endpoint = target.length();
-		}
-		int offset = 0;
-
-		if (target != null) {
-			int index = target.indexOf("{");
-			int second = 0;
-			while (index >= 0 && index < endpoint) {
-				second = target.indexOf("}", index);
-				if (second >= 0) {
-					offset += (second - index);
-				}
-				index = target.indexOf("{", second);
-			}
-
-			index = target.indexOf("<br>");
-			while (index >= 0 && index < endpoint) {
-				offset += 3; // "<br>" (4 characters) is replaced with '\n' (1
-											// character), hence the adjustment of 3
-				index = target.indexOf("<br>", index + 1);
-			}
-		}
-
-		return offset;
-	}
-
 	private abstract class DisplayItem {
 		public abstract String getText();
 
@@ -446,10 +381,10 @@ public class RulesActivity extends FragmentActivity {
 	}
 
 	private class RuleItem extends DisplayItem {
-		private int			category;
-		private int			subcategory;
-		private String	entry;
-		private String	rulesText;
+		private int category;
+		private int subcategory;
+		private String entry;
+		private String rulesText;
 
 		public RuleItem(int category, int subcategory, String entry, String rulesText) {
 			this.category = category;
@@ -481,32 +416,6 @@ public class RulesActivity extends FragmentActivity {
 				return String.valueOf((this.category * 100 + this.subcategory)) + "." + this.entry;
 			}
 		}
-
-		// public String getText() {
-		// if(this.subcategory == -1) {
-		// return "";
-		// }
-		// else if(this.entry == null) {
-		// return "";
-		// }
-		// else {
-		// return this.rulesText;
-		// }
-		// }
-		//
-		// public String getHeader() {
-		// if(this.subcategory == -1) {
-		// return String.valueOf(this.category) + ". " + this.rulesText;
-		// }
-		// else if(this.entry == null) {
-		// return String.valueOf((this.category * 100) + this.subcategory) + ". " +
-		// this.rulesText;
-		// }
-		// else {
-		// return String.valueOf((this.category * 100 + this.subcategory)) + "." +
-		// this.entry;
-		// }
-		// }
 
 		public boolean isClickable() {
 			return this.entry == null || this.entry.length() == 0;
@@ -544,11 +453,10 @@ public class RulesActivity extends FragmentActivity {
 	}
 
 	private class RulesListAdapter extends ArrayAdapter<DisplayItem> implements SectionIndexer {
-		private int												layoutResourceId;
-		private ArrayList<DisplayItem>		items;
-
-		private HashMap<String, Integer>	alphaIndex;
-		private String[]									sections;
+		private int	layoutResourceId;
+		private ArrayList<DisplayItem> items;
+		private HashMap<String, Integer> alphaIndex;
+		private String[] sections;
 
 		public RulesListAdapter(Context context, int textViewResourceId, ArrayList<DisplayItem> items) {
 			super(context, textViewResourceId, items);
@@ -574,8 +482,7 @@ public class RulesActivity extends FragmentActivity {
 				}
 
 				ArrayList<String> letters = new ArrayList<String>(this.alphaIndex.keySet());
-				Collections.sort(letters); // This should do nothing in practice, but
-																		// just to be safe
+				Collections.sort(letters); // This should do nothing in practice, but just to be safe
 
 				sections = new String[letters.size()];
 				letters.toArray(sections);

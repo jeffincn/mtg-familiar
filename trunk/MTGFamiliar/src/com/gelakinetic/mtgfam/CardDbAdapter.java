@@ -1125,7 +1125,8 @@ public class CardDbAdapter {
 		try {
 			// The new way (single query per type, should be much faster) - Alex
 			String sql = "SELECT COALESCE(CASE (SELECT " + KEY_SET + " FROM " + DATABASE_TABLE_CARDS + " WHERE " + KEY_NAME
-					+ " = '" + mCardName + "') WHEN 'UG' THEN 1 WHEN 'UNH' THEN 1 ELSE NULL END, " + "CASE (SELECT 1 FROM "
+					+ " = '" + mCardName + "') WHEN 'UG' THEN 1 WHEN 'UNH' THEN 1 WHEN 'ARS' THEN 1 WHEN 'PCP' THEN 1 " 
+					+ "WHEN 'PP2' THEN 1 ELSE NULL END, " + "CASE (SELECT 1 FROM "
 					+ DATABASE_TABLE_CARDS + " c INNER JOIN " + DATABASE_TABLE_LEGAL_SETS + " ls ON ls." + KEY_SET + " = c."
 					+ KEY_SET + " WHERE ls." + KEY_FORMAT + " = '" + format + "' AND c." + KEY_NAME + " = '" + mCardName
 					+ "') WHEN 1 THEN NULL ELSE CASE WHEN '" + format + "' = 'Legacy' " + "THEN NULL WHEN '" + format

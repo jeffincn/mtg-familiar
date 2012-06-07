@@ -63,14 +63,13 @@ public class CardDbAdapter {
 	public static final String		DATABASE_TABLE_FORMATS				= "formats";
 	private static final String		DATABASE_TABLE_LEGAL_SETS			= "legal_sets";
 	private static final String		DATABASE_TABLE_BANNED_CARDS		= "banned_cards";
-	private static final String		DATABASE_TABLE_SAVED_TRADES		= "saved_trades";
 	private static final String		DATABASE_TABLE_RULES					= "rules";
 	private static final String		DATABASE_TABLE_GLOSSARY				= "glossary";
 
-	public static final int				DATABASE_VERSION							= 24;
+	public static final int				DATABASE_VERSION							= 25;
 
 	public static final String		KEY_ID												= "_id";
-	public static final String		KEY_NAME											= SearchManager.SUGGEST_COLUMN_TEXT_1;							// "name";
+	public static final String		KEY_NAME											= SearchManager.SUGGEST_COLUMN_TEXT_1; // "name";
 	public static final String		KEY_SET												= "expansion";
 	public static final String		KEY_TYPE											= "type";
 	public static final String		KEY_ABILITY										= "cardtext";
@@ -149,13 +148,6 @@ public class CardDbAdapter {
 																																	+ KEY_NAME + " text not null, " + KEY_LEGALITY
 																																	+ " integer not null, " + KEY_FORMAT
 																																	+ " text not null);";
-
-	private static final String		DATABASE_CREATE_SAVED_TRADES	= "create table " + DATABASE_TABLE_SAVED_TRADES + "("
-																																	+ KEY_ID + " integer primary key autoincrement, "
-																																	+ KEY_MULTIVERSEID + " integer not null, " + KEY_SIDE
-																																	+ " integer not null, " + KEY_NAME
-																																	+ " text not null, " + KEY_NUMBER
-																																	+ " integer not null);";
 
 	private static final String		DATABASE_CREATE_RULES					= "create table " + DATABASE_TABLE_RULES + "(" + KEY_ID
 																																	+ " integer primary key autoincrement, "
@@ -243,7 +235,6 @@ public class CardDbAdapter {
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_FORMATS);
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_LEGAL_SETS);
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_BANNED_CARDS);
-		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_SAVED_TRADES);
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_RULES);
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_GLOSSARY);
 
@@ -252,7 +243,6 @@ public class CardDbAdapter {
 		mDb.execSQL(DATABASE_CREATE_FORMATS);
 		mDb.execSQL(DATABASE_CREATE_LEGAL_SETS);
 		mDb.execSQL(DATABASE_CREATE_BANNED_CARDS);
-		mDb.execSQL(DATABASE_CREATE_SAVED_TRADES);
 		mDb.execSQL(DATABASE_CREATE_RULES);
 		mDb.execSQL(DATABASE_CREATE_GLOSSARY);
 	}
@@ -1109,72 +1099,6 @@ public class CardDbAdapter {
 		initialValues.put(KEY_LEGALITY, status);
 		initialValues.put(KEY_FORMAT, format);
 		return mDb.insert(DATABASE_TABLE_BANNED_CARDS, null, initialValues);
-	}
-
-	public long addTradeCard(int multiverseID, int number, int side, String name) {
-		ContentValues initialValues = new ContentValues();
-		initialValues.put(KEY_NAME, name);
-		initialValues.put(KEY_MULTIVERSEID, multiverseID);
-		initialValues.put(KEY_NUMBER, number);
-		initialValues.put(KEY_SIDE, side);
-		return mDb.insert(DATABASE_TABLE_SAVED_TRADES, null, initialValues);
-	}
-
-	public void addTradeCard(String cardName, String setCode, int number, int side, String tradeName) {
-		String sql = "INSERT INTO " + DATABASE_TABLE_SAVED_TRADES + " (" + KEY_MULTIVERSEID + ", " + KEY_SIDE + ", "
-				+ KEY_NAME + ", " + KEY_NUMBER + ") SELECT " + KEY_MULTIVERSEID + ", " + side + ", '"
-				+ tradeName.replace("'", "''") + "', " + number + " FROM " + DATABASE_TABLE_CARDS + " WHERE " + KEY_NAME
-				+ " = '" + cardName.replace("'", "''") + "' AND expansion = '" + setCode.replace("'", "''") + "'";
-		mDb.execSQL(sql);
-	}
-
-	public Cursor fetchAllSavedTrades() {
-		try {
-			String sql = "SELECT " + KEY_ID + ", " + KEY_NAME + " FROM " + DATABASE_TABLE_SAVED_TRADES + " GROUP BY "
-					+ KEY_NAME;
-			return mDb.rawQuery(sql, null);
-		}
-		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
-		}
-		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
-		}
-		return null;
-	}
-
-	public Cursor fetchSavedTrade(String tradeName) {
-		try {
-			String sql = "SELECT " + DATABASE_TABLE_SAVED_TRADES + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "."
-					+ KEY_NAME + ", " + DATABASE_TABLE_SETS + "." + KEY_NAME_TCGPLAYER + ", " + DATABASE_TABLE_CARDS + "."
-					+ KEY_SET + ", " + DATABASE_TABLE_SAVED_TRADES + "." + KEY_NUMBER + ", " + DATABASE_TABLE_SAVED_TRADES + "."
-					+ KEY_SIDE + " FROM " + DATABASE_TABLE_SAVED_TRADES + " INNER JOIN " + DATABASE_TABLE_CARDS + " ON "
-					+ DATABASE_TABLE_CARDS + "." + KEY_MULTIVERSEID + " = " + DATABASE_TABLE_SAVED_TRADES + "."
-					+ KEY_MULTIVERSEID + " INNER JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE
-					+ " = " + DATABASE_TABLE_CARDS + "." + KEY_SET + " WHERE " + DATABASE_TABLE_SAVED_TRADES + "." + KEY_NAME
-					+ " = '" + tradeName.replace("'", "''") + "'";
-			return mDb.rawQuery(sql, null);
-		}
-		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
-		}
-		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
-		}
-		return null;
-	}
-
-	public int removeSavedTrade(String name) {
-		try {
-			return mDb.delete(DATABASE_TABLE_SAVED_TRADES, KEY_NAME + " = '" + name.replace("'", "''") + "'", null);
-		}
-		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
-		}
-		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
-		}
-		return 0;
 	}
 
 	public Cursor fetchAllFormats() {

@@ -18,7 +18,12 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.gelakinetic.mtgfam;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -64,7 +69,7 @@ public class CardTradingActivity extends FragmentActivity {
 	private final static int			DIALOG_PRICE_SETTING	= 2;
 	private final static int			DIALOG_SAVE_TRADE			= 3;
 	private final static int			DIALOG_LOAD_TRADE			= 4;
-	private final static int			DIALOG_DELETE_TRADE			= 5;
+	private final static int			DIALOG_DELETE_TRADE		= 5;
 	private String								sideForDialog;
 	private int										positionForDialog;
 
@@ -86,8 +91,8 @@ public class CardTradingActivity extends FragmentActivity {
 	private EditText							numberfield;
 
 	private int										priceSetting;
-	
-	private String currentTrade;
+
+	private String								currentTrade;
 
 	public static final String		card_not_found				= "Card Not Found";
 	public static final String		mangled_url						= "Mangled URL";
@@ -100,6 +105,8 @@ public class CardTradingActivity extends FragmentActivity {
 	private static final int			LOW_PRICE							= 0;
 	private static final int			AVG_PRICE							= 1;
 	private static final int			HIGH_PRICE						= 2;
+
+	private static final String		tradeExtension				= ".trade";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -198,12 +205,11 @@ public class CardTradingActivity extends FragmentActivity {
 		priceSetting = Integer.parseInt(prefs.getString("tradePrice", String.valueOf(AVG_PRICE)));
 
 		// Give this a default value so we don't get the null pointer-induced FC. It
-		// shouldn't matter what
-		// we set it to, as long as we set it, since we dismiss the dialog if it's
-		// showing in onResume().
+		// shouldn't matter what we set it to, as long as we set it, since we
+		// dismiss the dialog if it's showing in onResume().
 		sideForDialog = "left";
-		
-		//Default this to an empty string so we never get NPEs from it
+
+		// Default this to an empty string so we never get NPEs from it
 		currentTrade = "";
 	}
 
@@ -248,7 +254,7 @@ public class CardTradingActivity extends FragmentActivity {
 		Dialog dialog;
 		AlertDialog.Builder builder;
 		switch (id) {
-			case DIALOG_UPDATE_CARD:
+			case DIALOG_UPDATE_CARD: {
 				final int position = positionForDialog;
 				final String side = (sideForDialog.equals("left") ? "left" : "right");
 				final ArrayList<CardData> lSide = (sideForDialog.equals("left") ? lTradeLeft : lTradeRight);
@@ -313,9 +319,8 @@ public class CardTradingActivity extends FragmentActivity {
 						double uIP;
 						try {
 							uIP = Double.parseDouble(userInputPrice);
-							lSide.get(position).setMessage(""); // Clear the message so the
-																									// user's specified price will
-																									// display
+							// Clear the message so the user's specified price will display
+							lSide.get(position).setMessage("");
 						}
 						catch (NumberFormatException e) {
 							uIP = 0;
@@ -338,7 +343,8 @@ public class CardTradingActivity extends FragmentActivity {
 
 				dialog.show();
 				break;
-			case DIALOG_PRICE_SETTING:
+			}
+			case DIALOG_PRICE_SETTING: {
 				builder = new AlertDialog.Builder(this);
 
 				builder.setTitle("Price Options");
@@ -383,7 +389,8 @@ public class CardTradingActivity extends FragmentActivity {
 
 				dialog.show();
 				break;
-			case DIALOG_SAVE_TRADE:
+			}
+			case DIALOG_SAVE_TRADE: {
 				builder = new AlertDialog.Builder(this);
 
 				builder.setTitle("Save Trade");
@@ -397,17 +404,31 @@ public class CardTradingActivity extends FragmentActivity {
 				builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						String tradeName = input.getText().toString();
-						
-						// Overwrite any previous trades with the same name
-						mdbAdapter.removeSavedTrade(tradeName);
-						
-						for (CardData cd : lTradeLeft) {
-							mdbAdapter.addTradeCard(cd.getName(), cd.getSetCode(), cd.getNumberOf(), CardDbAdapter.LEFT, tradeName);
+
+						String FILENAME = tradeName + tradeExtension;
+						FileOutputStream fos;
+
+						try {
+							// MODE_PRIVATE will create the file (or replace a file of the
+							// same name)
+							fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+
+							for (CardData cd : lTradeLeft) {
+								fos.write(cd.toString(CardDbAdapter.LEFT).getBytes());
+							}
+							for (CardData cd : lTradeRight) {
+								fos.write(cd.toString(CardDbAdapter.RIGHT).getBytes());
+							}
+
+							fos.close();
 						}
-						for (CardData cd : lTradeRight) {
-							mdbAdapter.addTradeCard(cd.getName(), cd.getSetCode(), cd.getNumberOf(), CardDbAdapter.RIGHT, tradeName);
+						catch (FileNotFoundException e) {
+							Toast.makeText(getApplicationContext(), "FileNotFoundException", Toast.LENGTH_LONG).show();
 						}
-						
+						catch (IOException e) {
+							Toast.makeText(getApplicationContext(), "IOException", Toast.LENGTH_LONG).show();
+						}
+
 						currentTrade = tradeName;
 					}
 				});
@@ -426,55 +447,75 @@ public class CardTradingActivity extends FragmentActivity {
 					}
 				});
 				break;
-			case DIALOG_LOAD_TRADE:
-				Cursor trades = mdbAdapter.fetchAllSavedTrades();
-				trades.moveToFirst();
-				int nameIndex = trades.getColumnIndex(CardDbAdapter.KEY_NAME);
-				final String[] tradeNames = new String[trades.getCount()];
-				for (int i = 0; i < tradeNames.length; i++) {
-					tradeNames[i] = trades.getString(nameIndex);
-					trades.moveToNext();
+			}
+			case DIALOG_LOAD_TRADE: {
+				String[] files = fileList();
+				ArrayList<String> validFiles = new ArrayList<String>();
+				for (String fileName : files) {
+					int mid = fileName.lastIndexOf(".");
+					if (fileName.substring(mid, fileName.length()).equals(tradeExtension)) {
+						validFiles.add(fileName.substring(0, mid));
+					}
 				}
-				trades.close();
-				
+
+				if (validFiles.size() == 0) {
+					dialog = null;
+					Toast.makeText(getApplicationContext(), "No Saved Trades", Toast.LENGTH_LONG).show();
+					break;
+				}
+
+				final String[] tradeNames = new String[validFiles.size()];
+				validFiles.toArray(tradeNames);
+
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Select A Trade");
-				builder.setNegativeButton("Cancel",  new DialogInterface.OnClickListener() {
+				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						// Canceled.
 					}
 				});
-				builder.setItems(tradeNames, new DialogInterface.OnClickListener() { 
+				builder.setItems(tradeNames, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface di, int which) {
-						Cursor cardsToAdd = mdbAdapter.fetchSavedTrade(tradeNames[which]);
-						cardsToAdd.moveToFirst();
 
-						lTradeLeft.clear();
-						lTradeRight.clear();
+						try {
+							BufferedReader br = new BufferedReader(new InputStreamReader(openFileInput(tradeNames[which]
+									+ tradeExtension)));
 
-						while (!cardsToAdd.isAfterLast()) {
-							String cardName = cardsToAdd.getString(cardsToAdd.getColumnIndex(CardDbAdapter.KEY_NAME));
-							String tcgName = cardsToAdd.getString(cardsToAdd.getColumnIndex(CardDbAdapter.KEY_NAME_TCGPLAYER));
-							String cardSet = cardsToAdd.getString(cardsToAdd.getColumnIndex(CardDbAdapter.KEY_SET));
-							int side = cardsToAdd.getInt(cardsToAdd.getColumnIndex(CardDbAdapter.KEY_SIDE));
-							int numberOf = cardsToAdd.getInt(cardsToAdd.getColumnIndex(CardDbAdapter.KEY_NUMBER));
+							lTradeLeft.clear();
+							lTradeRight.clear();
 
-							CardData cd = new CardData(cardName, tcgName, cardSet, numberOf, 0, "loading", Integer.toString(numberOf));
-							if (side == CardDbAdapter.LEFT) {
-								lTradeLeft.add(0,cd);
-								FetchPriceTask loadPrice = new FetchPriceTask(lTradeLeft.get(0), aaTradeLeft);
-								loadPrice.execute();
+							String line;
+							String[] parts;
+							while ((line = br.readLine()) != null) {
+								parts = line.split(CardData.delimiter);
+
+								String cardName = parts[1];
+								String cardSet = parts[2];
+								String tcgName = mdbAdapter.getTCGname(cardSet);
+								int side = Integer.parseInt(parts[0]);
+								int numberOf = Integer.parseInt(parts[3]);
+
+								CardData cd = new CardData(cardName, tcgName, cardSet, numberOf, 0, "loading", Integer
+										.toString(numberOf));
+								if (side == CardDbAdapter.LEFT) {
+									lTradeLeft.add(0, cd);
+									FetchPriceTask loadPrice = new FetchPriceTask(lTradeLeft.get(0), aaTradeLeft);
+									loadPrice.execute();
+								}
+								else if (side == CardDbAdapter.RIGHT) {
+									lTradeRight.add(0, cd);
+									FetchPriceTask loadPrice = new FetchPriceTask(lTradeRight.get(0), aaTradeRight);
+									loadPrice.execute();
+								}
 							}
-							else if (side == CardDbAdapter.RIGHT) {
-								lTradeRight.add(0,cd);
-								FetchPriceTask loadPrice = new FetchPriceTask(lTradeRight.get(0), aaTradeRight);
-								loadPrice.execute();
-							}
-							cardsToAdd.moveToNext();
 						}
-						
-						cardsToAdd.close();
-						
+						catch (NumberFormatException e) {
+							Toast.makeText(getApplicationContext(), "NumberFormatException", Toast.LENGTH_LONG).show();
+						}
+						catch (IOException e) {
+							Toast.makeText(getApplicationContext(), "IOException", Toast.LENGTH_LONG).show();
+						}
+
 						currentTrade = tradeNames[which];
 
 						aaTradeLeft.notifyDataSetChanged();
@@ -490,27 +531,37 @@ public class CardTradingActivity extends FragmentActivity {
 					}
 				});
 				break;
-			case DIALOG_DELETE_TRADE:
-				Cursor tradesD = mdbAdapter.fetchAllSavedTrades();
-				tradesD.moveToFirst();
-				int nameIndexD = tradesD.getColumnIndex(CardDbAdapter.KEY_NAME);
-				final String[] tradeNamesD = new String[tradesD.getCount()];
-				for (int i = 0; i < tradeNamesD.length; i++) {
-					tradeNamesD[i] = tradesD.getString(nameIndexD);
-					tradesD.moveToNext();
+			}
+			case DIALOG_DELETE_TRADE: {
+				String[] files = fileList();
+				ArrayList<String> validFiles = new ArrayList<String>();
+				for (String fileName : files) {
+					int mid = fileName.lastIndexOf(".");
+					if (fileName.substring(mid, fileName.length()).equals(tradeExtension)) {
+						validFiles.add(fileName.substring(0, mid));
+					}
 				}
-				tradesD.close();
-				
+
+				if (validFiles.size() == 0) {
+					dialog = null;
+					Toast.makeText(getApplicationContext(), "No Saved Trades", Toast.LENGTH_LONG).show();
+					break;
+				}
+
+				final String[] tradeNamesD = new String[validFiles.size()];
+				validFiles.toArray(tradeNamesD);
+
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Delete A Trade");
-				builder.setNegativeButton("Cancel",  new DialogInterface.OnClickListener() {
+				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						// Canceled.
 					}
 				});
-				builder.setItems(tradeNamesD, new DialogInterface.OnClickListener() { 
+				builder.setItems(tradeNamesD, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface di, int which) {
-						mdbAdapter.removeSavedTrade(tradeNamesD[which]);
+						File toDelete = new File(getFilesDir(), tradeNamesD[which] + tradeExtension);
+						toDelete.delete();
 					}
 				});
 
@@ -522,8 +573,10 @@ public class CardTradingActivity extends FragmentActivity {
 					}
 				});
 				break;
-			default:
+			}
+			default: {
 				dialog = null;
+			}
 		}
 		return dialog;
 	}
@@ -731,8 +784,8 @@ public class CardTradingActivity extends FragmentActivity {
 			this.name = name;
 			this.number = number;
 			this.setCode = setCode;
-			if(setCode.length() > 0){
-				
+			if (setCode.length() > 0) {
+
 			}
 			this.tcgName = tcgName;
 			this.numberOf = numberOf;
@@ -799,6 +852,13 @@ public class CardTradingActivity extends FragmentActivity {
 		public boolean hasPrice() {
 			return this.message == null || this.message.length() == 0;
 		}
+
+		public static final String	delimiter	= "%";
+
+		public String toString(int side) {
+			return side + delimiter + this.getName() + delimiter + this.getSetCode() + delimiter + this.getNumberOf() + '\n';
+		}
+
 	}
 
 	private class TradeListAdapter extends ArrayAdapter<CardData> {

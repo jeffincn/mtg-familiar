@@ -150,6 +150,9 @@ public class ImageGetterHelper {
 				else if (source.equalsIgnoreCase("x")) {
 					d = r.getDrawable(R.drawable.x);
 				}
+				else if (source.equalsIgnoreCase("pwk")) {
+					d = r.getDrawable(R.drawable.pwk);
+				}
 
 				for (int i = 0; i < drawableNums.length; i++) {
 					if (source.equals(Integer.valueOf(i).toString())) {

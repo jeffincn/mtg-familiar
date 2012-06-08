@@ -66,7 +66,7 @@ public class CardDbAdapter {
 	private static final String		DATABASE_TABLE_RULES					= "rules";
 	private static final String		DATABASE_TABLE_GLOSSARY				= "glossary";
 
-	public static final int				DATABASE_VERSION							= 25;
+	public static final int				DATABASE_VERSION							= 26;
 
 	public static final String		KEY_ID												= "_id";
 	public static final String		KEY_NAME											= SearchManager.SUGGEST_COLUMN_TEXT_1; // "name";

@@ -32,7 +32,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
     <item 
         android:id="@+id/change_gathering" 
-        android:title="Change Default Gathering" />
+        android:title="Change Default Gathering" android:icon="@drawable/defaultgathering"/>
     
     <item
         android:id="@+id/remove_player"

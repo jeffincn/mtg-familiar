@@ -41,7 +41,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:title="@string/legality"/>
     <item
         android:id="@+id/cardrulings"
-        android:icon="@drawable/menu_rules"
+        android:icon="@drawable/menu_random"
         android:title="@string/card_rulings" />
     <item
         android:id="@+id/quittosearch"

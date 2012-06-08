@@ -80,6 +80,7 @@ public class RulesActivity extends FragmentActivity {
 	private Pattern examplePattern;
 	private Pattern glyphPattern;
 	private Pattern keywordPattern;
+	private Pattern hyperlinkPattern;
 	private Pattern linkPattern;
 
 	@Override
@@ -207,6 +208,7 @@ public class RulesActivity extends FragmentActivity {
 		else {
 			keywordPattern = null;
 		}
+		hyperlinkPattern = Pattern.compile("\\<(http://)?(www|gatherer)(.+?)\\>");
 
 		/*
 		 * Regex breakdown for Adam: 
@@ -330,6 +332,7 @@ public class RulesActivity extends FragmentActivity {
 		if(keywordPattern != null) {
 			encodedInput = keywordPattern.matcher(encodedInput).replaceAll("\\<font color=\"yellow\"\\>$1\\</font\\>");
 		}
+		encodedInput = hyperlinkPattern.matcher(encodedInput).replaceAll("\\<a href=\"http://$2$3\"\\>$2$3\\</a\\>");
 		encodedInput = encodedInput.replace("{", "").replace("}", "");
 		
 		CharSequence cs = Html.fromHtml(encodedInput, imgGetter, null);

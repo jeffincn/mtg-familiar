@@ -255,8 +255,7 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
    - Fixed images for 2012 Planes and split cards.&lt;br />&lt;br />
    - Bugfixes and optimizations.
    </string>
-     	
-    <string name="gatherer">Gatherer Page</string>
+
     <string name="lifetitle">Life Counter</string>
     <string name="wakelocksummary">Force the life counter screen to never go to sleep</string>
     <string name="wakelocktitle">Wake Lock</string>

@@ -399,6 +399,7 @@ public class CardTradingActivity extends FragmentActivity {
 				// Set an EditText view to get user input
 				final EditText input = new EditText(this);
 				input.setText(currentTrade);
+				input.setSingleLine(true);
 				builder.setView(input);
 
 				builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {

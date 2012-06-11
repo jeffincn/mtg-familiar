@@ -627,8 +627,7 @@ public class CardViewActivity extends FragmentActivity {
 				else {
 					tcgCardName = cardName;
 				}
-				tcgCardName = tcgCardName.replace(" ", "%20").replace("Æ", "Ae");
-				priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p=" + tcgCardName));
+				priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p=" + tcgCardName).replace(" ", "%20").replace("Æ", "Ae"));
 
 				// Get a SAXParser from the SAXPArserFactory.
 				SAXParserFactory spf = SAXParserFactory.newInstance();

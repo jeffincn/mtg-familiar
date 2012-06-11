@@ -245,7 +245,7 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
    - UI fixes for small screens.&lt;br />&lt;br />
    - Bugfixes.
    -->
-   <!--  1.7
+   <!--  1.7  -->
    - Searchable, linked comprehensive rules are now included.&lt;br />&lt;br />
    - Card rulings can now be pulled up for each card.&lt;br />&lt;br />
    - You can now save and load trades.&lt;br />&lt;br />
@@ -253,11 +253,13 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
    - Round timer now has 5/10/15 minute warnings, accessible in the preferences.&lt;br />&lt;br />
    - Fancy new menu icons.&lt;br />&lt;br />
    - Fixed images for 2012 Planes and split cards.&lt;br />&lt;br />
-   - Bugfixes and optimizations.
- -->
- <!-- 1.8 -->
+   - Bugfixes and optimizations.&lt;br />&lt;br />
+<!--  1.7.1 -->
+   - 1.7.1: Fixed price lookup.
+ <!-- 1.8
  	- Create a gathering
-   </string>
+ -->
+    </string>
  
     <string name="lifetitle">Life Counter</string>
     <string name="wakelocksummary">Force the life counter screen to never go to sleep</string>

@@ -433,9 +433,9 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     <string name="tts_pref_install_title">Install Text-to-Speech</string>
     <string name="tts_pref_install_desc">Clicking here will take you to the text-to-speech install page in the Google Play Store</string>
     
-    <string name="tts_pref_fifteen_minutes">Fifteen-Minute Warning</string>
-    <string name="tts_pref_ten_minutes">Ten-Minute Warning</string>
-    <string name="tts_pref_five_minutes">Five-Minute Warning</string>
+    <string name="tts_pref_fifteen_minutes">15-Minute Warning</string>
+    <string name="tts_pref_ten_minutes">10-Minute Warning</string>
+    <string name="tts_pref_five_minutes">5-Minute Warning</string>
     <string name="rulestitle">Card Rulings</string>
     <string name="gathering_name_hint">Gathering\'s Name</string>
     <string name="gathering_default_name">Default Name</string>

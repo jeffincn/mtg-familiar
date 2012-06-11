@@ -27,12 +27,10 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:id="@+id/announce_life"
         android:icon="@drawable/menu_speech"
         android:title="@string/announcelife"/>
-<!-- 
     <item 
         android:id="@+id/change_gathering" 
         android:title="@string/change_default_gathering"
         android:icon="@drawable/menu_wizard"/>
- -->
      <item
         android:id="@+id/remove_player"
         android:icon="@drawable/menu_minus"

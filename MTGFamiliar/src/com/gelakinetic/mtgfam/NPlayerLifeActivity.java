@@ -212,7 +212,9 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 
 		MenuFragmentCompat.init(this, R.menu.life_counter_menu, "life_counter_menu_fragment");
 		
-		tts = new TextToSpeech(this, this);
+		if(preferences.getBoolean("hasTts", false)) {
+			tts = new TextToSpeech(this, this);
+		}
 	}
 
 	@Override
@@ -1103,8 +1105,6 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 	}
 
 	public void onInit(int status) {
-		if(status == TextToSpeech.SUCCESS) {
-			ttsInitialized = true;
-		}
+		ttsInitialized = true;
 	}
 }

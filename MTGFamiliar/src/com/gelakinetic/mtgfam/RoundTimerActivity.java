@@ -81,7 +81,7 @@ public class RoundTimerActivity extends FragmentActivity {
 	
 	private long endTime;
 	private boolean updatingDisplay;
-	private boolean hasTts = false;
+	private boolean ttsInitialized = false;
 	
 	private BroadcastReceiver resultReceiver = new BroadcastReceiver() {
 		@Override
@@ -94,7 +94,7 @@ public class RoundTimerActivity extends FragmentActivity {
 	private BroadcastReceiver ttsReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			hasTts = intent.getBooleanExtra(RoundTimerService.EXTRA_HAS_TTS, false);
+			ttsInitialized = intent.getBooleanExtra(RoundTimerService.EXTRA_TTS_INITIALIZED, false);
 		}
 	};
 	
@@ -141,8 +141,10 @@ public class RoundTimerActivity extends FragmentActivity {
 		sendBroadcast(i);
 		updatingDisplay = true; //So onResume() doesn't start the updates before we get the response broadcast
 		
-		i = new Intent(RoundTimerService.HAS_TTS_FILTER); //Find out if the phone has TTS
-		sendBroadcast(i);
+		if(settings.getBoolean("hasTts", false)) {
+			i = new Intent(RoundTimerService.TTS_INITIALIZED_FILTER); //Find out if TTS is initialized
+			sendBroadcast(i);
+		}
 	}
 	
 	@Override
@@ -176,7 +178,7 @@ public class RoundTimerActivity extends FragmentActivity {
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.set_timer_warnings).setVisible(hasTts);
+        menu.findItem(R.id.set_timer_warnings).setVisible(ttsInitialized);
 	    return true;
 	}
 	

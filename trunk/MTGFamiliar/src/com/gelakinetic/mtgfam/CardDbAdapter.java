@@ -152,7 +152,7 @@ public class CardDbAdapter {
 	private static final String		DATABASE_CREATE_RULES					= "create table " + DATABASE_TABLE_RULES + "(" + KEY_ID
 																																	+ " integer primary key autoincrement, "
 																																	+ KEY_CATEGORY + " integer not null, "
-																																	+ KEY_SUBCATEGORY + " integer null, " + KEY_ENTRY
+																																	+ KEY_SUBCATEGORY + " integer not null, " + KEY_ENTRY
 																																	+ " text null, " + KEY_RULE_TEXT + " text not null, "
 																																	+ KEY_POSITION + " integer null);";
 
@@ -1324,7 +1324,52 @@ public class CardDbAdapter {
 		}
 		return null;
 	}
+	
+	/**
+	 * Drops the rules and glossary tables.
+	 */
+	public void dropRulesTables() {
+		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_RULES);
+		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_GLOSSARY);
+	}
+	
+	/**
+	 * Creates the rules and glossary tables.
+	 */
+	public void createRulesTables() {
+		mDb.execSQL(DATABASE_CREATE_RULES);
+		mDb.execSQL(DATABASE_CREATE_GLOSSARY);
+	}
 
+	public void insertRule(int category, int subcategory, String entry, String text, int position) {
+		if(entry == null) {
+			entry = "NULL";
+		}
+		else {
+			entry = "'" + entry.replace("'", "''") + "'";
+		}
+		text = "'" + text.replace("'", "''") + "'";
+		String positionStr;
+		if(position < 0) {
+			positionStr = "NULL";
+		}
+		else {
+			positionStr = String.valueOf(position);
+		}
+		String sql = "INSERT INTO " + DATABASE_TABLE_RULES + " (" + KEY_CATEGORY + ", " + KEY_SUBCATEGORY + ", " + KEY_ENTRY + 
+				", " + KEY_RULE_TEXT + ", " + KEY_POSITION + ") VALUES (" + String.valueOf(category) + ", " + 
+				String.valueOf(subcategory) + ", " + entry + ", " + text + ", " + positionStr + ");";
+		mDb.execSQL(sql);
+	}
+	
+	public void insertGlossaryTerm(String term, String definition) {
+		term = "'" + term.replace("'", "''") + "'";
+		definition = "'" + definition.replace("'", "''") + "'";
+		String sql = "INSERT INTO " + DATABASE_TABLE_GLOSSARY + " (" + KEY_TERM + ", " + KEY_DEFINITION + 
+				") VALUES (" + term + ", " + definition + ");";
+		mDb.execSQL(sql);
+	}
+	
 	public SQLiteDatabase getReadableDatabase() {
 		return mDb;
 	}

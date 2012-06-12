@@ -32,12 +32,12 @@ public class RoundTimerService extends Service implements OnInitListener {
 	public static String REQUEST_FILTER = "com.gelakinetic.mtgfam.REQUEST_FILTER";
 	public static String START_FILTER = "com.gelakinetic.mtgfam.START_FILTER";
 	public static String CANCEL_FILTER = "com.gelakinetic.mtgfam.CANCEL_FILTER";
-	public static String HAS_TTS_FILTER = "com.gelakinetic.mtgfam.HAS_TTS_FILTER";
+	public static String TTS_INITIALIZED_FILTER = "com.gelakinetic.mtgfam.HAS_TTS_FILTER";
 	
 	private static int NOTIFICATION_ID = 53; //Arbitrary; we just need something no one else is using
 
 	public static String EXTRA_END_TIME = "EndTime";
-	public static String EXTRA_HAS_TTS = "HasTts";
+	public static String EXTRA_TTS_INITIALIZED = "TtsInitialized";
 	
 	private long endTime;
 	private Uri soundFile;
@@ -211,7 +211,7 @@ public class RoundTimerService extends Service implements OnInitListener {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Intent i = new Intent(RoundTimerActivity.TTS_FILTER);
-			i.putExtra(EXTRA_HAS_TTS, ttsInitialized);
+			i.putExtra(EXTRA_TTS_INITIALIZED, ttsInitialized);
 			sendBroadcast(i);
 		}
 	};
@@ -241,7 +241,7 @@ public class RoundTimerService extends Service implements OnInitListener {
 		registerReceiver(requestReceiver, new IntentFilter(REQUEST_FILTER));
 		registerReceiver(startReceiver, new IntentFilter(START_FILTER));
 		registerReceiver(cancelReceiver, new IntentFilter(CANCEL_FILTER));
-		registerReceiver(hasTtsReceiver, new IntentFilter(HAS_TTS_FILTER));
+		registerReceiver(hasTtsReceiver, new IntentFilter(TTS_INITIALIZED_FILTER));
 		
 		nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 		alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
@@ -308,8 +308,6 @@ public class RoundTimerService extends Service implements OnInitListener {
 
 	//@Override
 	public void onInit(int status) {
-		if(status == TextToSpeech.SUCCESS) {
-			ttsInitialized = true;
-		}
+		ttsInitialized = true;
 	}
 }

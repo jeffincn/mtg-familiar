@@ -36,6 +36,7 @@ import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -66,6 +67,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 	private static final int	APPLYINGPATCH		= 3;
 	private static final int	DBFROMWEB				= 4;
 //private static final int	DBFROMAPK				= 5;
+	private static final int	UPDATERULESGLOSSARY = 6;
 	private static final int	EXCEPTION				= 99;
 	private static final int	ABOUTDIALOG			= 0;
 	private static final int	CHANGELOGDIALOG	= 1;
@@ -90,6 +92,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 	private TextView					roundTimer;
 	private TextView					trader;
 	private Activity					me;
+	private long defaultLastRulesUpdate;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -98,6 +101,9 @@ public class MainActivity extends FragmentActivity implements Runnable {
 
 		mCtx = this;
 		me = this;
+
+		//NOTE: This needs to be updated with every release
+		defaultLastRulesUpdate = new Date(2012, 6, 9).getTime();
 
 		search = (TextView) findViewById(R.id.cardsearch);
 		rules = (TextView) findViewById(R.id.rules);
@@ -169,6 +175,11 @@ public class MainActivity extends FragmentActivity implements Runnable {
 		});
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		if(preferences.getLong("lastRulesUpdate", 0) == 0) {
+			SharedPreferences.Editor edit = preferences.edit();
+			edit.putLong("lastRulesUpdate", defaultLastRulesUpdate);
+			edit.commit();
+		}
 
 		mDbHelper = new CardDbAdapter(this);
 		mDbHelper.open();
@@ -196,9 +207,14 @@ public class MainActivity extends FragmentActivity implements Runnable {
 
 		MenuFragmentCompat.init(this, R.menu.main_menu, "main_menu_fragment");
 		
-		Intent tts = new Intent();
-		tts.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
-		startActivityForResult(tts, TTS_CHECK_CODE);
+		try {
+			Intent tts = new Intent();
+			tts.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+			startActivityForResult(tts, TTS_CHECK_CODE);
+		}
+		catch (ActivityNotFoundException anf) {
+			showTtsWarningIfShould();
+		}
 	}
 
 	@Override
@@ -234,30 +250,45 @@ public class MainActivity extends FragmentActivity implements Runnable {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if(requestCode == TTS_CHECK_CODE) {
-			if(resultCode != TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
-				if(!preferences.getBoolean("ttsdontask", false)) {
-					//So we don't display this dialog again and bother the user
-					SharedPreferences.Editor edit = preferences.edit();
-					edit.putBoolean("ttsdontask", true);
-					edit.commit();
-					
-					//Then display a dialog informing them of TTS
-					AlertDialog dialog = new Builder(this)
-					.setTitle("Text-to-Speech")
-					.setMessage("This application has text-to-speech capability for some of its features, but you don't " + 
-							"seem to have it installed. If you want to install it, use the \"Install Text-to-Speech\" link " + 
-							"in the settings menu.")
-					.setPositiveButton("OK", new OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							//Do nothing, just dismiss
-						}
-					})
-					.create();
-					
-					dialog.show();
-				}
+			if(resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+				//We have TTS, so flag it as such
+				SharedPreferences.Editor edit = preferences.edit();
+				edit.putBoolean("hasTts", true);
+				edit.commit();
+			}
+			else {
+				showTtsWarningIfShould();
 			}
 		}
+	}
+	
+	private void showTtsWarningIfShould() {
+		SharedPreferences.Editor edit = preferences.edit();
+		boolean shouldShow = preferences.getBoolean("ttsShowDialog", true);
+		
+		if(shouldShow) {
+			//So we don't display this dialog again and bother the user
+			edit.putBoolean("ttsShowDialog", false);
+			
+			//Then display a dialog informing them of TTS
+			AlertDialog dialog = new Builder(this)
+			.setTitle("Text-to-Speech")
+			.setMessage("This application has text-to-speech capability for some of its features, but you don't " + 
+					"seem to have it installed. If you want to install it, use the \"Install Text-to-Speech\" link " + 
+					"in the settings menu.")
+			.setPositiveButton("OK", new OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					//Do nothing, just dismiss
+				}
+			})
+			.create();
+			
+			dialog.show();
+		}
+		
+		//Also, even if we aren't showing the dialog, set a boolean indicating that we don't have TTS
+		edit.putBoolean("has_tts", false);
+		edit.commit();
 	}
 
 	@Override
@@ -422,6 +453,21 @@ public class MainActivity extends FragmentActivity implements Runnable {
 					}
 					parseTCGNames();
 				}
+				
+				long lastRulesUpdate = preferences.getLong("lastRulesUpdate", defaultLastRulesUpdate);
+				RulesParser rp = new RulesParser(new Date(lastRulesUpdate), mDbHelper, this);
+				if(rp.needsToUpdate()) {
+					if(rp.parseRules()) {
+						dialogReady = false;
+						handler.sendEmptyMessage(UPDATERULESGLOSSARY);
+						while(!dialogReady) {
+							//Spin until the dialog is ready
+						}
+						//TODO - loadRulesAndGlossary() returns an error code; use it?
+						rp.loadRulesAndGlossary();
+					}
+				}
+				
 				handler.sendEmptyMessage(OTAPATCH);
 			}
 			else if (threadType == DBFROMWEB) {
@@ -462,76 +508,100 @@ public class MainActivity extends FragmentActivity implements Runnable {
 
 	private Handler	handler	= new Handler() {
 
-														@Override
-														public void handleMessage(Message msg) {
-															switch (msg.what) {
-																case DBFROMWEB:
-																	if (dialog != null && dialog.isShowing()) {
-																		try {
-																			dialog.dismiss();
-																		}
-																		catch (Exception e) {
-																			;
-																		}
-																	}
-																	break;
-																case OTAPATCH:
-																	// If it successfully updated, update the
-																	// timestamp
-																	int curTime = (int) (new Date().getTime() * .001);
-																	SharedPreferences.Editor editor = preferences.edit();
-																	editor.putInt("lastLegalityUpdate", curTime);
-																	editor.commit();
+		@Override
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+				case DBFROMWEB:
+					if (dialog != null && dialog.isShowing()) {
+						try {
+							dialog.dismiss();
+						}
+						catch (Exception e) {
+							;
+						}
+					}
+					break;
+				case OTAPATCH:
+					// If it successfully updated, update the timestamp
+					long curTime = new Date().getTime();
+					SharedPreferences.Editor editor = preferences.edit();
+					editor.putInt("lastLegalityUpdate", (int) (curTime * .001));
+					editor.putLong("lastRulesUpdate", curTime);
+					editor.commit();
 
-																	if (dialog != null && dialog.isShowing()) {
-																		try {
-																			dialog.dismiss();
-																		}
-																		catch (Exception e) {
-																			;
-																		}
-																	}
-																	// unlock rotation
-																	me.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
-																	break;
-																case APPLYINGPATCH:
-																	numCardsAdded = 0;
+					if (dialog != null && dialog.isShowing()) {
+						try {
+							dialog.dismiss();
+						}
+						catch (Exception e) {
+							;
+						}
+					}
+					// unlock rotation
+					me.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
+					break;
+				case APPLYINGPATCH:
+					numCardsAdded = 0;
 
-																	if (dialog != null && dialog.isShowing()) {
-																		try {
-																			dialog.dismiss();
-																		}
-																		catch (Exception e) {
-																			;
-																		}
-																	}
-																	dialog = new ProgressDialog(MainActivity.this);
-																	dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-																	dialog.setMessage("Adding " + patchname + ". Please wait.");
-																	dialog.setCancelable(false);
-																	dialog.show();
+					if (dialog != null && dialog.isShowing()) {
+						try {
+							dialog.dismiss();
+						}
+						catch (Exception e) {
+							;
+						}
+					}
+					dialog = new ProgressDialog(MainActivity.this);
+					dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+					dialog.setMessage("Adding " + patchname + ". Please wait.");
+					dialog.setCancelable(false);
+					dialog.setProgressNumberFormat(null);
+					
+					dialog.show();
 
-																	dialogReady = true;
-																	break;
-																case EXCEPTION:
-																	if (dialog != null && dialog.isShowing()) {
-																		try {
-																			dialog.dismiss();
-																		}
-																		catch (Exception e) {
-																			;
-																		}
-																	}
+					dialogReady = true;
+					break;
+				case UPDATERULESGLOSSARY:
+					//Reusing the numCardsAdded, etc. from APPLYINGPATCH, even
+					//though it's not really cards. It's just simpler this way.
+					numCardsAdded = 0;
+					if(dialog != null && dialog.isShowing()) {
+						try {
+							dialog.dismiss();
+						}
+						catch (Exception e) {
+							//Eat it
+						}
+					}
+					
+					dialog = new ProgressDialog(MainActivity.this);
+					dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+					dialog.setMessage("Updating rules and glossary. Please wait.");
+					dialog.setCancelable(false);
+					dialog.setProgressNumberFormat(null);
+					dialog.show();
+					
+					dialogReady = true;
+					break;
+				case EXCEPTION:
+					if (dialog != null && dialog.isShowing()) {
+						try {
+							dialog.dismiss();
+						}
+						catch (Exception e) {
+							;
+						}
+					}
 
-																	AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
-																	builder.setMessage(stacktrace).setCancelable(true);
-																	AlertDialog alert = builder.create();
-																	alert.show();
+					AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
+					builder.setMessage(stacktrace).setCancelable(true);
+					AlertDialog alert = builder.create();
+					alert.show();
 
-																	stacktrace.toString();
-															}
-														}
-													};
+					stacktrace.toString();
+			}
+		}
+	};
 
 	private void parseJSON(URL cards) {
 		try {

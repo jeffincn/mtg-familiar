@@ -555,7 +555,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 					dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 					dialog.setMessage("Adding " + patchname + ". Please wait.");
 					dialog.setCancelable(false);
-					dialog.setProgressNumberFormat(null);
+					//dialog.setProgressNumberFormat(null); //Unsupported below API level 11
 					
 					dialog.show();
 
@@ -578,7 +578,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 					dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 					dialog.setMessage("Updating rules and glossary. Please wait.");
 					dialog.setCancelable(false);
-					dialog.setProgressNumberFormat(null);
+					//dialog.setProgressNumberFormat(null); //Unsupported below API level 11
 					dialog.show();
 					
 					dialogReady = true;

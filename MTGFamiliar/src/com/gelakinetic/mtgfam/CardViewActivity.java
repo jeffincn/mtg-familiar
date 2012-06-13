@@ -25,8 +25,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -571,6 +573,21 @@ public class CardViewActivity extends FragmentActivity {
 			}
 			catch (IOException e) {
 				error = "No Internet Connection";
+			}
+			catch (NullPointerException e) {
+				//Set the message
+				error = "Image Not Found";
+				try {
+					//And then try to "log the error", as it were
+					URL errUrl = new URL("http://www.twoevils.org/cardmissing" + URLEncoder.encode(cardName, "UTF-8"));
+					HttpURLConnection conn = (HttpURLConnection)errUrl.openConnection();
+					InputStream is = conn.getInputStream();
+					is.close();
+					conn.disconnect();
+				}
+				catch (Exception ex) {
+					//Eat it; if logging an error breaks, we officially don't care
+				}
 			}
 			return null;
 		}

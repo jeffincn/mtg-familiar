@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -118,10 +119,14 @@ public class RulesParser {
 				return false;
 			}
 			String date = this.rulesUrl.substring(txtIndex - 8, txtIndex);
-			Date rulesDate = new Date(Integer.parseInt(date.substring(0, 4)), //yyyy
-									  Integer.parseInt(date.substring(4, 6)), //mm
-									  Integer.parseInt(date.substring(6, 8)));//dd
-			
+			Calendar c = Calendar.getInstance();
+			c.set(Integer.parseInt(date.substring(0, 4)), 	  //yyyy
+				  Integer.parseInt(date.substring(4, 6)) - 1, //mm (months are 0-indexed for some inane reason)
+				  Integer.parseInt(date.substring(6, 8)), 	  //dd
+				  0,									  	  //hh
+				  0,									  	  //mm
+				  0);									  	  //ss
+			Date rulesDate = c.getTime();
 			return rulesDate.after(this.lastUpdated);
 		}
 	}

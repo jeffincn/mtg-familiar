@@ -28,6 +28,7 @@ import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.zip.GZIPInputStream;
 
@@ -103,7 +104,9 @@ public class MainActivity extends FragmentActivity implements Runnable {
 		me = this;
 
 		//NOTE: This needs to be updated with every release
-		defaultLastRulesUpdate = new Date(2012, 6, 9).getTime();
+		Calendar c = Calendar.getInstance();
+		c.set(2012, Calendar.JUNE, 9, 0, 0, 0);
+		defaultLastRulesUpdate = c.getTimeInMillis();
 
 		search = (TextView) findViewById(R.id.cardsearch);
 		rules = (TextView) findViewById(R.id.rules);

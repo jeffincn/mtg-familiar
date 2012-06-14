@@ -80,7 +80,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 // I don't like doing this, but we've gotta stick with the old clipboard
-@SuppressWarnings("deprecation")
+// @SuppressWarnings("deprecation")
 public class CardViewActivity extends FragmentActivity {
 
 	// Dont use 0, thats the default when the back key is pressed
@@ -553,7 +553,8 @@ public class CardViewActivity extends FragmentActivity {
 				newWidth = Math.round(cardPicture.getIntrinsicWidth() * scale);
 				newHeight = Math.round(cardPicture.getIntrinsicHeight() * scale);
 
-				cardPicture = new BitmapDrawable(mCtx.getResources(), Bitmap.createScaledBitmap(cardPicture.getBitmap(),
+				// Was using the new style constructor with the resources causing trouble?
+				cardPicture = new BitmapDrawable(/*mCtx.getResources(),*/ Bitmap.createScaledBitmap(cardPicture.getBitmap(),
 						newWidth, newHeight, true));
 			}
 			catch (FileNotFoundException e) {

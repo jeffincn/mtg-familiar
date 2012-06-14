@@ -257,10 +257,8 @@ public class RulesParser {
 		    
 		    return true;
 		} 
-		catch (MalformedURLException mue) {
-			return false;
-		} 
-		catch (IOException ioe) {
+		catch (Exception e) {
+			//POKEMON THAT SHIT
 			return false;
 		}
 		finally {

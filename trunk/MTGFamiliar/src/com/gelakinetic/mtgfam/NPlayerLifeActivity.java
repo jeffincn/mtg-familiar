@@ -1089,10 +1089,10 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 			case R.id.announce_life:
 				announceLifeTotals();
 				return true;
-//			case R.id.change_gathering:
-//				Intent i = new Intent(this, GatheringCreateActivity.class);
-//				startActivity(i);
-//				return true;
+			case R.id.change_gathering:
+				Intent i = new Intent(this, GatheringCreateActivity.class);
+				startActivity(i);
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}

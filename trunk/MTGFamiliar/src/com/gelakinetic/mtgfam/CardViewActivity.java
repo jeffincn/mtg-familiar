@@ -576,19 +576,7 @@ public class CardViewActivity extends FragmentActivity {
 				error = "No Internet Connection";
 			}
 			catch (NullPointerException e) {
-				//Set the message
 				error = "Image Not Found";
-				try {
-					//And then try to "log the error", as it were
-					URL errUrl = new URL("http://www.twoevils.org/cardmissing" + URLEncoder.encode(cardName, "UTF-8"));
-					HttpURLConnection conn = (HttpURLConnection)errUrl.openConnection();
-					InputStream is = conn.getInputStream();
-					is.close();
-					conn.disconnect();
-				}
-				catch (Exception ex) {
-					//Eat it; if logging an error breaks, we officially don't care
-				}
 			}
 			return null;
 		}

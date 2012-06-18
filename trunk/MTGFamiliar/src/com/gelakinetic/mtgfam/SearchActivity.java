@@ -23,13 +23,17 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.graphics.PorterDuff.Mode;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -68,6 +72,7 @@ public class SearchActivity extends FragmentActivity {
 	protected static final int		SETLIST			= 0;
 	protected static final int		FORMATLIST	= 1;
 	protected static final int		RARITYLIST	= 2;
+	protected static final int		CORRUPTION = 3;
 
 	private CardDbAdapter					mDbHelper;
 	private Button								searchbutton;
@@ -302,7 +307,13 @@ public class SearchActivity extends FragmentActivity {
 		});
 
 		Cursor setCursor = mDbHelper.fetchAllSets();
-		setCursor.moveToFirst();
+		try {
+			setCursor.moveToFirst();
+		}
+		catch (SQLiteDatabaseCorruptException e) {
+			showDialog(CORRUPTION);
+			return;
+		}
 
 		setNames = new String[setCursor.getCount()];
 		setSymbols = new String[setCursor.getCount()];
@@ -593,6 +604,24 @@ public class SearchActivity extends FragmentActivity {
 		}
 		else if (id == RARITYLIST) {
 			return rarityDialog;
+		}
+		else if (id == CORRUPTION) {
+			View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
+			TextView text = (TextView)dialogLayout.findViewById(R.id.corruption_message);
+			text.setText(Html.fromHtml(getString(R.string.corruption_error)));
+			text.setMovementMethod(LinkMovementMethod.getInstance());
+			
+			AlertDialog dialog = new AlertDialog.Builder(this)
+				.setTitle(R.string.corruption_error_title)
+				.setView(dialogLayout)
+				.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						finish();
+					}
+				})
+				.setCancelable(false)
+				.create();
+			return dialog;
 		}
 		return null;
 	}

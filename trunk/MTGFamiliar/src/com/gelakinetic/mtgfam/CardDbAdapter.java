@@ -359,10 +359,10 @@ public class CardDbAdapter {
 					null, KEY_DATE + " DESC");
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 
 		return c;
@@ -380,10 +380,10 @@ public class CardDbAdapter {
 			c.close();
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 
 		return count > 0;
@@ -396,10 +396,10 @@ public class CardDbAdapter {
 					null, null);
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 
 		c.moveToFirst();
@@ -416,10 +416,10 @@ public class CardDbAdapter {
 					null);
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 
 		c.moveToFirst();
@@ -449,10 +449,10 @@ public class CardDbAdapter {
 			mCursor = mDb.query(true, DATABASE_TABLE_CARDS, columns, KEY_ID + "=" + id, null, null, null, KEY_NAME, null);
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 
 		if (mCursor != null) {
@@ -484,10 +484,10 @@ public class CardDbAdapter {
 			mCursor = mDb.rawQuery(sql, null);
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 
 		if (mCursor != null) {
@@ -505,10 +505,10 @@ public class CardDbAdapter {
 					null);
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 
 		if (mCursor != null) {
@@ -569,10 +569,10 @@ public class CardDbAdapter {
 			mCursor = mDb.rawQuery(sql, null);
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 
 		if (mCursor != null) {
@@ -976,10 +976,10 @@ public class CardDbAdapter {
 			mCursor = mDb.rawQuery(sql, null);
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		if (mCursor != null) {
 			mCursor.moveToFirst();
@@ -1016,10 +1016,10 @@ public class CardDbAdapter {
 			mCursor = mDb.rawQuery(sql, null);
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		if (mCursor != null) {
 			mCursor.moveToFirst();
@@ -1039,10 +1039,10 @@ public class CardDbAdapter {
 			mCursor.close();
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		return ID;
 	}
@@ -1059,10 +1059,10 @@ public class CardDbAdapter {
 			mCursor.close();
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 
 		return name;
@@ -1106,10 +1106,10 @@ public class CardDbAdapter {
 			return mDb.query(DATABASE_TABLE_FORMATS, new String[] { KEY_ID, KEY_NAME, }, null, null, null, null, KEY_NAME);
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		return null;
 	}
@@ -1143,10 +1143,10 @@ public class CardDbAdapter {
 			return legality;
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		return -1;
 	}
@@ -1164,10 +1164,10 @@ public class CardDbAdapter {
 			mCursor.close();
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 
 		return name;
@@ -1179,10 +1179,10 @@ public class CardDbAdapter {
 					KEY_NAME, null);
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		return null;
 	}
@@ -1210,10 +1210,10 @@ public class CardDbAdapter {
 			}
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		return null;
 	}
@@ -1257,10 +1257,10 @@ public class CardDbAdapter {
 			}
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		return null;
 	}
@@ -1281,10 +1281,10 @@ public class CardDbAdapter {
 			}
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		return 0;
 	}
@@ -1303,10 +1303,10 @@ public class CardDbAdapter {
 			}
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		return "";
 	}
@@ -1317,10 +1317,10 @@ public class CardDbAdapter {
 			return mDb.rawQuery(sql, null);
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		return null;
 	}
@@ -1418,10 +1418,10 @@ public class CardDbAdapter {
 			cursor = builder.query(mDb, columns, selection, selectionArgs, KEY_NAME, null, KEY_NAME);
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 
 		if (!cursor.moveToFirst()) {
@@ -1554,10 +1554,10 @@ public class CardDbAdapter {
 			mCursor.close();
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 
 		return name;
@@ -1575,10 +1575,10 @@ public class CardDbAdapter {
 			mCursor.close();
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 
 		return mID;
@@ -1596,10 +1596,10 @@ public class CardDbAdapter {
 			mCursor.close();
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 
 		return name;
@@ -1617,10 +1617,10 @@ public class CardDbAdapter {
 			mCursor.close();
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 
 		return name;
@@ -1644,10 +1644,10 @@ public class CardDbAdapter {
 			}
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		return false;
 	}
@@ -1675,11 +1675,21 @@ public class CardDbAdapter {
 			}
 		}
 		catch (SQLiteException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		catch (IllegalStateException e) {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			showDbErrorToast();
 		}
 		return null;
+	}
+	
+	private void showDbErrorToast() {
+		try {
+			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+		}
+		catch (RuntimeException re) {
+			//Eat it; this will happen if we try to toast in a non-UI thread.
+			//It can happen when we get an error in autocomplete.
+		}
 	}
 }

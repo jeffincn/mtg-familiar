@@ -136,6 +136,8 @@ public class RulesActivity extends FragmentActivity {
 			try {
 				if (c.getCount() > 0) {
 					c.moveToFirst();
+					// throw this exception to test the dialog
+					// throw(new SQLiteDatabaseCorruptException("seriously"));
 					while (!c.isAfterLast()) {
 						if (isGlossary) {
 							rules.add(new GlossaryItem(c.getString(c.getColumnIndex(CardDbAdapter.KEY_TERM)), c.getString(c

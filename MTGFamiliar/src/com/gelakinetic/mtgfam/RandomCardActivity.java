@@ -25,26 +25,31 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.support.v4.app.FragmentActivity;
-import android.text.Html;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.Window;
+import android.widget.TextView;
 
 public class RandomCardActivity extends FragmentActivity {
 	private static final int		RULESDIALOG				= 0;
 	protected static final int	MOMIR_IMAGE				= 1;
 	protected static final int	STONEHEWER_IMAGE	= 2;
 	protected static final int	JHOIRA_IMAGE			= 3;
+	protected static final int	CORRUPTION = 4;
 	private CardDbAdapter				mDbAdapter;
 	private Random							rand;
 	private String							name;
@@ -106,17 +111,23 @@ public class RandomCardActivity extends FragmentActivity {
 
 				String[] returnTypes = new String[] { CardDbAdapter.KEY_NAME };
 
-				Cursor doods = mDbAdapter.Search(null, null, "Creature", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-						CardDbAdapter.NOONECARES, null, cmc, "=", null, null, null, null, 0, 0, false, returnTypes, true);
+				try {
+					Cursor doods = mDbAdapter.Search(null, null, "Creature", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
+							CardDbAdapter.NOONECARES, null, cmc, "=", null, null, null, null, 0, 0, false, returnTypes, true);
 
-				int pos = rand.nextInt(doods.getCount());
-				doods.moveToPosition(pos);
-				name = doods.getString(doods.getColumnIndex(CardDbAdapter.KEY_NAME));
-				doods.close();
-
-				Intent i = new Intent(mCtx, ResultListActivity.class);
-				i.putExtra("id", mDbAdapter.fetchIdByName(name));
-				startActivityForResult(i, 0);
+					int pos = rand.nextInt(doods.getCount());
+					doods.moveToPosition(pos);
+					name = doods.getString(doods.getColumnIndex(CardDbAdapter.KEY_NAME));
+					doods.close();
+	
+					Intent i = new Intent(mCtx, ResultListActivity.class);
+					i.putExtra("id", mDbAdapter.fetchIdByName(name));
+					startActivityForResult(i, 0);
+				}
+				catch (SQLiteDatabaseCorruptException e) {
+					showDialog(CORRUPTION);
+					return;
+				}
 			}
 		});
 
@@ -133,17 +144,23 @@ public class RandomCardActivity extends FragmentActivity {
 
 				String[] returnTypes = new String[] { CardDbAdapter.KEY_NAME };
 
-				Cursor equipment = mDbAdapter.Search(null, null, "Equipment", "wubrgl", 0, null, CardDbAdapter.NOONECARES,
-						null, CardDbAdapter.NOONECARES, null, cmc + 1, "<", null, null, null, null, 0, 0, false, returnTypes, true);
+				try {
+					Cursor equipment = mDbAdapter.Search(null, null, "Equipment", "wubrgl", 0, null, CardDbAdapter.NOONECARES,
+							null, CardDbAdapter.NOONECARES, null, cmc + 1, "<", null, null, null, null, 0, 0, false, returnTypes, true);
 
-				int pos = rand.nextInt(equipment.getCount());
-				equipment.moveToPosition(pos);
-				name = equipment.getString(equipment.getColumnIndex(CardDbAdapter.KEY_NAME));
-				equipment.close();
-
-				Intent i = new Intent(mCtx, ResultListActivity.class);
-				i.putExtra("id", mDbAdapter.fetchIdByName(name));
-				startActivityForResult(i, 0);
+					int pos = rand.nextInt(equipment.getCount());
+					equipment.moveToPosition(pos);
+					name = equipment.getString(equipment.getColumnIndex(CardDbAdapter.KEY_NAME));
+					equipment.close();
+	
+					Intent i = new Intent(mCtx, ResultListActivity.class);
+					i.putExtra("id", mDbAdapter.fetchIdByName(name));
+					startActivityForResult(i, 0);
+				}
+				catch (SQLiteDatabaseCorruptException e) {
+					showDialog(CORRUPTION);
+					return;
+				}
 			}
 		});
 
@@ -153,31 +170,37 @@ public class RandomCardActivity extends FragmentActivity {
 
 				String[] returnTypes = new String[] { CardDbAdapter.KEY_NAME };
 
-				Cursor instants = mDbAdapter.Search(null, null, "instant", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-						CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, false, returnTypes, true);
+				try {
+					Cursor instants = mDbAdapter.Search(null, null, "instant", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
+							CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, false, returnTypes, true);
 
-				// Get 3 random, distinct numbers
-				int pos[] = new int[3];
-				pos[0] = rand.nextInt(instants.getCount());
-				pos[1] = rand.nextInt(instants.getCount());
-				while (pos[0] == pos[1]) {
+					// Get 3 random, distinct numbers
+					int pos[] = new int[3];
+					pos[0] = rand.nextInt(instants.getCount());
 					pos[1] = rand.nextInt(instants.getCount());
-				}
-				pos[2] = rand.nextInt(instants.getCount());
-				while (pos[0] == pos[2] || pos[1] == pos[2]) {
+					while (pos[0] == pos[1]) {
+						pos[1] = rand.nextInt(instants.getCount());
+					}
 					pos[2] = rand.nextInt(instants.getCount());
+					while (pos[0] == pos[2] || pos[1] == pos[2]) {
+						pos[2] = rand.nextInt(instants.getCount());
+					}
+	
+					String names[] = new String[3];
+					Intent intent = new Intent(mCtx, ResultListActivity.class);
+					for (int i = 0; i < 3; i++) {
+						instants.moveToPosition(pos[i]);
+						names[i] = instants.getString(instants.getColumnIndex(CardDbAdapter.KEY_NAME));
+						intent.putExtra("id" + i, mDbAdapter.fetchIdByName(names[i]));
+					}
+					instants.close();
+	
+					startActivityForResult(intent, 0);
 				}
-
-				String names[] = new String[3];
-				Intent intent = new Intent(mCtx, ResultListActivity.class);
-				for (int i = 0; i < 3; i++) {
-					instants.moveToPosition(pos[i]);
-					names[i] = instants.getString(instants.getColumnIndex(CardDbAdapter.KEY_NAME));
-					intent.putExtra("id" + i, mDbAdapter.fetchIdByName(names[i]));
+				catch (SQLiteDatabaseCorruptException e) {
+					showDialog(CORRUPTION);
+					return;
 				}
-				instants.close();
-
-				startActivityForResult(intent, 0);
 			}
 		});
 
@@ -187,31 +210,37 @@ public class RandomCardActivity extends FragmentActivity {
 
 				String[] returnTypes = new String[] { CardDbAdapter.KEY_NAME };
 
-				Cursor sorceries = mDbAdapter.Search(null, null, "sorcery", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-						CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, false, returnTypes, true);
-
-				// Get 3 random, distinct numbers
-				int pos[] = new int[3];
-				pos[0] = rand.nextInt(sorceries.getCount());
-				pos[1] = rand.nextInt(sorceries.getCount());
-				while (pos[0] == pos[1]) {
+				try {
+					Cursor sorceries = mDbAdapter.Search(null, null, "sorcery", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
+							CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, false, returnTypes, true);
+	
+					// Get 3 random, distinct numbers
+					int pos[] = new int[3];
+					pos[0] = rand.nextInt(sorceries.getCount());
 					pos[1] = rand.nextInt(sorceries.getCount());
-				}
-				pos[2] = rand.nextInt(sorceries.getCount());
-				while (pos[0] == pos[2] || pos[1] == pos[2]) {
+					while (pos[0] == pos[1]) {
+						pos[1] = rand.nextInt(sorceries.getCount());
+					}
 					pos[2] = rand.nextInt(sorceries.getCount());
+					while (pos[0] == pos[2] || pos[1] == pos[2]) {
+						pos[2] = rand.nextInt(sorceries.getCount());
+					}
+	
+					String names[] = new String[3];
+					Intent intent = new Intent(mCtx, ResultListActivity.class);
+					for (int i = 0; i < 3; i++) {
+						sorceries.moveToPosition(pos[i]);
+						names[i] = sorceries.getString(sorceries.getColumnIndex(CardDbAdapter.KEY_NAME));
+						intent.putExtra("id" + i, mDbAdapter.fetchIdByName(names[i]));
+					}
+					sorceries.close();
+	
+					startActivityForResult(intent, 0);
 				}
-
-				String names[] = new String[3];
-				Intent intent = new Intent(mCtx, ResultListActivity.class);
-				for (int i = 0; i < 3; i++) {
-					sorceries.moveToPosition(pos[i]);
-					names[i] = sorceries.getString(sorceries.getColumnIndex(CardDbAdapter.KEY_NAME));
-					intent.putExtra("id" + i, mDbAdapter.fetchIdByName(names[i]));
+				catch (SQLiteDatabaseCorruptException e) {
+					showDialog(CORRUPTION);
+					return;
 				}
-				sorceries.close();
-
-				startActivityForResult(intent, 0);
 			}
 		});
 
@@ -303,6 +332,23 @@ public class RandomCardActivity extends FragmentActivity {
 
 			ImageView image = (ImageView) d.findViewById(R.id.cardimage);
 			image.setImageResource(R.drawable.jhoira_full);
+		}
+		else if (id == CORRUPTION) {
+			View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
+			TextView text = (TextView)dialogLayout.findViewById(R.id.corruption_message);
+			text.setText(Html.fromHtml(getString(R.string.corruption_error)));
+			text.setMovementMethod(LinkMovementMethod.getInstance());
+			
+			d = new AlertDialog.Builder(this)
+				.setTitle(R.string.corruption_error_title)
+				.setView(dialogLayout)
+				.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						finish();
+					}
+				})
+				.setCancelable(false)
+				.create();
 		}
 		return d;
 	}

@@ -32,6 +32,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.text.Html;
@@ -65,6 +66,7 @@ public class RulesActivity extends FragmentActivity {
 	private static final int SEARCH = 0;
 	private static final int RESULT_NORMAL = 1;
 	private static final int RESULT_QUIT_TO_MAIN = 2;
+	private static final int CORRUPTION = 3;
 	private static final int ARBITRARY_REQUEST_CODE = 23;
 
 	private CardDbAdapter mDbHelper;
@@ -131,63 +133,69 @@ public class RulesActivity extends FragmentActivity {
 			clickable = false;
 		}
 		if (c != null) {
-			if (c.getCount() > 0) {
-				c.moveToFirst();
-				while (!c.isAfterLast()) {
-					if (isGlossary) {
-						rules.add(new GlossaryItem(c.getString(c.getColumnIndex(CardDbAdapter.KEY_TERM)), c.getString(c
-								.getColumnIndex(CardDbAdapter.KEY_DEFINITION))));
-					}
-					else {
-						rules.add(new RuleItem(c.getInt(c.getColumnIndex(CardDbAdapter.KEY_CATEGORY)), c.getInt(c
-								.getColumnIndex(CardDbAdapter.KEY_SUBCATEGORY)),
-								c.getString(c.getColumnIndex(CardDbAdapter.KEY_ENTRY)), c.getString(c
-										.getColumnIndex(CardDbAdapter.KEY_RULE_TEXT))));
-					}
-					c.moveToNext();
-				}
-				c.close();
-				if (!isGlossary && category == -1 && keyword == null) {
-					// If it's the initial rules page, add a Glossary link to the end
-					rules.add(new GlossaryItem("Glossary", "", true));
-				}
-				int listItemResource = R.layout.rules_list_item;
-				if (category >= 0 && subcategory < 0) {
-					listItemResource = R.layout.rules_list_subcategory_item;
-				}
-				// These cases can't be exclusive; otherwise keyword search from
-				// anything but a subcategory will use the wrong layout
-				if (isGlossary || subcategory >= 0 || keyword != null) {
-					listItemResource = R.layout.rules_list_detail_item;
-				}
-				adapter = new RulesListAdapter(this, listItemResource, rules);
-				list.setAdapter(adapter);
-
-				if (clickable) {
-					// This only happens for rule items with no subcategory, so the cast
-					// should be safe
-					list.setOnItemClickListener(new OnItemClickListener() {
-						public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-							DisplayItem item = rules.get(position);
-							Intent i = new Intent(RulesActivity.this, RulesActivity.class);
-							if (RuleItem.class.isInstance(item)) {
-								RuleItem ri = (RuleItem) item;
-								i.putExtra(CATEGORY_KEY, ri.getCategory());
-								i.putExtra(SUBCATEGORY_KEY, ri.getSubcategory());
-							}
-							else if (GlossaryItem.class.isInstance(item)) {
-								i.putExtra(GLOSSARY_KEY, true);
-							}
-							// The else case shouldn't happen, but meh
-							startActivityForResult(i, ARBITRARY_REQUEST_CODE);
+			try {
+				if (c.getCount() > 0) {
+					c.moveToFirst();
+					while (!c.isAfterLast()) {
+						if (isGlossary) {
+							rules.add(new GlossaryItem(c.getString(c.getColumnIndex(CardDbAdapter.KEY_TERM)), c.getString(c
+									.getColumnIndex(CardDbAdapter.KEY_DEFINITION))));
 						}
-					});
+						else {
+							rules.add(new RuleItem(c.getInt(c.getColumnIndex(CardDbAdapter.KEY_CATEGORY)), c.getInt(c
+									.getColumnIndex(CardDbAdapter.KEY_SUBCATEGORY)),
+									c.getString(c.getColumnIndex(CardDbAdapter.KEY_ENTRY)), c.getString(c
+											.getColumnIndex(CardDbAdapter.KEY_RULE_TEXT))));
+						}
+						c.moveToNext();
+					}
+					c.close();
+					if (!isGlossary && category == -1 && keyword == null) {
+						// If it's the initial rules page, add a Glossary link to the end
+						rules.add(new GlossaryItem("Glossary", "", true));
+					}
+					int listItemResource = R.layout.rules_list_item;
+					if (category >= 0 && subcategory < 0) {
+						listItemResource = R.layout.rules_list_subcategory_item;
+					}
+					// These cases can't be exclusive; otherwise keyword search from
+					// anything but a subcategory will use the wrong layout
+					if (isGlossary || subcategory >= 0 || keyword != null) {
+						listItemResource = R.layout.rules_list_detail_item;
+					}
+					adapter = new RulesListAdapter(this, listItemResource, rules);
+					list.setAdapter(adapter);
+	
+					if (clickable) {
+						// This only happens for rule items with no subcategory, so the cast
+						// should be safe
+						list.setOnItemClickListener(new OnItemClickListener() {
+							public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+								DisplayItem item = rules.get(position);
+								Intent i = new Intent(RulesActivity.this, RulesActivity.class);
+								if (RuleItem.class.isInstance(item)) {
+									RuleItem ri = (RuleItem) item;
+									i.putExtra(CATEGORY_KEY, ri.getCategory());
+									i.putExtra(SUBCATEGORY_KEY, ri.getSubcategory());
+								}
+								else if (GlossaryItem.class.isInstance(item)) {
+									i.putExtra(GLOSSARY_KEY, true);
+								}
+								// The else case shouldn't happen, but meh
+								startActivityForResult(i, ARBITRARY_REQUEST_CODE);
+							}
+						});
+					}
+				}
+				else {
+					c.close();
+					Toast.makeText(this, "No results found.", Toast.LENGTH_SHORT).show();
+					this.finish();
 				}
 			}
-			else {
-				c.close();
-				Toast.makeText(this, "No results found.", Toast.LENGTH_SHORT).show();
-				this.finish();
+			catch (SQLiteDatabaseCorruptException e) {
+				showDialog(CORRUPTION);
+				return;
 			}
 		}
 		else {
@@ -285,6 +293,23 @@ public class RulesActivity extends FragmentActivity {
 				}
 			});
 			result = builder.create();
+		}
+		else if (id == CORRUPTION) {
+			View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
+			TextView text = (TextView)dialogLayout.findViewById(R.id.corruption_message);
+			text.setText(Html.fromHtml(getString(R.string.corruption_error)));
+			text.setMovementMethod(LinkMovementMethod.getInstance());
+			
+			result = new AlertDialog.Builder(this)
+				.setTitle(R.string.corruption_error_title)
+				.setView(dialogLayout)
+				.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						finish();
+					}
+				})
+				.setCancelable(false)
+				.create();
 		}
 
 		return result;

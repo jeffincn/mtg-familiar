@@ -25,10 +25,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,6 +49,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.DialogInterface.OnClickListener;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Bitmap;
@@ -62,7 +61,9 @@ import android.support.v4.app.FragmentActivity;
 import android.text.ClipboardManager;
 import android.text.Html;
 import android.text.Html.ImageGetter;
+import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
@@ -96,7 +97,8 @@ public class CardViewActivity extends FragmentActivity {
 	private static final int		GETIMAGE			= 2;
 	private static final int		CHANGESET			= 3;
 	private static final int		CARDRULINGS		= 4;
-
+	private static final int		BROKEN_IMAGE	= 5;
+	
 	// Where the card image is loaded to
 	private static final int		MAINPAGE			= 0;
 	private static final int		DIALOG				= 1;
@@ -224,6 +226,12 @@ public class CardViewActivity extends FragmentActivity {
 		}
 		catch (IllegalArgumentException e) {
 		}
+		try {
+			dismissDialog(BROKEN_IMAGE);
+		}
+		catch (IllegalArgumentException e) {
+		}
+		
 		MyApp appState = ((MyApp) getApplicationContext());
 		if (appState.getState() == QUITTOSEARCH) {
 			this.finish();
@@ -505,6 +513,7 @@ public class CardViewActivity extends FragmentActivity {
 		protected Long doInBackground(String... params) {
 			error = null;
 			try {
+				
 				String picurl;
 				if (setCode.equals("PP2")) {
 					picurl = "http://magiccards.info/extras/plane/planechase-2012-edition/" + cardName + ".jpg";
@@ -556,6 +565,9 @@ public class CardViewActivity extends FragmentActivity {
 				// Was using the new style constructor with the resources causing trouble?
 				cardPicture = new BitmapDrawable(/*mCtx.getResources(),*/ Bitmap.createScaledBitmap(cardPicture.getBitmap(),
 						newWidth, newHeight, true));
+				
+				// Throw this exception to test the dialog
+				// throw(new NullPointerException("seriously"));
 			}
 			catch (FileNotFoundException e) {
 				// internet works, image not found
@@ -576,7 +588,7 @@ public class CardViewActivity extends FragmentActivity {
 				error = "No Internet Connection";
 			}
 			catch (NullPointerException e) {
-				error = "Image Not Found";
+				error = "NPE: Image Not Found";
 			}
 			return null;
 		}
@@ -597,7 +609,12 @@ public class CardViewActivity extends FragmentActivity {
 				}
 			}
 			else {
-				Toast.makeText(mCtx, error, Toast.LENGTH_SHORT).show();
+				if(error.equalsIgnoreCase("NPE: Image Not Found")){
+					showDialog(BROKEN_IMAGE);
+				}
+				else{
+					Toast.makeText(mCtx, error, Toast.LENGTH_SHORT).show();
+				}
 				if (loadTo == MAINPAGE) {
 					cardpic.setVisibility(View.GONE);
 					name.setVisibility(View.VISIBLE);
@@ -804,6 +821,20 @@ public class CardViewActivity extends FragmentActivity {
 			DialogImageView.setImageDrawable(cardPicture);
 
 			return dialog;
+		}
+		else if (id == BROKEN_IMAGE){
+	    View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
+			TextView text = (TextView)dialogLayout.findViewById(R.id.corruption_message);
+			text.setText(Html.fromHtml(getString(R.string.brokenImageString)));
+			text.setMovementMethod(LinkMovementMethod.getInstance());
+			
+			dialog = new AlertDialog.Builder(this)
+				.setTitle(R.string.corruption_error_title)
+				.setView(dialogLayout)
+				.setPositiveButton(android.R.string.ok, null)
+				.create();
+			
+	    return dialog;
 		}
 		else if (id == GETLEGALITY) {
 			if (formats == null) {

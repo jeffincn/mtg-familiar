@@ -19,6 +19,10 @@
         If the problem continues to persist, please send us an email at &lt;a href="mailto:mtg.familiar@gmail.com">mtg.familiar@gmail.com&lt;/a>
         and let us know what\'s happening.</string>
     
+    <string name="brokenImageString">Congratulations, you found a NullPointerException! This should never happen, and we\'re not sure how, or why,
+		you found it. Please send us an email at &lt;a href="mailto:mtg.familiar@gmail.com">mtg.familiar@gmail.com&lt;/a> so we can track this bug
+		and fix it. Thanks!</string>
+    
     <string name="plus_str">+</string>
     <string name="minus_str">-</string>
     <string name="zero_str">0</string>

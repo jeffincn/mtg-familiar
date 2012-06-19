@@ -50,7 +50,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.DialogInterface.OnClickListener;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Bitmap;
@@ -62,9 +61,7 @@ import android.support.v4.app.FragmentActivity;
 import android.text.ClipboardManager;
 import android.text.Html;
 import android.text.Html.ImageGetter;
-import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
-import android.text.util.Linkify;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
@@ -132,7 +129,7 @@ public class CardViewActivity extends FragmentActivity {
 	private TCGPlayerXMLHandler	XMLhandler;
 	public ArrayList<Ruling>		rulingsArrayList;
 	private ProgressDialog			progDialog;
-	AsyncTask										asyncTask;
+	AsyncTask<String, Integer, Long>	asyncTask;
 
 	// Card info
 	private long								cardID;
@@ -195,10 +192,6 @@ public class CardViewActivity extends FragmentActivity {
 		mDbHelper = new CardDbAdapter(this);
 		mDbHelper.open();
 
-		setInfoFromID(cardID);
-
-		MenuFragmentCompat.init(this, R.menu.card_menu, "card_view_menu_fragment");
-
 		progDialog = new ProgressDialog(this);
 		progDialog.setTitle("");
 		progDialog.setMessage("Loading. Please wait...");
@@ -210,10 +203,10 @@ public class CardViewActivity extends FragmentActivity {
 				asyncTask.cancel(true);
 			}
 		});
-////		show(Context context, CharSequence title, CharSequence message, boolean indeterminate, boolean cancelable, DialogInterface.OnCancelListener cancelListener) 
-//			ProgressDialog.show(this, "", "Loading. Please wait...", true, true, 
-//		});
-//		progDialog.setCancelable(true);
+		
+		MenuFragmentCompat.init(this, R.menu.card_menu, "card_view_menu_fragment");
+
+		setInfoFromID(cardID);
 	}
 
 	@Override
@@ -433,7 +426,8 @@ public class CardViewActivity extends FragmentActivity {
 			((FrameLayout) findViewById(R.id.frameLayout1)).setVisibility(View.GONE);
 
 			progDialog.show();
-			new FetchPictureTask().execute((String[]) null);
+			asyncTask = new FetchPictureTask();
+			asyncTask.execute((String[]) null);
 		}
 		else {
 			((ImageView) findViewById(R.id.cardpic)).setVisibility(View.GONE);

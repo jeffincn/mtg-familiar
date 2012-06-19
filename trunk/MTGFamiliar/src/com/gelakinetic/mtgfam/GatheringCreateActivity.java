@@ -83,18 +83,24 @@ public class GatheringCreateActivity extends FragmentActivity {
 		mainLayout = (LinearLayout) findViewById(R.id.gathering_player_list);
 		
 		mCtx = this;
+	
+		File path = new File(getFilesDir(), FOLDERPATH);
+		File defaultGathering = new File(path, DEFAULTFILE);
+		if (defaultGathering.exists())
+		{	
+			String defaultG = getDefaultGathering();
+			gatheringName.setText(ReadGatheringNameFromXML(defaultG));
+			ArrayList<PlayerData> players = ReadGatheringXML(defaultG);
+			for(PlayerData player : players){
+				AddPlayerRowFromData(player);
+			}
+		}
 		
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
-		File defaultGathering = new File(FOLDERPATH, "default.info");
-		if (defaultGathering.exists())
-		{
-			
-		}
 		
 		MyApp appState = ((MyApp) getApplicationContext());
 		appState.setState(0);
@@ -222,6 +228,47 @@ public class GatheringCreateActivity extends FragmentActivity {
 		return returnList;
 	}
 	
+	private String ReadGatheringNameFromXML(String _gatheringFile){
+		File path = new File(getFilesDir(), FOLDERPATH);
+		File gathering = new File(path, _gatheringFile);
+		
+		return ReadGatheringNameFromXML(gathering);
+	}
+	
+	private String ReadGatheringNameFromXML(File _gatheringFile){
+		String returnString = "";
+		Document dom = null;
+		
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		
+		try {
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			dom = db.parse(_gatheringFile);
+		}catch(ParserConfigurationException pce) {
+			//pce.printStackTrace();
+			return returnString;
+		}catch(SAXException se) {
+			//se.printStackTrace();
+			return returnString;
+		}catch(IOException ioe) {
+			//.printStackTrace();
+			return returnString;
+		}
+		
+		if (dom == null)
+			return returnString;
+		
+		Element docEle = dom.getDocumentElement();
+		
+		//Element playerList = (Element) docEle.getElementsByTagName("players").item(0);
+		//int numOfPlayers = Integer.parseInt(playerList.getAttribute("number"));
+		
+		Element name = (Element) docEle.getElementsByTagName("name").item(0);
+		String gatheringName = name.getChildNodes().item(0).getNodeValue();		
+		
+		return gatheringName;
+	}
+	
 	private String writeGatheringXML(){
 		int players = mainLayout.getChildCount();
 		
@@ -233,7 +280,7 @@ public class GatheringCreateActivity extends FragmentActivity {
 	        
 	        serializer.startTag("", "gathering");
 	        serializer.startTag("", "name");
-	        serializer.text(gatheringName.getText().toString());
+	        serializer.text(gatheringName.getText().toString().trim());
 	        serializer.endTag("", "name");
 	        
 	        serializer.startTag("", "players");
@@ -246,7 +293,7 @@ public class GatheringCreateActivity extends FragmentActivity {
 	        	String defaultname = ((nameSelection.getCheckedRadioButtonId() == R.id.defaultNameRadio) ? "true" : "false");
 	        	
 	        	EditText customName = (EditText) player.findViewById(R.id.custom_name);
-	        	String name = customName.getText().toString();
+	        	String name = customName.getText().toString().trim();
 	        	if (name == null)
 	        		name = "";
 	        	
@@ -303,7 +350,26 @@ public class GatheringCreateActivity extends FragmentActivity {
 		return defaultGathering;
 	}
 	
-	private ArrayList<String> getGatheringList(){
+	private void AddPlayerRowFromData(PlayerData _player){
+		LayoutInflater inf = getLayoutInflater();
+		View v = inf.inflate(R.layout.gathering_create_player_row, null);
+		
+		if (!_player.getIsDefaultName()){
+			TextView name = (TextView) v.findViewById(R.id.custom_name);
+			name.setText(_player.customName);
+			
+			RadioGroup nameGroup = (RadioGroup) v.findViewById(R.id.radioGroupName);
+			nameGroup.check(R.id.customNameRadio);
+		}
+		
+		
+		TextView life = (TextView) v.findViewById(R.id.starting_life);
+		life.setText(String.valueOf(_player.getStartingLife()));
+		
+		mainLayout.addView(v);
+	}
+	
+	private ArrayList<String> getGatheringFileList(){
 		ArrayList<String> returnList = new ArrayList<String>();
 		
 		File path = new File(getFilesDir(), FOLDERPATH);
@@ -352,7 +418,7 @@ public class GatheringCreateActivity extends FragmentActivity {
 					File file = new File(path,  gathering + ".xml");
 					
 					String string = writeGatheringXML();
-					
+
 					BufferedWriter out = new BufferedWriter(new FileWriter(file));
 				
 					out.write(string);
@@ -361,7 +427,7 @@ public class GatheringCreateActivity extends FragmentActivity {
 					//Write out the new default
 					File namedDefault = new File(path, DEFAULTFILE);
 					out = new BufferedWriter(new FileWriter(namedDefault));
-					out.write(gathering);
+					out.write(file.getName());
 					out.close();
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
@@ -371,14 +437,23 @@ public class GatheringCreateActivity extends FragmentActivity {
 
 				return true;
 			case R.id.load_gathering:
-				ArrayList<String> gatherings = getGatheringList();
+				ArrayList<String> gatherings = getGatheringFileList();
 				final String[] fGatherings = gatherings.toArray(new String[gatherings.size()]);
+				final String[] properNames = new String[gatherings.size()];
+				for(int idx = 0; idx < gatherings.size(); idx++){
+					properNames[idx] = ReadGatheringNameFromXML(gatherings.get(idx));
+				}
 				
 				AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
 				builder.setTitle("Load a Gathering");
-				builder.setItems(fGatherings, new DialogInterface.OnClickListener() {
+				builder.setItems(properNames, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialogInterface, int item) {
-						ReadGatheringXML(fGatherings[item]);
+						gatheringName.setText(properNames[item]);
+						
+						ArrayList<PlayerData> players = ReadGatheringXML(fGatherings[item]);
+						for(PlayerData player : players){
+							AddPlayerRowFromData(player);
+						}
 						return;
 					}
 				});

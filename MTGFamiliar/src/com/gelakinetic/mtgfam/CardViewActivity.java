@@ -47,6 +47,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
@@ -98,7 +99,7 @@ public class CardViewActivity extends FragmentActivity {
 	private static final int		CHANGESET			= 3;
 	private static final int		CARDRULINGS		= 4;
 	private static final int		BROKEN_IMAGE	= 5;
-	
+
 	// Where the card image is loaded to
 	private static final int		MAINPAGE			= 0;
 	private static final int		DIALOG				= 1;
@@ -131,6 +132,7 @@ public class CardViewActivity extends FragmentActivity {
 	private TCGPlayerXMLHandler	XMLhandler;
 	public ArrayList<Ruling>		rulingsArrayList;
 	private ProgressDialog			progDialog;
+	AsyncTask										asyncTask;
 
 	// Card info
 	private long								cardID;
@@ -196,6 +198,22 @@ public class CardViewActivity extends FragmentActivity {
 		setInfoFromID(cardID);
 
 		MenuFragmentCompat.init(this, R.menu.card_menu, "card_view_menu_fragment");
+
+		progDialog = new ProgressDialog(this);
+		progDialog.setTitle("");
+		progDialog.setMessage("Loading. Please wait...");
+		progDialog.setIndeterminate(true);
+		progDialog.setCancelable(true);
+		progDialog.setOnCancelListener(new OnCancelListener() {
+			public void onCancel(DialogInterface pd) {
+				// TODO when the dialog is dismissed
+				asyncTask.cancel(true);
+			}
+		});
+////		show(Context context, CharSequence title, CharSequence message, boolean indeterminate, boolean cancelable, DialogInterface.OnCancelListener cancelListener) 
+//			ProgressDialog.show(this, "", "Loading. Please wait...", true, true, 
+//		});
+//		progDialog.setCancelable(true);
 	}
 
 	@Override
@@ -231,7 +249,7 @@ public class CardViewActivity extends FragmentActivity {
 		}
 		catch (IllegalArgumentException e) {
 		}
-		
+
 		MyApp appState = ((MyApp) getApplicationContext());
 		if (appState.getState() == QUITTOSEARCH) {
 			this.finish();
@@ -262,21 +280,21 @@ public class CardViewActivity extends FragmentActivity {
 		number = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NUMBER));
 
 		switch ((char) c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY))) {
-		case 'C':
-			set.setTextColor(this.getResources().getColor(R.color.common));
-			break;
-		case 'U':
-			set.setTextColor(this.getResources().getColor(R.color.uncommon));
-			break;
-		case 'R':
-			set.setTextColor(this.getResources().getColor(R.color.rare));
-			break;
-		case 'M':
-			set.setTextColor(this.getResources().getColor(R.color.mythic));
-			break;
-		case 'T':
-			set.setTextColor(this.getResources().getColor(R.color.timeshifted));
-			break;
+			case 'C':
+				set.setTextColor(this.getResources().getColor(R.color.common));
+				break;
+			case 'U':
+				set.setTextColor(this.getResources().getColor(R.color.uncommon));
+				break;
+			case 'R':
+				set.setTextColor(this.getResources().getColor(R.color.rare));
+				break;
+			case 'M':
+				set.setTextColor(this.getResources().getColor(R.color.mythic));
+				break;
+			case 'T':
+				set.setTextColor(this.getResources().getColor(R.color.timeshifted));
+				break;
 		}
 
 		String sCost = c.getString(c.getColumnIndex(CardDbAdapter.KEY_MANACOST));
@@ -414,7 +432,6 @@ public class CardViewActivity extends FragmentActivity {
 			artist.setVisibility(View.GONE);
 			((FrameLayout) findViewById(R.id.frameLayout1)).setVisibility(View.GONE);
 
-			progDialog = ProgressDialog.show(this, "", "Loading. Please wait...", true);
 			progDialog.show();
 			new FetchPictureTask().execute((String[]) null);
 		}
@@ -456,7 +473,7 @@ public class CardViewActivity extends FragmentActivity {
 		}
 		return false;
 	}
-	
+
 	private class FetchLegalityTask extends AsyncTask<String, Integer, Long> {
 
 		@Override
@@ -470,18 +487,18 @@ public class CardViewActivity extends FragmentActivity {
 			for (int i = 0; i < cFormats.getCount(); i++) {
 				formats[i] = cFormats.getString(cFormats.getColumnIndex(CardDbAdapter.KEY_NAME));
 				switch (mDbHelper.checkLegality(cardName, formats[i])) {
-				case CardDbAdapter.LEGAL:
-					legalities[i] = "Legal";
-					break;
-				case CardDbAdapter.RESTRICTED:
-					legalities[i] = "Restricted";
-					break;
-				case CardDbAdapter.BANNED:
-					legalities[i] = "Banned";
-					break;
-				default:
-					legalities[i] = "Error";
-					break;
+					case CardDbAdapter.LEGAL:
+						legalities[i] = "Legal";
+						break;
+					case CardDbAdapter.RESTRICTED:
+						legalities[i] = "Restricted";
+						break;
+					case CardDbAdapter.BANNED:
+						legalities[i] = "Banned";
+						break;
+					default:
+						legalities[i] = "Error";
+						break;
 				}
 				cFormats.moveToNext();
 			}
@@ -503,6 +520,11 @@ public class CardViewActivity extends FragmentActivity {
 			showDialog(GETLEGALITY);
 		}
 
+		@Override
+		protected void onCancelled() {
+			// TODO something when canceled?
+		}
+
 	}
 
 	private class FetchPictureTask extends AsyncTask<String, Integer, Long> {
@@ -513,11 +535,12 @@ public class CardViewActivity extends FragmentActivity {
 		protected Long doInBackground(String... params) {
 			error = null;
 			try {
-				
+
 				String picurl;
 				if (setCode.equals("PP2")) {
 					picurl = "http://magiccards.info/extras/plane/planechase-2012-edition/" + cardName + ".jpg";
-					picurl = picurl.replace(" ", "-").replace("Æ", "Ae").replace("?", "").replace(",", "").replace("'", "").replace("!", "");
+					picurl = picurl.replace(" ", "-").replace("Æ", "Ae").replace("?", "").replace(",", "").replace("'", "")
+							.replace("!", "");
 				}
 				else if (setCode.equals("PCP")) {
 					if (cardName.equalsIgnoreCase("tazeem")) {
@@ -535,11 +558,13 @@ public class CardViewActivity extends FragmentActivity {
 					else {
 						picurl = "http://magiccards.info/extras/plane/planechase/" + cardName + ".jpg";
 					}
-					picurl = picurl.replace(" ", "-").replace("Æ", "Ae").replace("?", "").replace(",", "").replace("'", "").replace("!", "");
+					picurl = picurl.replace(" ", "-").replace("Æ", "Ae").replace("?", "").replace(",", "").replace("'", "")
+							.replace("!", "");
 				}
 				else if (setCode.equals("ARS")) {
 					picurl = "http://magiccards.info/extras/scheme/archenemy/" + cardName + ".jpg";
-					picurl = picurl.replace(" ", "-").replace("Æ", "Ae").replace("?", "").replace(",", "").replace("'", "").replace("!", "");
+					picurl = picurl.replace(" ", "-").replace("Æ", "Ae").replace("?", "").replace(",", "").replace("'", "")
+							.replace("!", "");
 				}
 				else {
 					picurl = "http://magiccards.info/scans/en/" + mtgi_code + "/" + number + ".jpg";
@@ -562,10 +587,9 @@ public class CardViewActivity extends FragmentActivity {
 				newWidth = Math.round(cardPicture.getIntrinsicWidth() * scale);
 				newHeight = Math.round(cardPicture.getIntrinsicHeight() * scale);
 
-				// Was using the new style constructor with the resources causing trouble?
-				cardPicture = new BitmapDrawable(/*mCtx.getResources(),*/ Bitmap.createScaledBitmap(cardPicture.getBitmap(),
+				cardPicture = new BitmapDrawable(mCtx.getResources(), Bitmap.createScaledBitmap(cardPicture.getBitmap(),
 						newWidth, newHeight, true));
-				
+
 				// Throw this exception to test the dialog
 				// throw(new NullPointerException("seriously"));
 			}
@@ -609,10 +633,10 @@ public class CardViewActivity extends FragmentActivity {
 				}
 			}
 			else {
-				if(error.equalsIgnoreCase("NPE: Image Not Found")){
+				if (error.equalsIgnoreCase("NPE: Image Not Found")) {
 					showDialog(BROKEN_IMAGE);
 				}
-				else{
+				else {
 					Toast.makeText(mCtx, error, Toast.LENGTH_SHORT).show();
 				}
 				if (loadTo == MAINPAGE) {
@@ -626,6 +650,22 @@ public class CardViewActivity extends FragmentActivity {
 					flavor.setVisibility(View.VISIBLE);
 					artist.setVisibility(View.VISIBLE);
 				}
+			}
+		}
+
+		@Override
+		protected void onCancelled() {
+			// TODO something when canceled?
+			if (loadTo == MAINPAGE) {
+				cardpic.setVisibility(View.GONE);
+				name.setVisibility(View.VISIBLE);
+				cost.setVisibility(View.VISIBLE);
+				type.setVisibility(View.VISIBLE);
+				set.setVisibility(View.VISIBLE);
+				ability.setVisibility(View.VISIBLE);
+				pt.setVisibility(View.VISIBLE);
+				flavor.setVisibility(View.VISIBLE);
+				artist.setVisibility(View.VISIBLE);
 			}
 		}
 	}
@@ -644,13 +684,14 @@ public class CardViewActivity extends FragmentActivity {
 				if (isTransformable(number, setCode) && number.contains("b")) {
 					tcgCardName = mDbHelper.getTransformName(setCode, number.replace("b", "a"));
 				}
-				else if(mDbHelper.isSplitCard(multiverseId)){
+				else if (mDbHelper.isSplitCard(multiverseId)) {
 					tcgCardName = mDbHelper.getSplitName(multiverseId);
 				}
 				else {
 					tcgCardName = cardName;
 				}
-				priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p=" + tcgCardName).replace(" ", "%20").replace("Æ", "Ae"));
+				priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p="
+						+ tcgCardName).replace(" ", "%20").replace("Æ", "Ae"));
 
 				// Get a SAXParser from the SAXPArserFactory.
 				SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -711,6 +752,11 @@ public class CardViewActivity extends FragmentActivity {
 			else {
 				Toast.makeText(mCtx, error, Toast.LENGTH_SHORT).show();
 			}
+		}
+
+		@Override
+		protected void onCancelled() {
+			// TODO something when canceled?
 		}
 	}
 
@@ -774,12 +820,6 @@ public class CardViewActivity extends FragmentActivity {
 			catch (IllegalArgumentException e) {
 			}
 
-			// if (rulingsArrayList.size() == 0) {
-			// Toast.makeText(mCtx, "No Rulings For This Card",
-			// Toast.LENGTH_SHORT).show();
-			// return;
-			// }
-
 			if (!error) {
 				showDialog(CARDRULINGS);
 			}
@@ -788,6 +828,10 @@ public class CardViewActivity extends FragmentActivity {
 			}
 		}
 
+		@Override
+		protected void onCancelled() {
+			// TODO something when canceled?
+		}
 	}
 
 	private static class Ruling {
@@ -822,19 +866,16 @@ public class CardViewActivity extends FragmentActivity {
 
 			return dialog;
 		}
-		else if (id == BROKEN_IMAGE){
-	    View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
-			TextView text = (TextView)dialogLayout.findViewById(R.id.corruption_message);
+		else if (id == BROKEN_IMAGE) {
+			View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
+			TextView text = (TextView) dialogLayout.findViewById(R.id.corruption_message);
 			text.setText(Html.fromHtml(getString(R.string.brokenImageString)));
 			text.setMovementMethod(LinkMovementMethod.getInstance());
-			
-			dialog = new AlertDialog.Builder(this)
-				.setTitle(R.string.corruption_error_title)
-				.setView(dialogLayout)
-				.setPositiveButton(android.R.string.ok, null)
-				.create();
-			
-	    return dialog;
+
+			dialog = new AlertDialog.Builder(this).setTitle(R.string.corruption_error_title).setView(dialogLayout)
+					.setPositiveButton(android.R.string.ok, null).create();
+
+			return dialog;
 		}
 		else if (id == GETLEGALITY) {
 			if (formats == null) {
@@ -971,21 +1012,21 @@ public class CardViewActivity extends FragmentActivity {
 	public boolean onContextItemSelected(MenuItem item) {
 		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 		switch (item.getItemId()) {
-		case R.id.copy:
-			String text = copyView.getText().toString();
+			case R.id.copy:
+				String text = copyView.getText().toString();
 
-			clipboard.setText(text);
-			return true;
+				clipboard.setText(text);
+				return true;
 
-		case R.id.copyall:
-			String cat = name.getText().toString() + '\n' + cost.getText().toString() + '\n' + type.getText().toString()
-					+ '\n' + set.getText().toString() + '\n' + ability.getText().toString() + '\n' + flavor.getText().toString()
-					+ '\n' + pt.getText().toString() + '\n' + artist.getText().toString();
+			case R.id.copyall:
+				String cat = name.getText().toString() + '\n' + cost.getText().toString() + '\n' + type.getText().toString()
+						+ '\n' + set.getText().toString() + '\n' + ability.getText().toString() + '\n'
+						+ flavor.getText().toString() + '\n' + pt.getText().toString() + '\n' + artist.getText().toString();
 
-			clipboard.setText(cat);
-			return true;
-		default:
-			return super.onContextItemSelected(item);
+				clipboard.setText(cat);
+				return true;
+			default:
+				return super.onContextItemSelected(item);
 		}
 	}
 
@@ -993,47 +1034,47 @@ public class CardViewActivity extends FragmentActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-		case R.id.image:
-			progDialog = ProgressDialog.show(this, "", "Loading. Please wait...", true);
-			progDialog.show();
-			new FetchPictureTask().execute((String[]) null);
-			return true;
-		case R.id.price:
-			progDialog = ProgressDialog.show(this, "", "Loading. Please wait...", true);
-			progDialog.show();
-			new FetchPriceTask().execute((String[]) null);
-			return true;
-		case R.id.changeset:
-			showDialog(CHANGESET);
-			return true;
-		case R.id.legality:
-			progDialog = ProgressDialog.show(this, "", "Loading. Please wait...", true);
-			progDialog.show();
-			new FetchLegalityTask().execute((String[]) null);
-			return true;
-		case R.id.cardrulings:
-			progDialog = ProgressDialog.show(this, "", "Loading. Please wait...", true);
-			progDialog.show();
-			new FetchRulingsTask().execute((String[]) null);
-			return true;
-		case R.id.quittosearch:
-			MyApp appState = ((MyApp) getApplicationContext());
-			appState.setState(QUITTOSEARCH);
-			finish();
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
+			case R.id.image:
+				progDialog.show();
+				asyncTask = new FetchPictureTask();
+				asyncTask.execute((String[]) null);
+				return true;
+			case R.id.price:
+				progDialog.show();
+				asyncTask = new FetchPriceTask();
+				asyncTask.execute((String[]) null);
+				return true;
+			case R.id.changeset:
+				showDialog(CHANGESET);
+				return true;
+			case R.id.legality:
+				progDialog.show();
+				asyncTask = new FetchLegalityTask();
+				asyncTask.execute((String[]) null);
+				return true;
+			case R.id.cardrulings:
+				progDialog.show();
+				asyncTask = new FetchRulingsTask();
+				asyncTask.execute((String[]) null);
+				return true;
+			case R.id.quittosearch:
+				MyApp appState = ((MyApp) getApplicationContext());
+				appState.setState(QUITTOSEARCH);
+				finish();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 
 	@Override
 	protected void onPrepareDialog(int id, Dialog dialog) {
 		switch (id) {
-		case GETIMAGE:
-			if (DialogImageView != null) {
-				DialogImageView.setImageDrawable(cardPicture);
-			}
-			break;
+			case GETIMAGE:
+				if (DialogImageView != null) {
+					DialogImageView.setImageDrawable(cardPicture);
+				}
+				break;
 		}
 	}
 

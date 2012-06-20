@@ -260,6 +260,9 @@ public class CardViewActivity extends FragmentActivity {
 		if (progDialog.isShowing()) {
 			progDialog.cancel();
 		}
+		if(asyncTask != null){
+			asyncTask.cancel(true);
+		}
 	}
 
 	private void setInfoFromID(long id) {

@@ -48,6 +48,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -255,6 +256,9 @@ public class CardViewActivity extends FragmentActivity {
 		super.onDestroy();
 		if (mDbHelper != null) {
 			mDbHelper.close();
+		}
+		if (progDialog.isShowing()) {
+			progDialog.cancel();
 		}
 	}
 
@@ -643,6 +647,7 @@ public class CardViewActivity extends FragmentActivity {
 					pt.setVisibility(View.VISIBLE);
 					flavor.setVisibility(View.VISIBLE);
 					artist.setVisibility(View.VISIBLE);
+					((FrameLayout) findViewById(R.id.frameLayout1)).setVisibility(View.VISIBLE);
 				}
 			}
 		}
@@ -660,6 +665,7 @@ public class CardViewActivity extends FragmentActivity {
 				pt.setVisibility(View.VISIBLE);
 				flavor.setVisibility(View.VISIBLE);
 				artist.setVisibility(View.VISIBLE);
+				((FrameLayout) findViewById(R.id.frameLayout1)).setVisibility(View.VISIBLE);
 			}
 		}
 	}

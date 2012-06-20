@@ -15,9 +15,10 @@
     <string name="dberror">Database Error. Try clearing app data in Android\'s settings</string>
     <string name="corruption_error_title">Error</string>
     <string name="corruption_error">Whoops! It looks like an important part of this app has been corrupted and doesn\'t work anymore.
-        Please try clearing the app data in your device\'s settings, and if that doesn\'t work reinstall the app from the Play Store.
-        If the problem continues to persist, please send us an email at &lt;a href="mailto:mtg.familiar@gmail.com">mtg.familiar@gmail.com&lt;/a>
-        and let us know what\'s happening.</string>
+        We\'re trying to figure out exactly what\'s causing this to happen, so please send us an email at 
+        &lt;a href="mailto:mtg.familiar@gmail.com">mtg.familiar@gmail.com&lt;/a> so we can track this bug and fix it.
+        In the meantime, if it doesn\'t manage to fix itself, please try clearing the app data in your device\'s settings,
+        and if that doesn\'t work reinstall the app from the Play Store.</string>
     
     <string name="brokenImageString">Congratulations, you found a NullPointerException! This should never happen, and we\'re not sure how, or why,
 		you found it. Please send us an email at &lt;a href="mailto:mtg.familiar@gmail.com">mtg.familiar@gmail.com&lt;/a> so we can track this bug

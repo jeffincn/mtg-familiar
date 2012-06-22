@@ -19,6 +19,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
@@ -114,14 +115,18 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 	private TextToSpeech tts;
 	private boolean ttsInitialized = false;
 
+	private GatheringsIO gIO;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.n_player_life_activity);
 
+		gIO = new GatheringsIO(getApplicationContext());
+		
 		players = new ArrayList<Player>(2);
-
+		
 		orientation = getResources().getConfiguration().orientation;
 
 		listSizeHeight = -10;
@@ -280,8 +285,28 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 		String lifeData = preferences.getString(PLAYER_DATA, null);
 
 		if (lifeData == null || lifeData.length() == 0) {
-			addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, (Context) this);
-			addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, (Context) this);
+			boolean addedPlayers = false;
+			
+			try {
+				String dGathering = gIO.getDefaultGathering();
+				if (!dGathering.equals("")){
+					ArrayList<GatheringsIO.PlayerData> loadedPlayers = gIO.ReadGatheringXML(dGathering);
+					players = new ArrayList<Player>(loadedPlayers.size());
+					for (GatheringsIO.PlayerData player : loadedPlayers){
+						addPlayer(player.getName(), player.getStartingLife(), INITIAL_POISON, null, null, (Context) this);
+						addedPlayers = true;
+					}
+				}
+			} catch (Exception e) {
+				players.clear();
+				players = new ArrayList<Player>(2);
+				addedPlayers = false;
+			}
+			
+			if (addedPlayers == false){
+				addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, (Context) this);
+				addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, (Context) this);
+			}
 		}
 		else if (players.size() == 0) {
 			numPlayers = 0;
@@ -1089,10 +1114,11 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 			case R.id.announce_life:
 				announceLifeTotals();
 				return true;
-//			case R.id.change_gathering:
-//				Intent i = new Intent(this, GatheringCreateActivity.class);
-//				startActivity(i);
-//				return true;
+			case R.id.change_gathering:
+				Intent i = new Intent(this, GatheringCreateActivity.class);
+				finish();
+				startActivity(i);
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}

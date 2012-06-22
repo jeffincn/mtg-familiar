@@ -453,9 +453,8 @@ public class CardTradingActivity extends FragmentActivity {
 				String[] files = fileList();
 				ArrayList<String> validFiles = new ArrayList<String>();
 				for (String fileName : files) {
-					int mid = fileName.lastIndexOf(".");
-					if (fileName.substring(mid, fileName.length()).equals(tradeExtension)) {
-						validFiles.add(fileName.substring(0, mid));
+					if (fileName.endsWith(tradeExtension)) {
+						validFiles.add(fileName.substring(0, fileName.indexOf(tradeExtension)));
 					}
 				}
 
@@ -537,9 +536,8 @@ public class CardTradingActivity extends FragmentActivity {
 				String[] files = fileList();
 				ArrayList<String> validFiles = new ArrayList<String>();
 				for (String fileName : files) {
-					int mid = fileName.lastIndexOf(".");
-					if (fileName.substring(mid, fileName.length()).equals(tradeExtension)) {
-						validFiles.add(fileName.substring(0, mid));
+					if (fileName.endsWith(tradeExtension)) {
+						validFiles.add(fileName.substring(0, fileName.indexOf(tradeExtension)));
 					}
 				}
 

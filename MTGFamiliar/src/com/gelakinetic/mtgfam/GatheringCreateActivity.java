@@ -39,20 +39,30 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlSerializer;
 
+import com.gelakinetic.mtgfam.GatheringsIO.PlayerData;
+
 import android.R.bool;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.XmlResourceParser;
 
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 
 import android.support.v4.app.FragmentActivity;
+import android.text.TextWatcher;
 
 import android.util.Xml;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
 
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -60,13 +70,15 @@ import android.widget.Toast;
 
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import com.gelakinetic.mtgfam.GatheringsIO;
 
 public class GatheringCreateActivity extends FragmentActivity {
-	final private String						FOLDERPATH = "Gatherings";
-	final private String						DEFAULTFILE = "default.info";
+	final private static String						FOLDERPATH = "Gatherings";
+	final private static String						DEFAULTFILE = "default.info";
 	final private String						name_gathering = "Please entering a name for the Gathering.";
 	
 	private Context								mCtx;
+	private GatheringsIO						gIO;
 	private LinearLayout						mainLayout;	
 	
 	private TextView							gatheringName;
@@ -83,14 +95,13 @@ public class GatheringCreateActivity extends FragmentActivity {
 		mainLayout = (LinearLayout) findViewById(R.id.gathering_player_list);
 		
 		mCtx = this;
+		gIO = new GatheringsIO(mCtx);
 	
-		File path = new File(getFilesDir(), FOLDERPATH);
-		File defaultGathering = new File(path, DEFAULTFILE);
-		if (defaultGathering.exists())
+		String defaultG = gIO.getDefaultGathering();
+		if (!defaultG.equals(""))
 		{	
-			String defaultG = getDefaultGathering();
-			gatheringName.setText(ReadGatheringNameFromXML(defaultG));
-			ArrayList<PlayerData> players = ReadGatheringXML(defaultG);
+			gatheringName.setText(gIO.ReadGatheringNameFromXML(defaultG));
+			ArrayList<PlayerData> players = gIO.ReadGatheringXML(defaultG);
 			for(PlayerData player : players){
 				AddPlayerRowFromData(player);
 			}
@@ -127,150 +138,11 @@ public class GatheringCreateActivity extends FragmentActivity {
 		super.onSaveInstanceState(outState);
 	}
 	
-	private class PlayerData{
-		private boolean isDefaultName;
-		private String customName;
-		private int startingLife;
-		
-		PlayerData(){
-			isDefaultName = true;
-			customName = "";
-			startingLife = 20;
-		}
-		
-		private void setCustomName(String _customName){
-			customName = _customName;
-		}
-		
-		private String getName(){
-			return customName;
-		}
-		
-		private void setStartingLife(int _startingLife){
-			startingLife = _startingLife;
-		}
-		
-		private int getStartingLife(){
-			return startingLife;
-		}
-		
-		private void setDefaultName(boolean _isDefault){
-			isDefaultName = _isDefault;
-		}
-		
-		private boolean getIsDefaultName() {
-			return isDefaultName;
-		}
-	}
 	
-	
-	private ArrayList<PlayerData> ReadGatheringXML(String _gatheringFile){
-		File path = new File(getFilesDir(), FOLDERPATH);
-		File gathering = new File(path, _gatheringFile);
-		
-		return ReadGatheringXML(gathering);
-	}
-	
-	private ArrayList<PlayerData> ReadGatheringXML(File _gatheringFile){
-		ArrayList<PlayerData> returnList = new ArrayList<PlayerData>();
-		Document dom = null;
-		
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		
-		try {
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			dom = db.parse(_gatheringFile);
-		}catch(ParserConfigurationException pce) {
-			//pce.printStackTrace();
-			return returnList;
-		}catch(SAXException se) {
-			//se.printStackTrace();
-			return returnList;
-		}catch(IOException ioe) {
-			//.printStackTrace();
-			return returnList;
-		}
-		
-		if (dom == null)
-			return returnList;
-		
-		Element docEle = dom.getDocumentElement();
-		
-		//Element playerList = (Element) docEle.getElementsByTagName("players").item(0);
-		//int numOfPlayers = Integer.parseInt(playerList.getAttribute("number"));
-		
-		NodeList nl = docEle.getElementsByTagName("player");
-		if(nl != null && nl.getLength() > 0) {
-			for(int i = 0 ; i < nl.getLength();i++) {
-				
-				Element el = (Element)nl.item(i);
-				
-				Element name = (Element) el.getElementsByTagName("name").item(0);
-				String customName = "";
-				boolean isDefault = Boolean.parseBoolean(name.getAttribute("default"));
-				if (isDefault == false) {
-					customName = (String)name.getChildNodes().item(0).getNodeValue();
-				}
-				
-				Element life = (Element) el.getElementsByTagName("startinglife").item(0);
-				String sLife = (String)life.getChildNodes().item(0).getNodeValue();
-				int startingLife = Integer.parseInt(sLife);
-				
-				PlayerData player = new PlayerData();
-				player.setDefaultName(isDefault);
-				player.setCustomName(customName);
-				player.setStartingLife(startingLife);
-				
-				returnList.add(player);
-			}
-		}		
-		
-		return returnList;
-	}
-	
-	private String ReadGatheringNameFromXML(String _gatheringFile){
-		File path = new File(getFilesDir(), FOLDERPATH);
-		File gathering = new File(path, _gatheringFile);
-		
-		return ReadGatheringNameFromXML(gathering);
-	}
-	
-	private String ReadGatheringNameFromXML(File _gatheringFile){
-		String returnString = "";
-		Document dom = null;
-		
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		
-		try {
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			dom = db.parse(_gatheringFile);
-		}catch(ParserConfigurationException pce) {
-			//pce.printStackTrace();
-			return returnString;
-		}catch(SAXException se) {
-			//se.printStackTrace();
-			return returnString;
-		}catch(IOException ioe) {
-			//.printStackTrace();
-			return returnString;
-		}
-		
-		if (dom == null)
-			return returnString;
-		
-		Element docEle = dom.getDocumentElement();
-		
-		//Element playerList = (Element) docEle.getElementsByTagName("players").item(0);
-		//int numOfPlayers = Integer.parseInt(playerList.getAttribute("number"));
-		
-		Element name = (Element) docEle.getElementsByTagName("name").item(0);
-		String gatheringName = name.getChildNodes().item(0).getNodeValue();		
-		
-		return gatheringName;
-	}
 	
 	private String writeGatheringXML(){
 		int players = mainLayout.getChildCount();
+		int defaultPlayers = 1;
 		
 	    XmlSerializer serializer = Xml.newSerializer();
 	    StringWriter writer = new StringWriter();
@@ -296,6 +168,11 @@ public class GatheringCreateActivity extends FragmentActivity {
 	        	String name = customName.getText().toString().trim();
 	        	if (name == null)
 	        		name = "";
+
+	        	if (defaultname.equals("true")){
+	        		name = "Player " + defaultPlayers;
+	        		defaultPlayers++;
+	        	}
 	        	
 	        	EditText startingLife = (EditText) player.findViewById(R.id.starting_life);
 	        	String life = startingLife.getText().toString();
@@ -318,75 +195,46 @@ public class GatheringCreateActivity extends FragmentActivity {
 	        serializer.endTag("", "players");
 	        serializer.endTag("", "gathering");
 	        serializer.endDocument();
+	        
+			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+	        Editor editor = preferences.edit();
+	        editor.putString("player_data", null);
+	        editor.commit();
+	        
 	        return writer.toString();
 	    } catch (Exception e) {
 	        throw new RuntimeException(e);
 	    } 
 	}
 	
-	private String getDefaultGathering(){
-		String defaultGathering = "";
-		BufferedReader reader;
-		
-		File path = new File(getFilesDir(), FOLDERPATH);
-		File defaultFile = new File(path, DEFAULTFILE);
-		
-		if (!defaultFile.exists()){
-			return "";
-		}
-		
-		try {
-			reader = new BufferedReader(new FileReader(defaultFile));
-			defaultGathering = reader.readLine();
-			
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return "";
-		} catch (IOException e) {
-			e.printStackTrace();
-			return "";
-		}
-		
-		return defaultGathering;
-	}
-	
 	private void AddPlayerRowFromData(PlayerData _player){
 		LayoutInflater inf = getLayoutInflater();
 		View v = inf.inflate(R.layout.gathering_create_player_row, null);
+		TextView name = (TextView) v.findViewById(R.id.custom_name);
+		final RadioGroup nameGroup = (RadioGroup) v.findViewById(R.id.radioGroupName);
 		
 		if (!_player.getIsDefaultName()){
-			TextView name = (TextView) v.findViewById(R.id.custom_name);
-			name.setText(_player.customName);
+			name.setText(_player.getName());
 			
-			RadioGroup nameGroup = (RadioGroup) v.findViewById(R.id.radioGroupName);
+
 			nameGroup.check(R.id.customNameRadio);
 		}
-		
-		
+		name.setOnFocusChangeListener(new OnFocusChangeListener() {
+			
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus){
+					nameGroup.check(R.id.customNameRadio);
+				}
+			}
+		});
 		TextView life = (TextView) v.findViewById(R.id.starting_life);
 		life.setText(String.valueOf(_player.getStartingLife()));
 		
 		mainLayout.addView(v);
 	}
 	
-	private ArrayList<String> getGatheringFileList(){
-		ArrayList<String> returnList = new ArrayList<String>();
-		
-		File path = new File(getFilesDir(), FOLDERPATH);
-		if (!path.exists()){
-			return returnList;
-		}
-		
-		File[] gatheringList = path.listFiles();
-		
-		for (int idx = 0; idx < gatheringList.length; idx++){
-			if (gatheringList[idx].getName().equals(DEFAULTFILE)){
-				continue;
-			}
-			returnList.add(gatheringList[idx].getName());
-		}
-		
-		return returnList;
+	private void RemoveAllPlayerRows(){
+		mainLayout.removeAllViews();
 	}
 	
 	@Override
@@ -394,10 +242,7 @@ public class GatheringCreateActivity extends FragmentActivity {
 		// Handle item selection
 		switch (item.getItemId()) {
 			case R.id.add_player:
-				LayoutInflater inf = getLayoutInflater();
-				View v = inf.inflate(R.layout.gathering_create_player_row, null);
-				mainLayout.addView(v);
-				
+				AddPlayerRowFromData(gIO.new PlayerData());				
 				return true;
 			case R.id.remove_player:
 				mainLayout.removeViewAt(mainLayout.getChildCount() - 1);
@@ -434,23 +279,29 @@ public class GatheringCreateActivity extends FragmentActivity {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+				
+				Intent i = new Intent(this, NPlayerLifeActivity.class);
+				finish();
+				startActivity(i);
 
 				return true;
 			case R.id.load_gathering:
-				ArrayList<String> gatherings = getGatheringFileList();
+				ArrayList<String> gatherings = gIO.getGatheringFileList();
 				final String[] fGatherings = gatherings.toArray(new String[gatherings.size()]);
 				final String[] properNames = new String[gatherings.size()];
 				for(int idx = 0; idx < gatherings.size(); idx++){
-					properNames[idx] = ReadGatheringNameFromXML(gatherings.get(idx));
+					properNames[idx] = gIO.ReadGatheringNameFromXML(gatherings.get(idx));
 				}
 				
 				AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
 				builder.setTitle("Load a Gathering");
 				builder.setItems(properNames, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialogInterface, int item) {
+					public void onClick(DialogInterface dialogInterface, int item) {						
+						RemoveAllPlayerRows();
+						
 						gatheringName.setText(properNames[item]);
 						
-						ArrayList<PlayerData> players = ReadGatheringXML(fGatherings[item]);
+						ArrayList<PlayerData> players = gIO.ReadGatheringXML(fGatherings[item]);
 						for(PlayerData player : players){
 							AddPlayerRowFromData(player);
 						}

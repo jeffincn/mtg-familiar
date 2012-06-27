@@ -185,7 +185,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 		}
 
 		mDbHelper = new CardDbAdapter(this);
-		mDbHelper.open();
+		mDbHelper.openWritable();
 		boolean autoupdate = preferences.getBoolean("autoupdate", true);
 		if (autoupdate) {
 			startThread(OTAPATCH);
@@ -426,7 +426,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 				// TODO check if this if statement is really necessary
 				if (mDbHelper == null) {
 					mDbHelper = new CardDbAdapter(this);
-					mDbHelper.open();
+					mDbHelper.openWritable();
 				}
 				ArrayList<String[]> patchInfo = JsonParser.readUpdateJsonStream(this);
 
@@ -478,7 +478,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 					// TODO check if this if statement is really necessary
 					if (mDbHelper == null) {
 						mDbHelper = new CardDbAdapter(this);
-						mDbHelper.open();
+						mDbHelper.openWritable();
 					}
 
 					mDbHelper.dropCreateDB();

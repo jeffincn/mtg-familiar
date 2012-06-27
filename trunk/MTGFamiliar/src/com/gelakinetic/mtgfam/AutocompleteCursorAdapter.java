@@ -29,11 +29,11 @@ import android.widget.TextView;
 
 public class AutocompleteCursorAdapter extends CursorAdapter {
 
-	private CardDbAdapter	mDbAdapter;
+	private CardDbAdapter	mDbHelper;
 
 	public AutocompleteCursorAdapter(Context context, Cursor c) {
 		super(context, c);
-		mDbAdapter = new CardDbAdapter(context);
+		mDbHelper = new CardDbAdapter(context);
 	}
 
 	@Override
@@ -67,9 +67,9 @@ public class AutocompleteCursorAdapter extends CursorAdapter {
 
 		Cursor cursor = null;
 		try {
-			mDbAdapter.open();
-			cursor = mDbAdapter.autoComplete(filter);
-			mDbAdapter.close();
+			mDbHelper.openReadable();
+			cursor = mDbHelper.autoComplete(filter);
+			mDbHelper.close();
 		}
 		catch (Exception e) {
 			return null;

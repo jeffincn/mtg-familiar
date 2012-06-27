@@ -219,9 +219,15 @@ public class CardDbAdapter {
 	 * @throws SQLException
 	 *           if the database could be neither opened or created
 	 */
-	public CardDbAdapter open() throws SQLException {
+	public CardDbAdapter openWritable() throws SQLException {
 		mDbHelper = new DatabaseHelper(mCtx);
 		mDb = mDbHelper.getWritableDatabase();
+		return this;
+	}
+
+	public CardDbAdapter openReadable() throws SQLException {
+		mDbHelper = new DatabaseHelper(mCtx);
+		mDb = mDbHelper.getReadableDatabase();
 		return this;
 	}
 

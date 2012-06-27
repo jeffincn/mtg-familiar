@@ -61,7 +61,7 @@ public class CardSearchProvider extends ContentProvider {
 
 	// private DictionaryDatabase mDictionary;
 
-	private CardDbAdapter						mDbAdapter;
+	private CardDbAdapter						mDbHelper;
 
 	// UriMatcher stuff
 	private static final int				SEARCH_WORDS					= 0;
@@ -87,8 +87,8 @@ public class CardSearchProvider extends ContentProvider {
 
 	@Override
 	public boolean onCreate() {
-		mDbAdapter = new CardDbAdapter(getContext());
-		mDbAdapter.open(); //TODO this is never closed. could be a problem
+		mDbHelper = new CardDbAdapter(getContext());
+		mDbHelper.openReadable(); //TODO this is never closed. could be a problem
 		return true;
 	}
 
@@ -131,7 +131,7 @@ public class CardSearchProvider extends ContentProvider {
         CardDbAdapter.KEY_NAME,
         SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID};
 
-    return mDbAdapter.getWordMatches(query, columns);
+    return mDbHelper.getWordMatches(query, columns);
   }
 
   private Cursor search(String query) {
@@ -140,7 +140,7 @@ public class CardSearchProvider extends ContentProvider {
         BaseColumns._ID,
         CardDbAdapter.KEY_NAME};
 
-    return mDbAdapter.getWordMatches(query, columns);
+    return mDbHelper.getWordMatches(query, columns);
   }
 
   private Cursor getWord(Uri uri) {
@@ -148,7 +148,7 @@ public class CardSearchProvider extends ContentProvider {
     String[] columns = new String[] {
         CardDbAdapter.KEY_NAME};
 
-    return mDbAdapter.getWord(rowId, columns);
+    return mDbHelper.getWord(rowId, columns);
   }
 
 private Cursor refreshShortcut(Uri uri) {
@@ -166,7 +166,7 @@ private Cursor refreshShortcut(Uri uri) {
       SearchManager.SUGGEST_COLUMN_SHORTCUT_ID,
       SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID};
 
-  return mDbAdapter.getWord(rowId, columns);
+  return mDbHelper.getWord(rowId, columns);
 }
 
 	/**

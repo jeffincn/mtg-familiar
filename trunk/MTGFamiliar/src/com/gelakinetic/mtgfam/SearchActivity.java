@@ -126,7 +126,7 @@ public class SearchActivity extends FragmentActivity {
 		mCtx = this;
 
 		mDbHelper = new CardDbAdapter(this);
-		mDbHelper.open();
+		mDbHelper.openReadable();
 
 		namefield = (AutoCompleteTextView) findViewById(R.id.namesearch);
 		namefield.setAdapter(new AutocompleteCursorAdapter(mCtx, null));

@@ -35,7 +35,7 @@ public class WidgetSearchActivity extends Activity {
 		mCtx = this;
 
 		mDbHelper = new CardDbAdapter(this);
-		mDbHelper.open();
+		mDbHelper.openReadable();
 
 		namefield = (EditText) findViewById(R.id.widget_namefield);
 		searchButton = (ImageView) findViewById(R.id.search_button);

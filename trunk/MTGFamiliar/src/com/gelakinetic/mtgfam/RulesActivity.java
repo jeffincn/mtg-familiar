@@ -93,7 +93,7 @@ public class RulesActivity extends FragmentActivity {
 		MenuFragmentCompat.init(this, R.menu.rules_menu, "rules_menu_fragment");
 
 		mDbHelper = new CardDbAdapter(this);
-		mDbHelper.open();
+		mDbHelper.openReadable();
 
 		imgGetter = ImageGetterHelper.GlyphGetter(getResources());
 

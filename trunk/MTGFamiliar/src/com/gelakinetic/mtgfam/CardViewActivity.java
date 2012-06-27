@@ -191,7 +191,7 @@ public class CardViewActivity extends FragmentActivity {
 		scroll_results = preferences.getBoolean("scrollresults", false);
 
 		mDbHelper = new CardDbAdapter(this);
-		mDbHelper.open();
+		mDbHelper.openReadable();
 
 		progDialog = new ProgressDialog(this);
 		progDialog.setTitle("");

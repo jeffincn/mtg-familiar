@@ -50,7 +50,7 @@ public class RandomCardActivity extends FragmentActivity {
 	protected static final int	STONEHEWER_IMAGE	= 2;
 	protected static final int	JHOIRA_IMAGE			= 3;
 	protected static final int	CORRUPTION = 4;
-	private CardDbAdapter				mDbAdapter;
+	private CardDbAdapter				mDbHelper;
 	private Random							rand;
 	private String							name;
 	private Spinner							momirCmcChoice;
@@ -112,7 +112,7 @@ public class RandomCardActivity extends FragmentActivity {
 				String[] returnTypes = new String[] { CardDbAdapter.KEY_NAME };
 
 				try {
-					Cursor doods = mDbAdapter.Search(null, null, "Creature", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
+					Cursor doods = mDbHelper.Search(null, null, "Creature", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
 							CardDbAdapter.NOONECARES, null, cmc, "=", null, null, null, null, 0, 0, false, returnTypes, true);
 
 					int pos = rand.nextInt(doods.getCount());
@@ -121,7 +121,7 @@ public class RandomCardActivity extends FragmentActivity {
 					doods.close();
 	
 					Intent i = new Intent(mCtx, ResultListActivity.class);
-					i.putExtra("id", mDbAdapter.fetchIdByName(name));
+					i.putExtra("id", mDbHelper.fetchIdByName(name));
 					startActivityForResult(i, 0);
 				}
 				catch (SQLiteDatabaseCorruptException e) {
@@ -145,7 +145,7 @@ public class RandomCardActivity extends FragmentActivity {
 				String[] returnTypes = new String[] { CardDbAdapter.KEY_NAME };
 
 				try {
-					Cursor equipment = mDbAdapter.Search(null, null, "Equipment", "wubrgl", 0, null, CardDbAdapter.NOONECARES,
+					Cursor equipment = mDbHelper.Search(null, null, "Equipment", "wubrgl", 0, null, CardDbAdapter.NOONECARES,
 							null, CardDbAdapter.NOONECARES, null, cmc + 1, "<", null, null, null, null, 0, 0, false, returnTypes, true);
 
 					int pos = rand.nextInt(equipment.getCount());
@@ -154,7 +154,7 @@ public class RandomCardActivity extends FragmentActivity {
 					equipment.close();
 	
 					Intent i = new Intent(mCtx, ResultListActivity.class);
-					i.putExtra("id", mDbAdapter.fetchIdByName(name));
+					i.putExtra("id", mDbHelper.fetchIdByName(name));
 					startActivityForResult(i, 0);
 				}
 				catch (SQLiteDatabaseCorruptException e) {
@@ -171,7 +171,7 @@ public class RandomCardActivity extends FragmentActivity {
 				String[] returnTypes = new String[] { CardDbAdapter.KEY_NAME };
 
 				try {
-					Cursor instants = mDbAdapter.Search(null, null, "instant", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
+					Cursor instants = mDbHelper.Search(null, null, "instant", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
 							CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, false, returnTypes, true);
 
 					// Get 3 random, distinct numbers
@@ -191,7 +191,7 @@ public class RandomCardActivity extends FragmentActivity {
 					for (int i = 0; i < 3; i++) {
 						instants.moveToPosition(pos[i]);
 						names[i] = instants.getString(instants.getColumnIndex(CardDbAdapter.KEY_NAME));
-						intent.putExtra("id" + i, mDbAdapter.fetchIdByName(names[i]));
+						intent.putExtra("id" + i, mDbHelper.fetchIdByName(names[i]));
 					}
 					instants.close();
 	
@@ -211,7 +211,7 @@ public class RandomCardActivity extends FragmentActivity {
 				String[] returnTypes = new String[] { CardDbAdapter.KEY_NAME };
 
 				try {
-					Cursor sorceries = mDbAdapter.Search(null, null, "sorcery", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
+					Cursor sorceries = mDbHelper.Search(null, null, "sorcery", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
 							CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, false, returnTypes, true);
 	
 					// Get 3 random, distinct numbers
@@ -231,7 +231,7 @@ public class RandomCardActivity extends FragmentActivity {
 					for (int i = 0; i < 3; i++) {
 						sorceries.moveToPosition(pos[i]);
 						names[i] = sorceries.getString(sorceries.getColumnIndex(CardDbAdapter.KEY_NAME));
-						intent.putExtra("id" + i, mDbAdapter.fetchIdByName(names[i]));
+						intent.putExtra("id" + i, mDbHelper.fetchIdByName(names[i]));
 					}
 					sorceries.close();
 	
@@ -256,8 +256,8 @@ public class RandomCardActivity extends FragmentActivity {
 		adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		stonehewerCmcChoice.setAdapter(adapter1);
 
-		mDbAdapter = new CardDbAdapter(this);
-		mDbAdapter.open();
+		mDbHelper = new CardDbAdapter(this);
+		mDbHelper.openReadable();
 
 		cmcChoices = getResources().getStringArray(R.array.momir_spinner);
 
@@ -286,8 +286,8 @@ public class RandomCardActivity extends FragmentActivity {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if (mDbAdapter != null) {
-			mDbAdapter.close();
+		if (mDbHelper != null) {
+			mDbHelper.close();
 		}
 	}
 	

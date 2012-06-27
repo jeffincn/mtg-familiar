@@ -76,7 +76,7 @@ public class ResultListActivity extends FragmentActivity {
 		cursorPositionOffset = 0;
 
 		mDbHelper = new CardDbAdapter(this);
-		mDbHelper.open();
+		mDbHelper.openReadable();
 		mCtx = this;
 
 		String[] returnTypes = new String[] { CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_SET,

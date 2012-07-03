@@ -574,7 +574,8 @@ public class CardViewActivity extends FragmentActivity {
 
 				URL u = new URL(picurl);
 				cardPicture = new BitmapDrawable(u.openStream());
-
+				Bitmap bmp = cardPicture.getBitmap();
+				
 				Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 				int newHeight;
 				int newWidth;
@@ -588,8 +589,8 @@ public class CardViewActivity extends FragmentActivity {
 				newWidth = Math.round(cardPicture.getIntrinsicWidth() * scale);
 				newHeight = Math.round(cardPicture.getIntrinsicHeight() * scale);
 
-				cardPicture = new BitmapDrawable(mCtx.getResources(), Bitmap.createScaledBitmap(cardPicture.getBitmap(),
-						newWidth, newHeight, true));
+				bmp = Bitmap.createScaledBitmap(bmp, newWidth, newHeight, true);
+				cardPicture = new BitmapDrawable(mCtx.getResources(), bmp);
 
 				// Throw this exception to test the dialog
 				// throw(new NullPointerException("seriously"));

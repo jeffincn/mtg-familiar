@@ -276,6 +276,7 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
  -->
   <!-- 1.8  -->
  	- Create a gathering
+	- Wishlist
      </string>
  
     <string name="lifetitle">Life Counter</string>
@@ -436,6 +437,7 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     <string name="save_trade">Save Trade</string>
     <string name="load_trade">Load Trade</string>
     <string name="delete_trade">Delete Trade</string>
+	<string name="Wishlist">Wishlist</string>
     
     <string name="rules_search">Keyword Search</string>
     <string name="rules_exit">Exit Rules</string>

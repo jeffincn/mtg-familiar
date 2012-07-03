@@ -48,7 +48,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
-import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -59,7 +58,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
-import android.text.ClipboardManager;
 import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.text.method.LinkMovementMethod;
@@ -79,72 +77,70 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-// I don't like doing this, but we've gotta stick with the old clipboard
-// @SuppressWarnings("deprecation")
 public class CardViewActivity extends FragmentActivity {
 
 	// Dont use 0, thats the default when the back key is pressed
-	protected static final int	RANDOMLEFT		= 2;
-	protected static final int	RANDOMRIGHT		= 3;
-	protected static final int	QUITTOSEARCH	= 4;
-	protected static final int	SWIPELEFT			= 5;
-	protected static final int	SWIPERIGHT		= 6;
+	protected static final int				RANDOMLEFT		= 2;
+	protected static final int				RANDOMRIGHT		= 3;
+	protected static final int				QUITTOSEARCH	= 4;
+	protected static final int				SWIPELEFT			= 5;
+	protected static final int				SWIPERIGHT		= 6;
 
 	// Dialogs
-	private static final int		GETLEGALITY		= 0;
-	private static final int		GETPRICE			= 1;
-	private static final int		GETIMAGE			= 2;
-	private static final int		CHANGESET			= 3;
-	private static final int		CARDRULINGS		= 4;
-	private static final int		BROKEN_IMAGE	= 5;
+	private static final int					GETLEGALITY		= 0;
+	private static final int					GETPRICE			= 1;
+	private static final int					GETIMAGE			= 2;
+	private static final int					CHANGESET			= 3;
+	private static final int					CARDRULINGS		= 4;
+	private static final int					BROKEN_IMAGE	= 5;
 
 	// Where the card image is loaded to
-	private static final int		MAINPAGE			= 0;
-	private static final int		DIALOG				= 1;
+	private static final int					MAINPAGE			= 0;
+	private static final int					DIALOG				= 1;
 
 	// Random useful things
-	private CardDbAdapter				mDbHelper;
-	private Context							mCtx;
-	private ImageGetter					imgGetter;
-	private TextView						copyView;
+	private CardDbAdapter							mDbHelper;
+	private Context										mCtx;
+	private ImageGetter								imgGetter;
+	private TextView									copyView;
 
 	// UI elements
-	private TextView						name;
-	private TextView						cost;
-	private TextView						type;
-	private TextView						set;
-	private TextView						ability;
-	private TextView						pt;
-	private TextView						flavor;
-	private TextView						artist;
-	private Button							transform;
-	private Button							leftRandom;
-	private Button							rightRandom;
-	private ImageView						cardpic;
-	private ImageView						DialogImageView;
+	private TextView									name;
+	private TextView									cost;
+	private TextView									type;
+	private TextView									set;
+	private TextView									ability;
+	private TextView									pt;
+	private TextView									flavor;
+	private TextView									artist;
+	private Button										transform;
+	private Button										leftRandom;
+	private Button										rightRandom;
+	private ImageView									cardpic;
+	private ImageView									DialogImageView;
 
 	// Stuff for AsyncTasks
-	private BitmapDrawable			cardPicture;
-	private String[]						legalities;
-	private String[]						formats;
-	private TCGPlayerXMLHandler	XMLhandler;
-	public ArrayList<Ruling>		rulingsArrayList;
-	private ProgressDialog			progDialog;
+	private BitmapDrawable						cardPicture;
+	private String[]									legalities;
+	private String[]									formats;
+	private TCGPlayerXMLHandler				XMLhandler;
+	public ArrayList<Ruling>					rulingsArrayList;
+	private ProgressDialog						progDialog;
 	AsyncTask<String, Integer, Long>	asyncTask;
 
 	// Card info
-	private long								cardID;
-	private String							number;
-	private String							setCode;
-	private String							cardName;
-	private String							mtgi_code;
-	private int									multiverseId;
+	private long											cardID;
+	private String										number;
+	private String										setCode;
+	private String										cardName;
+	private String										mtgi_code;
+	private int												multiverseId;
 
 	// Preferences
-	private int									loadTo;
-	private boolean							isRandom;
-	private boolean							isSingle;
-	private boolean							scroll_results;
+	private int												loadTo;
+	private boolean										isRandom;
+	private boolean										isSingle;
+	private boolean										scroll_results;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -204,7 +200,7 @@ public class CardViewActivity extends FragmentActivity {
 				asyncTask.cancel(true);
 			}
 		});
-		
+
 		MenuFragmentCompat.init(this, R.menu.card_menu, "card_view_menu_fragment");
 
 		setInfoFromID(cardID);
@@ -260,7 +256,7 @@ public class CardViewActivity extends FragmentActivity {
 		if (progDialog.isShowing()) {
 			progDialog.cancel();
 		}
-		if(asyncTask != null){
+		if (asyncTask != null) {
 			asyncTask.cancel(true);
 		}
 	}
@@ -280,21 +276,21 @@ public class CardViewActivity extends FragmentActivity {
 		number = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NUMBER));
 
 		switch ((char) c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY))) {
-			case 'C':
-				set.setTextColor(this.getResources().getColor(R.color.common));
-				break;
-			case 'U':
-				set.setTextColor(this.getResources().getColor(R.color.uncommon));
-				break;
-			case 'R':
-				set.setTextColor(this.getResources().getColor(R.color.rare));
-				break;
-			case 'M':
-				set.setTextColor(this.getResources().getColor(R.color.mythic));
-				break;
-			case 'T':
-				set.setTextColor(this.getResources().getColor(R.color.timeshifted));
-				break;
+		case 'C':
+			set.setTextColor(this.getResources().getColor(R.color.common));
+			break;
+		case 'U':
+			set.setTextColor(this.getResources().getColor(R.color.uncommon));
+			break;
+		case 'R':
+			set.setTextColor(this.getResources().getColor(R.color.rare));
+			break;
+		case 'M':
+			set.setTextColor(this.getResources().getColor(R.color.mythic));
+			break;
+		case 'T':
+			set.setTextColor(this.getResources().getColor(R.color.timeshifted));
+			break;
 		}
 
 		String sCost = c.getString(c.getColumnIndex(CardDbAdapter.KEY_MANACOST));
@@ -488,18 +484,18 @@ public class CardViewActivity extends FragmentActivity {
 			for (int i = 0; i < cFormats.getCount(); i++) {
 				formats[i] = cFormats.getString(cFormats.getColumnIndex(CardDbAdapter.KEY_NAME));
 				switch (mDbHelper.checkLegality(cardName, formats[i])) {
-					case CardDbAdapter.LEGAL:
-						legalities[i] = "Legal";
-						break;
-					case CardDbAdapter.RESTRICTED:
-						legalities[i] = "Restricted";
-						break;
-					case CardDbAdapter.BANNED:
-						legalities[i] = "Banned";
-						break;
-					default:
-						legalities[i] = "Error";
-						break;
+				case CardDbAdapter.LEGAL:
+					legalities[i] = "Legal";
+					break;
+				case CardDbAdapter.RESTRICTED:
+					legalities[i] = "Restricted";
+					break;
+				case CardDbAdapter.BANNED:
+					legalities[i] = "Banned";
+					break;
+				default:
+					legalities[i] = "Error";
+					break;
 				}
 				cFormats.moveToNext();
 			}
@@ -575,7 +571,7 @@ public class CardViewActivity extends FragmentActivity {
 				URL u = new URL(picurl);
 				cardPicture = new BitmapDrawable(u.openStream());
 				Bitmap bmp = cardPicture.getBitmap();
-				
+
 				Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 				int newHeight;
 				int newWidth;
@@ -1012,25 +1008,37 @@ public class CardViewActivity extends FragmentActivity {
 		inflater.inflate(R.menu.copy_menu, menu);
 	}
 
+	private static final boolean	useOldClipboard	= (android.os.Build.VERSION.SDK_INT < 11);
+
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+		// use a final static boolean for JIT compile-time culling of deprecated calls for future-proofing
+		// this is probably overkill because the old name space will likely be retained for backwards compatibility
+		// Scoped name space usage is poor practice, but direct references allow us to target the correct SDK.
+		String copyText = "";
 		switch (item.getItemId()) {
 			case R.id.copy:
-				String text = copyView.getText().toString();
-
-				clipboard.setText(text);
-				return true;
-
+				copyText = copyView.getText().toString();
+				break;
 			case R.id.copyall:
-				String cat = name.getText().toString() + '\n' + cost.getText().toString() + '\n' + type.getText().toString()
-						+ '\n' + set.getText().toString() + '\n' + ability.getText().toString() + '\n'
-						+ flavor.getText().toString() + '\n' + pt.getText().toString() + '\n' + artist.getText().toString();
-
-				clipboard.setText(cat);
-				return true;
+				copyText = name.getText().toString() + '\n' + cost.getText().toString() + '\n' + type.getText().toString() + '\n'
+						+ set.getText().toString() + '\n' + ability.getText().toString() + '\n' + flavor.getText().toString() + '\n'
+						+ pt.getText().toString() + '\n' + artist.getText().toString();
+				break;
 			default:
 				return super.onContextItemSelected(item);
+		}
+
+		if (useOldClipboard) {
+			android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+			clipboard.setText(copyText);
+			return true;
+		}
+		else {
+			android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+			clipboard.setText(copyText);
+			return true;
 		}
 	}
 
@@ -1038,47 +1046,47 @@ public class CardViewActivity extends FragmentActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-			case R.id.image:
-				progDialog.show();
-				asyncTask = new FetchPictureTask();
-				asyncTask.execute((String[]) null);
-				return true;
-			case R.id.price:
-				progDialog.show();
-				asyncTask = new FetchPriceTask();
-				asyncTask.execute((String[]) null);
-				return true;
-			case R.id.changeset:
-				showDialog(CHANGESET);
-				return true;
-			case R.id.legality:
-				progDialog.show();
-				asyncTask = new FetchLegalityTask();
-				asyncTask.execute((String[]) null);
-				return true;
-			case R.id.cardrulings:
-				progDialog.show();
-				asyncTask = new FetchRulingsTask();
-				asyncTask.execute((String[]) null);
-				return true;
-			case R.id.quittosearch:
-				MyApp appState = ((MyApp) getApplicationContext());
-				appState.setState(QUITTOSEARCH);
-				finish();
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
+		case R.id.image:
+			progDialog.show();
+			asyncTask = new FetchPictureTask();
+			asyncTask.execute((String[]) null);
+			return true;
+		case R.id.price:
+			progDialog.show();
+			asyncTask = new FetchPriceTask();
+			asyncTask.execute((String[]) null);
+			return true;
+		case R.id.changeset:
+			showDialog(CHANGESET);
+			return true;
+		case R.id.legality:
+			progDialog.show();
+			asyncTask = new FetchLegalityTask();
+			asyncTask.execute((String[]) null);
+			return true;
+		case R.id.cardrulings:
+			progDialog.show();
+			asyncTask = new FetchRulingsTask();
+			asyncTask.execute((String[]) null);
+			return true;
+		case R.id.quittosearch:
+			MyApp appState = ((MyApp) getApplicationContext());
+			appState.setState(QUITTOSEARCH);
+			finish();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
 		}
 	}
 
 	@Override
 	protected void onPrepareDialog(int id, Dialog dialog) {
 		switch (id) {
-			case GETIMAGE:
-				if (DialogImageView != null) {
-					DialogImageView.setImageDrawable(cardPicture);
-				}
-				break;
+		case GETIMAGE:
+			if (DialogImageView != null) {
+				DialogImageView.setImageDrawable(cardPicture);
+			}
+			break;
 		}
 	}
 

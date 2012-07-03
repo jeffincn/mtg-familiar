@@ -132,6 +132,25 @@
                     android:textSize="30dip" />
 
                 <TextView
+                    android:id="@+id/wishlist"
+                    style="@style/text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:drawableTop="@drawable/wishlist_icon"
+                    android:gravity="center_horizontal"
+                    android:text="@string/Wishlist"
+                    android:textSize="30dip" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout5"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dip"
+                android:orientation="horizontal" >
+
+                <TextView
                     android:id="@+id/roundTimer"
                     style="@style/text"
                     android:layout_width="0dp"
@@ -142,14 +161,6 @@
                     android:gravity="center"
                     android:text="@string/roundtimer"
                     android:textSize="30dip" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/linearLayout5"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="3dip"
-                android:orientation="horizontal" >
 
                 <TextView
                     android:id="@+id/rules"
@@ -174,7 +185,7 @@
                     android:gravity="center"
                     android:text="@string/mojhosto_label"
                     android:textSize="30dip" />
-
+                <!--
                 <TextView
                     android:id="@+id/null2"
                     style="@style/text"
@@ -184,6 +195,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:textSize="30dip" />
+                -->
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

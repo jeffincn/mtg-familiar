@@ -92,6 +92,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 	private TextView					nbplayerbutton;
 	private TextView					roundTimer;
 	private TextView					trader;
+	private TextView					wishlist;
 	private Activity					me;
 	private long defaultLastRulesUpdate;
 
@@ -116,6 +117,7 @@ public class MainActivity extends FragmentActivity implements Runnable {
 		nbplayerbutton = (TextView) findViewById(R.id.Nplayerlifecounter);
 		roundTimer = (TextView) findViewById(R.id.roundTimer);
 		trader = (TextView) findViewById(R.id.trade);
+		wishlist = (TextView) findViewById(R.id.wishlist);
 
 		nbplayerbutton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -173,6 +175,13 @@ public class MainActivity extends FragmentActivity implements Runnable {
 		trader.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent(mCtx, CardTradingActivity.class);
+				startActivity(i);
+			}
+		});
+
+		wishlist.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Intent i = new Intent(mCtx, WishlistActivity.class);
 				startActivity(i);
 			}
 		});

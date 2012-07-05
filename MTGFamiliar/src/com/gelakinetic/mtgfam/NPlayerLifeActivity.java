@@ -472,7 +472,7 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 			case DIALOG_SET_NAME:
 				LayoutInflater factory = LayoutInflater.from(this);
 				final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
-				nameInput = (EditText) textEntryView.findViewById(R.id.editText1);
+				nameInput = (EditText) textEntryView.findViewById(R.id.player_name);
 				dialog = new AlertDialog.Builder(this).setTitle("Enter Name").setView(textEntryView)
 						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {

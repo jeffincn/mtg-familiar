@@ -12,13 +12,12 @@
 -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/linearLayout1"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/rulings_title"
         style="@style/text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -29,18 +28,21 @@
         android:text="@string/rulestitle" />
 
     <ScrollView
-        android:id="@+id/scrollView1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/url"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/textView1" android:layout_marginLeft="5dip" android:layout_marginRight="5dip">
+        android:layout_below="@+id/rulings_title"
+        android:layout_above="@+id/url"
+        android:layout_marginLeft="5dip"
+        android:layout_marginRight="5dip">
 
         <TextView
             android:id="@+id/rules"
             style="@style/text"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:textSize="20dip"/>
+            android:layout_height="wrap_content"
+            android:textSize="20dip" />
+        
     </ScrollView>
 
     <TextView
@@ -51,6 +53,6 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true" 
         android:gravity="center"
-        android:layout_margin="5dip"/>
+        android:layout_margin="5dip" />
 
 </RelativeLayout>

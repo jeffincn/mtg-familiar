@@ -4,10 +4,15 @@
         android:id="@+id/action_search"
         android:actionViewClass="android.widget.SearchView"
         android:icon="@drawable/menu_search"/>
-    <item android:id="@+id/remove_player" android:icon="@drawable/menu_minus" android:title="@string/removeplayer"></item>
-    <item android:id="@+id/add_player" android:icon="@drawable/menu_plus" android:title="@string/addplayer"></item>
-    <item android:id="@+id/save_gathering" android:icon="@drawable/menu_store" android:title="@string/gathering_menu_save"></item>
-    <item android:id="@+id/load_gathering" android:icon="@drawable/menu_load" android:title="@string/gathering_menu_load"></item>
+    <item android:id="@+id/gdelete_gathering" android:icon="@drawable/menu_delete" android:title="@string/gathering_menu_delete"></item>
+    <item android:id="@+id/gremove_player" android:icon="@drawable/menu_minus" android:title="@string/removeplayer"></item>
+    <item android:id="@+id/gadd_player" android:icon="@drawable/menu_plus" android:title="@string/addplayer"></item>
+    <item android:id="@+id/gload_gathering" android:icon="@drawable/menu_load" android:title="@string/gathering_menu_load"></item>
+    <item android:id="@+id/gsave_gathering" android:icon="@drawable/menu_store" android:title="@string/gathering_menu_save"></item>
+    
+    
+    
+    
     
 
 </menu>

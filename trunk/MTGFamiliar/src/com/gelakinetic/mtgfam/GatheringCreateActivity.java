@@ -18,64 +18,46 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.gelakinetic.mtgfam;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlSerializer;
 
-import com.gelakinetic.mtgfam.GatheringsIO.PlayerData;
-
-import android.R.bool;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.res.XmlResourceParser;
-
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-
 import android.support.v4.app.FragmentActivity;
-import android.text.TextWatcher;
-
 import android.util.Xml;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
-
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Toast;
-
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import com.gelakinetic.mtgfam.GatheringsIO;
+import android.widget.Toast;
+
+import com.gelakinetic.mtgfam.GatheringsIO.PlayerData;
 
 public class GatheringCreateActivity extends FragmentActivity {
 	final private static String						FOLDERPATH = "Gatherings";
 	final private static String						DEFAULTFILE = "default.info";
 	final private String						name_gathering = "Please entering a name for the Gathering.";
+	
+	private String								loadedGathering;
 	
 	private Context								mCtx;
 	private GatheringsIO						gIO;
@@ -100,7 +82,9 @@ public class GatheringCreateActivity extends FragmentActivity {
 		String defaultG = gIO.getDefaultGathering();
 		if (!defaultG.equals(""))
 		{	
-			gatheringName.setText(gIO.ReadGatheringNameFromXML(defaultG));
+			String gName = gIO.ReadGatheringNameFromXML(defaultG); 
+			loadedGathering = defaultG;
+			gatheringName.setText(gName);
 			ArrayList<PlayerData> players = gIO.ReadGatheringXML(defaultG);
 			for(PlayerData player : players){
 				AddPlayerRowFromData(player);
@@ -241,19 +225,59 @@ public class GatheringCreateActivity extends FragmentActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-			case R.id.add_player:
-				AddPlayerRowFromData(gIO.new PlayerData());				
+			case R.id.gdelete_gathering:
+				if (loadedGathering == null)
+					return true;
+				
+				String gatheringNameInFile = gIO.ReadGatheringNameFromXML(loadedGathering);
+				if (gatheringNameInFile.equals(gatheringName.getText().toString())){
+					gIO.DeleteGathering(loadedGathering);
+					RemoveAllPlayerRows();
+					gatheringName.setText("");
+				}
 				return true;
-			case R.id.remove_player:
+			case R.id.gremove_player:
 				mainLayout.removeViewAt(mainLayout.getChildCount() - 1);
 				return true;
-			case R.id.save_gathering:
+			case R.id.gadd_player:
+				AddPlayerRowFromData(gIO.new PlayerData());				
+				return true;
+			case R.id.gload_gathering:
+				ArrayList<String> gatherings = gIO.getGatheringFileList();
+				final String[] fGatherings = gatherings.toArray(new String[gatherings.size()]);
+				final String[] properNames = new String[gatherings.size()];
+				for(int idx = 0; idx < gatherings.size(); idx++){
+					properNames[idx] = gIO.ReadGatheringNameFromXML(gatherings.get(idx));
+				}
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
+				builder.setTitle("Load a Gathering");
+				builder.setItems(properNames, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialogInterface, int item) {						
+						RemoveAllPlayerRows();
+						
+						loadedGathering = fGatherings[item];
+						gatheringName.setText(properNames[item]);
+						
+						ArrayList<PlayerData> players = gIO.ReadGatheringXML(fGatherings[item]);
+						for(PlayerData player : players){
+							AddPlayerRowFromData(player);
+						}
+						return;
+					}
+				});
+				builder.create().show();
+				return true;
+			case R.id.gsave_gathering:
 				if (gatheringName.getText().toString().trim().equals("")) {
 					Toast.makeText(getApplicationContext(), name_gathering, Toast.LENGTH_LONG).show();
 				}
 				
 				try {
-					String gathering = gatheringName.getText().toString().replaceAll("[^A-Za-z0-9]", "");
+					Date date = new Date();
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddkkmmss");
+					
+					String gathering = sdf.format(date);
 					
 					File path = new File(getFilesDir(), FOLDERPATH);
 					if (!path.exists())
@@ -284,35 +308,6 @@ public class GatheringCreateActivity extends FragmentActivity {
 				finish();
 				startActivity(i);
 
-				return true;
-			case R.id.load_gathering:
-				ArrayList<String> gatherings = gIO.getGatheringFileList();
-				final String[] fGatherings = gatherings.toArray(new String[gatherings.size()]);
-				final String[] properNames = new String[gatherings.size()];
-				for(int idx = 0; idx < gatherings.size(); idx++){
-					properNames[idx] = gIO.ReadGatheringNameFromXML(gatherings.get(idx));
-				}
-				
-				AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
-				builder.setTitle("Load a Gathering");
-				builder.setItems(properNames, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialogInterface, int item) {						
-						RemoveAllPlayerRows();
-						
-						gatheringName.setText(properNames[item]);
-						
-						ArrayList<PlayerData> players = gIO.ReadGatheringXML(fGatherings[item]);
-						for(PlayerData player : players){
-							AddPlayerRowFromData(player);
-						}
-						return;
-					}
-				});
-				builder.create().show();
-				
-				
-				
-				
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

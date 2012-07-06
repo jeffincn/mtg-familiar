@@ -17,6 +17,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.preference.PreferenceManager;
 
 public class GatheringsIO {
 	final private static String						FOLDERPATH = "Gatherings";
@@ -80,6 +83,7 @@ public class GatheringsIO {
 						
 			reader = new BufferedReader(new FileReader(defaultFile));
 			defaultGathering = reader.readLine();
+			reader.close();
 			
 		} catch (FileNotFoundException e) {
 			return "";
@@ -211,5 +215,22 @@ public class GatheringsIO {
 		String gatheringName = name.getChildNodes().item(0).getNodeValue();		
 		
 		return gatheringName;
+	}
+	
+	public void DeleteGathering(String fileName){
+		File path = new File(ctx.getFilesDir(), FOLDERPATH);
+		File gatheringFile = new File(path, fileName);
+		gatheringFile.delete();
+		
+		String defaultGathering = getDefaultGathering();
+		if (defaultGathering.equals(fileName)){
+			File defaultFile = new File(path, DEFAULTFILE);
+			defaultFile.delete();
+			
+			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ctx);
+	        Editor editor = preferences.edit();
+	        editor.putString("player_data", null);
+	        editor.commit();
+		}
 	}
 }

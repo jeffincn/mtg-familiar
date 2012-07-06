@@ -465,4 +465,5 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     <string name="gathering_default_life_num">20</string>
     <string name="gathering_menu_save">Set and Save Gathering</string>
     <string name="gathering_menu_load">Load Gathering</string>
+    <string name="gathering_menu_delete">Delete Gathering</string>
 </resources>

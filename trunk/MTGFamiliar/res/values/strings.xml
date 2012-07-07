@@ -466,4 +466,15 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     <string name="gathering_menu_save">Set and Save Gathering</string>
     <string name="gathering_menu_load">Load Gathering</string>
     <string name="gathering_menu_delete">Delete Gathering</string>
+    <string name="type">Type</string>
+    <string name="cost">Cost</string>
+    <string name="rulestext">Ability</string>
+    <string name="p">P</string>
+    <string name="t">T</string>
+    <string name="slash">/</string>
+    <string-array name="set_spinner">
+        <item >Any Printing</item>
+        <item >First Printing Only</item>
+        <item >Reprints Only</item>
+    </string-array>
 </resources>

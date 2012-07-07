@@ -53,6 +53,10 @@ public class CardDbAdapter {
 	public static final int				SEVENMINUSSTAR								= -1003;
 	public static final int				STARSQUARED										= -1004;
 	public static final int				NOONECARES										= -1005;
+	
+	public static final int				ANYPRINTING = 0;
+	public static final int				FIRSTPRINTING = 1;
+	public static final int				REPRINT = 2;
 
 	public static final int				AND														= 0;
 	public static final int				OR														= 1;
@@ -590,7 +594,7 @@ public class CardDbAdapter {
 
 	public Cursor Search(String cardname, String cardtext, String cardtype, String color, int colorlogic, String sets,
 			float pow_choice, String pow_logic, float tou_choice, String tou_logic, int cmc, String cmcLogic, String format,
-			String rarity, String flavor, String artist, int type_logic, int text_logic, boolean backface,
+			String rarity, String flavor, String artist, int type_logic, int text_logic, int set_logic, boolean backface,
 			String[] returnTypes, boolean consolidate) {
 		Cursor mCursor = null;
 
@@ -950,6 +954,24 @@ public class CardDbAdapter {
 
 		if (!backface) {
 			statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_NUMBER + " NOT LIKE '%b%')";
+		}
+		
+		if (set_logic != ANYPRINTING) {
+			statement = " JOIN (SELECT iT" + DATABASE_TABLE_CARDS + "." + KEY_NAME 
+								+ ", MIN(" + DATABASE_TABLE_SETS + "." + KEY_DATE + ") AS " + KEY_DATE 
+							+ " FROM " + DATABASE_TABLE_CARDS + " AS iT" + DATABASE_TABLE_CARDS 
+							+ " JOIN " + DATABASE_TABLE_SETS 
+							+ " ON iT" + DATABASE_TABLE_CARDS + "." + KEY_SET + " = " + DATABASE_TABLE_SETS + "." + KEY_CODE 
+							+ " GROUP BY iT" + DATABASE_TABLE_CARDS + "." + KEY_NAME 
+						+ ") AS FirstPrints"
+						+ " ON " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " = FirstPrints." + KEY_NAME 
+						+ statement;
+			if(set_logic == FIRSTPRINTING)			
+				statement = " AND " + DATABASE_TABLE_SETS + "." + KEY_DATE + " = FirstPrints." + KEY_DATE 
+						+ statement;
+			else
+				statement = " AND " + DATABASE_TABLE_SETS + "." + KEY_DATE + " <> FirstPrints." + KEY_DATE 
+					+ statement;
 		}
 
 		if (statement.equals(" WHERE 1=1")) {

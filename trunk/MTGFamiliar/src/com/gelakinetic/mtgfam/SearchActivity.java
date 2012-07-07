@@ -68,6 +68,7 @@ public class SearchActivity extends FragmentActivity {
 	protected static final String	TYPELOGIC		= "typelogic";
 	protected static final String	TEXTLOGIC		= "textlogic";
 	// End addition
+	protected static final String	SETLOGIC		= "setlogic";
 
 	protected static final int		SETLIST			= 0;
 	protected static final int		FORMATLIST	= 1;
@@ -112,6 +113,7 @@ public class SearchActivity extends FragmentActivity {
 	// Variables below added by Reuben Kriegel
 	private Spinner								textspinner;
 	private Spinner								typespinner;
+	private Spinner								setspinner;
 
 	private int										selectedFormat;
 
@@ -216,6 +218,7 @@ public class SearchActivity extends FragmentActivity {
 		colorspinner = (Spinner) findViewById(R.id.colorlogic);
 		textspinner = (Spinner) findViewById(R.id.textlogic);
 		typespinner = (Spinner) findViewById(R.id.typelogic);
+		setspinner = (Spinner)  findViewById(R.id.setlogic);
 
 		setButton = (Button) findViewById(R.id.setsearch);
 		formatButton = (Button) findViewById(R.id.formatsearch);
@@ -282,6 +285,11 @@ public class SearchActivity extends FragmentActivity {
 		adapter9.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		textspinner.setAdapter(adapter9);
 
+		ArrayAdapter<CharSequence> adapter10 = ArrayAdapter.createFromResource(this, R.array.set_spinner,
+				android.R.layout.simple_spinner_item);
+		adapter10.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		setspinner.setAdapter(adapter10);
+		
 		setButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				showDialog(SETLIST);
@@ -582,6 +590,7 @@ public class SearchActivity extends FragmentActivity {
 		i.putExtra(TYPELOGIC, typespinner.getSelectedItemPosition());
 		i.putExtra(TEXTLOGIC, textspinner.getSelectedItemPosition());
 		// End addition
+		i.putExtra(SETLOGIC, setspinner.getSelectedItemPosition());
 		startActivityForResult(i, 0);
 	}
 
@@ -674,6 +683,7 @@ public class SearchActivity extends FragmentActivity {
 		
 		textspinner.setSelection(0);
 		typespinner.setSelection(0);
+		setspinner.setSelection(0);
 		
 		powLogic.setSelection(0);
 		powChoice.setSelection(0);

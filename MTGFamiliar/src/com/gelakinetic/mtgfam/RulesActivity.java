@@ -351,7 +351,7 @@ public class RulesActivity extends FragmentActivity {
 		return super.onKeyDown(keyCode, event);
 	}
 
-	private SpannableString formatText(String input) {
+	private SpannableString formatText(String input, boolean linkify) {
 		String encodedInput = input;
 		encodedInput = underscorePattern.matcher(encodedInput).replaceAll("\\<i\\>$1\\</i\\>");
 		encodedInput = examplePattern.matcher(encodedInput).replaceAll("\\<i\\>$1\\</i\\>");
@@ -365,37 +365,39 @@ public class RulesActivity extends FragmentActivity {
 		CharSequence cs = Html.fromHtml(encodedInput, imgGetter, null);
 		SpannableString result = new SpannableString(cs);
 
+		if(linkify) {
 		Matcher m = linkPattern.matcher(cs);
-		while (m.find()) {
-			try {
-				String[] tokens = cs.subSequence(m.start(), m.end()).toString().split("(\\.)");
-				int firstInt = Integer.parseInt(tokens[0]);
-				final int linkCat = firstInt / 100;
-				final int linkSub = firstInt % 100;
-				int position = 0;
-				if (tokens.length > 1) {
-					String entry = tokens[1];
-					int dashIndex = entry.indexOf("-");
-					if (dashIndex >= 0) {
-						entry = entry.substring(0, dashIndex);
+			while (m.find()) {
+				try {
+					String[] tokens = cs.subSequence(m.start(), m.end()).toString().split("(\\.)");
+					int firstInt = Integer.parseInt(tokens[0]);
+					final int linkCat = firstInt / 100;
+					final int linkSub = firstInt % 100;
+					int position = 0;
+					if (tokens.length > 1) {
+						String entry = tokens[1];
+						int dashIndex = entry.indexOf("-");
+						if (dashIndex >= 0) {
+							entry = entry.substring(0, dashIndex);
+						}
+						position = mDbHelper.getRulePosition(linkCat, linkSub, entry);
 					}
-					position = mDbHelper.getRulePosition(linkCat, linkSub, entry);
+					final int linkPosition = position;
+					result.setSpan(new ClickableSpan() {
+						@Override
+						public void onClick(View widget) {
+							//Open a new activity instance
+							Intent i = new Intent(RulesActivity.this, RulesActivity.class);
+							i.putExtra(CATEGORY_KEY, linkCat);
+							i.putExtra(SUBCATEGORY_KEY, linkSub);
+							i.putExtra(POSITION_KEY, linkPosition);
+							startActivityForResult(i, ARBITRARY_REQUEST_CODE);
+						}
+					}, m.start(), m.end(), 0);
 				}
-				final int linkPosition = position;
-				result.setSpan(new ClickableSpan() {
-					@Override
-					public void onClick(View widget) {
-						//Open a new activity instance
-						Intent i = new Intent(RulesActivity.this, RulesActivity.class);
-						i.putExtra(CATEGORY_KEY, linkCat);
-						i.putExtra(SUBCATEGORY_KEY, linkSub);
-						i.putExtra(POSITION_KEY, linkPosition);
-						startActivityForResult(i, ARBITRARY_REQUEST_CODE);
-					}
-				}, m.start(), m.end(), 0);
-			}
-			catch (Exception e) {
-				// Eat any exceptions; they'll just cause the link to not appear
+				catch (Exception e) {
+					// Eat any exceptions; they'll just cause the link to not appear
+				}
 			}
 		}
 
@@ -538,13 +540,13 @@ public class RulesActivity extends FragmentActivity {
 				String header = data.getHeader();
 				String text = data.getText();
 
-				rulesHeader.setText(header);
+				rulesHeader.setText(formatText(header, false), BufferType.SPANNABLE);
 				if (text.equals("")) {
 					rulesText.setVisibility(View.GONE);
 				}
 				else {
 					rulesText.setVisibility(View.VISIBLE);
-					rulesText.setText(formatText(text), BufferType.SPANNABLE);
+					rulesText.setText(formatText(text, true), BufferType.SPANNABLE);
 				}
 				if (!data.isClickable()) {
 					rulesText.setMovementMethod(LinkMovementMethod.getInstance());

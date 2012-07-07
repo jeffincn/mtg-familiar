@@ -77,10 +77,13 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 	private int															playerWidth;
 	private int															playerHeight;
 	private LinearLayout										mainLayout;
+	private LinearLayout										doublePlayer;
+	private int 												playersInRow;
 
 	private int															orientation;
 	private SharedPreferences								preferences;
 	private boolean													canGetLock;
+	private boolean													compactMode;
 	private Editor													editor;
 	private ImageView												lifeButton;
 	private ImageView												poisonButton;
@@ -133,6 +136,7 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		canGetLock = preferences.getBoolean("wakelock", true);
+		compactMode = preferences.getBoolean("compactMode", false);
 		editor = preferences.edit();
 
 		poisonButton = (ImageView) findViewById(R.id.poison_button);
@@ -271,7 +275,8 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 		}
 
 		mainLayout = (LinearLayout) findViewById(R.id.playerList);
-
+		playersInRow = 0;
+		
 		MyApp appState = ((MyApp) getApplicationContext());
 		appState.setState(0);
 
@@ -564,7 +569,27 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 
 		players.add(p);
 
-		mainLayout.addView(layout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
+		if (compactMode){
+			p.hideHistory();
+			
+			LinearLayout doublePlayerRow;
+			if (playersInRow == 0){
+				doublePlayer = (LinearLayout) inflater.inflate(R.layout.life_counter_player_double, null);
+				LinearLayout playerPlacement = (LinearLayout) doublePlayer.findViewById(R.id.playerLeft);
+				playerPlacement.addView(layout);
+				
+				mainLayout.addView(doublePlayer);
+				playersInRow++;
+			} else if (playersInRow == 1){
+				LinearLayout playerPlacement = (LinearLayout) doublePlayer.findViewById(R.id.playerRight);
+				playerPlacement.addView(layout);
+				
+				doublePlayer = null;
+				playersInRow = 0;
+			}
+		} else {
+			mainLayout.addView(layout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
+		}
 	}
 
 	private void removePlayer(int index) {
@@ -872,6 +897,10 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 			history.invalidate();
 		}
 
+		public void hideHistory(){
+			((View)history.getParent()).setVisibility(history.GONE);
+		}
+		
 		public void addOutputViews(TextView n, TextView l, ListView lv) {
 			TVname = n;
 			TVlife = l;

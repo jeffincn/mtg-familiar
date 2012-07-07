@@ -477,4 +477,6 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
         <item >First Printing Only</item>
         <item >Reprints Only</item>
     </string-array>
+    <string name="compactLife">Compact Mode</string>
+    <string name="compactLifeSummary">Display the life counter in compact mode (No History)</string>
 </resources>

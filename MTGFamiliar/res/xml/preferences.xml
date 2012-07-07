@@ -54,6 +54,7 @@
             android:key="wakelock"
             android:summary="@string/wakelocksummary"
             android:title="@string/wakelocktitle" />
+        <CheckBoxPreference android:key="compactMode" android:summary="@string/compactLifeSummary" android:title="@string/compactLife" android:defaultValue="false"/>
     </PreferenceCategory>
     
     <PreferenceCategory android:title="@string/timertitle" >

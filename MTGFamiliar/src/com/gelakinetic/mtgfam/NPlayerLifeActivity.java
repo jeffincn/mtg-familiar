@@ -807,6 +807,7 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 
 		public String			name;
 		public int				life;
+		public int 				defaultLife;
 		public int				poison;
 		public Player			me;
 
@@ -826,6 +827,7 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context) {
 			name = n;
 			life = l;
+			defaultLife = l;
 			poison = p;
 			this.lifeAdapter = new HistoryAdapter(context, life);
 			this.poisonAdapter = new HistoryAdapter(context, poison);
@@ -1049,7 +1051,7 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 		public String toFreshString() {
 			String data = this.name + ";";
 
-			data += INITIAL_LIFE + ";";
+			data += defaultLife + ";";
 			data += ";";
 
 			data += INITIAL_POISON + ";";

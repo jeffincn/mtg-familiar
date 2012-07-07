@@ -115,7 +115,7 @@ public class WishlistActivity extends FragmentActivity {
 		bAdd = (Button) findViewById(R.id.addCard);
 		tradePrice = (TextView) findViewById(R.id.priceText);
 		lvWishlist = (ListView) findViewById(R.id.wishlist);
-		aaWishlist = new TradeListAdapter(mCtx, R.layout.trader_row, lWishlist);
+		aaWishlist = new TradeListAdapter(mCtx, R.layout.wishlist_row, lWishlist);
 		lvWishlist.setAdapter(aaWishlist);
 
 		bAdd.setOnClickListener(new View.OnClickListener() {
@@ -216,6 +216,10 @@ public class WishlistActivity extends FragmentActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+//		if (c != null) {
+//			c.deactivate();
+//			c.close();
+//		}
 		if (mdbAdapter != null) {
 			mdbAdapter.close();
 		}
@@ -633,10 +637,10 @@ public class WishlistActivity extends FragmentActivity {
 			}
 			CardData data = items.get(position);
 			if (data != null) {
-				TextView nameField = (TextView) v.findViewById(R.id.traderRowName);
-				TextView setField = (TextView) v.findViewById(R.id.traderRowSet);
-				TextView numberField = (TextView) v.findViewById(R.id.traderNumber);
-				TextView priceField = (TextView) v.findViewById(R.id.traderRowPrice);
+				TextView nameField = (TextView) v.findViewById(R.id.wishlistRowName);
+				TextView setField = (TextView) v.findViewById(R.id.wishlistRowSet);
+				TextView numberField = (TextView) v.findViewById(R.id.wishlistNumber);
+				TextView priceField = (TextView) v.findViewById(R.id.wishlistRowPrice);
 
 				nameField.setText(data.getName());
 				setField.setText(data.getTcgName());
@@ -654,6 +658,48 @@ public class WishlistActivity extends FragmentActivity {
 		}
 	}
 
+//	private void fillData(Cursor c) {
+//
+//		ArrayList<String> fromList = new ArrayList<String>();
+//		ArrayList<Integer> toList = new ArrayList<Integer>();
+//		fromList.add(CardDbAdapter.KEY_NAME);
+//		toList.add(R.id.cardname);
+//		if (preferences.getBoolean("setPref", true)) {
+//			fromList.add(CardDbAdapter.KEY_SET);
+//			toList.add(R.id.cardset);
+//		}
+//		if (preferences.getBoolean("manacostPref", true)) {
+//			fromList.add(CardDbAdapter.KEY_MANACOST);
+//			toList.add(R.id.cardcost);
+//		}
+//		if (preferences.getBoolean("typePref", true)) {
+//			fromList.add(CardDbAdapter.KEY_TYPE);
+//			toList.add(R.id.cardtype);
+//		}
+//		if (preferences.getBoolean("abilityPref", true)) {
+//			fromList.add(CardDbAdapter.KEY_ABILITY);
+//			toList.add(R.id.cardability);
+//		}
+//		if (preferences.getBoolean("ptPref", true)) {
+//			fromList.add(CardDbAdapter.KEY_POWER);
+//			toList.add(R.id.cardp);
+//			fromList.add(CardDbAdapter.KEY_TOUGHNESS);
+//			toList.add(R.id.cardt);
+//			fromList.add(CardDbAdapter.KEY_LOYALTY);
+//			toList.add(R.id.cardt);
+//		}
+//		String[] from = new String[fromList.size()];
+//		fromList.toArray(from);
+//
+//		int[] to = new int[toList.size()];
+//		for (int i = 0; i < to.length; i++) {
+//			to[i] = toList.get(i);
+//		}
+//
+//		ResultListAdapter rla = new ResultListAdapter(this, R.layout.card_row, c, from, to, this.getResources());
+//		lv.setAdapter(rla);
+//	}
+	
 	private class FetchPriceTask extends AsyncTask<Void, Void, Integer> {
 		CardData					data;
 		TradeListAdapter	toNotify;

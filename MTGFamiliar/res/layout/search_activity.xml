@@ -317,6 +317,12 @@
                     android:textSize="18dp" />
             </LinearLayout>
 
+            <Spinner
+                android:id="@+id/setlogic"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1" />
+            
             <LinearLayout
                 android:id="@+id/linearLayout1"
                 android:layout_width="fill_parent"

@@ -54,7 +54,7 @@
         android:layout_weight="1"
         android:layout_gravity="clip_horizontal" >
 
-        <!-- Preview: listitem=@layout/trader_row -->
+        <!-- Preview: listitem=@layout/wishlist_row -->
     </ListView>
 
 </LinearLayout>

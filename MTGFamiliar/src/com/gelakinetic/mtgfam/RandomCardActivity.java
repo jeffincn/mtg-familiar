@@ -113,7 +113,7 @@ public class RandomCardActivity extends FragmentActivity {
 
 				try {
 					Cursor doods = mDbHelper.Search(null, null, "Creature", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-							CardDbAdapter.NOONECARES, null, cmc, "=", null, null, null, null, 0, 0, false, returnTypes, true);
+							CardDbAdapter.NOONECARES, null, cmc, "=", null, null, null, null, 0, 0, CardDbAdapter.ANYPRINTING, false, returnTypes, true);
 
 					int pos = rand.nextInt(doods.getCount());
 					doods.moveToPosition(pos);
@@ -146,7 +146,7 @@ public class RandomCardActivity extends FragmentActivity {
 
 				try {
 					Cursor equipment = mDbHelper.Search(null, null, "Equipment", "wubrgl", 0, null, CardDbAdapter.NOONECARES,
-							null, CardDbAdapter.NOONECARES, null, cmc + 1, "<", null, null, null, null, 0, 0, false, returnTypes, true);
+							null, CardDbAdapter.NOONECARES, null, cmc + 1, "<", null, null, null, null, 0, 0, CardDbAdapter.ANYPRINTING, false, returnTypes, true);
 
 					int pos = rand.nextInt(equipment.getCount());
 					equipment.moveToPosition(pos);
@@ -172,7 +172,7 @@ public class RandomCardActivity extends FragmentActivity {
 
 				try {
 					Cursor instants = mDbHelper.Search(null, null, "instant", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-							CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, false, returnTypes, true);
+							CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, CardDbAdapter.ANYPRINTING, false, returnTypes, true);
 
 					// Get 3 random, distinct numbers
 					int pos[] = new int[3];
@@ -212,7 +212,7 @@ public class RandomCardActivity extends FragmentActivity {
 
 				try {
 					Cursor sorceries = mDbHelper.Search(null, null, "sorcery", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-							CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, false, returnTypes, true);
+							CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, CardDbAdapter.ANYPRINTING, false, returnTypes, true);
 	
 					// Get 3 random, distinct numbers
 					int pos[] = new int[3];

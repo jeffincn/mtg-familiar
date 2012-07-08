@@ -51,6 +51,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.text.Html;
 import android.text.Html.ImageGetter;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -112,6 +113,12 @@ public class WishlistActivity extends FragmentActivity {
 
 		namefield = (AutoCompleteTextView) findViewById(R.id.namesearch);
 		namefield.setAdapter(new AutocompleteCursorAdapter(this, null));
+		namefield.setOnKeyListener(new View.OnKeyListener(){
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+				selectedId = -1;
+				selectedName = "";
+				return false;
+			}});
 		namefield.setOnItemClickListener(new AdapterView.OnItemClickListener(){
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
@@ -133,7 +140,7 @@ public class WishlistActivity extends FragmentActivity {
 
 		bAdd.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				if (namefield.getText().toString().length() > 0) {
+				if (selectedId != -1 && selectedName.length() > 0) {
 					String numberOfFromField = numberfield.getText().toString();
 					if (numberOfFromField.length() == 0) {
 						numberOfFromField = "1";
@@ -146,6 +153,8 @@ public class WishlistActivity extends FragmentActivity {
 					aaWishlist.notifyDataSetChanged();
 					FetchPriceTask loadPrice = new FetchPriceTask(data, aaWishlist);
 					loadPrice.execute();
+					selectedId = -1;
+					selectedName = "";
 					namefield.setText("");
 					numberfield.setText("1");
 				}

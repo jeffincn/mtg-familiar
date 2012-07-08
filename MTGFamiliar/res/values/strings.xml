@@ -414,7 +414,7 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
 	    <string name="trader_change_set">Change Set</string>
 	    <string name="trader_remove">Remove</string>
 	    <string name="trader_default_number_of">1x</string>
-    <string name="type_card_first">Type in a card above first</string>
+    <string name="type_card_first">Select a card above first</string>
     
     <string name="trade_window_title">Trade Window</string>
     <string name="trade_option_title">Price Setting</string>

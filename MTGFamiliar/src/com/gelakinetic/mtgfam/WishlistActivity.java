@@ -10,11 +10,11 @@ the Free Software Foundation, either version 3 of the License, or
 
 MTG Familiar is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
+along with MTG Familiar. If not, see <http://www.gnu.org/licenses/>.
  */
 package com.gelakinetic.mtgfam;
 
@@ -42,12 +42,15 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
+import android.text.Html;
+import android.text.Html.ImageGetter;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -69,6 +72,8 @@ public class WishlistActivity extends FragmentActivity {
 	private int										positionForDialog;
 
 	private AutoCompleteTextView	namefield;
+	private long selectedId=-1;
+	private String selectedName="";
 
 	private Button								bAdd;
 	private TextView							tradePrice;
@@ -107,6 +112,14 @@ public class WishlistActivity extends FragmentActivity {
 
 		namefield = (AutoCompleteTextView) findViewById(R.id.namesearch);
 		namefield.setAdapter(new AutocompleteCursorAdapter(this, null));
+		namefield.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				Cursor c = (Cursor) parent.getItemAtPosition(position);
+				selectedId = Long.parseLong(c.getString(c.getColumnIndex(CardDbAdapter.KEY_ID)));
+				selectedName = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
+			}
+		});
 
 		numberfield = (EditText) findViewById(R.id.numberInput);
 		numberfield.setText("1");
@@ -115,7 +128,7 @@ public class WishlistActivity extends FragmentActivity {
 		bAdd = (Button) findViewById(R.id.addCard);
 		tradePrice = (TextView) findViewById(R.id.priceText);
 		lvWishlist = (ListView) findViewById(R.id.wishlist);
-		aaWishlist = new TradeListAdapter(mCtx, R.layout.wishlist_row, lWishlist);
+		aaWishlist = new TradeListAdapter(mCtx, R.layout.wishlist_row, lWishlist, this.getResources());
 		lvWishlist.setAdapter(aaWishlist);
 
 		bAdd.setOnClickListener(new View.OnClickListener() {
@@ -127,7 +140,7 @@ public class WishlistActivity extends FragmentActivity {
 					}
 					int numberOf = Integer.parseInt(numberOfFromField);
 
-					CardData data = new CardData(namefield.getText().toString(), "", "", numberOf, 0, "loading", "");
+					CardData data = new CardData(selectedId, selectedName, "", "", numberOf, 0, "loading", "", "", "", "", "", "", '-');
 
 					lWishlist.add(0, data);
 					aaWishlist.notifyDataSetChanged();
@@ -172,13 +185,14 @@ public class WishlistActivity extends FragmentActivity {
 				while ((line = br.readLine()) != null) {
 					parts = line.split(CardData.delimiter);
 	
-					String cardName = parts[0];
-					String cardSet = parts[1];
+					Long id = Long.parseLong(parts[0]);
+					String cardName = parts[1];
+					String cardSet = parts[2];
 					String tcgName = mdbAdapter.getTCGname(cardSet);
-					int numberOf = Integer.parseInt(parts[2]);
+					int numberOf = Integer.parseInt(parts[3]);
 	
-					CardData cd = new CardData(cardName, tcgName, cardSet, numberOf, 0, "loading", Integer
-							.toString(numberOf));
+					CardData cd = new CardData(id, cardName, tcgName, cardSet, numberOf, 0, "loading", Integer
+							.toString(numberOf), "", "", "", "", "", -1);
 					lWishlist.add(0, cd);
 					FetchPriceTask loadPrice = new FetchPriceTask(lWishlist.get(0), aaWishlist);
 					loadPrice.execute();
@@ -216,10 +230,6 @@ public class WishlistActivity extends FragmentActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-//		if (c != null) {
-//			c.deactivate();
-//			c.close();
-//		}
 		if (mdbAdapter != null) {
 			mdbAdapter.close();
 		}
@@ -292,7 +302,7 @@ public class WishlistActivity extends FragmentActivity {
 						String userInputPrice = priceText.getText().toString();
 						double uIP;
 						try {
-							uIP = Double.parseDouble(userInputPrice);
+							uIP = Long.parseLong(userInputPrice);
 							// Clear the message so the user's specified price will display
 							lList.get(position).setMessage("");
 						}
@@ -371,9 +381,11 @@ public class WishlistActivity extends FragmentActivity {
 		Cursor cards = mdbAdapter.fetchCardByName(name);
 		Set<String> sets = new LinkedHashSet<String>();
 		Set<String> setCodes = new LinkedHashSet<String>();
+		Set<Long> cardIds = new LinkedHashSet<Long>();
 		while (!cards.isAfterLast()) {
 			if (sets.add(mdbAdapter.getTCGname(cards.getString(cards.getColumnIndex(CardDbAdapter.KEY_SET))))) {
 				setCodes.add(cards.getString(cards.getColumnIndex(CardDbAdapter.KEY_SET)));
+				cardIds.add(cards.getLong(cards.getColumnIndex(CardDbAdapter.KEY_ID)));
 			}
 			cards.moveToNext();
 		}
@@ -382,12 +394,14 @@ public class WishlistActivity extends FragmentActivity {
 
 		final String[] aSets = sets.toArray(new String[sets.size()]);
 		final String[] aSetCodes = setCodes.toArray(new String[setCodes.size()]);
+		final Long[] aCardIds = cardIds.toArray(new Long[cardIds.size()]);
 		AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
 		builder.setTitle("Pick a Set");
 		builder.setItems(aSets, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialogInterface, int item) {
 				lWishlist.get(_position).setSetCode(aSetCodes[item]);
 				lWishlist.get(_position).setTcgName(aSets[item]);
+				lWishlist.get(_position).setId(aCardIds[item]);
 				lWishlist.get(_position).setMessage("loading");
 				aaWishlist.notifyDataSetChanged();
 				FetchPriceTask loadPrice = new FetchPriceTask(lWishlist.get(_position), aaWishlist);
@@ -401,17 +415,17 @@ public class WishlistActivity extends FragmentActivity {
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
-		// Read values from the "savedInstanceState"-object and put them in your
-		// textview
 		namefield.setText(savedInstanceState.getString("nameBox"));
 		tradePrice.setText(savedInstanceState.getString("totalPrice"));
 
 		ArrayList<String> cardDataIn = savedInstanceState.getStringArrayList("wishlistCards");
 		for (String card : cardDataIn) {
 			String[] cardData = card.split("\\|");
-			int numberOf = Integer.parseInt(cardData[6]);
-			CardData data = new CardData(cardData[0], cardData[1], cardData[2], numberOf, Integer.parseInt(cardData[3]),
-					cardData[4], cardData[5]);
+			Long id = Long.parseLong(cardData[0]);
+			int numberOf = Integer.parseInt(cardData[7]);
+			int rarity =  Integer.parseInt(cardData[12]);
+			CardData data = new CardData(id, cardData[1], cardData[2], cardData[3], numberOf, Integer.parseInt(cardData[4]),
+					cardData[5], cardData[6], cardData[7], cardData[8], cardData[9], cardData[10], cardData[11], rarity);
 
 			lWishlist.add(data);
 
@@ -431,8 +445,9 @@ public class WishlistActivity extends FragmentActivity {
 
 		ArrayList<String> cardDataOut = new ArrayList<String>();
 		for (CardData data : lWishlist) {
-			String cardData = String.format("%s|%s|%s|%s|%s|%s|%s", data.getName(), data.getTcgName(),
-					data.getSetCode(), data.getPrice(), data.getMessage(), data.getNumber(), data.getNumberOf());
+			String cardData = String.format("%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s", data.getId().toString(), data.getName(), data.getTcgName(),
+					data.getSetCode(), data.getPrice(), data.getMessage(), data.getNumber(), data.getNumberOf()
+					, data.getType(), data.getCost(), data.getAbility(), data.getP(), data.getT(), Integer.toString(data.getRarity()));
 			cardDataOut.add(cardData);
 		}
 		outState.putStringArrayList("wishlistCards", cardDataOut);
@@ -525,15 +540,24 @@ public class WishlistActivity extends FragmentActivity {
 
 	private class CardData {
 
-		private String	name;
-		private String	number;
-		private String	tcgName;
-		private String	setCode;
-		private int			numberOf;
-		private int			price;		// In cents
-		private String	message;
+		private Long id;
+		private String name;
+		private String number;
+		private String tcgName;
+		private String setCode;
+		private int numberOf;
+		private int price;		// In cents
+		private String message;
+		private String type;
+		private String cost;
+		private String ability;
+		private String p;
+		private String t;
+		private int rarity;
 
-		public CardData(String name, String tcgName, String setCode, int numberOf, int price, String message, String number) {
+		public CardData(Long id, String name, String tcgName, String setCode, int numberOf, int price, String message, String number
+				, String type, String cost, String ability, String p, String t, int rarity) {
+			this.id = id;
 			this.name = name;
 			this.number = number;
 			this.setCode = setCode;
@@ -544,6 +568,20 @@ public class WishlistActivity extends FragmentActivity {
 			this.numberOf = numberOf;
 			this.price = price;
 			this.message = message;
+			this.type = type;
+			this.cost = cost;
+			this.ability = ability;
+			this.p = p;
+			this.t = t;
+			this.rarity = rarity;
+		}
+
+		public Long getId() {
+			return this.id;
+		}
+
+		public void setId(Long newId) {
+			this.id = newId;
 		}
 
 		public String getName() {
@@ -574,6 +612,54 @@ public class WishlistActivity extends FragmentActivity {
 			this.setCode = newSetCode;
 		}
 
+		public String getType() {
+			return this.type;
+		}
+
+		public void setType(String newType) {
+			this.type = newType;
+		}
+		
+		public String getCost() {
+			return this.cost;
+		}
+
+		public void setCost(String newCost) {
+			this.cost = newCost;
+		}
+		
+		public String getAbility() {
+			return this.ability;
+		}
+
+		public void setAbility(String newAbility) {
+			this.ability = newAbility;
+		}
+		
+		public String getP() {
+			return this.p;
+		}
+
+		public void setP(String newP) {
+			this.p = newP;
+		}
+		
+		public String getT() {
+			return this.t;
+		}
+
+		public void setT(String newT) {
+			this.t = newT;
+		}
+		
+		public int getRarity() {
+			return this.rarity;
+		}
+
+		public void setRarity(int newRarity) {
+			this.rarity = newRarity;
+		}
+		
 		public int getNumberOf() {
 			return this.numberOf;
 		}
@@ -609,7 +695,7 @@ public class WishlistActivity extends FragmentActivity {
 		public static final String	delimiter	= "%";
 
 		public String toString() {
-			return this.getName() + delimiter + this.getSetCode() + delimiter + this.getNumberOf() + '\n';
+			return this.getId() + delimiter + this.getName() + delimiter + this.getSetCode() + delimiter + this.getNumberOf() + '\n';
 		}
 
 	}
@@ -619,13 +705,17 @@ public class WishlistActivity extends FragmentActivity {
 		private int									layoutResourceId;
 		private ArrayList<CardData>	items;
 		private Context							mCtx;
+		private Resources		resources;
+		private ImageGetter	imgGetter;
 
-		public TradeListAdapter(Context context, int textViewResourceId, ArrayList<CardData> items) {
+		public TradeListAdapter(Context context, int textViewResourceId, ArrayList<CardData> items, Resources r) {
 			super(context, textViewResourceId, items);
 
 			this.mCtx = context;
 			this.layoutResourceId = textViewResourceId;
 			this.items = items;
+			resources = r;
+			imgGetter = ImageGetterHelper.GlyphGetter(r);
 		}
 
 		@Override
@@ -638,12 +728,42 @@ public class WishlistActivity extends FragmentActivity {
 			CardData data = items.get(position);
 			if (data != null) {
 				TextView nameField = (TextView) v.findViewById(R.id.wishlistRowName);
+				TextView typeField = (TextView) v.findViewById(R.id.cardtype);
+				TextView costField = (TextView) v.findViewById(R.id.cardcost);
+				TextView abilityField = (TextView) v.findViewById(R.id.cardability);
 				TextView setField = (TextView) v.findViewById(R.id.wishlistRowSet);
 				TextView numberField = (TextView) v.findViewById(R.id.wishlistNumber);
 				TextView priceField = (TextView) v.findViewById(R.id.wishlistRowPrice);
+				TextView pField = (TextView) v.findViewById(R.id.cardp);
+				TextView tField = (TextView) v.findViewById(R.id.cardt);
 
 				nameField.setText(data.getName());
+				typeField.setText(data.getType());
+				String manaCost = data.getCost();
+				manaCost = manaCost.replace("{", "<img src=\"").replace("}", "\"/>");
+				CharSequence csq = Html.fromHtml(manaCost, imgGetter, null);
+				costField.setText(csq);
+				abilityField.setText(data.getAbility());
 				setField.setText(data.getTcgName());
+				char r = (char) data.getRarity();
+				switch (r) {
+					case 'C':
+						setField.setTextColor(resources.getColor(R.color.common));
+						break;
+					case 'U':
+						setField.setTextColor(resources.getColor(R.color.uncommon));
+						break;
+					case 'R':
+						setField.setTextColor(resources.getColor(R.color.rare));
+						break;
+					case 'M':
+						setField.setTextColor(resources.getColor(R.color.mythic));
+						break;
+					case 'T':
+						setField.setTextColor(resources.getColor(R.color.timeshifted));
+						break;
+				}
+				
 				numberField.setText(data.hasPrice() ? data.getNumberOf() + "x" : "");
 				priceField.setText(data.hasPrice() ? data.getPriceString() : data.getMessage());
 
@@ -653,59 +773,25 @@ public class WishlistActivity extends FragmentActivity {
 				else {
 					priceField.setTextColor(mCtx.getResources().getColor(R.color.red));
 				}
+				pField.setText(data.getP());
+				tField.setText(data.getT());
 			}
 			return v;
 		}
 	}
 
-//	private void fillData(Cursor c) {
-//
-//		ArrayList<String> fromList = new ArrayList<String>();
-//		ArrayList<Integer> toList = new ArrayList<Integer>();
-//		fromList.add(CardDbAdapter.KEY_NAME);
-//		toList.add(R.id.cardname);
-//		if (preferences.getBoolean("setPref", true)) {
-//			fromList.add(CardDbAdapter.KEY_SET);
-//			toList.add(R.id.cardset);
-//		}
-//		if (preferences.getBoolean("manacostPref", true)) {
-//			fromList.add(CardDbAdapter.KEY_MANACOST);
-//			toList.add(R.id.cardcost);
-//		}
-//		if (preferences.getBoolean("typePref", true)) {
-//			fromList.add(CardDbAdapter.KEY_TYPE);
-//			toList.add(R.id.cardtype);
-//		}
-//		if (preferences.getBoolean("abilityPref", true)) {
-//			fromList.add(CardDbAdapter.KEY_ABILITY);
-//			toList.add(R.id.cardability);
-//		}
-//		if (preferences.getBoolean("ptPref", true)) {
-//			fromList.add(CardDbAdapter.KEY_POWER);
-//			toList.add(R.id.cardp);
-//			fromList.add(CardDbAdapter.KEY_TOUGHNESS);
-//			toList.add(R.id.cardt);
-//			fromList.add(CardDbAdapter.KEY_LOYALTY);
-//			toList.add(R.id.cardt);
-//		}
-//		String[] from = new String[fromList.size()];
-//		fromList.toArray(from);
-//
-//		int[] to = new int[toList.size()];
-//		for (int i = 0; i < to.length; i++) {
-//			to[i] = toList.get(i);
-//		}
-//
-//		ResultListAdapter rla = new ResultListAdapter(this, R.layout.card_row, c, from, to, this.getResources());
-//		lv.setAdapter(rla);
-//	}
-	
 	private class FetchPriceTask extends AsyncTask<Void, Void, Integer> {
-		CardData					data;
+		CardData			data;
 		TradeListAdapter	toNotify;
-		String						price		= "";
-		String						setCode	= "";
-		String						tcgName	= "";
+		String				price		= "";
+		String				setCode	= "";
+		String				tcgName	= "";
+		String 				type = "";
+		String 				cost = "";
+		String 				ability = "";
+		String 				p = "";
+		String 				t = "";
+		int		 			rarity = -1;
 
 		public FetchPriceTask(CardData _data, TradeListAdapter _toNotify) {
 			data = _data;
@@ -714,16 +800,39 @@ public class WishlistActivity extends FragmentActivity {
 
 		@Override
 		protected Integer doInBackground(Void... params) {
+			Long id;
 			String cardName;
 			String number;
 			try {
+				id = data.getId();
 				cardName = data.getName();
 				number = data.getNumber();
 				setCode = data.getSetCode();
 				tcgName = data.getTcgName();
-				if (number.equals("") || setCode.equals("") || tcgName.equals("")) {
+				type = data.getType();
+				cost = data.getCost();
+				ability = data.getAbility();
+				p = data.getP();
+				t = data.getT();
+				rarity = data.getRarity();
+				
+				if (id.equals(-1) || number.equals("") || setCode.equals("") || tcgName.equals("") ||
+						type.equals("") || cost.equals("") || ability.equals("") ||
+						p.equals("") || t.equals("") || rarity == -1) {
 					Cursor card;
-					card = mdbAdapter.fetchCardByName(data.getName());
+					card = mdbAdapter.fetchCard(data.getId(),
+							new String[] { CardDbAdapter.KEY_ID
+								, CardDbAdapter.KEY_NAME
+								, CardDbAdapter.KEY_SET
+								, CardDbAdapter.KEY_TYPE
+								, CardDbAdapter.KEY_RARITY
+								, CardDbAdapter.KEY_MANACOST
+								, CardDbAdapter.KEY_POWER
+								, CardDbAdapter.KEY_TOUGHNESS
+								, CardDbAdapter.KEY_ABILITY
+								, CardDbAdapter.KEY_NUMBER
+							});
+
 					if (card.moveToFirst()) {
 						cardName = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NAME));
 						if (data.getSetCode().equals("")) {
@@ -736,7 +845,19 @@ public class WishlistActivity extends FragmentActivity {
 
 						number = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NUMBER));
 						data.setNumber(number);
-
+						type = card.getString(card.getColumnIndex(CardDbAdapter.KEY_TYPE));
+						data.setType(type);
+						cost = card.getString(card.getColumnIndex(CardDbAdapter.KEY_MANACOST));
+						data.setCost(cost);
+						ability = card.getString(card.getColumnIndex(CardDbAdapter.KEY_ABILITY)); 
+						data.setAbility(ability);
+						p = card.getString(card.getColumnIndex(CardDbAdapter.KEY_POWER));
+						data.setP(p);
+						t = card.getString(card.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS));
+						data.setT(t);
+						rarity = card.getInt(card.getColumnIndex(CardDbAdapter.KEY_RARITY));
+						data.setRarity(rarity);
+						
 						card.deactivate();
 						card.close();
 					}

@@ -275,8 +275,9 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
    - 1.7.3: Price, image, rules, and legality loading dialogs are cancellable now.&lt;br />&lt;br />
  -->
   <!-- 1.8  -->
- 	- Create a gathering
-	- Wishlist
+ 	- Create a gathering&lt;br />&lt;br />
+ 	- Life Counter Compact Mode&lt;br />&lt;br /> 
+	- Wishlist&lt;br />&lt;br />
      </string>
  
     <string name="lifetitle">Life Counter</string>

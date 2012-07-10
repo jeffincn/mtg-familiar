@@ -595,6 +595,16 @@ public class NPlayerLifeActivity extends FragmentActivity implements OnInitListe
 	private void removePlayer(int index) {
 		mainLayout.removeView(players.get(index).layout);
 		players.remove(index);
+		
+		
+		//Rather then go through all the logic of finding the removed player, and adjusting the locations
+		//of all the player views, just restart the activity when in compact mode, this will adjust the 
+		//layouts to not have a blank area when players are removed.
+		if (compactMode){
+			Intent intent = getIntent();
+			finish();
+			startActivity(intent);
+		}
 	}
 
 	private void reset(int type) {

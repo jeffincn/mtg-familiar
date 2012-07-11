@@ -27,17 +27,20 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
+import com.gelakinetic.mtgfam.MainActivity.OTATask;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 
 public class JsonParser {
 
-	public static void readCardJsonStream(InputStream in, MainActivity mMain, CardDbAdapter mDbHelper) throws IOException {
+	public static void readCardJsonStream(InputStream in, OTATask task, String setName, CardDbAdapter mDbHelper) throws IOException {
 		JsonReader reader = new JsonReader(new InputStreamReader(in, "ISO-8859-1"));
 
 		String s, s1, s2, ptstr;
+		
+		int numTotalElements = 0;
+		int elementsParsed = 0;
 
 		reader.beginObject();
 		s = reader.nextName();
@@ -261,7 +264,9 @@ public class JsonParser {
 								}
 							}
 							mDbHelper.createCard(c);
-							mMain.cardAdded();
+							//mMain.cardAdded();
+							elementsParsed++;
+							task.publicPublishProgress(new String[] { "Parsing " + setName, "Parsing " + setName, "" + (int)Math.round(100*elementsParsed / (double)numTotalElements) });
 							reader.endObject();
 						}
 						reader.endArray();
@@ -270,20 +275,21 @@ public class JsonParser {
 				reader.endObject();
 			}
 			if (s.equalsIgnoreCase("w")) { // num_cards
-				mMain.setNumCards(reader.nextInt());
+				numTotalElements = reader.nextInt();
+				//mMain.setNumCards(reader.nextInt());
 			}
 		}
 		reader.endObject();
+		task.publicPublishProgress(new String[] { "Done Parsing "+ setName, "Done Parsing "+ setName, "0" });
 		return;
 	}
 
-	public static ArrayList<String[]> readUpdateJsonStream(MainActivity mMain) {
+	public static ArrayList<String[]> readUpdateJsonStream(SharedPreferences settings) {
 		ArrayList<String[]> patchInfo = new ArrayList<String[]>();
 		URL update;
 		String label;
 		String date = null;
 		String label2;
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mMain);
 
 		try {
 			update = new URL("https://sites.google.com/site/mtgfamiliar/manifests/patches.json");
@@ -422,12 +428,11 @@ public class JsonParser {
 		return;
 	}
 	
-	public static void readTCGNameJsonStream(MainActivity mMain, CardDbAdapter mDbHelper) {
+	public static void readTCGNameJsonStream(SharedPreferences settings, CardDbAdapter mDbHelper) {
 		URL update;
 		String label;
 		String date = null;
 		String label2;
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mMain);
 		String name = null, code = null;
 		
 		try {

@@ -424,10 +424,13 @@ public class CardTradingActivity extends FragmentActivity {
 							fos.close();
 						}
 						catch (FileNotFoundException e) {
-							Toast.makeText(getApplicationContext(), "FileNotFoundException", Toast.LENGTH_LONG).show();
+							Toast.makeText(getApplicationContext(), "The trade could not be saved; please try again.", Toast.LENGTH_LONG).show();
 						}
 						catch (IOException e) {
-							Toast.makeText(getApplicationContext(), "IOException", Toast.LENGTH_LONG).show();
+							Toast.makeText(getApplicationContext(), "The trade could not be saved; please try again.", Toast.LENGTH_LONG).show();
+						}
+						catch (IllegalArgumentException e) {
+							Toast.makeText(getApplicationContext(), "Trade names may not contain the path separator character ('/').", Toast.LENGTH_LONG).show();
 						}
 
 						currentTrade = tradeName;

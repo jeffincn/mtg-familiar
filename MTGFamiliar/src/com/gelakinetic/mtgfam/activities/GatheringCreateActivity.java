@@ -54,7 +54,6 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.GatheringsIO;
 import com.gelakinetic.mtgfam.helpers.GatheringsIO.PlayerData;
-import com.gelakinetic.mtgfam.helpers.MyApp;
 
 public class GatheringCreateActivity extends FamiliarActivity {
 	final private static String						FOLDERPATH = "Gatherings";

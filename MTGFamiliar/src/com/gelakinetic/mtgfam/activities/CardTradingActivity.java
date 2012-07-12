@@ -48,12 +48,7 @@ import android.database.sqlite.SQLiteException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
-
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -66,10 +61,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.AutocompleteCursorAdapter;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
-import com.gelakinetic.mtgfam.helpers.MyApp;
 import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler;
 
 public class CardTradingActivity extends FamiliarActivity {
@@ -115,6 +112,7 @@ public class CardTradingActivity extends FamiliarActivity {
 	private static final int			AVG_PRICE							= 1;
 	private static final int			HIGH_PRICE						= 2;
 
+	private static final String		autosaveName					= "autosave";
 	private static final String		tradeExtension				= ".trade";
 
 	@Override
@@ -244,6 +242,22 @@ public class CardTradingActivity extends FamiliarActivity {
 		}
 		catch (IllegalArgumentException e) {
 		}
+
+		try {
+			// Test to see if the autosave file exist, then load the trade it if does.
+			openFileInput(autosaveName + tradeExtension);
+			LoadTrade(autosaveName + tradeExtension);
+		}
+		catch (FileNotFoundException e) {
+			// Do nothing if the file doesn't exist
+		}
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+
+		SaveTrade(autosaveName + tradeExtension);
 	}
 
 	@Override
@@ -411,31 +425,7 @@ public class CardTradingActivity extends FamiliarActivity {
 						String tradeName = input.getText().toString();
 
 						String FILENAME = tradeName + tradeExtension;
-						FileOutputStream fos;
-
-						try {
-							// MODE_PRIVATE will create the file (or replace a file of the
-							// same name)
-							fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-
-							for (CardData cd : lTradeLeft) {
-								fos.write(cd.toString(CardDbAdapter.LEFT).getBytes());
-							}
-							for (CardData cd : lTradeRight) {
-								fos.write(cd.toString(CardDbAdapter.RIGHT).getBytes());
-							}
-
-							fos.close();
-						}
-						catch (FileNotFoundException e) {
-							Toast.makeText(getApplicationContext(), "The trade could not be saved; please try again.", Toast.LENGTH_LONG).show();
-						}
-						catch (IOException e) {
-							Toast.makeText(getApplicationContext(), "The trade could not be saved; please try again.", Toast.LENGTH_LONG).show();
-						}
-						catch (IllegalArgumentException e) {
-							Toast.makeText(getApplicationContext(), "Trade names may not contain the path separator character ('/').", Toast.LENGTH_LONG).show();
-						}
+						SaveTrade(FILENAME);
 
 						currentTrade = tradeName;
 					}
@@ -484,44 +474,7 @@ public class CardTradingActivity extends FamiliarActivity {
 				builder.setItems(tradeNames, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface di, int which) {
 
-						try {
-							BufferedReader br = new BufferedReader(new InputStreamReader(openFileInput(tradeNames[which]
-									+ tradeExtension)));
-
-							lTradeLeft.clear();
-							lTradeRight.clear();
-
-							String line;
-							String[] parts;
-							while ((line = br.readLine()) != null) {
-								parts = line.split(CardData.delimiter);
-
-								String cardName = parts[1];
-								String cardSet = parts[2];
-								String tcgName = mdbHelper.getTCGname(cardSet);
-								int side = Integer.parseInt(parts[0]);
-								int numberOf = Integer.parseInt(parts[3]);
-
-								CardData cd = new CardData(cardName, tcgName, cardSet, numberOf, 0, "loading", Integer
-										.toString(numberOf));
-								if (side == CardDbAdapter.LEFT) {
-									lTradeLeft.add(0, cd);
-									FetchPriceTask loadPrice = new FetchPriceTask(lTradeLeft.get(0), aaTradeLeft);
-									loadPrice.execute();
-								}
-								else if (side == CardDbAdapter.RIGHT) {
-									lTradeRight.add(0, cd);
-									FetchPriceTask loadPrice = new FetchPriceTask(lTradeRight.get(0), aaTradeRight);
-									loadPrice.execute();
-								}
-							}
-						}
-						catch (NumberFormatException e) {
-							Toast.makeText(getApplicationContext(), "NumberFormatException", Toast.LENGTH_LONG).show();
-						}
-						catch (IOException e) {
-							Toast.makeText(getApplicationContext(), "IOException", Toast.LENGTH_LONG).show();
-						}
+						LoadTrade(tradeNames[which] + tradeExtension);
 
 						currentTrade = tradeNames[which];
 
@@ -585,6 +538,76 @@ public class CardTradingActivity extends FamiliarActivity {
 			}
 		}
 		return dialog;
+	}
+
+	protected void SaveTrade(String _tradeName) {
+		FileOutputStream fos;
+
+		try {
+			// MODE_PRIVATE will create the file (or replace a file of the
+			// same name)
+			fos = openFileOutput(_tradeName, Context.MODE_PRIVATE);
+
+			for (CardData cd : lTradeLeft) {
+				fos.write(cd.toString(CardDbAdapter.LEFT).getBytes());
+			}
+			for (CardData cd : lTradeRight) {
+				fos.write(cd.toString(CardDbAdapter.RIGHT).getBytes());
+			}
+
+			fos.close();
+		}
+		catch (FileNotFoundException e) {
+			Toast.makeText(getApplicationContext(), "The trade could not be saved; please try again.", Toast.LENGTH_LONG)
+					.show();
+		}
+		catch (IOException e) {
+			Toast.makeText(getApplicationContext(), "The trade could not be saved; please try again.", Toast.LENGTH_LONG)
+					.show();
+		}
+		catch (IllegalArgumentException e) {
+			Toast.makeText(getApplicationContext(), "Trade names may not contain the path separator character ('/').",
+					Toast.LENGTH_LONG).show();
+		}
+	}
+
+	protected void LoadTrade(String _tradeName) {
+		try {
+			BufferedReader br = new BufferedReader(new InputStreamReader(openFileInput(_tradeName)));
+
+			lTradeLeft.clear();
+			lTradeRight.clear();
+
+			String line;
+			String[] parts;
+			while ((line = br.readLine()) != null) {
+				parts = line.split(CardData.delimiter);
+
+				String cardName = parts[1];
+				String cardSet = parts[2];
+				String tcgName = mdbHelper.getTCGname(cardSet);
+				int side = Integer.parseInt(parts[0]);
+				int numberOf = Integer.parseInt(parts[3]);
+
+				CardData cd = new CardData(cardName, tcgName, cardSet, numberOf, 0, "loading", Integer.toString(numberOf));
+				if (side == CardDbAdapter.LEFT) {
+					lTradeLeft.add(0, cd);
+					FetchPriceTask loadPrice = new FetchPriceTask(lTradeLeft.get(0), aaTradeLeft);
+					loadPrice.execute();
+				}
+				else if (side == CardDbAdapter.RIGHT) {
+					lTradeRight.add(0, cd);
+					FetchPriceTask loadPrice = new FetchPriceTask(lTradeRight.get(0), aaTradeRight);
+					loadPrice.execute();
+				}
+			}
+		}
+		catch (NumberFormatException e) {
+			Toast.makeText(getApplicationContext(), "NumberFormatException", Toast.LENGTH_LONG).show();
+		}
+		catch (IOException e) {
+			Toast.makeText(getApplicationContext(), "IOException", Toast.LENGTH_LONG).show();
+		}
 	}
 
 	protected void ChangeSet(final String _side, final int _position) {
@@ -973,11 +996,11 @@ public class CardTradingActivity extends FamiliarActivity {
 			try {
 				if (number.contains("b") && CardViewActivity.isTransformable(number, data.setCode)) {
 					priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p="
-							+ mdbHelper.getTransformName(setCode, number.replace("b", "a"))).replace(" ", "%20").replace("ï¿½", "Ae"));
+							+ mdbHelper.getTransformName(setCode, number.replace("b", "a"))).replace(" ", "%20").replace("Æ", "Ae"));
 				}
 				else {
 					priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p="
-							+ cardName).replace(" ", "%20").replace("ï¿½", "Ae"));
+							+ cardName).replace(" ", "%20").replace("Æ", "Ae"));
 				}
 			}
 			catch (MalformedURLException e) {
@@ -1090,9 +1113,10 @@ public class CardTradingActivity extends FamiliarActivity {
 				return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) { super.onCreateOptionsMenu(menu);
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
 		MenuInflater inflater = new MenuInflater(this);
 		inflater.inflate(R.menu.trader_menu, menu);
 		return true;

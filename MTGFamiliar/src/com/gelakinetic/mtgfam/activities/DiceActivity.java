@@ -35,7 +35,6 @@ import android.widget.TextView;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.helpers.MyApp;
 
 public class DiceActivity extends FamiliarActivity {
 	private Random													r;

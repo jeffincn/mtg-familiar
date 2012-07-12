@@ -12,9 +12,9 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.gelakinetic.mtgfam.activities.MainActivity.OTATask;
-
 import android.database.sqlite.SQLiteException;
+
+import com.gelakinetic.mtgfam.activities.MainActivity.OTATask;
 
 public class RulesParser {
 

@@ -47,7 +47,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.helpers.MyApp;
 import com.gelakinetic.mtgfam.helpers.RoundTimerService;
 
 public class RoundTimerActivity extends FamiliarActivity {

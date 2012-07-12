@@ -59,7 +59,6 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
-import com.gelakinetic.mtgfam.helpers.MyApp;
 
 public class RulesActivity extends FamiliarActivity {
 

@@ -47,7 +47,6 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
-import com.gelakinetic.mtgfam.helpers.MyApp;
 
 public class RandomCardActivity extends FamiliarActivity {
 	private static final int		RULESDIALOG				= 0;

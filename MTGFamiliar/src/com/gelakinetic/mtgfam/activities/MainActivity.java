@@ -64,7 +64,6 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.JsonParser;
-import com.gelakinetic.mtgfam.helpers.MyApp;
 import com.gelakinetic.mtgfam.helpers.RoundTimerService;
 import com.gelakinetic.mtgfam.helpers.RulesParser;
 

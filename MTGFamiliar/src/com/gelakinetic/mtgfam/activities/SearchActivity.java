@@ -50,7 +50,6 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.AutocompleteCursorAdapter;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
-import com.gelakinetic.mtgfam.helpers.MyApp;
 
 public class SearchActivity extends FamiliarActivity {
 	public static final String	NAME				= "name";

@@ -106,6 +106,7 @@ public class CardTradingActivity extends FragmentActivity {
 	private static final int			AVG_PRICE							= 1;
 	private static final int			HIGH_PRICE						= 2;
 
+	private static final String		autosaveName				= "autosave";
 	private static final String		tradeExtension				= ".trade";
 
 	@Override
@@ -237,9 +238,24 @@ public class CardTradingActivity extends FragmentActivity {
 		}
 		catch (IllegalArgumentException e) {
 		}
-
+		
 		MyApp appState = ((MyApp) getApplicationContext());
 		appState.setState(0);
+		
+		try {
+			//Test to see if the autosave file exist, then load the trade it if does.
+			openFileInput(autosaveName + tradeExtension);
+			LoadTrade(autosaveName + tradeExtension);
+		} catch (FileNotFoundException e){
+			//Do nothing if the file doesn't exist
+		}
+	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+
+		SaveTrade(autosaveName + tradeExtension);
 	}
 
 	@Override
@@ -407,31 +423,7 @@ public class CardTradingActivity extends FragmentActivity {
 						String tradeName = input.getText().toString();
 
 						String FILENAME = tradeName + tradeExtension;
-						FileOutputStream fos;
-
-						try {
-							// MODE_PRIVATE will create the file (or replace a file of the
-							// same name)
-							fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-
-							for (CardData cd : lTradeLeft) {
-								fos.write(cd.toString(CardDbAdapter.LEFT).getBytes());
-							}
-							for (CardData cd : lTradeRight) {
-								fos.write(cd.toString(CardDbAdapter.RIGHT).getBytes());
-							}
-
-							fos.close();
-						}
-						catch (FileNotFoundException e) {
-							Toast.makeText(getApplicationContext(), "The trade could not be saved; please try again.", Toast.LENGTH_LONG).show();
-						}
-						catch (IOException e) {
-							Toast.makeText(getApplicationContext(), "The trade could not be saved; please try again.", Toast.LENGTH_LONG).show();
-						}
-						catch (IllegalArgumentException e) {
-							Toast.makeText(getApplicationContext(), "Trade names may not contain the path separator character ('/').", Toast.LENGTH_LONG).show();
-						}
+						SaveTrade(FILENAME);
 
 						currentTrade = tradeName;
 					}
@@ -479,45 +471,8 @@ public class CardTradingActivity extends FragmentActivity {
 				});
 				builder.setItems(tradeNames, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface di, int which) {
-
-						try {
-							BufferedReader br = new BufferedReader(new InputStreamReader(openFileInput(tradeNames[which]
-									+ tradeExtension)));
-
-							lTradeLeft.clear();
-							lTradeRight.clear();
-
-							String line;
-							String[] parts;
-							while ((line = br.readLine()) != null) {
-								parts = line.split(CardData.delimiter);
-
-								String cardName = parts[1];
-								String cardSet = parts[2];
-								String tcgName = mdbHelper.getTCGname(cardSet);
-								int side = Integer.parseInt(parts[0]);
-								int numberOf = Integer.parseInt(parts[3]);
-
-								CardData cd = new CardData(cardName, tcgName, cardSet, numberOf, 0, "loading", Integer
-										.toString(numberOf));
-								if (side == CardDbAdapter.LEFT) {
-									lTradeLeft.add(0, cd);
-									FetchPriceTask loadPrice = new FetchPriceTask(lTradeLeft.get(0), aaTradeLeft);
-									loadPrice.execute();
-								}
-								else if (side == CardDbAdapter.RIGHT) {
-									lTradeRight.add(0, cd);
-									FetchPriceTask loadPrice = new FetchPriceTask(lTradeRight.get(0), aaTradeRight);
-									loadPrice.execute();
-								}
-							}
-						}
-						catch (NumberFormatException e) {
-							Toast.makeText(getApplicationContext(), "NumberFormatException", Toast.LENGTH_LONG).show();
-						}
-						catch (IOException e) {
-							Toast.makeText(getApplicationContext(), "IOException", Toast.LENGTH_LONG).show();
-						}
+						
+						LoadTrade(tradeNames[which] + tradeExtension);
 
 						currentTrade = tradeNames[which];
 
@@ -582,7 +537,75 @@ public class CardTradingActivity extends FragmentActivity {
 		}
 		return dialog;
 	}
+	
+	protected void SaveTrade(String _tradeName){
+		FileOutputStream fos;
 
+		try {
+			// MODE_PRIVATE will create the file (or replace a file of the
+			// same name)
+			fos = openFileOutput(_tradeName, Context.MODE_PRIVATE);
+
+			for (CardData cd : lTradeLeft) {
+				fos.write(cd.toString(CardDbAdapter.LEFT).getBytes());
+			}
+			for (CardData cd : lTradeRight) {
+				fos.write(cd.toString(CardDbAdapter.RIGHT).getBytes());
+			}
+
+			fos.close();
+		}
+		catch (FileNotFoundException e) {
+			Toast.makeText(getApplicationContext(), "The trade could not be saved; please try again.", Toast.LENGTH_LONG).show();
+		}
+		catch (IOException e) {
+			Toast.makeText(getApplicationContext(), "The trade could not be saved; please try again.", Toast.LENGTH_LONG).show();
+		}
+		catch (IllegalArgumentException e) {
+			Toast.makeText(getApplicationContext(), "Trade names may not contain the path separator character ('/').", Toast.LENGTH_LONG).show();
+		}
+	}
+
+	protected void LoadTrade(String _tradeName){
+		try {
+			BufferedReader br = new BufferedReader(new InputStreamReader(openFileInput(_tradeName)));
+
+			lTradeLeft.clear();
+			lTradeRight.clear();
+
+			String line;
+			String[] parts;
+			while ((line = br.readLine()) != null) {
+				parts = line.split(CardData.delimiter);
+
+				String cardName = parts[1];
+				String cardSet = parts[2];
+				String tcgName = mdbHelper.getTCGname(cardSet);
+				int side = Integer.parseInt(parts[0]);
+				int numberOf = Integer.parseInt(parts[3]);
+
+				CardData cd = new CardData(cardName, tcgName, cardSet, numberOf, 0, "loading", Integer
+						.toString(numberOf));
+				if (side == CardDbAdapter.LEFT) {
+					lTradeLeft.add(0, cd);
+					FetchPriceTask loadPrice = new FetchPriceTask(lTradeLeft.get(0), aaTradeLeft);
+					loadPrice.execute();
+				}
+				else if (side == CardDbAdapter.RIGHT) {
+					lTradeRight.add(0, cd);
+					FetchPriceTask loadPrice = new FetchPriceTask(lTradeRight.get(0), aaTradeRight);
+					loadPrice.execute();
+				}
+			}
+		}
+		catch (NumberFormatException e) {
+			Toast.makeText(getApplicationContext(), "NumberFormatException", Toast.LENGTH_LONG).show();
+		}
+		catch (IOException e) {
+			Toast.makeText(getApplicationContext(), "IOException", Toast.LENGTH_LONG).show();
+		}
+	}
+	
 	protected void ChangeSet(final String _side, final int _position) {
 		CardData data = (_side.equals("left") ? lTradeLeft.get(_position) : lTradeRight.get(_position));
 		String name = data.getName();

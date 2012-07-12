@@ -24,7 +24,6 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
 import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.helpers.MyApp;
 
 public class PreferencesActivity extends PreferenceActivity {
 	public void onCreate(Bundle savedInstanceState) {

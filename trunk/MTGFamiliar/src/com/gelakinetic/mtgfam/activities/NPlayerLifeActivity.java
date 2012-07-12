@@ -61,7 +61,6 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.GatheringsIO;
-import com.gelakinetic.mtgfam.helpers.MyApp;
 
 public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListener {
 
@@ -568,12 +567,11 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 
 		players.add(p);
 
-		if (compactMode){
+                if (compactMode && orientation != LANDSCAPE){
 			p.hideHistory();
 			
-			LinearLayout doublePlayerRow;
 			if (playersInRow == 0){
-				doublePlayer = (LinearLayout) inflater.inflate(R.layout.life_counter_player_double, null);
+                                doublePlayer = (LinearLayout) inflater.inflate(R.layout.life_counter_player_double_row, null);
 				LinearLayout playerPlacement = (LinearLayout) doublePlayer.findViewById(R.id.playerLeft);
 				playerPlacement.addView(layout);
 				
@@ -594,7 +592,6 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	private void removePlayer(int index) {
 		mainLayout.removeView(players.get(index).layout);
 		players.remove(index);
-		
 		
 		//Rather then go through all the logic of finding the removed player, and adjusting the locations
 		//of all the player views, just restart the activity when in compact mode, this will adjust the 

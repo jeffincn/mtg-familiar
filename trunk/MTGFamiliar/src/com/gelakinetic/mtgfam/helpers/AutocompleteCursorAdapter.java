@@ -19,7 +19,6 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam.helpers;
 
-import com.gelakinetic.mtgfam.R;
 import android.content.Context;
 import android.database.Cursor;
 import android.view.LayoutInflater;
@@ -27,6 +26,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
+
+import com.gelakinetic.mtgfam.R;
 
 public class AutocompleteCursorAdapter extends CursorAdapter {
 

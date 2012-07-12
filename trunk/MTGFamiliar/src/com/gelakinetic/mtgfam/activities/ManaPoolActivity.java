@@ -32,7 +32,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.helpers.MyApp;
 
 public class ManaPoolActivity extends FamiliarActivity {
 	private Button	whiteMinus, blueMinus, blackMinus, redMinus, greenMinus, colorlessMinus, spellMinus;

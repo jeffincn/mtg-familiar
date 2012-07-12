@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-Copyright 2011 Adam Feinstein and April King.
+/**
+Copyright 2011 Adam Feinstein
 
 This file is part of MTG Familiar.
 
@@ -16,16 +15,26 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
--->
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+ */
 
-    <item
-        android:id="@+id/wishlist_menu_clear"
-        android:icon="@drawable/menu_cancel"
-        android:title="@string/clear"/>
-    <item
-        android:id="@+id/wishlist_menu_settings"
-        android:icon="@drawable/menu_hi_med_low"
-        android:title="@string/trade_price_setting" />
+package com.gelakinetic.mtgfam.activities;
 
-</menu>
+import android.content.res.Configuration;
+import android.os.Bundle;
+import android.preference.PreferenceActivity;
+
+import com.gelakinetic.mtgfam.R;
+import com.gelakinetic.mtgfam.helpers.MyApp;
+
+public class PreferencesActivity extends PreferenceActivity {
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		addPreferencesFromResource(R.xml.preferences);
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+	}
+
+}

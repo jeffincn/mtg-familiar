@@ -480,4 +480,5 @@ Media licenced under under the &lt;a href="http://creativecommons.org/licenses/b
     </string-array>
     <string name="compactLife">Compact Mode</string>
     <string name="compactLifeSummary">Display the life counter in compact mode (No History)</string>
+    <string name="verbosewishlisttext">Show card details in wishlist.</string>
 </resources>

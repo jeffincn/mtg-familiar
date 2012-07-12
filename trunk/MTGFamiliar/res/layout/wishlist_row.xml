@@ -64,22 +64,11 @@
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
-            android:id="@+id/wishlistNumber"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:layout_gravity="right"
-            android:gravity="right"
-            android:text="@string/trader_default_number_of"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:visibility="visible" />
-
-        <TextView
             android:id="@+id/wishlistRowPrice"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_gravity="left"
+            android:layout_gravity="center"
             android:gravity="left"
             android:maxLines="1"
             android:text="@string/trader_default_price"
@@ -117,6 +106,6 @@
                 android:gravity="right"
                 android:text="@string/t"
 	            android:textAppearance="?android:attr/textAppearanceSmall" />
-        </LinearLayout>
+            </LinearLayout>
     </LinearLayout>
 </LinearLayout>

@@ -157,5 +157,11 @@
 		android:title="@string/defaultpathtitle" android:key="@string/default_deck_path_key" 
 		android:dialogTitle="@string/default_deck_path_dialog_title" /> </PreferenceCategory>
     -->
+    <PreferenceCategory android:title="@string/Wishlist" >
 
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="verboseWishlistPref"
+            android:title="@string/verbosewishlisttext"/>
+	</PreferenceCategory>
 </PreferenceScreen>

@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-Copyright 2012 Alex Levine
+/**
+Copyright 2011 Adam Feinstein
 
 This file is part of MTG Familiar.
 
@@ -16,17 +15,20 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
--->
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
-	
-	<item 
-	    android:id="@+id/rules_menu_search"
-        android:icon="@drawable/menu_search"
-	    android:title="@string/rules_search" />
-	
-	<item
-        android:id="@+id/rules_menu_exit"
-        android:icon="@drawable/menu_cancel"
-        android:title="@string/rules_exit"/>
+ */
 
-</menu>
+package com.gelakinetic.mtgfam.helpers;
+
+import android.app.Application;
+
+public class MyApp extends Application {
+
+  private int myState;
+
+  public int getState(){
+    return myState;
+  }
+  public void setState(int s){
+    myState = s;
+  }
+}

@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-        <item
-        android:id="@+id/action_search"
-        android:actionViewClass="android.widget.SearchView"
-        android:icon="@drawable/menu_search"/>
     <item android:id="@+id/gdelete_gathering" android:icon="@drawable/menu_delete" android:title="@string/gathering_menu_delete"></item>
     <item android:id="@+id/gremove_player" android:icon="@drawable/menu_minus" android:title="@string/removeplayer"></item>
     <item android:id="@+id/gadd_player" android:icon="@drawable/menu_plus" android:title="@string/addplayer"></item>

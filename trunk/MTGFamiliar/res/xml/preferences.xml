@@ -26,7 +26,7 @@
             android:entryValues="@array/updatefrequencydaysvalues"
             android:key="updatefrequency"
             android:summary="@string/updatefrequencysummary"
-            android:title="@string/updatefrequencytitle" android:defaultValue="3"/>
+            android:title="@string/updatefrequencytitle" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/cardviewtitle" >

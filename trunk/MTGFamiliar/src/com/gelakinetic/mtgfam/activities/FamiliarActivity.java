@@ -110,18 +110,18 @@ public abstract class FamiliarActivity extends SherlockActivity {
 	 */
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(R.string.search_hint).setIcon(R.drawable.menu_search)
-				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+		.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				new Thread(new Runnable() {
 					@Override
-					public boolean onMenuItemClick(MenuItem item) {
-						new Thread(new Runnable() {
-							@Override
-							public void run() {
-								new Instrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_SEARCH);
-							}
-						}).start();
-						return true;
+					public void run() {
+						new Instrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_SEARCH);
 					}
-				}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				}).start();
+				return true;
+			}
+		}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 		return true;
 	}
@@ -210,38 +210,40 @@ public abstract class FamiliarActivity extends SherlockActivity {
 
 			this.publishProgress(new String[] { "indeterminate", "Checking Legality" });
 
-			ArrayList<String[]> patchInfo = JsonParser.readUpdateJsonStream(preferences);
-
 			try {
+				ArrayList<String[]> patchInfo = JsonParser.readUpdateJsonStream(preferences);
+
 				URL legal = new URL("https://sites.google.com/site/mtgfamiliar/manifests/legality.json");
 				InputStream in = new BufferedInputStream(legal.openStream());
 				JsonParser.readLegalityJsonStream(in, mDbHelper, preferences);
-			}
-			catch (MalformedURLException e1) {
-			}
-			catch (IOException e) {
-			}
 
-			this.publishProgress(new String[] { "determinate", "Checking for New Cards" });
+				this.publishProgress(new String[] { "determinate", "Checking for New Cards" });
 
-			if (patchInfo != null) {
+				if (patchInfo != null) {
 
-				for (int i = 0; i < patchInfo.size(); i++) {
-					String[] set = patchInfo.get(i);
-					if (!mDbHelper.doesSetExist(set[2])) {
-						try {
-							GZIPInputStream gis = new GZIPInputStream(new URL(set[1]).openStream());
-							JsonParser.readCardJsonStream(gis, this, set[0], mDbHelper);
-						}
-						catch (MalformedURLException e) {
-							// Log.e("JSON error", e.toString());
-						}
-						catch (IOException e) {
-							// Log.e("JSON error", e.toString());
+					for (int i = 0; i < patchInfo.size(); i++) {
+						String[] set = patchInfo.get(i);
+						if (!mDbHelper.doesSetExist(set[2])) {
+							try {
+								GZIPInputStream gis = new GZIPInputStream(new URL(set[1]).openStream());
+								JsonParser.readCardJsonStream(gis, this, set[0], mDbHelper);
+							}
+							catch (MalformedURLException e) {
+								// Log.e("JSON error", e.toString());
+							}
+							catch (IOException e) {
+								// Log.e("JSON error", e.toString());
+							}
 						}
 					}
+					JsonParser.readTCGNameJsonStream(preferences, mDbHelper);
 				}
-				JsonParser.readTCGNameJsonStream(preferences, mDbHelper);
+			}
+			catch (MalformedURLException e1) {
+				// eat it
+			}
+			catch (IOException e) {
+				// eat it
 			}
 
 			this.publishProgress(new String[] { "determinate", "Checking for New Comprehensive Rules" });

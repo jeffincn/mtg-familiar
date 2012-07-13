@@ -37,7 +37,6 @@ public class JsonParser {
 	public static void readCardJsonStream(InputStream in, OTATask task, String setName, CardDbAdapter mDbHelper)
 			throws IOException {
 		JsonReader reader = new JsonReader(new InputStreamReader(in, "ISO-8859-1"));
-
 		String s, s1, s2, ptstr;
 
 		int numTotalElements = 0;
@@ -283,63 +282,59 @@ public class JsonParser {
 		}
 		reader.endObject();
 		task.publicPublishProgress(new String[] { "Done Parsing " + setName, "Done Parsing " + setName, "0" });
+		reader.close();
 		return;
 	}
 
-	public static ArrayList<String[]> readUpdateJsonStream(SharedPreferences settings) {
+	public static ArrayList<String[]> readUpdateJsonStream(SharedPreferences settings) throws MalformedURLException, IOException {
 		ArrayList<String[]> patchInfo = new ArrayList<String[]>();
 		URL update;
 		String label;
 		String date = null;
 		String label2;
 
-		try {
-			update = new URL("https://sites.google.com/site/mtgfamiliar/manifests/patches.json");
-			InputStreamReader isr = new InputStreamReader(update.openStream(), "ISO-8859-1");
-			JsonReader reader = new JsonReader(isr);
+		update = new URL("https://sites.google.com/site/mtgfamiliar/manifests/patches.json");
+		InputStreamReader isr = new InputStreamReader(update.openStream(), "ISO-8859-1");
+		JsonReader reader = new JsonReader(isr);
 
-			reader.beginObject();
-			while (reader.hasNext()) {
-				label = reader.nextName();
+		reader.beginObject();
+		while (reader.hasNext()) {
+			label = reader.nextName();
 
-				if (label.equals("Date")) {
-					String lastUpdate = settings.getString("lastUpdate", "");
-					date = reader.nextString();
-					if (lastUpdate.equals(date)) {
-						return null;
-					}
-				}
-				else if (label.equals("Patches")) {
-					reader.beginArray();
-					while (reader.hasNext()) {
-						reader.beginObject();
-						String[] setdata = new String[3];
-						while (reader.hasNext()) {
-							label2 = reader.nextName();
-							if (label2.equals("Name")) {
-								setdata[0] = reader.nextString();
-							}
-							else if (label2.equals("URL")) {
-								setdata[1] = reader.nextString();
-							}
-							else if (label2.equals("Code")) {
-								setdata[2] = reader.nextString();
-							}
-						}
-						patchInfo.add(setdata);
-						reader.endObject();
-					}
-					reader.endArray();
+			if (label.equals("Date")) {
+				String lastUpdate = settings.getString("lastUpdate", "");
+				date = reader.nextString();
+				if (lastUpdate.equals(date)) {
+					reader.close();
+					return null;
 				}
 			}
-			reader.endObject();
+			else if (label.equals("Patches")) {
+				reader.beginArray();
+				while (reader.hasNext()) {
+					reader.beginObject();
+					String[] setdata = new String[3];
+					while (reader.hasNext()) {
+						label2 = reader.nextName();
+						if (label2.equals("Name")) {
+							setdata[0] = reader.nextString();
+						}
+						else if (label2.equals("URL")) {
+							setdata[1] = reader.nextString();
+						}
+						else if (label2.equals("Code")) {
+							setdata[2] = reader.nextString();
+						}
+					}
+					patchInfo.add(setdata);
+					reader.endObject();
+				}
+				reader.endArray();
+			}
 		}
-		catch (MalformedURLException e) {
-			return null;
-		}
-		catch (IOException e) {
-			return null;
-		}
+		reader.endObject();
+		reader.close();
+
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putString("lastUpdate", date);
 		editor.commit();
@@ -373,6 +368,7 @@ public class JsonParser {
 				// compare date, maybe return, update sharedprefs
 				String spDate = settings.getString("date", null);
 				if (spDate != null && spDate.equals(date)) {
+					reader.close();
 					return; // dates match, nothing new here.
 				}
 
@@ -426,60 +422,55 @@ public class JsonParser {
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putString("date", date);
 		editor.commit();
-
+		reader.close();
 		return;
 	}
 
-	public static void readTCGNameJsonStream(SharedPreferences settings, CardDbAdapter mDbHelper) {
+	public static void readTCGNameJsonStream(SharedPreferences settings, CardDbAdapter mDbHelper) throws MalformedURLException, IOException{
 		URL update;
 		String label;
 		String date = null;
 		String label2;
 		String name = null, code = null;
 
-		try {
-			update = new URL("https://sites.google.com/site/mtgfamiliar/manifests/TCGnames.json");
-			InputStreamReader isr = new InputStreamReader(update.openStream(), "ISO-8859-1");
-			JsonReader reader = new JsonReader(isr);
+		update = new URL("https://sites.google.com/site/mtgfamiliar/manifests/TCGnames.json");
+		InputStreamReader isr = new InputStreamReader(update.openStream(), "ISO-8859-1");
+		JsonReader reader = new JsonReader(isr);
 
-			reader.beginObject();
-			while (reader.hasNext()) {
-				label = reader.nextName();
+		reader.beginObject();
+		while (reader.hasNext()) {
+			label = reader.nextName();
 
-				if (label.equals("Date")) {
-					String lastUpdate = settings.getString("lastTCGNameUpdate", "");
-					date = reader.nextString();
-					if (lastUpdate.equals(date)) {
-						return;
-					}
-				}
-				else if (label.equals("Sets")) {
-					reader.beginArray();
-					while (reader.hasNext()) {
-						reader.beginObject();
-						while (reader.hasNext()) {
-							label2 = reader.nextName();
-							if (label2.equals("Code")) {
-								code = reader.nextString();
-							}
-							else if (label2.equals("TCGName")) {
-								name = reader.nextString();
-							}
-						}
-						mDbHelper.addTCGname(name, code);
-						reader.endObject();
-					}
-					reader.endArray();
+			if (label.equals("Date")) {
+				String lastUpdate = settings.getString("lastTCGNameUpdate", "");
+				date = reader.nextString();
+				if (lastUpdate.equals(date)) {
+					reader.close();
+					return;
 				}
 			}
-			reader.endObject();
+			else if (label.equals("Sets")) {
+				reader.beginArray();
+				while (reader.hasNext()) {
+					reader.beginObject();
+					while (reader.hasNext()) {
+						label2 = reader.nextName();
+						if (label2.equals("Code")) {
+							code = reader.nextString();
+						}
+						else if (label2.equals("TCGName")) {
+							name = reader.nextString();
+						}
+					}
+					mDbHelper.addTCGname(name, code);
+					reader.endObject();
+				}
+				reader.endArray();
+			}
 		}
-		catch (MalformedURLException e) {
-			return;
-		}
-		catch (IOException e) {
-			return;
-		}
+		reader.endObject();
+		reader.close();
+
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putString("lastTCGNameUpdate", date);
 		editor.commit();

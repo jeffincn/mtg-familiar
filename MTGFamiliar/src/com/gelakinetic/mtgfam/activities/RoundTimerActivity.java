@@ -50,124 +50,121 @@ import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.RoundTimerService;
 
 public class RoundTimerActivity extends FamiliarActivity {
-	
-	public static String RESULT_FILTER = "com.gelakinetic.mtgfam.RESULT_FILTER";
-	public static String TTS_FILTER = "com.gelakinetic.mtgfam.TTS_FILTER";
-	public static String EXTRA_END_TIME = "EndTime";
-	
-	private static int RINGTONE_REQUEST_CODE = 17;
-	
-	private static int DIALOG_SET_WARNINGS = 0;
-	
-	private Handler timerHandler = new Handler();
-	private Runnable updateTimeViewTask = new Runnable() 
-	{
-		public void run()
-		{	
-			displayTimeLeft();
-			
-			if(endTime > SystemClock.elapsedRealtime())
-			{
-				actionButton.setText(R.string.cancel_timer);
-				timerHandler.postDelayed(updateTimeViewTask, 100);
-			}
-			else
-			{
-				actionButton.setText(R.string.start_timer);
-			}
-		}
-	};
 
-	private TimePicker picker;
-	private Button actionButton;
-	private TextView timeView;
-	
-	private long endTime;
-	private boolean updatingDisplay;
-	private boolean ttsInitialized = false;
-	
-	private BroadcastReceiver resultReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			endTime = intent.getLongExtra(RoundTimerService.EXTRA_END_TIME, SystemClock.elapsedRealtime());
-			startUpdatingDisplay();
-		}
-	};
-	
-	private BroadcastReceiver ttsReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			ttsInitialized = intent.getBooleanExtra(RoundTimerService.EXTRA_TTS_INITIALIZED, false);
-		}
-	};
-	
+	public static String			RESULT_FILTER					= "com.gelakinetic.mtgfam.RESULT_FILTER";
+	public static String			TTS_FILTER						= "com.gelakinetic.mtgfam.TTS_FILTER";
+	public static String			EXTRA_END_TIME				= "EndTime";
+
+	private static int				RINGTONE_REQUEST_CODE	= 17;
+
+	private static int				DIALOG_SET_WARNINGS		= 0;
+
+	private Handler						timerHandler					= new Handler();
+	private Runnable					updateTimeViewTask		= new Runnable() {
+																										public void run() {
+																											displayTimeLeft();
+
+																											if (endTime > SystemClock.elapsedRealtime()) {
+																												actionButton.setText(R.string.cancel_timer);
+																												timerHandler.postDelayed(updateTimeViewTask, 100);
+																											}
+																											else {
+																												actionButton.setText(R.string.start_timer);
+																											}
+																										}
+																									};
+
+	private TimePicker				picker;
+	private Button						actionButton;
+	private TextView					timeView;
+
+	private long							endTime;
+	private boolean						updatingDisplay;
+	private boolean						ttsInitialized				= false;
+
+	private BroadcastReceiver	resultReceiver				= new BroadcastReceiver() {
+																										@Override
+																										public void onReceive(Context context, Intent intent) {
+																											endTime = intent.getLongExtra(RoundTimerService.EXTRA_END_TIME,
+																													SystemClock.elapsedRealtime());
+																											startUpdatingDisplay();
+																										}
+																									};
+
+	private BroadcastReceiver	ttsReceiver						= new BroadcastReceiver() {
+																										@Override
+																										public void onReceive(Context context, Intent intent) {
+																											ttsInitialized = intent.getBooleanExtra(
+																													RoundTimerService.EXTRA_TTS_INITIALIZED, false);
+																										}
+																									};
+
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.round_timer_activity);
-		//this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		
+		// this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
 		registerReceiver(resultReceiver, new IntentFilter(RESULT_FILTER));
 		registerReceiver(ttsReceiver, new IntentFilter(TTS_FILTER));
-		
+
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
-				
-		this.picker = (TimePicker)findViewById(R.id.rt_time_picker);
+
+		this.picker = (TimePicker) findViewById(R.id.rt_time_picker);
 		picker.setIs24HourView(true);
-		
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(RoundTimerActivity.this);
+
 		int length;
-		try	{
-			length = Integer.parseInt(settings.getString("roundLength", "50"));
+		try {
+			length = Integer.parseInt(preferences.getString("roundLength", "50"));
 		}
-		catch(Exception ex)	{
-			//Eat the exception; this should never happen in practice, and if it does we just want to
-			//default to 50 and pretend nothing broke
+		catch (Exception ex) {
+			// Eat the exception; this should never happen in practice, and if it does
+			// we just want to
+			// default to 50 and pretend nothing broke
 			length = 50;
 		}
 		picker.setCurrentHour(length / 60);
 		picker.setCurrentMinute(length % 60);
-		
-		this.actionButton = (Button)findViewById(R.id.rt_action_button);
+
+		this.actionButton = (Button) findViewById(R.id.rt_action_button);
 		actionButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				startCancelClick(v);
 			}
 		});
-		
-		this.timeView = (TextView)findViewById(R.id.rt_time_display);
-		
+
+		this.timeView = (TextView) findViewById(R.id.rt_time_display);
+
 		Intent i = new Intent(RoundTimerService.REQUEST_FILTER);
 		sendBroadcast(i);
-		updatingDisplay = true; //So onResume() doesn't start the updates before we get the response broadcast
-		
-		if(settings.getBoolean("hasTts", false)) {
-			i = new Intent(RoundTimerService.TTS_INITIALIZED_FILTER); //Find out if TTS is initialized
+		updatingDisplay = true; // So onResume() doesn't start the updates before we
+														// get the response broadcast
+
+		if (preferences.getBoolean("hasTts", false)) {
+			i = new Intent(RoundTimerService.TTS_INITIALIZED_FILTER); // Find out if
+																																// TTS is
+																																// initialized
 			sendBroadcast(i);
 		}
 	}
-	
+
 	@Override
-	protected void onResume() 
-	{
+	protected void onResume() {
 		super.onResume();
-		if(!updatingDisplay)
-		{
+		if (!updatingDisplay) {
 			startUpdatingDisplay();
 		}
 	}
-	
+
 	@Override
-	protected void onPause()
-	{
+	protected void onPause() {
 		super.onPause();
-		updatingDisplay = false; //So we resume the updates when we resume the activity
+		updatingDisplay = false; // So we resume the updates when we resume the
+															// activity
 	}
-	
+
 	@Override
-	protected void onDestroy()
-	{
+	protected void onDestroy() {
 		super.onDestroy();
 		unregisterReceiver(resultReceiver);
 		unregisterReceiver(ttsReceiver);
@@ -175,27 +172,25 @@ public class RoundTimerActivity extends FamiliarActivity {
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.set_timer_warnings).setVisible(ttsInitialized);
-	    return true;
+		menu.findItem(R.id.set_timer_warnings).setVisible(ttsInitialized);
+		return true;
 	}
-	
+
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) 
-	{
+	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
-		switch (item.getItemId())
-		{
+		switch (item.getItemId()) {
 			case R.id.set_timer_ringtone:
-				SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-				Uri soundFile = Uri.parse(settings.getString("timerSound", RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION).toString()));
-				
+				Uri soundFile = Uri.parse(preferences.getString("timerSound",
+						RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION).toString()));
+
 				Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
 				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
 				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Alert Tone");
 				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, soundFile);
 				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, System.DEFAULT_NOTIFICATION_URI);
 				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false);
-				
+
 				startActivityForResult(intent, RINGTONE_REQUEST_CODE);
 				return true;
 			case R.id.set_timer_warnings:
@@ -205,59 +200,52 @@ public class RoundTimerActivity extends FamiliarActivity {
 				return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
 	@Override
 	public Dialog onCreateDialog(int id) {
 		Dialog dialog = null;
-		if(id == DIALOG_SET_WARNINGS) {
+		if (id == DIALOG_SET_WARNINGS) {
 			final View v = View.inflate(this, R.layout.timer_warning_dialog, null);
-			final CheckBox chkFifteen = (CheckBox)v.findViewById(R.id.timer_pref_fifteen);
-			final CheckBox chkTen = (CheckBox)v.findViewById(R.id.timer_pref_ten);
-			final CheckBox chkFive = (CheckBox)v.findViewById(R.id.timer_pref_five);
-			
-			dialog = new AlertDialog.Builder(this)
-				.setView(v)
-				.setTitle(R.string.rt_warning_dialog_title)
-				.setPositiveButton("OK", new OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(RoundTimerActivity.this).edit();
-						edit.putBoolean("fifteenMinutePref", chkFifteen.isChecked());
-						edit.putBoolean("tenMinutePref", chkTen.isChecked());
-						edit.putBoolean("fiveMinutePref", chkFive.isChecked());
-						edit.commit();
-					}
-				})
-				.create();
+			final CheckBox chkFifteen = (CheckBox) v.findViewById(R.id.timer_pref_fifteen);
+			final CheckBox chkTen = (CheckBox) v.findViewById(R.id.timer_pref_ten);
+			final CheckBox chkFive = (CheckBox) v.findViewById(R.id.timer_pref_five);
+
+			dialog = new AlertDialog.Builder(this).setView(v).setTitle(R.string.rt_warning_dialog_title)
+					.setPositiveButton("OK", new OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(RoundTimerActivity.this)
+									.edit();
+							edit.putBoolean("fifteenMinutePref", chkFifteen.isChecked());
+							edit.putBoolean("tenMinutePref", chkTen.isChecked());
+							edit.putBoolean("fiveMinutePref", chkFive.isChecked());
+							edit.commit();
+						}
+					}).create();
 		}
 		return dialog;
 	}
-	
+
 	@Override
 	protected void onPrepareDialog(int id, Dialog dialog) {
-		if(id == DIALOG_SET_WARNINGS) {
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-			boolean fifteen = prefs.getBoolean("fifteenMinutePref", false);
-			boolean ten = prefs.getBoolean("tenMinutePref", false);
-			boolean five = prefs.getBoolean("fiveMinutePref", false);
-			
-			((CheckBox)dialog.findViewById(R.id.timer_pref_fifteen)).setChecked(fifteen);
-			((CheckBox)dialog.findViewById(R.id.timer_pref_ten)).setChecked(ten);
-			((CheckBox)dialog.findViewById(R.id.timer_pref_five)).setChecked(five);
+		if (id == DIALOG_SET_WARNINGS) {
+			boolean fifteen = preferences.getBoolean("fifteenMinutePref", false);
+			boolean ten = preferences.getBoolean("tenMinutePref", false);
+			boolean five = preferences.getBoolean("fiveMinutePref", false);
+
+			((CheckBox) dialog.findViewById(R.id.timer_pref_fifteen)).setChecked(fifteen);
+			((CheckBox) dialog.findViewById(R.id.timer_pref_ten)).setChecked(ten);
+			((CheckBox) dialog.findViewById(R.id.timer_pref_five)).setChecked(five);
 		}
 	}
-	
+
 	@Override
-	protected void onActivityResult(final int requestCode, final int resultCode, final Intent intent)
-	{
-		if(resultCode == Activity.RESULT_OK)
-		{
-			if(requestCode == RINGTONE_REQUEST_CODE)
-			{
+	protected void onActivityResult(final int requestCode, final int resultCode, final Intent intent) {
+		if (resultCode == Activity.RESULT_OK) {
+			if (requestCode == RINGTONE_REQUEST_CODE) {
 				Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-				
-				if (uri != null)
-				{
-					//Save it
+
+				if (uri != null) {
+					// Save it
 					SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(this).edit();
 					edit.putString("timerSound", uri.toString());
 					edit.commit();
@@ -265,95 +253,87 @@ public class RoundTimerActivity extends FamiliarActivity {
 			}
 		}
 	}
-	
-	public void startCancelClick(View view)
-	{
-		if(endTime > SystemClock.elapsedRealtime())
-		{
-			//We're running, so this command is cancel
+
+	public void startCancelClick(View view) {
+		if (endTime > SystemClock.elapsedRealtime()) {
+			// We're running, so this command is cancel
 			endTime = SystemClock.elapsedRealtime();
-			
+
 			Intent i = new Intent(RoundTimerService.CANCEL_FILTER);
 			sendBroadcast(i);
-			
+
 			actionButton.setText(R.string.start_timer);
 		}
-		else
-		{
-			//We're not running, so this command is start
-			picker.clearFocus(); //This forces the inner value to update, in case the user typed it in manually
+		else {
+			// We're not running, so this command is start
+			picker.clearFocus(); // This forces the inner value to update, in case the
+														// user typed it in manually
 			int hours = picker.getCurrentHour();
 			int minutes = picker.getCurrentMinute();
 
 			long timeInMillis = ((hours * 3600) + (minutes * 60)) * 1000;
-			if(timeInMillis == 0)
-			{
+			if (timeInMillis == 0) {
 				return;
 			}
-			
+
 			endTime = SystemClock.elapsedRealtime() + timeInMillis;
-			
+
 			Intent i = new Intent(RoundTimerService.START_FILTER);
 			i.putExtra(EXTRA_END_TIME, endTime);
 			sendBroadcast(i);
-			
+
 			startUpdatingDisplay();
 			actionButton.setText(R.string.cancel_timer);
 		}
 	}
-	
-	private void startUpdatingDisplay()
-	{
+
+	private void startUpdatingDisplay() {
 		updatingDisplay = true;
 		displayTimeLeft();
 		timerHandler.removeCallbacks(updateTimeViewTask);
 		timerHandler.postDelayed(updateTimeViewTask, 100);
 	}
-	
-	private void displayTimeLeft()
-	{
+
+	private void displayTimeLeft() {
 		long timeLeftMillis = endTime - SystemClock.elapsedRealtime();
 		String timeLeftStr = "";
-		
-		if(timeLeftMillis <= 0)
-		{
-			timeLeftStr = "00:00:00"; 
+
+		if (timeLeftMillis <= 0) {
+			timeLeftStr = "00:00:00";
 		}
-		else
-		{
+		else {
 			long timeLeftInSecs = (timeLeftMillis / 1000);
-			
-			//This is a slight hack to handle the fact that it always rounds down. It makes the clock look much nicer this way.
+
+			// This is a slight hack to handle the fact that it always rounds down. It
+			// makes the clock look much nicer this way.
 			timeLeftInSecs++;
-			
+
 			String hours = String.valueOf(timeLeftInSecs / (3600));
 			String minutes = String.valueOf((timeLeftInSecs % 3600) / 60);
 			String seconds = String.valueOf(timeLeftInSecs % 60);
-			
-			if(hours.length() == 1)
-			{
+
+			if (hours.length() == 1) {
 				timeLeftStr += "0";
 			}
 			timeLeftStr += hours + ":";
-			
-			if(minutes.length() == 1)
-			{
+
+			if (minutes.length() == 1) {
 				timeLeftStr += "0";
 			}
 			timeLeftStr += minutes + ":";
-			
-			if(seconds.length() == 1)
-			{
+
+			if (seconds.length() == 1) {
 				timeLeftStr += "0";
 			}
 			timeLeftStr += seconds;
 		}
-		
+
 		timeView.setText(timeLeftStr);
 	}
-	
+
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) { super.onCreateOptionsMenu(menu);
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
 		MenuInflater inflater = new MenuInflater(this);
 		inflater.inflate(R.menu.timer_menu, menu);
 		return true;

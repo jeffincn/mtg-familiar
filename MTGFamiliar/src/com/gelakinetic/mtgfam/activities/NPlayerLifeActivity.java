@@ -31,14 +31,12 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.view.LayoutInflater;
@@ -81,10 +79,9 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	private int															playerHeight;
 	private LinearLayout										mainLayout;
 	private LinearLayout										doublePlayer;
-	private int 												playersInRow;
+	private int															playersInRow;
 
 	private int															orientation;
-	private SharedPreferences								preferences;
 	private boolean													canGetLock;
 	private boolean													compactMode;
 	private Editor													editor;
@@ -116,12 +113,12 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	private int															numPlayers						= 0;
 	private int															listSizeHeight;
 	private int															listSizeWidth;
-	
-	private TextToSpeech tts;
-	private boolean ttsInitialized = false;
 
-	private GatheringsIO gIO;
-	
+	private TextToSpeech										tts;
+	private boolean													ttsInitialized				= false;
+
+	private GatheringsIO										gIO;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -129,15 +126,14 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		setContentView(R.layout.n_player_life_activity);
 
 		gIO = new GatheringsIO(getApplicationContext());
-		
+
 		players = new ArrayList<Player>(2);
-		
+
 		orientation = getResources().getConfiguration().orientation;
 
 		listSizeHeight = -10;
 		listSizeWidth = -10;
 
-		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		canGetLock = preferences.getBoolean("wakelock", true);
 		compactMode = preferences.getBoolean("compactMode", false);
 		editor = preferences.edit();
@@ -220,8 +216,8 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		scheduler.scheduleWithFixedDelay(runnable, timerTick, timerTick, TimeUnit.MILLISECONDS);
 
 		setType(LIFE);
-		
-		if(preferences.getBoolean("hasTts", false)) {
+
+		if (preferences.getBoolean("hasTts", false)) {
 			tts = new TextToSpeech(this, this);
 		}
 	}
@@ -230,7 +226,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	public void onDestroy() {
 		super.onDestroy();
 		scheduler.shutdown();
-		if(tts != null) {
+		if (tts != null) {
 			tts.shutdown();
 		}
 	}
@@ -277,7 +273,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 
 		mainLayout = (LinearLayout) findViewById(R.id.playerList);
 		playersInRow = 0;
-		
+
 		if (canGetLock) {
 			pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 			wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
@@ -288,24 +284,25 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 
 		if (lifeData == null || lifeData.length() == 0) {
 			boolean addedPlayers = false;
-			
+
 			try {
 				String dGathering = gIO.getDefaultGathering();
-				if (!dGathering.equals("")){
+				if (!dGathering.equals("")) {
 					ArrayList<GatheringsIO.PlayerData> loadedPlayers = gIO.ReadGatheringXML(dGathering);
 					players = new ArrayList<Player>(loadedPlayers.size());
-					for (GatheringsIO.PlayerData player : loadedPlayers){
+					for (GatheringsIO.PlayerData player : loadedPlayers) {
 						addPlayer(player.getName(), player.getStartingLife(), INITIAL_POISON, null, null, (Context) this);
 						addedPlayers = true;
 					}
 				}
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				players.clear();
 				players = new ArrayList<Player>(2);
 				addedPlayers = false;
 			}
-			
-			if (addedPlayers == false){
+
+			if (addedPlayers == false) {
 				addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, (Context) this);
 				addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, (Context) this);
 			}
@@ -397,10 +394,10 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 					listSizeHeight /= 2;
 					break;
 			}
-			if(listSizeHeight < 256){
+			if (listSizeHeight < 256) {
 				listSizeHeight = 192;
 			}
-			
+
 		}
 
 		for (Player p : players) {
@@ -501,7 +498,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		}
 		return dialog;
 	}
-	
+
 	private void update() {
 		switch (activeType) {
 			case LIFE:
@@ -567,24 +564,26 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 
 		players.add(p);
 
-                if (compactMode && orientation != LANDSCAPE){
+		if (compactMode && orientation != LANDSCAPE) {
 			p.hideHistory();
-			
-			if (playersInRow == 0){
-                                doublePlayer = (LinearLayout) inflater.inflate(R.layout.life_counter_player_double_row, null);
+
+			if (playersInRow == 0) {
+				doublePlayer = (LinearLayout) inflater.inflate(R.layout.life_counter_player_double_row, null);
 				LinearLayout playerPlacement = (LinearLayout) doublePlayer.findViewById(R.id.playerLeft);
 				playerPlacement.addView(layout);
-				
+
 				mainLayout.addView(doublePlayer);
 				playersInRow++;
-			} else if (playersInRow == 1){
+			}
+			else if (playersInRow == 1) {
 				LinearLayout playerPlacement = (LinearLayout) doublePlayer.findViewById(R.id.playerRight);
 				playerPlacement.addView(layout);
-				
+
 				doublePlayer = null;
 				playersInRow = 0;
 			}
-		} else {
+		}
+		else {
 			mainLayout.addView(layout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
 		}
 	}
@@ -592,11 +591,13 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	private void removePlayer(int index) {
 		mainLayout.removeView(players.get(index).layout);
 		players.remove(index);
-		
-		//Rather then go through all the logic of finding the removed player, and adjusting the locations
-		//of all the player views, just restart the activity when in compact mode, this will adjust the 
-		//layouts to not have a blank area when players are removed.
-		if (compactMode){
+
+		// Rather then go through all the logic of finding the removed player, and
+		// adjusting the locations
+		// of all the player views, just restart the activity when in compact mode,
+		// this will adjust the
+		// layouts to not have a blank area when players are removed.
+		if (compactMode) {
 			Intent intent = getIntent();
 			finish();
 			startActivity(intent);
@@ -632,11 +633,11 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		private ArrayList<Vector<Integer>>	list;
 		private Context											context;
 
-		public static final int							ABSOLUTE	= 0, RELATIVE = 1;
-		public static final int							CHANGING	= 2;
+		public static final int							ABSOLUTE				= 0, RELATIVE = 1;
+		public static final int							CHANGING				= 2;
 
-		public static final int							NOTAREALUPDATE = 1;
-		
+		public static final int							NOTAREALUPDATE	= 1;
+
 		public HistoryAdapter(Context context, int initialValue) {
 			this.context = context;
 			list = new ArrayList<Vector<Integer>>();
@@ -668,16 +669,17 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 
 		public void update(int magnitude) {
 			delta += magnitude;
-			
+
 			Vector<Integer> vi = new Vector<Integer>();
-			Boolean addNewVi = true; 
-			for(Vector<Integer> testvi : list) {
+			Boolean addNewVi = true;
+			for (Vector<Integer> testvi : list) {
 				try {
 					if (testvi.get(CHANGING).intValue() == NOTAREALUPDATE) {
 						vi = testvi;
 						addNewVi = false;
 						vi.clear();
-						break; //Short circuit, we have the changing row already no need to search the rest of the list. 
+						break; // Short circuit, we have the changing row already no need to
+										// search the rest of the list.
 					}
 				}
 				catch (ArrayIndexOutOfBoundsException e) {
@@ -686,11 +688,12 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			}
 
 			int lastLifeTotal = initialValue;
-			if (list.size() != 0)
-			{
-				//I know this is a weird code block, but its basically finding the first non-changing history row.
-				//It does this by searching for the changing value, when the changing value doesn't exist, use that value.
-				for(Vector<Integer> testvi : list) {
+			if (list.size() != 0) {
+				// I know this is a weird code block, but its basically finding the
+				// first non-changing history row.
+				// It does this by searching for the changing value, when the changing
+				// value doesn't exist, use that value.
+				for (Vector<Integer> testvi : list) {
 					try {
 						if (testvi.get(CHANGING).intValue() == NOTAREALUPDATE) {
 							continue;
@@ -699,38 +702,39 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 					catch (ArrayIndexOutOfBoundsException e) {
 						try {
 							lastLifeTotal = testvi.get(ABSOLUTE).intValue();
-						} 
+						}
 						catch (ArrayIndexOutOfBoundsException innerE) {
 							continue;
 						}
-						break; //Short circuit, we have the life total from the last committed update.
+						break; // Short circuit, we have the life total from the last
+										// committed update.
 					}
 				}
 			}
-			
+
 			vi.add(lastLifeTotal + delta);
 			vi.add(delta);
-			vi.add(NOTAREALUPDATE); 
+			vi.add(NOTAREALUPDATE);
 
 			if (addNewVi == true) {
 				count++;
 				list.add(0, vi);
 			}
-			//if the change is 0, remove the row from the list. 
-			if (vi.get(RELATIVE).intValue() == 0){
-				if (list.get(0).get(RELATIVE).intValue() == 0){
+			// if the change is 0, remove the row from the list.
+			if (vi.get(RELATIVE).intValue() == 0) {
+				if (list.get(0).get(RELATIVE).intValue() == 0) {
 					list.remove(0);
 					count--;
 				}
 			}
-			
+
 			notifyDataSetChanged();
 		}
 
 		public void commit() {
 			Iterator<Vector<Integer>> iterate = list.iterator();
-			while(iterate.hasNext()) {
-				try	{
+			while (iterate.hasNext()) {
+				try {
 					if (iterate.next().get(CHANGING).intValue() == NOTAREALUPDATE) {
 						iterate.remove();
 						count--;
@@ -740,8 +744,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 					continue;
 				}
 			}
-			
-			
+
 			int lastValue = initialValue;
 			if (delta == 0) {
 				return;
@@ -775,10 +778,10 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			}
 			return (long) position;
 		}
-		
+
 		public int clearToPosition(int position) {
 			int returnValue = list.get(position).get(ABSOLUTE).intValue();
-			for(int idx = position - 1; idx >= 0; idx--) {
+			for (int idx = position - 1; idx >= 0; idx--) {
 				list.remove(idx);
 				count--;
 			}
@@ -806,28 +809,30 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			}
 			relativeString += relativeValue;
 			relative.setText(relativeString);
-			
+
 			int color;
-			switch(activeType) {
+			switch (activeType) {
 				case POISON:
-					//Positive poison is bad, so display red; otherwise show green
-					color = (relativeValue > 0) ? context.getResources().getInteger(R.color.red) : context.getResources().getInteger(R.color.green);
+					// Positive poison is bad, so display red; otherwise show green
+					color = (relativeValue > 0) ? context.getResources().getInteger(R.color.red) : context.getResources()
+							.getInteger(R.color.green);
 					break;
 				case LIFE:
 				default:
-					//Negative life is bad, so display red; otherwise show green
-					color = (relativeValue < 0) ? context.getResources().getInteger(R.color.red) : context.getResources().getInteger(R.color.green);
+					// Negative life is bad, so display red; otherwise show green
+					color = (relativeValue < 0) ? context.getResources().getInteger(R.color.red) : context.getResources()
+							.getInteger(R.color.green);
 					break;
 			}
-			
+
 			try {
 				if (row.get(CHANGING).intValue() == NOTAREALUPDATE) {
 					relative.setTextColor(color);
 					absolute.setTextColor(color);
 				}
 			}
-			catch (Exception e){
-				//No changes needed.
+			catch (Exception e) {
+				// No changes needed.
 			}
 
 			return v;
@@ -838,7 +843,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 
 		public String			name;
 		public int				life;
-		public int 				defaultLife;
+		public int				defaultLife;
 		public int				poison;
 		public Player			me;
 
@@ -903,10 +908,10 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			history.invalidate();
 		}
 
-		public void hideHistory(){
-			((View)history.getParent()).setVisibility(View.GONE);
+		public void hideHistory() {
+			((View) history.getParent()).setVisibility(View.GONE);
 		}
-		
+
 		public void addOutputViews(TextView n, TextView l, ListView lv) {
 			TVname = n;
 			TVlife = l;
@@ -924,9 +929,8 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 
 			history.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
-				public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
-						int arg2, long arg3) {
-					
+				public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+
 					int totalAtPosition;
 					switch (activeType) {
 						case LIFE:
@@ -942,7 +946,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 					return false;
 				}
 			});
-			
+
 			TVname.setOnClickListener(new View.OnClickListener() {
 
 				public void onClick(View v) {
@@ -1097,35 +1101,36 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			this.layout = layout;
 		}
 	}
-	
+
 	private void announceLifeTotals() {
-		if(ttsInitialized) {
+		if (ttsInitialized) {
 			boolean first = true;
-			for(Player p : players) {
-				//Format: "{name} has {quantity} {life | poison counter(s)}", depending on the current mode
+			for (Player p : players) {
+				// Format: "{name} has {quantity} {life | poison counter(s)}", depending
+				// on the current mode
 				String sentence = "";
 				sentence += p.name;
 				sentence += " has ";
-				
-				if(activeType == LIFE) {
+
+				if (activeType == LIFE) {
 					sentence += String.valueOf(p.life);
 					sentence += " life";
 				}
 				else {
 					sentence += String.valueOf(p.poison);
 					sentence += " poison counter";
-					if(p.poison != 1) {
+					if (p.poison != 1) {
 						sentence += "s";
 					}
 				}
-				
-				if(first) {
-					//Flush on the first one, so we interrupt if it's already going
+
+				if (first) {
+					// Flush on the first one, so we interrupt if it's already going
 					tts.speak(sentence, TextToSpeech.QUEUE_FLUSH, null);
 					first = false;
 				}
 				else {
-					//Otherwise, add to the queue
+					// Otherwise, add to the queue
 					tts.speak(sentence, TextToSpeech.QUEUE_ADD, null);
 				}
 			}
@@ -1159,19 +1164,20 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 				return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.announce_life).setVisible(ttsInitialized);
-	    return true;
+		menu.findItem(R.id.announce_life).setVisible(ttsInitialized);
+		return true;
 	}
 
 	public void onInit(int status) {
 		ttsInitialized = true;
 	}
-	
+
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) { super.onCreateOptionsMenu(menu);
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
 		MenuInflater inflater = new MenuInflater(this);
 		inflater.inflate(R.menu.life_counter_menu, menu);
 		return true;

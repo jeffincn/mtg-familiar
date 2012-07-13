@@ -28,17 +28,18 @@ import java.util.ArrayList;
 
 import android.content.SharedPreferences;
 
-import com.gelakinetic.mtgfam.activities.MainActivity.OTATask;
+import com.gelakinetic.mtgfam.activities.FamiliarActivity.OTATask;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 
 public class JsonParser {
 
-	public static void readCardJsonStream(InputStream in, OTATask task, String setName, CardDbAdapter mDbHelper) throws IOException {
+	public static void readCardJsonStream(InputStream in, OTATask task, String setName, CardDbAdapter mDbHelper)
+			throws IOException {
 		JsonReader reader = new JsonReader(new InputStreamReader(in, "ISO-8859-1"));
 
 		String s, s1, s2, ptstr;
-		
+
 		int numTotalElements = 0;
 		int elementsParsed = 0;
 
@@ -264,9 +265,10 @@ public class JsonParser {
 								}
 							}
 							mDbHelper.createCard(c);
-							//mMain.cardAdded();
+							// mMain.cardAdded();
 							elementsParsed++;
-							task.publicPublishProgress(new String[] { "Parsing " + setName, "Parsing " + setName, "" + (int)Math.round(100*elementsParsed / (double)numTotalElements) });
+							task.publicPublishProgress(new String[] { "Parsing " + setName, "Parsing " + setName,
+									"" + (int) Math.round(100 * elementsParsed / (double) numTotalElements) });
 							reader.endObject();
 						}
 						reader.endArray();
@@ -276,11 +278,11 @@ public class JsonParser {
 			}
 			if (s.equalsIgnoreCase("w")) { // num_cards
 				numTotalElements = reader.nextInt();
-				//mMain.setNumCards(reader.nextInt());
+				// mMain.setNumCards(reader.nextInt());
 			}
 		}
 		reader.endObject();
-		task.publicPublishProgress(new String[] { "Done Parsing "+ setName, "Done Parsing "+ setName, "0" });
+		task.publicPublishProgress(new String[] { "Done Parsing " + setName, "Done Parsing " + setName, "0" });
 		return;
 	}
 
@@ -427,14 +429,14 @@ public class JsonParser {
 
 		return;
 	}
-	
+
 	public static void readTCGNameJsonStream(SharedPreferences settings, CardDbAdapter mDbHelper) {
 		URL update;
 		String label;
 		String date = null;
 		String label2;
 		String name = null, code = null;
-		
+
 		try {
 			update = new URL("https://sites.google.com/site/mtgfamiliar/manifests/TCGnames.json");
 			InputStreamReader isr = new InputStreamReader(update.openStream(), "ISO-8859-1");

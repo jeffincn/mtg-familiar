@@ -19,21 +19,42 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam.activities;
 
-import android.content.res.Configuration;
+import android.app.Instrumentation;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
+import android.view.KeyEvent;
 
+import com.actionbarsherlock.app.SherlockPreferenceActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.gelakinetic.mtgfam.R;
 
-public class PreferencesActivity extends PreferenceActivity {
+public class PreferencesActivity extends SherlockPreferenceActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.preferences);
 	}
+	
+	/*
+	 * Always add a virtual search key to the menu on the actionbar
+	 * super.onCreateOptionsMenu should always be called from FamiliarActivities
+	 */
+	public boolean onCreateOptionsMenu(Menu menu) {
+		menu.add(R.string.search_hint).setIcon(R.drawable.menu_search)
+				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+					@Override
+					public boolean onMenuItemClick(MenuItem item) {
+						new Thread(new Runnable() {
+							@Override
+							public void run() {
+								new Instrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_SEARCH);
+							}
+						}).start();
+						return true;
+					}
+				}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		super.onConfigurationChanged(newConfig);
+		return true;
 	}
 
 }

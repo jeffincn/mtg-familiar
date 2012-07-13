@@ -19,10 +19,8 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 package com.gelakinetic.mtgfam.activities;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -275,19 +273,17 @@ public class ManaPoolActivity extends FamiliarActivity {
 	}
 
 	private void load() {
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-		white = settings.getInt("whiteMana", 0);
-		blue = settings.getInt("blueMana", 0);
-		black = settings.getInt("blackMana", 0);
-		red = settings.getInt("redMana", 0);
-		green = settings.getInt("greenMana", 0);
-		colorless = settings.getInt("colorlessMana", 0);
-		spell = settings.getInt("spellCount", 0);
+		white = preferences.getInt("whiteMana", 0);
+		blue = preferences.getInt("blueMana", 0);
+		black = preferences.getInt("blackMana", 0);
+		red = preferences.getInt("redMana", 0);
+		green = preferences.getInt("greenMana", 0);
+		colorless = preferences.getInt("colorlessMana", 0);
+		spell = preferences.getInt("spellCount", 0);
 	}
 
 	private void store() {
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-		settings.edit().putInt("whiteMana", white).putInt("blueMana", blue).putInt("blackMana", black)
+		preferences.edit().putInt("whiteMana", white).putInt("blueMana", blue).putInt("blackMana", black)
 				.putInt("redMana", red).putInt("greenMana", green).putInt("colorlessMana", colorless)
 				.putInt("spellCount", spell).commit();
 	}
@@ -303,8 +299,7 @@ public class ManaPoolActivity extends FamiliarActivity {
 	}
 
 	public static void reset(Context context) {
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-		settings.edit().putInt("whiteMana", 0).putInt("blueMana", 0).putInt("blackMana", 0).putInt("redMana", 0)
+		preferences.edit().putInt("whiteMana", 0).putInt("blueMana", 0).putInt("blackMana", 0).putInt("redMana", 0)
 				.putInt("greenMana", 0).putInt("colorlessMana", 0).putInt("spellCount", 0).commit();
 	}
 
@@ -312,7 +307,7 @@ public class ManaPoolActivity extends FamiliarActivity {
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -325,9 +320,10 @@ public class ManaPoolActivity extends FamiliarActivity {
 				return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) { super.onCreateOptionsMenu(menu);
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
 		MenuInflater inflater = new MenuInflater(this);
 		inflater.inflate(R.menu.mana_pool_menu, menu);
 		return true;

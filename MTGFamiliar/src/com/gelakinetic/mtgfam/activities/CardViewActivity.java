@@ -50,14 +50,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.text.method.LinkMovementMethod;
@@ -106,8 +104,6 @@ public class CardViewActivity extends FamiliarActivity {
 	private static final int					DIALOG				= 1;
 
 	// Random useful things
-	private CardDbAdapter							mDbHelper;
-	private Context										mCtx;
 	private ImageGetter								imgGetter;
 	private TextView									copyView;
 
@@ -154,8 +150,6 @@ public class CardViewActivity extends FamiliarActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.card_view_activity);
 
-		mCtx = this;
-
 		name = (TextView) findViewById(R.id.name);
 		cost = (TextView) findViewById(R.id.cost);
 		type = (TextView) findViewById(R.id.type);
@@ -179,8 +173,6 @@ public class CardViewActivity extends FamiliarActivity {
 		registerForContextMenu(flavor);
 		registerForContextMenu(artist);
 
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-
 		Bundle extras = getIntent().getExtras();
 		cardID = extras.getLong("id");
 		isRandom = extras.getBoolean(SearchActivity.RANDOM);
@@ -192,9 +184,6 @@ public class CardViewActivity extends FamiliarActivity {
 			loadTo = DIALOG;
 		}
 		scroll_results = preferences.getBoolean("scrollresults", false);
-
-		mDbHelper = new CardDbAdapter(this);
-		mDbHelper.openReadable();
 
 		progDialog = new ProgressDialog(this);
 		progDialog.setTitle("");
@@ -249,9 +238,6 @@ public class CardViewActivity extends FamiliarActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		if (mDbHelper != null) {
-			mDbHelper.close();
-		}
 		if (progDialog.isShowing()) {
 			progDialog.cancel();
 		}
@@ -275,21 +261,21 @@ public class CardViewActivity extends FamiliarActivity {
 		number = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NUMBER));
 
 		switch ((char) c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY))) {
-		case 'C':
-			set.setTextColor(this.getResources().getColor(R.color.common));
-			break;
-		case 'U':
-			set.setTextColor(this.getResources().getColor(R.color.uncommon));
-			break;
-		case 'R':
-			set.setTextColor(this.getResources().getColor(R.color.rare));
-			break;
-		case 'M':
-			set.setTextColor(this.getResources().getColor(R.color.mythic));
-			break;
-		case 'T':
-			set.setTextColor(this.getResources().getColor(R.color.timeshifted));
-			break;
+			case 'C':
+				set.setTextColor(this.getResources().getColor(R.color.common));
+				break;
+			case 'U':
+				set.setTextColor(this.getResources().getColor(R.color.uncommon));
+				break;
+			case 'R':
+				set.setTextColor(this.getResources().getColor(R.color.rare));
+				break;
+			case 'M':
+				set.setTextColor(this.getResources().getColor(R.color.mythic));
+				break;
+			case 'T':
+				set.setTextColor(this.getResources().getColor(R.color.timeshifted));
+				break;
 		}
 
 		String sCost = c.getString(c.getColumnIndex(CardDbAdapter.KEY_MANACOST));
@@ -483,18 +469,18 @@ public class CardViewActivity extends FamiliarActivity {
 			for (int i = 0; i < cFormats.getCount(); i++) {
 				formats[i] = cFormats.getString(cFormats.getColumnIndex(CardDbAdapter.KEY_NAME));
 				switch (mDbHelper.checkLegality(cardName, formats[i])) {
-				case CardDbAdapter.LEGAL:
-					legalities[i] = "Legal";
-					break;
-				case CardDbAdapter.RESTRICTED:
-					legalities[i] = "Restricted";
-					break;
-				case CardDbAdapter.BANNED:
-					legalities[i] = "Banned";
-					break;
-				default:
-					legalities[i] = "Error";
-					break;
+					case CardDbAdapter.LEGAL:
+						legalities[i] = "Legal";
+						break;
+					case CardDbAdapter.RESTRICTED:
+						legalities[i] = "Restricted";
+						break;
+					case CardDbAdapter.BANNED:
+						legalities[i] = "Banned";
+						break;
+					default:
+						legalities[i] = "Error";
+						break;
 				}
 				cFormats.moveToNext();
 			}
@@ -680,7 +666,7 @@ public class CardViewActivity extends FamiliarActivity {
 			URL priceurl;
 			try {
 				XMLhandler = null;
-				
+
 				String tcgname = mDbHelper.getTCGname(setCode);
 				String tcgCardName;
 				if (isTransformable(number, setCode) && number.contains("b")) {
@@ -1016,18 +1002,21 @@ public class CardViewActivity extends FamiliarActivity {
 	@SuppressLint("NewApi")
 	@Override
 	public boolean onContextItemSelected(android.view.MenuItem item) {
-		// use a final static boolean for JIT compile-time culling of deprecated calls for future-proofing
-		// this is probably overkill because the old name space will likely be retained for backwards compatibility
-		// Scoped name space usage is poor practice, but direct references allow us to target the correct SDK.
+		// use a final static boolean for JIT compile-time culling of deprecated
+		// calls for future-proofing
+		// this is probably overkill because the old name space will likely be
+		// retained for backwards compatibility
+		// Scoped name space usage is poor practice, but direct references allow us
+		// to target the correct SDK.
 		String copyText = "";
 		switch (item.getItemId()) {
 			case R.id.copy:
 				copyText = copyView.getText().toString();
 				break;
 			case R.id.copyall:
-				copyText = name.getText().toString() + '\n' + cost.getText().toString() + '\n' + type.getText().toString() + '\n'
-						+ set.getText().toString() + '\n' + ability.getText().toString() + '\n' + flavor.getText().toString() + '\n'
-						+ pt.getText().toString() + '\n' + artist.getText().toString();
+				copyText = name.getText().toString() + '\n' + cost.getText().toString() + '\n' + type.getText().toString()
+						+ '\n' + set.getText().toString() + '\n' + ability.getText().toString() + '\n'
+						+ flavor.getText().toString() + '\n' + pt.getText().toString() + '\n' + artist.getText().toString();
 				break;
 			default:
 				return super.onContextItemSelected(item);
@@ -1049,53 +1038,53 @@ public class CardViewActivity extends FamiliarActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-		case R.id.image:
-			progDialog.show();
-			asyncTask = new FetchPictureTask();
-			asyncTask.execute((String[]) null);
-			return true;
-		case R.id.price:
-			progDialog.show();
-			asyncTask = new FetchPriceTask();
-			asyncTask.execute((String[]) null);
-			return true;
-		case R.id.changeset:
-			showDialog(CHANGESET);
-			return true;
-		case R.id.legality:
-			progDialog.show();
-			asyncTask = new FetchLegalityTask();
-			asyncTask.execute((String[]) null);
-			return true;
-		case R.id.cardrulings:
-			progDialog.show();
-			asyncTask = new FetchRulingsTask();
-			asyncTask.execute((String[]) null);
-			return true;
-		case R.id.quittosearch:
-			MyApp appState = ((MyApp) getApplicationContext());
-			appState.setState(QUITTOSEARCH);
-			finish();
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
+			case R.id.image:
+				progDialog.show();
+				asyncTask = new FetchPictureTask();
+				asyncTask.execute((String[]) null);
+				return true;
+			case R.id.price:
+				progDialog.show();
+				asyncTask = new FetchPriceTask();
+				asyncTask.execute((String[]) null);
+				return true;
+			case R.id.changeset:
+				showDialog(CHANGESET);
+				return true;
+			case R.id.legality:
+				progDialog.show();
+				asyncTask = new FetchLegalityTask();
+				asyncTask.execute((String[]) null);
+				return true;
+			case R.id.cardrulings:
+				progDialog.show();
+				asyncTask = new FetchRulingsTask();
+				asyncTask.execute((String[]) null);
+				return true;
+			case R.id.quittosearch:
+				MyApp appState = ((MyApp) getApplicationContext());
+				appState.setState(QUITTOSEARCH);
+				finish();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 
 	@Override
 	protected void onPrepareDialog(int id, Dialog dialog) {
 		switch (id) {
-		case GETIMAGE:
-			if (DialogImageView != null) {
-				DialogImageView.setImageDrawable(cardPicture);
-			}
-			break;
+			case GETIMAGE:
+				if (DialogImageView != null) {
+					DialogImageView.setImageDrawable(cardPicture);
+				}
+				break;
 		}
 	}
 
-
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) { super.onCreateOptionsMenu(menu);
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
 		MenuInflater inflater = new MenuInflater(this);
 		inflater.inflate(R.menu.card_menu, menu);
 		return true;

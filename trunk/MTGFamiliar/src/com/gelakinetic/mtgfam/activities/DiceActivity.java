@@ -23,11 +23,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -50,9 +48,8 @@ public class DiceActivity extends FamiliarActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.dice_activity);
-		
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-		d2AsCoin = settings.getBoolean("d2AsCoin", true);
+
+		d2AsCoin = preferences.getBoolean("d2AsCoin", true);
 
 		final DiceActivity anchor = this;
 		r = new Random();
@@ -182,9 +179,10 @@ public class DiceActivity extends FamiliarActivity {
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 	}
-	
+
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) { super.onCreateOptionsMenu(menu);
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
 		MenuInflater inflater = new MenuInflater(this);
 		inflater.inflate(R.menu.dice_menu, menu);
 		return true;

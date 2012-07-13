@@ -88,7 +88,7 @@ public class CardSearchProvider extends ContentProvider {
 	@Override
 	public boolean onCreate() {
 		mDbHelper = new CardDbAdapter(getContext());
-		mDbHelper.openReadable(); //TODO this is never closed. could be a problem
+		mDbHelper.openReadable(); // TODO this is never closed. could be a problem
 		return true;
 	}
 
@@ -123,51 +123,45 @@ public class CardSearchProvider extends ContentProvider {
 				throw new IllegalArgumentException("Unknown Uri: " + uri);
 		}
 	}
-	
-  private Cursor getSuggestions(String query) {
-    query = query.toLowerCase();
-    String[] columns = new String[] {
-        BaseColumns._ID,
-        CardDbAdapter.KEY_NAME,
-        SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID};
 
-    return mDbHelper.getWordMatches(query, columns);
-  }
+	private Cursor getSuggestions(String query) {
+		query = query.toLowerCase();
+		String[] columns = new String[] { BaseColumns._ID, CardDbAdapter.KEY_NAME,
+				SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID };
 
-  private Cursor search(String query) {
-    query = query.toLowerCase();
-    String[] columns = new String[] {
-        BaseColumns._ID,
-        CardDbAdapter.KEY_NAME};
+		return mDbHelper.getWordMatches(query, columns);
+	}
 
-    return mDbHelper.getWordMatches(query, columns);
-  }
+	private Cursor search(String query) {
+		query = query.toLowerCase();
+		String[] columns = new String[] { BaseColumns._ID, CardDbAdapter.KEY_NAME };
 
-  private Cursor getWord(Uri uri) {
-    String rowId = uri.getLastPathSegment();
-    String[] columns = new String[] {
-        CardDbAdapter.KEY_NAME};
+		return mDbHelper.getWordMatches(query, columns);
+	}
 
-    return mDbHelper.getWord(rowId, columns);
-  }
+	private Cursor getWord(Uri uri) {
+		String rowId = uri.getLastPathSegment();
+		String[] columns = new String[] { CardDbAdapter.KEY_NAME };
 
-private Cursor refreshShortcut(Uri uri) {
-  /* This won't be called with the current implementation, but if we include
-   * {@link SearchManager#SUGGEST_COLUMN_SHORTCUT_ID} as a column in our suggestions table, we
-   * could expect to receive refresh queries when a shortcutted suggestion is displayed in
-   * Quick Search Box. In which case, this method will query the table for the specific
-   * word, using the given item Uri and provide all the columns originally provided with the
-   * suggestion query.
-   */
-  String rowId = uri.getLastPathSegment();
-  String[] columns = new String[] {
-      BaseColumns._ID,
-      CardDbAdapter.KEY_NAME,
-      SearchManager.SUGGEST_COLUMN_SHORTCUT_ID,
-      SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID};
+		return mDbHelper.getWord(rowId, columns);
+	}
 
-  return mDbHelper.getWord(rowId, columns);
-}
+	private Cursor refreshShortcut(Uri uri) {
+		/*
+		 * This won't be called with the current implementation, but if we include
+		 * {@link SearchManager#SUGGEST_COLUMN_SHORTCUT_ID} as a column in our
+		 * suggestions table, we could expect to receive refresh queries when a
+		 * shortcutted suggestion is displayed in Quick Search Box. In which case,
+		 * this method will query the table for the specific word, using the given
+		 * item Uri and provide all the columns originally provided with the
+		 * suggestion query.
+		 */
+		String rowId = uri.getLastPathSegment();
+		String[] columns = new String[] { BaseColumns._ID, CardDbAdapter.KEY_NAME,
+				SearchManager.SUGGEST_COLUMN_SHORTCUT_ID, SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID };
+
+		return mDbHelper.getWord(rowId, columns);
+	}
 
 	/**
 	 * This method is required in order to query the supported types. It's also

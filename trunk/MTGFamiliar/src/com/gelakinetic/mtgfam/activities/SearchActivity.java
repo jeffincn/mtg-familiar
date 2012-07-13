@@ -21,7 +21,6 @@ package com.gelakinetic.mtgfam.activities;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -52,35 +51,34 @@ import com.gelakinetic.mtgfam.helpers.AutocompleteCursorAdapter;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 
 public class SearchActivity extends FamiliarActivity {
-	public static final String	NAME				= "name";
-	public static final String	TEXT				= "text";
-	public static final String	TYPE				= "type";
-	public static final String	COLOR				= "color";
-	public static final String	COLORLOGIC	= "colorlogic";
-	public static final String	SET					= "set";
-	public static final String	POW_CHOICE	= "pow_choice";
-	public static final String	POW_LOGIC		= "pow_logic";
-	public static final String	TOU_CHOICE	= "tou_choice";
-	public static final String	TOU_LOGIC		= "tou_logic";
-	public static final String	CMC					= "cmc";
-	public static final String	CMC_LOGIC		= "cmc_logic";
-	public static final String	FORMAT			= "format";
-	public static final String	RARITY			= "rarity";
-	public static final String	ARTIST			= "artist";
-	public static final String	FLAVOR			= "flavor";
-	public static final String	RANDOM			= "random";
+	public static final String		NAME				= "name";
+	public static final String		TEXT				= "text";
+	public static final String		TYPE				= "type";
+	public static final String		COLOR				= "color";
+	public static final String		COLORLOGIC	= "colorlogic";
+	public static final String		SET					= "set";
+	public static final String		POW_CHOICE	= "pow_choice";
+	public static final String		POW_LOGIC		= "pow_logic";
+	public static final String		TOU_CHOICE	= "tou_choice";
+	public static final String		TOU_LOGIC		= "tou_logic";
+	public static final String		CMC					= "cmc";
+	public static final String		CMC_LOGIC		= "cmc_logic";
+	public static final String		FORMAT			= "format";
+	public static final String		RARITY			= "rarity";
+	public static final String		ARTIST			= "artist";
+	public static final String		FLAVOR			= "flavor";
+	public static final String		RANDOM			= "random";
 	// lines below added by Reuben Kriegel
-	public static final String	TYPELOGIC		= "typelogic";
-	public static final String	TEXTLOGIC		= "textlogic";
+	public static final String		TYPELOGIC		= "typelogic";
+	public static final String		TEXTLOGIC		= "textlogic";
 	// End addition
-	public static final String	SETLOGIC		= "setlogic";
+	public static final String		SETLOGIC		= "setlogic";
 
 	protected static final int		SETLIST			= 0;
 	protected static final int		FORMATLIST	= 1;
 	protected static final int		RARITYLIST	= 2;
-	protected static final int		CORRUPTION = 3;
+	protected static final int		CORRUPTION	= 3;
 
-	private CardDbAdapter					mDbHelper;
 	private Button								searchbutton;
 	private AutoCompleteTextView	namefield;
 	private EditText							textfield;
@@ -97,7 +95,6 @@ public class SearchActivity extends FamiliarActivity {
 	private String[]							setNames;
 	private boolean[]							setChecked;
 	private String[]							setSymbols;
-	private Context								mCtx;
 	private Spinner								powLogic;
 	private Spinner								powChoice;
 	private Spinner								touLogic;
@@ -127,11 +124,6 @@ public class SearchActivity extends FamiliarActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.search_activity);
-		
-		mCtx = this;
-
-		mDbHelper = new CardDbAdapter(this);
-		mDbHelper.openReadable();
 
 		namefield = (AutoCompleteTextView) findViewById(R.id.namesearch);
 		namefield.setAdapter(new AutocompleteCursorAdapter(mCtx, null));
@@ -221,7 +213,7 @@ public class SearchActivity extends FamiliarActivity {
 		colorspinner = (Spinner) findViewById(R.id.colorlogic);
 		textspinner = (Spinner) findViewById(R.id.textlogic);
 		typespinner = (Spinner) findViewById(R.id.typelogic);
-		setspinner = (Spinner)  findViewById(R.id.setlogic);
+		setspinner = (Spinner) findViewById(R.id.setlogic);
 
 		setButton = (Button) findViewById(R.id.setsearch);
 		formatButton = (Button) findViewById(R.id.formatsearch);
@@ -270,7 +262,7 @@ public class SearchActivity extends FamiliarActivity {
 		adapter6.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		colorspinner.setAdapter(adapter6);
 		colorspinner.setSelection(2);
-		
+
 		// Lines Below added by Reuben Kriegel
 		ArrayAdapter<CharSequence> adapter7 = ArrayAdapter.createFromResource(this, R.array.text_spinner,
 				android.R.layout.simple_spinner_item);
@@ -292,7 +284,7 @@ public class SearchActivity extends FamiliarActivity {
 				android.R.layout.simple_spinner_item);
 		adapter10.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		setspinner.setAdapter(adapter10);
-		
+
 		setButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				showDialog(SETLIST);
@@ -405,14 +397,6 @@ public class SearchActivity extends FamiliarActivity {
 		});
 	}
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		if (mDbHelper != null) {
-			mDbHelper.close();
-		}
-	}
-	
 	private void doSearch(boolean isRandom) {
 		String name = namefield.getText().toString();
 		String text = textfield.getText().toString();
@@ -612,20 +596,16 @@ public class SearchActivity extends FamiliarActivity {
 		}
 		else if (id == CORRUPTION) {
 			View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
-			TextView text = (TextView)dialogLayout.findViewById(R.id.corruption_message);
+			TextView text = (TextView) dialogLayout.findViewById(R.id.corruption_message);
 			text.setText(Html.fromHtml(getString(R.string.corruption_error)));
 			text.setMovementMethod(LinkMovementMethod.getInstance());
-			
-			AlertDialog dialog = new AlertDialog.Builder(this)
-				.setTitle(R.string.corruption_error_title)
-				.setView(dialogLayout)
-				.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						finish();
-					}
-				})
-				.setCancelable(false)
-				.create();
+
+			AlertDialog dialog = new AlertDialog.Builder(this).setTitle(R.string.corruption_error_title)
+					.setView(dialogLayout).setPositiveButton(R.string.dialog_ok, new OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							finish();
+						}
+					}).setCancelable(false).create();
 			return dialog;
 		}
 		return null;
@@ -676,11 +656,11 @@ public class SearchActivity extends FamiliarActivity {
 		checkboxG.setChecked(false);
 		checkboxL.setChecked(false);
 		colorspinner.setSelection(2);
-		
+
 		textspinner.setSelection(0);
 		typespinner.setSelection(0);
 		setspinner.setSelection(0);
-		
+
 		powLogic.setSelection(0);
 		powChoice.setSelection(0);
 		touLogic.setSelection(0);
@@ -766,9 +746,10 @@ public class SearchActivity extends FamiliarActivity {
 				return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) { super.onCreateOptionsMenu(menu);
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
 		MenuInflater inflater = new MenuInflater(this);
 		inflater.inflate(R.menu.search_menu, menu);
 		return true;

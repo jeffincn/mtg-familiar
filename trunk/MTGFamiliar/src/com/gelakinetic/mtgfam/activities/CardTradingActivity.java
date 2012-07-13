@@ -70,7 +70,6 @@ import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler;
 
 public class CardTradingActivity extends FamiliarActivity {
-	private Context								mCtx;
 	private final static int			DIALOG_UPDATE_CARD		= 1;
 	private final static int			DIALOG_PRICE_SETTING	= 2;
 	private final static int			DIALOG_SAVE_TRADE			= 3;
@@ -93,7 +92,6 @@ public class CardTradingActivity extends FamiliarActivity {
 	private TradeListAdapter			aaTradeRight;
 	private ArrayList<CardData>		lTradeRight;
 
-	private CardDbAdapter					mdbHelper;
 	private EditText							numberfield;
 
 	private int										priceSetting;
@@ -119,9 +117,6 @@ public class CardTradingActivity extends FamiliarActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.trader_activity);
-
-		mCtx = this;
-		mdbHelper = new CardDbAdapter(this).openReadable();
 
 		namefield = (AutoCompleteTextView) findViewById(R.id.namesearch);
 		namefield.setAdapter(new AutocompleteCursorAdapter(this, null));
@@ -206,8 +201,7 @@ public class CardTradingActivity extends FamiliarActivity {
 			}
 		});
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		priceSetting = Integer.parseInt(prefs.getString("tradePrice", String.valueOf(AVG_PRICE)));
+		priceSetting = Integer.parseInt(preferences.getString("tradePrice", String.valueOf(AVG_PRICE)));
 
 		// Give this a default value so we don't get the null pointer-induced FC. It
 		// shouldn't matter what we set it to, as long as we set it, since we
@@ -258,14 +252,6 @@ public class CardTradingActivity extends FamiliarActivity {
 		super.onPause();
 
 		SaveTrade(autosaveName + tradeExtension);
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		if (mdbHelper != null) {
-			mdbHelper.close();
-		}
 	}
 
 	protected Dialog onCreateDialog(int id) {
@@ -585,7 +571,7 @@ public class CardTradingActivity extends FamiliarActivity {
 
 				String cardName = parts[1];
 				String cardSet = parts[2];
-				String tcgName = mdbHelper.getTCGname(cardSet);
+				String tcgName = mDbHelper.getTCGname(cardSet);
 				int side = Integer.parseInt(parts[0]);
 				int numberOf = Integer.parseInt(parts[3]);
 
@@ -614,11 +600,11 @@ public class CardTradingActivity extends FamiliarActivity {
 		CardData data = (_side.equals("left") ? lTradeLeft.get(_position) : lTradeRight.get(_position));
 		String name = data.getName();
 
-		Cursor cards = mdbHelper.fetchCardByName(name);
+		Cursor cards = mDbHelper.fetchCardByName(name);
 		Set<String> sets = new LinkedHashSet<String>();
 		Set<String> setCodes = new LinkedHashSet<String>();
 		while (!cards.isAfterLast()) {
-			if (sets.add(mdbHelper.getTCGname(cards.getString(cards.getColumnIndex(CardDbAdapter.KEY_SET))))) {
+			if (sets.add(mDbHelper.getTCGname(cards.getString(cards.getColumnIndex(CardDbAdapter.KEY_SET))))) {
 				setCodes.add(cards.getString(cards.getColumnIndex(CardDbAdapter.KEY_SET)));
 			}
 			cards.moveToNext();
@@ -957,12 +943,12 @@ public class CardTradingActivity extends FamiliarActivity {
 				tcgName = data.getTcgName();
 				if (number.equals("") || setCode.equals("") || tcgName.equals("")) {
 					Cursor card;
-					card = mdbHelper.fetchCardByName(data.getName());
+					card = mDbHelper.fetchCardByName(data.getName());
 					if (card.moveToFirst()) {
 						cardName = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NAME));
 						if (data.getSetCode().equals("")) {
 							setCode = card.getString(card.getColumnIndex(CardDbAdapter.KEY_SET));
-							tcgName = mdbHelper.getTCGname(setCode);
+							tcgName = mDbHelper.getTCGname(setCode);
 
 							data.setSetCode(setCode);
 							data.setTcgName(tcgName);
@@ -996,7 +982,7 @@ public class CardTradingActivity extends FamiliarActivity {
 			try {
 				if (number.contains("b") && CardViewActivity.isTransformable(number, data.setCode)) {
 					priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p="
-							+ mdbHelper.getTransformName(setCode, number.replace("b", "a"))).replace(" ", "%20").replace("Æ", "Ae"));
+							+ mDbHelper.getTransformName(setCode, number.replace("b", "a"))).replace(" ", "%20").replace("Æ", "Ae"));
 				}
 				else {
 					priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p="

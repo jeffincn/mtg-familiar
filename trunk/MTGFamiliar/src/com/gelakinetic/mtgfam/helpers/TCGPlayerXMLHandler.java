@@ -37,10 +37,10 @@ public class TCGPlayerXMLHandler extends DefaultHandler {
 	private boolean	in_avgprice	= false;
 	private boolean	in_link			= false;
 
-	public String					hiprice;
-	public String					avgprice;
-	public String					lowprice;
-	public String					link;
+	public String		hiprice;
+	public String		avgprice;
+	public String		lowprice;
+	public String		link;
 
 	// ===========================================================
 	// Methods

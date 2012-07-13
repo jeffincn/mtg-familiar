@@ -23,15 +23,12 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.MergeCursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -48,40 +45,33 @@ import com.gelakinetic.mtgfam.helpers.ResultListAdapter;
 
 public class ResultListActivity extends FamiliarActivity {
 
-	public static final int					NO_RESULT							= 1;
-	static int								cursorPosition				= 0;
-	static int								cursorPositionOffset	= 0;
-	private CardDbAdapter			mDbHelper;
-	private ListView					lv;
-	private Context						mCtx;
-	private Cursor						c;
-	private boolean						isSingle							= false;
-	private SharedPreferences	preferences;
-	private boolean						isRandom							= false;
-	private int[]							randomSequence;
-	private int								randomIndex						= 0;
-	private int								numChoices;
-	private boolean						randomFromMenu				= false;
+	public static final int	NO_RESULT							= 1;
+	static int							cursorPosition				= 0;
+	static int							cursorPositionOffset	= 0;
+	private ListView				lv;
+	private Cursor					c;
+	private boolean					isSingle							= false;
+	private boolean					isRandom							= false;
+	private int[]						randomSequence;
+	private int							randomIndex						= 0;
+	private int							numChoices;
+	private boolean					randomFromMenu				= false;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.result_list_activity);
-		
-		MyApp appState = ((MyApp)getApplicationContext());
-		if(appState.getState() == CardViewActivity.QUITTOSEARCH){
+
+		MyApp appState = ((MyApp) getApplicationContext());
+		if (appState.getState() == CardViewActivity.QUITTOSEARCH) {
 			this.finish();
 			return;
 		}
-		
+
 		// After a search, make sure the position is on top
 		cursorPosition = 0;
 		cursorPositionOffset = 0;
-
-		mDbHelper = new CardDbAdapter(this);
-		mDbHelper.openReadable();
-		mCtx = this;
 
 		String[] returnTypes = new String[] { CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_SET,
 				CardDbAdapter.KEY_RARITY, CardDbAdapter.KEY_MANACOST, CardDbAdapter.KEY_TYPE, CardDbAdapter.KEY_ABILITY,
@@ -93,21 +83,22 @@ public class ResultListActivity extends FamiliarActivity {
 
 		Bundle extras = intent.getExtras();
 
-		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		boolean consolidate = preferences.getBoolean("consolidateSearch", true);
-		
+
 		if (Intent.ACTION_VIEW.equals(intent.getAction())) {
 			// handles a click on a search suggestion; launches activity to show word
 			Uri u = intent.getData();
 			id = Long.parseLong(u.getLastPathSegment());
 			String name = mDbHelper.getNameFromId(id);
 			c = mDbHelper.Search(name, null, null, "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-					CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, CardDbAdapter.ANYPRINTING, true, returnTypes, consolidate);
+					CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, CardDbAdapter.ANYPRINTING, true,
+					returnTypes, consolidate);
 		}
 		else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
 			String query = intent.getStringExtra(SearchManager.QUERY);
 			c = mDbHelper.Search(query, null, null, "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-					CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, CardDbAdapter.ANYPRINTING, true, returnTypes, consolidate);
+					CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, CardDbAdapter.ANYPRINTING, true,
+					returnTypes, consolidate);
 		}
 		else if ((id = extras.getLong("id")) != 0L) {
 			c = mDbHelper.fetchCard(id, null);
@@ -129,7 +120,7 @@ public class ResultListActivity extends FamiliarActivity {
 					extras.getFloat(SearchActivity.TOU_CHOICE), extras.getString(SearchActivity.TOU_LOGIC),
 					extras.getInt(SearchActivity.CMC), extras.getString(SearchActivity.CMC_LOGIC),
 					extras.getString(SearchActivity.FORMAT), extras.getString(SearchActivity.RARITY),
-					extras.getString(SearchActivity.FLAVOR), extras.getString(SearchActivity.ARTIST), 
+					extras.getString(SearchActivity.FLAVOR), extras.getString(SearchActivity.ARTIST),
 					extras.getInt(SearchActivity.TYPELOGIC), extras.getInt(SearchActivity.TEXTLOGIC),
 					extras.getInt(SearchActivity.SETLOGIC), true, returnTypes, consolidate);
 		}
@@ -142,7 +133,7 @@ public class ResultListActivity extends FamiliarActivity {
 		}
 		else {
 
-			lv = (ListView)findViewById(R.id.resultList);//getListView();
+			lv = (ListView) findViewById(R.id.resultList);// getListView();
 			registerForContextMenu(lv);
 
 			if (extras.getBoolean(SearchActivity.RANDOM)) {
@@ -175,11 +166,11 @@ public class ResultListActivity extends FamiliarActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-			MyApp appState = ((MyApp)getApplicationContext());
-			if(appState.getState() == CardViewActivity.QUITTOSEARCH){
-				this.finish();
-				return;
-			}
+		MyApp appState = ((MyApp) getApplicationContext());
+		if (appState.getState() == CardViewActivity.QUITTOSEARCH) {
+			this.finish();
+			return;
+		}
 		fillData(c);
 		lv.setSelectionFromTop(cursorPosition, cursorPositionOffset);
 	}
@@ -193,19 +184,11 @@ public class ResultListActivity extends FamiliarActivity {
 	}
 
 	@Override
-	public void onStop() {
-		super.onStop();
-	}
-
-	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		if (c != null) {
 			c.deactivate();
 			c.close();
-		}
-		if (mDbHelper != null) {
-			mDbHelper.close();
 		}
 	}
 
@@ -269,7 +252,7 @@ public class ResultListActivity extends FamiliarActivity {
 					id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
 					i.putExtra("id", id);
 					i.putExtra(SearchActivity.RANDOM, isRandom);
-//					i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+					// i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 					startActivityForResult(i, 0);
 					break;
 				case CardViewActivity.RANDOMRIGHT:
@@ -286,23 +269,22 @@ public class ResultListActivity extends FamiliarActivity {
 					break;
 				case CardViewActivity.SWIPELEFT:
 					lastID = data.getLongExtra("lastID", -1l);
-					
+
 					c.moveToFirst();
-					while(!c.isAfterLast()){
-						if (lastID == c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID))){
+					while (!c.isAfterLast()) {
+						if (lastID == c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID))) {
 							c.moveToPrevious();
-							
-							//In case the id was matched against the first item.
+
+							// In case the id was matched against the first item.
 							if (c.isBeforeFirst())
 								c.moveToLast();
-								
+
 							break;
 						}
 						else
 							c.moveToNext();
 					}
-					
-					
+
 					i = new Intent(mCtx, CardViewActivity.class);
 					id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
 					i.putExtra("id", id);
@@ -311,23 +293,22 @@ public class ResultListActivity extends FamiliarActivity {
 					break;
 				case CardViewActivity.SWIPERIGHT:
 					lastID = data.getLongExtra("lastID", -1l);
-					
+
 					c.moveToFirst();
-					while(!c.isAfterLast()){
-						if (lastID == c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID))){
+					while (!c.isAfterLast()) {
+						if (lastID == c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID))) {
 							c.moveToNext();
-							
-							//In case the id was matched against the last item.
+
+							// In case the id was matched against the last item.
 							if (c.isAfterLast())
 								c.moveToFirst();
-								
+
 							break;
 						}
 						else
 							c.moveToNext();
 					}
-					
-					
+
 					i = new Intent(mCtx, CardViewActivity.class);
 					id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
 					i.putExtra("id", id);
@@ -376,7 +357,7 @@ public class ResultListActivity extends FamiliarActivity {
 		i.putExtra(SearchActivity.RANDOM, isRandom);
 		startActivityForResult(i, 0);
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
@@ -389,9 +370,10 @@ public class ResultListActivity extends FamiliarActivity {
 				return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) { super.onCreateOptionsMenu(menu);
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
 		MenuInflater inflater = new MenuInflater(this);
 		inflater.inflate(R.menu.result_list_menu, menu);
 		return true;

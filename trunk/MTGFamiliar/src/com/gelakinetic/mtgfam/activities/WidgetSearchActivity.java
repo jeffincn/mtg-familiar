@@ -1,6 +1,5 @@
 package com.gelakinetic.mtgfam.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -26,20 +25,12 @@ public class WidgetSearchActivity extends FamiliarActivity {
 	private ImageView					searchButton;
 	private ListView					resultList;
 
-	private CardDbAdapter			mDbHelper;
-
-	private Context						mCtx;
 	private ResultListAdapter	rla;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.widget_search_activity);
-
-		mCtx = this;
-
-		mDbHelper = new CardDbAdapter(this);
-		mDbHelper.openReadable();
 
 		namefield = (EditText) findViewById(R.id.widget_namefield);
 		searchButton = (ImageView) findViewById(R.id.search_button);
@@ -80,14 +71,6 @@ public class WidgetSearchActivity extends FamiliarActivity {
 
 			}
 		});
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		if (mDbHelper != null) {
-			mDbHelper.close();
-		}
 	}
 
 	private void fillData(Cursor c) {
@@ -148,12 +131,12 @@ public class WidgetSearchActivity extends FamiliarActivity {
 			fillData(c);
 		}
 	}
-	
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) { super.onCreateOptionsMenu(menu);
-		//MenuInflater inflater = new MenuInflater(this);
-		//inflater.inflate(R.menu.main_menu, menu);
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
+		// MenuInflater inflater = new MenuInflater(this);
+		// inflater.inflate(R.menu.main_menu, menu);
 		return true;
 	}
 }

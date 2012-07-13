@@ -62,41 +62,37 @@ import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 
 public class RulesActivity extends FamiliarActivity {
 
-	public static String CATEGORY_KEY = "category";
-	public static String SUBCATEGORY_KEY = "subcategory";
-	public static String POSITION_KEY = "position";
-	public static String KEYWORD_KEY = "keyword";
-	public static String GLOSSARY_KEY = "glossary";
+	public static String						CATEGORY_KEY						= "category";
+	public static String						SUBCATEGORY_KEY					= "subcategory";
+	public static String						POSITION_KEY						= "position";
+	public static String						KEYWORD_KEY							= "keyword";
+	public static String						GLOSSARY_KEY						= "glossary";
 
-	private static final int SEARCH = 0;
-	private static final int RESULT_NORMAL = 1;
-	private static final int RESULT_QUIT_TO_MAIN = 2;
-	private static final int CORRUPTION = 3;
-	private static final int ARBITRARY_REQUEST_CODE = 23;
+	private static final int				SEARCH									= 0;
+	private static final int				RESULT_NORMAL						= 1;
+	private static final int				RESULT_QUIT_TO_MAIN			= 2;
+	private static final int				CORRUPTION							= 3;
+	private static final int				ARBITRARY_REQUEST_CODE	= 23;
 
-	private CardDbAdapter mDbHelper;
-	private ImageGetter imgGetter;
-	private ListView list;
-	private RulesListAdapter adapter;
-	private ArrayList<DisplayItem> rules;
-	private int category;
-	private int subcategory;
-	private String keyword;
-	
-	private Pattern underscorePattern;
-	private Pattern examplePattern;
-	private Pattern glyphPattern;
-	private Pattern keywordPattern;
-	private Pattern hyperlinkPattern;
-	private Pattern linkPattern;
+	private ImageGetter							imgGetter;
+	private ListView								list;
+	private RulesListAdapter				adapter;
+	private ArrayList<DisplayItem>	rules;
+	private int											category;
+	private int											subcategory;
+	private String									keyword;
+
+	private Pattern									underscorePattern;
+	private Pattern									examplePattern;
+	private Pattern									glyphPattern;
+	private Pattern									keywordPattern;
+	private Pattern									hyperlinkPattern;
+	private Pattern									linkPattern;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.rules_activity);
-
-		mDbHelper = new CardDbAdapter(this);
-		mDbHelper.openReadable();
 
 		imgGetter = ImageGetterHelper.GlyphGetter(getResources());
 
@@ -147,9 +143,10 @@ public class RulesActivity extends FamiliarActivity {
 									.getColumnIndex(CardDbAdapter.KEY_DEFINITION))));
 						}
 						else {
-							rules.add(new RuleItem(c.getInt(c.getColumnIndex(CardDbAdapter.KEY_CATEGORY)), c.getInt(c
-									.getColumnIndex(CardDbAdapter.KEY_SUBCATEGORY)),
-									c.getString(c.getColumnIndex(CardDbAdapter.KEY_ENTRY)), c.getString(c
+							rules
+									.add(new RuleItem(c.getInt(c.getColumnIndex(CardDbAdapter.KEY_CATEGORY)), c.getInt(c
+											.getColumnIndex(CardDbAdapter.KEY_SUBCATEGORY)), c.getString(c
+											.getColumnIndex(CardDbAdapter.KEY_ENTRY)), c.getString(c
 											.getColumnIndex(CardDbAdapter.KEY_RULE_TEXT))));
 						}
 						c.moveToNext();
@@ -170,7 +167,7 @@ public class RulesActivity extends FamiliarActivity {
 					}
 					adapter = new RulesListAdapter(this, listItemResource, rules);
 					list.setAdapter(adapter);
-	
+
 					if (clickable) {
 						// This only happens for rule items with no subcategory, so the cast
 						// should be safe
@@ -209,13 +206,13 @@ public class RulesActivity extends FamiliarActivity {
 		}
 
 		list.setSelection(position);
-		
+
 		// Explanations for these regexes are available upon request.
 		// - Alex
 		underscorePattern = Pattern.compile("_(.+?)_");
 		examplePattern = Pattern.compile("(Example:.+)$");
 		glyphPattern = Pattern.compile("\\{([a-zA-Z0-9/]{1,3})\\}");
-		if(keyword != null && !keyword.contains("{") && !keyword.contains("}")) {
+		if (keyword != null && !keyword.contains("{") && !keyword.contains("}")) {
 			keywordPattern = Pattern.compile("(" + Pattern.quote(keyword) + ")", Pattern.CASE_INSENSITIVE);
 		}
 		else {
@@ -224,31 +221,20 @@ public class RulesActivity extends FamiliarActivity {
 		hyperlinkPattern = Pattern.compile("\\<(http://)?(www|gatherer)(.+?)\\>");
 
 		/*
-		 * Regex breakdown for Adam: 
-		 * [1-9]{1}: first character is between 1 and 9 
-		 * [0-9]{2}: followed by two characters between 0 and 9 (i.e. a 3-digit number)
-		 * (...)?: maybe followed by the group: 
-		 * \\.: period
-		 * ([a-z0-9]{1,3}(-[a-z]{1})?)?: maybe followed by one to three alphanumeric characters,
-		 * 		which are maybe followed by a hyphen and an alphabetical character 
-		 * \\.?: maybe followed by another period
+		 * Regex breakdown for Adam: [1-9]{1}: first character is between 1 and 9
+		 * [0-9]{2}: followed by two characters between 0 and 9 (i.e. a 3-digit
+		 * number) (...)?: maybe followed by the group: \\.: period
+		 * ([a-z0-9]{1,3}(-[a-z]{1})?)?: maybe followed by one to three alphanumeric
+		 * characters, which are maybe followed by a hyphen and an alphabetical
+		 * character \\.?: maybe followed by another period
 		 * 
-		 * I realize this isn't completely easy to read, but it might at least help make some sense of the regex so 
-		 * I'm not just waving my hands and shouting "WIZAAAAAARDS!". I still reserve the right to do that, though.
-		 *  - Alex
+		 * I realize this isn't completely easy to read, but it might at least help
+		 * make some sense of the regex so I'm not just waving my hands and shouting
+		 * "WIZAAAAAARDS!". I still reserve the right to do that, though. - Alex
 		 */
 		linkPattern = Pattern.compile("([1-9]{1}[0-9]{2}(\\.([a-z0-9]{1,3}(-[a-z]{1})?)?\\.?)?)");
 
 		setResult(RESULT_NORMAL);
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-
-		if (mDbHelper != null) {
-			mDbHelper.close();
-		}
 	}
 
 	@Override
@@ -294,20 +280,16 @@ public class RulesActivity extends FamiliarActivity {
 		}
 		else if (id == CORRUPTION) {
 			View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
-			TextView text = (TextView)dialogLayout.findViewById(R.id.corruption_message);
+			TextView text = (TextView) dialogLayout.findViewById(R.id.corruption_message);
 			text.setText(Html.fromHtml(getString(R.string.corruption_error)));
 			text.setMovementMethod(LinkMovementMethod.getInstance());
-			
-			result = new AlertDialog.Builder(this)
-				.setTitle(R.string.corruption_error_title)
-				.setView(dialogLayout)
-				.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						finish();
-					}
-				})
-				.setCancelable(false)
-				.create();
+
+			result = new AlertDialog.Builder(this).setTitle(R.string.corruption_error_title).setView(dialogLayout)
+					.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							finish();
+						}
+					}).setCancelable(false).create();
 		}
 
 		return result;
@@ -352,17 +334,17 @@ public class RulesActivity extends FamiliarActivity {
 		encodedInput = underscorePattern.matcher(encodedInput).replaceAll("\\<i\\>$1\\</i\\>");
 		encodedInput = examplePattern.matcher(encodedInput).replaceAll("\\<i\\>$1\\</i\\>");
 		encodedInput = glyphPattern.matcher(encodedInput).replaceAll("\\<img src=\"$1\"/\\>");
-		if(keywordPattern != null) {
+		if (keywordPattern != null) {
 			encodedInput = keywordPattern.matcher(encodedInput).replaceAll("\\<font color=\"yellow\"\\>$1\\</font\\>");
 		}
 		encodedInput = hyperlinkPattern.matcher(encodedInput).replaceAll("\\<a href=\"http://$2$3\"\\>$2$3\\</a\\>");
 		encodedInput = encodedInput.replace("{", "").replace("}", "");
-		
+
 		CharSequence cs = Html.fromHtml(encodedInput, imgGetter, null);
 		SpannableString result = new SpannableString(cs);
 
-		if(linkify) {
-		Matcher m = linkPattern.matcher(cs);
+		if (linkify) {
+			Matcher m = linkPattern.matcher(cs);
 			while (m.find()) {
 				try {
 					String[] tokens = cs.subSequence(m.start(), m.end()).toString().split("(\\.)");
@@ -382,7 +364,7 @@ public class RulesActivity extends FamiliarActivity {
 					result.setSpan(new ClickableSpan() {
 						@Override
 						public void onClick(View widget) {
-							//Open a new activity instance
+							// Open a new activity instance
 							Intent i = new Intent(RulesActivity.this, RulesActivity.class);
 							i.putExtra(CATEGORY_KEY, linkCat);
 							i.putExtra(SUBCATEGORY_KEY, linkSub);
@@ -409,10 +391,10 @@ public class RulesActivity extends FamiliarActivity {
 	}
 
 	private class RuleItem extends DisplayItem {
-		private int category;
-		private int subcategory;
-		private String entry;
-		private String rulesText;
+		private int			category;
+		private int			subcategory;
+		private String	entry;
+		private String	rulesText;
 
 		public RuleItem(int category, int subcategory, String entry, String rulesText) {
 			this.category = category;
@@ -481,10 +463,10 @@ public class RulesActivity extends FamiliarActivity {
 	}
 
 	private class RulesListAdapter extends ArrayAdapter<DisplayItem> implements SectionIndexer {
-		private int	layoutResourceId;
-		private ArrayList<DisplayItem> items;
-		private HashMap<String, Integer> alphaIndex;
-		private String[] sections;
+		private int												layoutResourceId;
+		private ArrayList<DisplayItem>		items;
+		private HashMap<String, Integer>	alphaIndex;
+		private String[]									sections;
 
 		public RulesListAdapter(Context context, int textViewResourceId, ArrayList<DisplayItem> items) {
 			super(context, textViewResourceId, items);
@@ -510,7 +492,8 @@ public class RulesActivity extends FamiliarActivity {
 				}
 
 				ArrayList<String> letters = new ArrayList<String>(this.alphaIndex.keySet());
-				Collections.sort(letters); // This should do nothing in practice, but just to be safe
+				Collections.sort(letters); // This should do nothing in practice, but
+																		// just to be safe
 
 				sections = new String[letters.size()];
 				letters.toArray(sections);
@@ -580,9 +563,10 @@ public class RulesActivity extends FamiliarActivity {
 			}
 		}
 	}
-	
+
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) { super.onCreateOptionsMenu(menu);
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
 		MenuInflater inflater = new MenuInflater(this);
 		inflater.inflate(R.menu.rules_menu, menu);
 		return true;

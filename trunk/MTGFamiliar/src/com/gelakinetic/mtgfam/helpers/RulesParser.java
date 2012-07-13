@@ -14,46 +14,46 @@ import java.util.regex.Pattern;
 
 import android.database.sqlite.SQLiteException;
 
-import com.gelakinetic.mtgfam.activities.MainActivity.OTATask;
+import com.gelakinetic.mtgfam.activities.FamiliarActivity.OTATask;
 
 public class RulesParser {
 
 	// Instance variables
-	private Date lastUpdated;
-	private String rulesUrl;
-	private CardDbAdapter mDbHelper;
-	private OTATask task;
-	private ArrayList<RuleItem> rules;
-	private ArrayList<GlossaryItem> glossary;
+	private Date										lastUpdated;
+	private String									rulesUrl;
+	private CardDbAdapter						mDbHelper;
+	private OTATask									task;
+	private ArrayList<RuleItem>			rules;
+	private ArrayList<GlossaryItem>	glossary;
 
 	// URLs and the regex
-	private final String source = "http://www.wizards.com/Magic/TCG/Article.aspx?x=magic/rules";
-	private final String prefix = "http://www.wizards.com";
-	private final String regex = "(/magic/comprules/MagicCompRules_[0-9]{8}\\.txt)";
+	private final String						source								= "http://www.wizards.com/Magic/TCG/Article.aspx?x=magic/rules";
+	private final String						prefix								= "http://www.wizards.com";
+	private final String						regex									= "(/magic/comprules/MagicCompRules_[0-9]{8}\\.txt)";
 
 	// Delimiting tokens
 	// NOTE: If WotC changes their rules file format drastically, these may need
 	// to be changed as well
-	private final String preRules = "Customer Service Information";
-	private final String postRulesPreGlossary = "Glossary";
-	private final String postGlossary = "Credits";
+	private final String						preRules							= "Customer Service Information";
+	private final String						postRulesPreGlossary	= "Glossary";
+	private final String						postGlossary					= "Credits";
 
 	// Result codes
 	/**
 	 * Returned from fetchAndLoad() if everything works correctly.
 	 */
-	public static int SUCCESS = 0;
+	public static int								SUCCESS								= 0;
 
 	/**
 	 * Returned from fetchAndLoad() if some of the rules/terms failed, but some
 	 * succeeded.
 	 */
-	public static int ERRORS = 1;
+	public static int								ERRORS								= 1;
 
 	/**
 	 * Returned from fetchAndLoad() if a catastrophic failure occurs.
 	 */
-	public static int FAILURE = 2;
+	public static int								FAILURE								= 2;
 
 	public RulesParser(Date lastUpdated, CardDbAdapter mDbHelper, OTATask otaTask) {
 		this.lastUpdated = lastUpdated;
@@ -295,7 +295,8 @@ public class RulesParser {
 			int statusCode = SUCCESS;
 			int numTotalElements = rules.size() + glossary.size();
 			int elementsParsed = 0;
-			task.publicPublishProgress(new String[] { "Parsing Comprehensive Rules", "Parsing Comprehensive Rules", "" + (int)Math.round(100*elementsParsed / (double)numTotalElements) });
+			task.publicPublishProgress(new String[] { "Parsing Comprehensive Rules", "Parsing Comprehensive Rules",
+					"" + (int) Math.round(100 * elementsParsed / (double) numTotalElements) });
 			// main.setNumCards(rules.size() + glossary.size());
 
 			for (RuleItem rule : rules) {
@@ -307,7 +308,8 @@ public class RulesParser {
 				}
 				finally {
 					elementsParsed++;
-					task.publicPublishProgress(new String[] { "Parsing Comprehensive Rules", "Parsing Comprehensive Rules", "" + (int)Math.round(100*elementsParsed / (double)numTotalElements)});
+					task.publicPublishProgress(new String[] { "Parsing Comprehensive Rules", "Parsing Comprehensive Rules",
+							"" + (int) Math.round(100 * elementsParsed / (double) numTotalElements) });
 				}
 			}
 
@@ -321,25 +323,28 @@ public class RulesParser {
 				}
 				finally {
 					elementsParsed++;
-					task.publicPublishProgress(new String[] { "Parsing Comprehensive Rules", "Parsing Comprehensive Rules", "" + (int)Math.round(100*elementsParsed / (double)numTotalElements) });
+					task.publicPublishProgress(new String[] { "Parsing Comprehensive Rules", "Parsing Comprehensive Rules",
+							"" + (int) Math.round(100 * elementsParsed / (double) numTotalElements) });
 				}
 			}
 
-			task.publicPublishProgress(new String[] { "Done Parsing Comprehensive Rules", "Done Parsing Comprehensive Rules", "0" });
+			task.publicPublishProgress(new String[] { "Done Parsing Comprehensive Rules", "Done Parsing Comprehensive Rules",
+					"0" });
 			return statusCode;
 		}
 		catch (SQLiteException sqe) {
-			task.publicPublishProgress(new String[] { "Done Parsing Comprehensive Rules", "Done Parsing Comprehensive Rules", "0" });
+			task.publicPublishProgress(new String[] { "Done Parsing Comprehensive Rules", "Done Parsing Comprehensive Rules",
+					"0" });
 			return FAILURE;
 		}
 	}
 
 	private class RuleItem {
-		public int category;
-		public int subcategory;
-		public String entry;
-		public String text;
-		public int position;
+		public int		category;
+		public int		subcategory;
+		public String	entry;
+		public String	text;
+		public int		position;
 
 		public RuleItem(int category, int subcategory, String entry, String text, int position) {
 			this.category = category;
@@ -355,8 +360,8 @@ public class RulesParser {
 	}
 
 	private class GlossaryItem {
-		public String term;
-		public String definition;
+		public String	term;
+		public String	definition;
 
 		public GlossaryItem(String term) {
 			this.term = term;

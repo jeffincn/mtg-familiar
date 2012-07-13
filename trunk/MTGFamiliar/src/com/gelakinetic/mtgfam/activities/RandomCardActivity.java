@@ -23,7 +23,6 @@ import java.util.Random;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -31,7 +30,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
@@ -53,14 +51,12 @@ public class RandomCardActivity extends FamiliarActivity {
 	protected static final int	MOMIR_IMAGE				= 1;
 	protected static final int	STONEHEWER_IMAGE	= 2;
 	protected static final int	JHOIRA_IMAGE			= 3;
-	protected static final int	CORRUPTION = 4;
-	private CardDbAdapter				mDbHelper;
+	protected static final int	CORRUPTION				= 4;
 	private Random							rand;
 	private String							name;
 	private Spinner							momirCmcChoice;
 	private String[]						cmcChoices;
 	private Button							momirButton;
-	private Context							mCtx;
 	private Button							stonehewerButton;
 	private Spinner							stonehewerCmcChoice;
 	private Button							jhoiraInstantButton;
@@ -68,7 +64,6 @@ public class RandomCardActivity extends FamiliarActivity {
 	private ImageView						stonehewerImage;
 	private ImageView						momirImage;
 	private ImageView						jhoiraImage;
-	private SharedPreferences		preferences;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -100,8 +95,6 @@ public class RandomCardActivity extends FamiliarActivity {
 		jhoiraInstantButton = (Button) findViewById(R.id.jhorira_instant_button);
 		jhoiraSorceryButton = (Button) findViewById(R.id.jhorira_sorcery_button);
 
-		mCtx = (Context) this;
-
 		momirButton.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
@@ -117,13 +110,14 @@ public class RandomCardActivity extends FamiliarActivity {
 
 				try {
 					Cursor doods = mDbHelper.Search(null, null, "Creature", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-							CardDbAdapter.NOONECARES, null, cmc, "=", null, null, null, null, 0, 0, CardDbAdapter.ANYPRINTING, false, returnTypes, true);
+							CardDbAdapter.NOONECARES, null, cmc, "=", null, null, null, null, 0, 0, CardDbAdapter.ANYPRINTING, false,
+							returnTypes, true);
 
 					int pos = rand.nextInt(doods.getCount());
 					doods.moveToPosition(pos);
 					name = doods.getString(doods.getColumnIndex(CardDbAdapter.KEY_NAME));
 					doods.close();
-	
+
 					Intent i = new Intent(mCtx, ResultListActivity.class);
 					i.putExtra("id", mDbHelper.fetchIdByName(name));
 					startActivityForResult(i, 0);
@@ -150,13 +144,14 @@ public class RandomCardActivity extends FamiliarActivity {
 
 				try {
 					Cursor equipment = mDbHelper.Search(null, null, "Equipment", "wubrgl", 0, null, CardDbAdapter.NOONECARES,
-							null, CardDbAdapter.NOONECARES, null, cmc + 1, "<", null, null, null, null, 0, 0, CardDbAdapter.ANYPRINTING, false, returnTypes, true);
+							null, CardDbAdapter.NOONECARES, null, cmc + 1, "<", null, null, null, null, 0, 0,
+							CardDbAdapter.ANYPRINTING, false, returnTypes, true);
 
 					int pos = rand.nextInt(equipment.getCount());
 					equipment.moveToPosition(pos);
 					name = equipment.getString(equipment.getColumnIndex(CardDbAdapter.KEY_NAME));
 					equipment.close();
-	
+
 					Intent i = new Intent(mCtx, ResultListActivity.class);
 					i.putExtra("id", mDbHelper.fetchIdByName(name));
 					startActivityForResult(i, 0);
@@ -176,7 +171,8 @@ public class RandomCardActivity extends FamiliarActivity {
 
 				try {
 					Cursor instants = mDbHelper.Search(null, null, "instant", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-							CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, CardDbAdapter.ANYPRINTING, false, returnTypes, true);
+							CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, CardDbAdapter.ANYPRINTING, false,
+							returnTypes, true);
 
 					// Get 3 random, distinct numbers
 					int pos[] = new int[3];
@@ -189,7 +185,7 @@ public class RandomCardActivity extends FamiliarActivity {
 					while (pos[0] == pos[2] || pos[1] == pos[2]) {
 						pos[2] = rand.nextInt(instants.getCount());
 					}
-	
+
 					String names[] = new String[3];
 					Intent intent = new Intent(mCtx, ResultListActivity.class);
 					for (int i = 0; i < 3; i++) {
@@ -198,7 +194,7 @@ public class RandomCardActivity extends FamiliarActivity {
 						intent.putExtra("id" + i, mDbHelper.fetchIdByName(names[i]));
 					}
 					instants.close();
-	
+
 					startActivityForResult(intent, 0);
 				}
 				catch (SQLiteDatabaseCorruptException e) {
@@ -216,8 +212,9 @@ public class RandomCardActivity extends FamiliarActivity {
 
 				try {
 					Cursor sorceries = mDbHelper.Search(null, null, "sorcery", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-							CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, CardDbAdapter.ANYPRINTING, false, returnTypes, true);
-	
+							CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, CardDbAdapter.ANYPRINTING, false,
+							returnTypes, true);
+
 					// Get 3 random, distinct numbers
 					int pos[] = new int[3];
 					pos[0] = rand.nextInt(sorceries.getCount());
@@ -229,7 +226,7 @@ public class RandomCardActivity extends FamiliarActivity {
 					while (pos[0] == pos[2] || pos[1] == pos[2]) {
 						pos[2] = rand.nextInt(sorceries.getCount());
 					}
-	
+
 					String names[] = new String[3];
 					Intent intent = new Intent(mCtx, ResultListActivity.class);
 					for (int i = 0; i < 3; i++) {
@@ -238,7 +235,7 @@ public class RandomCardActivity extends FamiliarActivity {
 						intent.putExtra("id" + i, mDbHelper.fetchIdByName(names[i]));
 					}
 					sorceries.close();
-	
+
 					startActivityForResult(intent, 0);
 				}
 				catch (SQLiteDatabaseCorruptException e) {
@@ -260,14 +257,9 @@ public class RandomCardActivity extends FamiliarActivity {
 		adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		stonehewerCmcChoice.setAdapter(adapter1);
 
-		mDbHelper = new CardDbAdapter(this);
-		mDbHelper.openReadable();
-
 		cmcChoices = getResources().getStringArray(R.array.momir_spinner);
 
 		rand = new Random(System.currentTimeMillis());
-
-		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		boolean b = preferences.getBoolean("mojhostoFirstTime", true);
 		if (b) {
@@ -276,17 +268,9 @@ public class RandomCardActivity extends FamiliarActivity {
 			editor.putBoolean("mojhostoFirstTime", false);
 			editor.commit();
 		}
-		
+
 	}
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		if (mDbHelper != null) {
-			mDbHelper.close();
-		}
-	}
-	
 	@Override
 	protected Dialog onCreateDialog(int id) {
 
@@ -331,24 +315,20 @@ public class RandomCardActivity extends FamiliarActivity {
 		}
 		else if (id == CORRUPTION) {
 			View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
-			TextView text = (TextView)dialogLayout.findViewById(R.id.corruption_message);
+			TextView text = (TextView) dialogLayout.findViewById(R.id.corruption_message);
 			text.setText(Html.fromHtml(getString(R.string.corruption_error)));
 			text.setMovementMethod(LinkMovementMethod.getInstance());
-			
-			d = new AlertDialog.Builder(this)
-				.setTitle(R.string.corruption_error_title)
-				.setView(dialogLayout)
-				.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						finish();
-					}
-				})
-				.setCancelable(false)
-				.create();
+
+			d = new AlertDialog.Builder(this).setTitle(R.string.corruption_error_title).setView(dialogLayout)
+					.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							finish();
+						}
+					}).setCancelable(false).create();
 		}
 		return d;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
@@ -360,9 +340,10 @@ public class RandomCardActivity extends FamiliarActivity {
 				return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) { super.onCreateOptionsMenu(menu);
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
 		MenuInflater inflater = new MenuInflater(this);
 		inflater.inflate(R.menu.random_menu, menu);
 		return true;

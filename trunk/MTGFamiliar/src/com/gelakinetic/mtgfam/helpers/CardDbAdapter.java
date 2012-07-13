@@ -55,10 +55,10 @@ public class CardDbAdapter {
 	public static final int				SEVENMINUSSTAR								= -1003;
 	public static final int				STARSQUARED										= -1004;
 	public static final int				NOONECARES										= -1005;
-	
-	public static final int				ANYPRINTING = 0;
-	public static final int				FIRSTPRINTING = 1;
-	public static final int				REPRINT = 2;
+
+	public static final int				ANYPRINTING										= 0;
+	public static final int				FIRSTPRINTING									= 1;
+	public static final int				REPRINT												= 2;
 
 	public static final int				AND														= 0;
 	public static final int				OR														= 1;
@@ -75,7 +75,7 @@ public class CardDbAdapter {
 	public static final int				DATABASE_VERSION							= 26;
 
 	public static final String		KEY_ID												= "_id";
-	public static final String		KEY_NAME											= SearchManager.SUGGEST_COLUMN_TEXT_1; // "name";
+	public static final String		KEY_NAME											= SearchManager.SUGGEST_COLUMN_TEXT_1;							// "name";
 	public static final String		KEY_SET												= "expansion";
 	public static final String		KEY_TYPE											= "type";
 	public static final String		KEY_ABILITY										= "cardtext";
@@ -957,23 +957,18 @@ public class CardDbAdapter {
 		if (!backface) {
 			statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_NUMBER + " NOT LIKE '%b%')";
 		}
-		
+
 		if (set_logic != ANYPRINTING) {
-			statement = " JOIN (SELECT iT" + DATABASE_TABLE_CARDS + "." + KEY_NAME 
-								+ ", MIN(" + DATABASE_TABLE_SETS + "." + KEY_DATE + ") AS " + KEY_DATE 
-							+ " FROM " + DATABASE_TABLE_CARDS + " AS iT" + DATABASE_TABLE_CARDS 
-							+ " JOIN " + DATABASE_TABLE_SETS 
-							+ " ON iT" + DATABASE_TABLE_CARDS + "." + KEY_SET + " = " + DATABASE_TABLE_SETS + "." + KEY_CODE 
-							+ " GROUP BY iT" + DATABASE_TABLE_CARDS + "." + KEY_NAME 
-						+ ") AS FirstPrints"
-						+ " ON " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " = FirstPrints." + KEY_NAME 
-						+ statement;
-			if(set_logic == FIRSTPRINTING)			
-				statement = " AND " + DATABASE_TABLE_SETS + "." + KEY_DATE + " = FirstPrints." + KEY_DATE 
-						+ statement;
-			else
-				statement = " AND " + DATABASE_TABLE_SETS + "." + KEY_DATE + " <> FirstPrints." + KEY_DATE 
+			statement = " JOIN (SELECT iT" + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", MIN(" + DATABASE_TABLE_SETS + "."
+					+ KEY_DATE + ") AS " + KEY_DATE + " FROM " + DATABASE_TABLE_CARDS + " AS iT" + DATABASE_TABLE_CARDS
+					+ " JOIN " + DATABASE_TABLE_SETS + " ON iT" + DATABASE_TABLE_CARDS + "." + KEY_SET + " = "
+					+ DATABASE_TABLE_SETS + "." + KEY_CODE + " GROUP BY iT" + DATABASE_TABLE_CARDS + "." + KEY_NAME
+					+ ") AS FirstPrints" + " ON " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " = FirstPrints." + KEY_NAME
 					+ statement;
+			if (set_logic == FIRSTPRINTING)
+				statement = " AND " + DATABASE_TABLE_SETS + "." + KEY_DATE + " = FirstPrints." + KEY_DATE + statement;
+			else
+				statement = " AND " + DATABASE_TABLE_SETS + "." + KEY_DATE + " <> FirstPrints." + KEY_DATE + statement;
 		}
 
 		if (statement.equals(" WHERE 1=1")) {
@@ -1155,14 +1150,13 @@ public class CardDbAdapter {
 		try {
 			// The new way (single query per type, should be much faster) - Alex
 			String sql = "SELECT COALESCE(CASE (SELECT " + KEY_SET + " FROM " + DATABASE_TABLE_CARDS + " WHERE " + KEY_NAME
-					+ " = '" + mCardName + "') WHEN 'UG' THEN 1 WHEN 'UNH' THEN 1 WHEN 'ARS' THEN 1 WHEN 'PCP' THEN 1 " 
-					+ "WHEN 'PP2' THEN 1 ELSE NULL END, " + "CASE (SELECT 1 FROM "
-					+ DATABASE_TABLE_CARDS + " c INNER JOIN " + DATABASE_TABLE_LEGAL_SETS + " ls ON ls." + KEY_SET + " = c."
-					+ KEY_SET + " WHERE ls." + KEY_FORMAT + " = '" + format + "' AND c." + KEY_NAME + " = '" + mCardName
-					+ "') WHEN 1 THEN NULL ELSE CASE WHEN '" + format + "' = 'Legacy' " + "THEN NULL WHEN '" + format
-					+ "' = 'Vintage' THEN NULL ELSE 1 END END, (SELECT " + KEY_LEGALITY + " from " + DATABASE_TABLE_BANNED_CARDS
-					+ " WHERE " + KEY_NAME + " = '" + mCardName + "' AND " + KEY_FORMAT + " = '" + format + "'), 0) AS "
-					+ KEY_LEGALITY;
+					+ " = '" + mCardName + "') WHEN 'UG' THEN 1 WHEN 'UNH' THEN 1 WHEN 'ARS' THEN 1 WHEN 'PCP' THEN 1 "
+					+ "WHEN 'PP2' THEN 1 ELSE NULL END, " + "CASE (SELECT 1 FROM " + DATABASE_TABLE_CARDS + " c INNER JOIN "
+					+ DATABASE_TABLE_LEGAL_SETS + " ls ON ls." + KEY_SET + " = c." + KEY_SET + " WHERE ls." + KEY_FORMAT + " = '"
+					+ format + "' AND c." + KEY_NAME + " = '" + mCardName + "') WHEN 1 THEN NULL ELSE CASE WHEN '" + format
+					+ "' = 'Legacy' " + "THEN NULL WHEN '" + format + "' = 'Vintage' THEN NULL ELSE 1 END END, (SELECT "
+					+ KEY_LEGALITY + " from " + DATABASE_TABLE_BANNED_CARDS + " WHERE " + KEY_NAME + " = '" + mCardName
+					+ "' AND " + KEY_FORMAT + " = '" + format + "'), 0) AS " + KEY_LEGALITY;
 
 			Cursor c = null;
 			c = mDb.rawQuery(sql, null);
@@ -1354,7 +1348,7 @@ public class CardDbAdapter {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Drops the rules and glossary tables.
 	 */
@@ -1362,7 +1356,7 @@ public class CardDbAdapter {
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_RULES);
 		mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_GLOSSARY);
 	}
-	
+
 	/**
 	 * Creates the rules and glossary tables.
 	 */
@@ -1372,7 +1366,7 @@ public class CardDbAdapter {
 	}
 
 	public void insertRule(int category, int subcategory, String entry, String text, int position) {
-		if(entry == null) {
+		if (entry == null) {
 			entry = "NULL";
 		}
 		else {
@@ -1380,26 +1374,26 @@ public class CardDbAdapter {
 		}
 		text = "'" + text.replace("'", "''") + "'";
 		String positionStr;
-		if(position < 0) {
+		if (position < 0) {
 			positionStr = "NULL";
 		}
 		else {
 			positionStr = String.valueOf(position);
 		}
-		String sql = "INSERT INTO " + DATABASE_TABLE_RULES + " (" + KEY_CATEGORY + ", " + KEY_SUBCATEGORY + ", " + KEY_ENTRY + 
-				", " + KEY_RULE_TEXT + ", " + KEY_POSITION + ") VALUES (" + String.valueOf(category) + ", " + 
-				String.valueOf(subcategory) + ", " + entry + ", " + text + ", " + positionStr + ");";
+		String sql = "INSERT INTO " + DATABASE_TABLE_RULES + " (" + KEY_CATEGORY + ", " + KEY_SUBCATEGORY + ", "
+				+ KEY_ENTRY + ", " + KEY_RULE_TEXT + ", " + KEY_POSITION + ") VALUES (" + String.valueOf(category) + ", "
+				+ String.valueOf(subcategory) + ", " + entry + ", " + text + ", " + positionStr + ");";
 		mDb.execSQL(sql);
 	}
-	
+
 	public void insertGlossaryTerm(String term, String definition) {
 		term = "'" + term.replace("'", "''") + "'";
 		definition = "'" + definition.replace("'", "''") + "'";
-		String sql = "INSERT INTO " + DATABASE_TABLE_GLOSSARY + " (" + KEY_TERM + ", " + KEY_DEFINITION + 
-				") VALUES (" + term + ", " + definition + ");";
+		String sql = "INSERT INTO " + DATABASE_TABLE_GLOSSARY + " (" + KEY_TERM + ", " + KEY_DEFINITION + ") VALUES ("
+				+ term + ", " + definition + ");";
 		mDb.execSQL(sql);
 	}
-	
+
 	public SQLiteDatabase getReadableDatabase() {
 		return mDb;
 	}
@@ -1712,14 +1706,14 @@ public class CardDbAdapter {
 		}
 		return null;
 	}
-	
+
 	private void showDbErrorToast() {
 		try {
 			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
 		}
 		catch (RuntimeException re) {
-			//Eat it; this will happen if we try to toast in a non-UI thread.
-			//It can happen when we get an error in autocomplete.
+			// Eat it; this will happen if we try to toast in a non-UI thread.
+			// It can happen when we get an error in autocomplete.
 		}
 	}
 }

@@ -55,9 +55,6 @@ public abstract class FamiliarActivity extends SherlockActivity {
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-		mDbHelper = new CardDbAdapter(this);
-		mDbHelper.openWritable();
-
 		// NOTE: This needs to be updated with every release
 		Calendar c = Calendar.getInstance();
 		c.set(2012, Calendar.JUNE, 9, 0, 0, 0);
@@ -71,10 +68,32 @@ public abstract class FamiliarActivity extends SherlockActivity {
 			int lastLegalityUpdate = preferences.getInt("lastLegalityUpdate", 0);
 			// days to ms
 			if (((int) (curTime * .001) - lastLegalityUpdate) > (updatefrequency * 24 * 60 * 60)) {
-				asyncTask = new OTATask();
-				asyncTask.execute((Void[]) null);
+				//If we should be updating, check to see if we already are
+				MyApp appState = (MyApp)getApplicationContext();
+				boolean update;
+				synchronized(this) {
+					if(!appState.isUpdating()) {
+						appState.setUpdating(true);
+						appState.setUpdatingActivity(this);
+						update = true;
+					}
+					else {
+						update = false;
+						if(appState.getUpdatingActivity() != this) {
+							finish();
+						}
+					}
+				}
+				
+				if(update) {
+					asyncTask = new OTATask();
+					asyncTask.execute((Void[]) null);
+				}
 			}
 		}
+
+		mDbHelper = new CardDbAdapter(this);
+		mDbHelper.openWritable();
 	}
 
 	@Override
@@ -291,11 +310,17 @@ public abstract class FamiliarActivity extends SherlockActivity {
 			}
 			catch (IllegalArgumentException e) {
 			}
+			
+			MyApp appState = (MyApp)getApplicationContext();
+			appState.setUpdating(false);
+			appState.setUpdatingActivity(null);
 		}
 
 		@Override
 		protected void onCancelled() {
-			// TODO something when canceled?
+			MyApp appState = (MyApp)getApplicationContext();
+			appState.setUpdating(false);
+			appState.setUpdatingActivity(null);
 		}
 	}
 }

@@ -128,7 +128,7 @@ public class ResultListActivity extends FamiliarActivity {
 		if (c == null || c.getCount() == 0) {
 			Intent i = new Intent();
 			setResult(NO_RESULT, i);
-			Toast.makeText(this, getString(R.string.toast_no_result), Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, getString(R.string.search_toast_no_results), Toast.LENGTH_SHORT).show();
 			finish();
 		}
 		else {

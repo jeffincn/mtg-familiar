@@ -11,157 +11,179 @@
 	along with MTG Familiar. If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="Automatic Updates" >
+    <PreferenceCategory android:title="@string/pref_cat_updates">
 
         <CheckBoxPreference
-            android:defaultValue="true"
             android:key="autoupdate"
-            android:summary="@string/automaticupdatesummary"
-            android:title="@string/automaticupdatetitle" />
+            android:defaultValue="true"
+            android:title="@string/pref_auto_updates_title"
+            android:summary="@string/pref_auto_updates_summary" />
 
         <ListPreference
-            android:entries="@array/updatefrequencydays"
-            android:entryValues="@array/updatefrequencydaysvalues"
             android:key="updatefrequency"
-            android:summary="@string/updatefrequencysummary"
-            android:title="@string/updatefrequencytitle" />
+            android:entries="@array/update_frequency_days"
+            android:entryValues="@array/update_frequency_days_values"
+            android:title="@string/pref_update_frequency_title"
+            android:summary="@string/pref_update_frequency_summary" />
+        
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/cardviewtitle" >
+    <PreferenceCategory android:title="@string/pref_cat_card_view">
 
         <CheckBoxPreference
-            android:defaultValue="false"
             android:key="picFirst"
-            android:summary="@string/picfirstsummary"
-            android:title="@string/picfirsttitle" />
-        <CheckBoxPreference android:key="scrollresults" android:title="@string/card_view_scroll" android:summary="@string/card_view_scroll_desc" android:defaultValue="false"/>
-    </PreferenceCategory>
+            android:defaultValue="false"
+            android:title="@string/pref_show_art_title"
+            android:summary="@string/pref_show_art_summary" />
+        
+        <CheckBoxPreference 
+            android:key="scrollresults"
+            android:defaultValue="false"
+            android:title="@string/pref_scroll_title"
+            android:summary="@string/pref_scroll_summary" />
 
-    <PreferenceCategory android:title="Dice" >
+   	</PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_cat_dice">
 
         <CheckBoxPreference
-            android:defaultValue="true"
             android:key="d2AsCoin"
-            android:title="@string/d2title" />
+            android:defaultValue="true"
+            android:title="@string/pref_d2_as_coin_title" />
+        
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/lifetitle" >
+    <PreferenceCategory android:title="@string/pref_cat_life_counter">
 
         <CheckBoxPreference
-            android:defaultValue="true"
             android:key="wakelock"
-            android:summary="@string/wakelocksummary"
-            android:title="@string/wakelocktitle" />
-        <CheckBoxPreference android:key="compactMode" android:summary="@string/compactLifeSummary" android:title="@string/compactLife" android:defaultValue="false"/>
+            android:defaultValue="true"
+            android:title="@string/pref_wake_lock_title"
+            android:summary="@string/pref_wake_lock_summary" />
+        
+        <CheckBoxPreference 
+            android:key="compactMode"
+            android:defaultValue="false" 
+            android:title="@string/pref_compact_mode_title"
+            android:summary="@string/pref_compact_mode_summary" />
+    
     </PreferenceCategory>
     
-    <PreferenceCategory android:title="@string/timertitle" >
-    
-    	<!-- <EditTextPreference 
-    		android:key="roundLength"
-    		android:title="@string/rt_defaulttime_title"
-    		android:summary="@string/rt_defaulttime_desc"
-    		android:defaultValue="50"
-    		android:dialogTitle="Round Length"
-    		android:dialogMessage="Enter a value in minutes" /> -->
+    <PreferenceCategory android:title="@string/pref_cat_timer">
 
     	<ListPreference 
+    		android:key="roundLength"
     		android:entries="@array/rt_defaulttimes"
     		android:entryValues="@array/rt_defaulttimesvalues"
     		android:defaultValue="50"
-    		android:key="roundLength"
-    		android:title="@string/rt_defaulttime_title"
-    		android:summary="@string/rt_defaulttime_desc" />
+    		android:title="@string/pref_default_time_title"
+    		android:summary="@string/pref_default_time_summary" />
 
     	<RingtonePreference
+    		android:key="timerSound"
     		android:ringtoneType="notification"
     		android:showSilent="false"
-    		android:key="timerSound"
-    		android:summary="@string/ringtonesummary"
-    		android:title="@string/ringtonetitle" />
+    		android:title="@string/pref_ringtone_title"
+    		android:summary="@string/pref_ringtone_summary" />
         
         <CheckBoxPreference 
             android:key="fifteenMinutePref"
-            android:title="@string/tts_pref_fifteen_minutes"
-            android:defaultValue="false" />
+            android:defaultValue="false"
+            android:title="@string/pref_fifteen_minutes_title" />
         
         <CheckBoxPreference 
             android:key="tenMinutePref"
-            android:title="@string/tts_pref_ten_minutes"
-            android:defaultValue="false" />
+            android:defaultValue="false"
+            android:title="@string/pref_ten_minutes_title" />
         
         <CheckBoxPreference     
             android:key="fiveMinutePref"
-            android:title="@string/tts_pref_five_minutes"
-            android:defaultValue="false" />
+            android:defaultValue="false"
+            android:title="@string/pref_five_minutes_title" />
     
     </PreferenceCategory>
     
-    <PreferenceCategory android:title="@string/trade_window_title">
+    <PreferenceCategory android:title="@string/pref_cat_trade_window">
         
         <ListPreference
+            android:key="tradePrice"
             android:entries="@array/trade_option_entries"
             android:entryValues="@array/trade_option_values"
             android:defaultValue="1"
-            android:key="tradePrice"
-            android:title="@string/trade_option_title"
-            android:summary="@string/trade_option_desc" />
+            android:title="@string/pref_trade_price_title"
+            android:summary="@string/pref_trade_price_summary" />
         
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/resultlisttitle" >
+    <PreferenceCategory android:title="@string/pref_cat_result_list">
 
         <CheckBoxPreference
-            android:defaultValue="true"
             android:key="consolidateSearch"
-            android:title="@string/consolidate" android:summary="@string/consolidatetext"/>
+            android:defaultValue="true"
+            android:title="@string/pref_consolidate_title"
+            android:summary="@string/pref_consolidate_summary"/>
 
         <CheckBoxPreference
-            android:defaultValue="true"
             android:key="setPref"
-            android:title="@string/setPreftitle" />
+            android:defaultValue="true"
+            android:title="@string/pref_show_set_title" />
         
         <CheckBoxPreference
-            android:defaultValue="true"
             android:key="manacostPref"
-            android:title="@string/manacostPreftitle" />
+            android:defaultValue="true"
+            android:title="@string/pref_show_mana_title" />
 
         <CheckBoxPreference
-            android:key="typePref"
-            android:title="@string/typePreftitle" android:defaultValue="true"/>
+            android:key="typePref" 
+            android:defaultValue="true"
+            android:title="@string/pref_show_type_title" />
 
         <CheckBoxPreference
-            android:key="abilityPref"
-            android:title="@string/abilityPreftitle" android:defaultValue="true"/>
+            android:key="abilityPref" 
+            android:defaultValue="true"
+            android:title="@string/pref_show_ability_title" />
 
         <CheckBoxPreference
-            android:key="ptPref"
-            android:title="@string/ptPreftitle" android:defaultValue="true"/>
+            android:key="ptPref" 
+            android:defaultValue="true"
+            android:title="@string/pref_show_pt_title" />
+        
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/tts_pref_section">
+    
+    <PreferenceCategory android:title="@string/main_wishlist">
+
+        <CheckBoxPreference
+            android:key="verboseWishlistPref"
+            android:defaultValue="true"
+            android:title="@string/pref_wishlist_details_title"
+            android:summary="@string/pref_wishlist_details_summary" />
+        
+	</PreferenceCategory>
+	
+    <PreferenceCategory android:title="@string/pref_cat_tts">
         
         <Preference 
-            android:title="@string/tts_pref_install_title"
-            android:summary="@string/tts_pref_install_desc" >
+            android:title="@string/pref_install_tts_title"
+            android:summary="@string/pref_install_tts_summary">
         
             <intent android:action="android.speech.tts.engine.INSTALL_TTS_DATA" />
             
         </Preference>
         
     </PreferenceCategory>
+    
     <!--
-         <PreferenceCategory android:title="Deck Manager"> <EditTextPreference 
-		android:defaultValue="@string/defaultdeckpath" android:summary="@string/defaultpathsummary" 
-		android:title="@string/defaultpathtitle" android:key="@string/default_deck_path_key" 
-		android:dialogTitle="@string/default_deck_path_dialog_title" /> </PreferenceCategory>
-    -->
-    <PreferenceCategory android:title="@string/Wishlist" >
-
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="verboseWishlistPref"
-            android:title="@string/verbosewishlisttext"/>
+	<PreferenceCategory android:title="Deck Manager"> 
+	
+		<EditTextPreference 
+			android:defaultValue="@string/defaultdeckpath"
+			android:summary="@string/defaultpathsummary" 
+			android:title="@string/defaultpathtitle"
+			android:key="@string/default_deck_path_key" 
+			android:dialogTitle="@string/default_deck_path_dialog_title" /> 
+			
 	</PreferenceCategory>
+    -->
 </PreferenceScreen>

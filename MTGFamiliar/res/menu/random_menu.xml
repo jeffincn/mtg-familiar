@@ -21,6 +21,6 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <item
         android:id="@+id/random_rules"
         android:icon="@drawable/menu_rules"
-        android:title="@string/random_rules"/>
+        android:title="@string/mojhosto_rules_title"/>
 
 </menu>

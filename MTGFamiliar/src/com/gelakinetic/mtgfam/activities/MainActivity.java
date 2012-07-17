@@ -234,7 +234,7 @@ public class MainActivity extends FamiliarActivity {
 
 		if (id == DONATEDIALOG) {
 			builder.setTitle("Donate to the Devs");
-			builder.setNeutralButton("Thanks Anyway!", new DialogInterface.OnClickListener() {
+			builder.setNeutralButton(R.string.dialog_thanks, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.cancel();
 				}
@@ -244,7 +244,7 @@ public class MainActivity extends FamiliarActivity {
 			View dialoglayout = inflater.inflate(R.layout.about_dialog, (ViewGroup) findViewById(R.id.dialog_layout_root));
 
 			TextView text = (TextView) dialoglayout.findViewById(R.id.aboutfield);
-			text.setText(Html.fromHtml(getString(R.string.donate_to_devs)));
+			text.setText(Html.fromHtml(getString(R.string.main_donate_text)));
 			text.setMovementMethod(LinkMovementMethod.getInstance());
 
 			text.setTextSize(15);
@@ -283,7 +283,7 @@ public class MainActivity extends FamiliarActivity {
 			View dialoglayout = inflater.inflate(R.layout.about_dialog, (ViewGroup) findViewById(R.id.dialog_layout_root));
 
 			TextView text = (TextView) dialoglayout.findViewById(R.id.aboutfield);
-			text.setText(Html.fromHtml(getString(R.string.about_this_app)));
+			text.setText(Html.fromHtml(getString(R.string.main_about_text)));
 			text.setMovementMethod(LinkMovementMethod.getInstance());
 
 			builder.setView(dialoglayout);
@@ -302,7 +302,7 @@ public class MainActivity extends FamiliarActivity {
 				}
 			});
 
-			builder.setMessage(Html.fromHtml(getString(R.string.whatsnew)));
+			builder.setMessage(Html.fromHtml(getString(R.string.main_whats_new_text)));
 		}
 		return builder.create();
 	}

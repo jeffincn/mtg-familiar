@@ -21,18 +21,18 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <item
         android:id="@+id/announce_life"
         android:icon="@drawable/menu_speech"
-        android:title="@string/announcelife"/>
+        android:title="@string/life_counter_announce_life"/>
     <item 
         android:id="@+id/change_gathering" 
-        android:title="@string/change_default_gathering"
+        android:title="@string/life_counter_change_default_gathering"
         android:icon="@drawable/menu_wizard"/>
      <item
         android:id="@+id/remove_player"
         android:icon="@drawable/menu_minus"
-        android:title="@string/removeplayer"/>
+        android:title="@string/life_counter_remove_player"/>
     <item
         android:id="@+id/add_player"
         android:icon="@drawable/menu_plus"
-        android:title="@string/addplayer"/>
+        android:title="@string/life_counter_add_player"/>
 
 </menu>

@@ -26,31 +26,31 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <item
         android:id="@+id/checkUpdate"
         android:icon="@drawable/menu_update"
-        android:title="@string/chkupd"
+        android:title="@string/main_force_update_title"
         android:showAsAction="ifRoom"/>
     <item
         android:id="@+id/preferences"
         android:icon="@drawable/menu_settings"
-        android:title="@string/preferences"
+        android:title="@string/main_settings_title"
         android:showAsAction="ifRoom"/>
     <item
         android:id="@+id/donate"
         android:icon="@drawable/menu_donate"
-        android:title="@string/donate"
+        android:title="@string/main_donate_title"
         android:showAsAction="ifRoom" />
     <item
         android:id="@+id/whatsnew"
         android:icon="@drawable/menu_new"
-        android:title="@string/whatsnewtitle"
+        android:title="@string/main_whats_new_title"
         android:showAsAction="ifRoom"/>
     <item
         android:id="@+id/aboutapp"
         android:icon="@drawable/menu_about"
-        android:title="@string/about"
+        android:title="@string/main_about_title"
         android:showAsAction="ifRoom"/>
     <!--
-    <item android:title="@string/refreshDB" android:id="@+id/refreshDB"/>
-    <item android:title="@string/webDB" android:id="@+id/buildWebDB"></item>
+    <item android:title="@string/main_refresh_db" android:id="@+id/refreshDB" />
+    <item android:title="@string/main_build_db" android:id="@+id/buildWebDB" />
     -->
 
 </menu>

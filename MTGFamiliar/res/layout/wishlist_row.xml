@@ -18,7 +18,7 @@
 			android:layout_height="wrap_content"
 			android:layout_weight="1"
 			android:gravity="center_vertical"
-			android:text="@string/name" />
+			android:text="@string/wishlist_name" />
 
             <TextView
                 android:id="@+id/cardcost"
@@ -27,7 +27,7 @@
                 android:layout_marginBottom="-3sp"
                 android:gravity="right|center_vertical"
                 android:paddingTop="4.5sp"
-                android:text="@string/cost" />
+                android:text="@string/ph_cost" />
     
     </LinearLayout>
 
@@ -36,7 +36,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="-5sp"
-        android:text="@string/type" 
+        android:text="@string/ph_type" 
      android:textAppearance="?android:attr/textAppearanceSmall" />
     
     <TextView
@@ -45,7 +45,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:paddingTop="3sp"
-            android:text="@string/rulestext"
+            android:text="@string/ph_ability"
             android:textSize="18sp" >
 	</TextView>
 
@@ -60,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:text="@string/setsearch"
+            android:text="@string/search_set"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
@@ -71,7 +71,7 @@
             android:layout_gravity="center"
             android:gravity="left"
             android:maxLines="1"
-            android:text="@string/trader_default_price"
+            android:text="@string/wishlist_default_price"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <LinearLayout
@@ -88,7 +88,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="right"
-                android:text="@string/p"
+                android:text="@string/ph_power"
 	            android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <TextView
@@ -104,8 +104,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="right"
-                android:text="@string/t"
+                android:text="@string/ph_toughness"
 	            android:textAppearance="?android:attr/textAppearanceSmall" />
             </LinearLayout>
+            
     </LinearLayout>
+    
 </LinearLayout>

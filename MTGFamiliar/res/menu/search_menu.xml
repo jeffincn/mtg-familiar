@@ -21,17 +21,17 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <item
         android:id="@+id/search_menu_random_search"
         android:icon="@drawable/menu_random"
-        android:title="@string/randomButton"></item>
+        android:title="@string/search_randomize"></item>
 
     <item
         android:id="@+id/search_menu_search"
         android:icon="@drawable/menu_search"
-        android:title="@string/searchButton"/>
+        android:title="@string/search_search"/>
 
     <!--         android:icon="@android:drawable/ic_menu_clear_playlist" -->
     <item
         android:id="@+id/search_menu_clear"
         android:icon="@drawable/menu_cancel"
-        android:title="@string/clear"/>
+        android:title="@string/search_clear_fields"/>
 
 </menu>

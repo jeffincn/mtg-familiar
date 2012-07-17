@@ -32,7 +32,7 @@
             android:background="@drawable/textfield_search_selected_holo_dark"
             android:ems="10"
             android:gravity="center_vertical"
-            android:hint="@string/name"
+            android:hint="@string/search_name"
             android:inputType="text|textNoSuggestions"
             android:singleLine="true"
             android:textColor="#FFFFFF"

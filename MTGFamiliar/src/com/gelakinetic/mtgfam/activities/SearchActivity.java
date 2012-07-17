@@ -597,10 +597,10 @@ public class SearchActivity extends FamiliarActivity {
 		else if (id == CORRUPTION) {
 			View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
 			TextView text = (TextView) dialogLayout.findViewById(R.id.corruption_message);
-			text.setText(Html.fromHtml(getString(R.string.corruption_error)));
+			text.setText(Html.fromHtml(getString(R.string.error_corruption)));
 			text.setMovementMethod(LinkMovementMethod.getInstance());
 
-			AlertDialog dialog = new AlertDialog.Builder(this).setTitle(R.string.corruption_error_title)
+			AlertDialog dialog = new AlertDialog.Builder(this).setTitle(R.string.error)
 					.setView(dialogLayout).setPositiveButton(R.string.dialog_ok, new OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
 							finish();

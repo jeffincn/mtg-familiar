@@ -50,6 +50,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.Html.ImageGetter;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -79,8 +80,8 @@ public class WishlistActivity extends FamiliarActivity {
 	private int										positionForDialog;
 
 	private AutoCompleteTextView	namefield;
-	private long									selectedId						= -1;
-	private String								selectedName					= "";
+	private long selectedId=-1;
+	private String selectedName="";
 
 	private Button								bAdd;
 	private TextView							tradePrice;
@@ -91,6 +92,8 @@ public class WishlistActivity extends FamiliarActivity {
 	private EditText							numberfield;
 
 	private int										priceSetting;
+	private boolean showTotalPrice;
+	private boolean verbose;
 
 	public static final String		card_not_found				= "Card Not Found";
 	public static final String		mangled_url						= "Mangled URL";
@@ -104,13 +107,19 @@ public class WishlistActivity extends FamiliarActivity {
 	private static final int			AVG_PRICE							= 1;
 	private static final int			HIGH_PRICE						= 2;
 
-	private static final String		wishlistName					= "card.wishlist";
+	private static final String		wishlistName				= "card.wishlist";
+
+	private SharedPreferences preferences;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.wishlist_activity);
 
+		preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		showTotalPrice = preferences.getBoolean("showTotalPriceWishlistPref", false);
+		verbose = preferences.getBoolean("verboseWishlistPref", true);
+		
 		namefield = (AutoCompleteTextView) findViewById(R.id.namesearch);
 		namefield.setAdapter(new AutocompleteCursorAdapter(this, null));
 		namefield.setOnKeyListener(new View.OnKeyListener() {
@@ -138,6 +147,10 @@ public class WishlistActivity extends FamiliarActivity {
 		aaWishlist = new TradeListAdapter(mCtx, R.layout.wishlist_row, lWishlist, this.getResources());
 		lvWishlist.setAdapter(aaWishlist);
 
+		if(!showTotalPrice){
+			tradePrice.setVisibility(View.GONE);
+		}
+		
 		bAdd.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				if (selectedId != -1 && selectedName.length() > 0) {
@@ -147,8 +160,7 @@ public class WishlistActivity extends FamiliarActivity {
 					}
 					int numberOf = Integer.parseInt(numberOfFromField);
 
-					CardData data = new CardData(selectedId, selectedName, "", "", numberOf, 0, "loading", "", "", "", "", "",
-							"", '-');
+					CardData data = new CardData(selectedId, selectedName, "", "", numberOf, 0, "loading", "", "", "", "", "", "", CardDbAdapter.NOONECARES, '-');
 
 					lWishlist.add(0, data);
 					aaWishlist.notifyDataSetChanged();
@@ -200,8 +212,8 @@ public class WishlistActivity extends FamiliarActivity {
 					String tcgName = mDbHelper.getTCGname(cardSet);
 					int numberOf = Integer.parseInt(parts[3]);
 
-					CardData cd = new CardData(id, cardName, tcgName, cardSet, numberOf, 0, "loading",
-							Integer.toString(numberOf), "", "", "", "", "", -1);
+					CardData cd = new CardData(id, cardName, tcgName, cardSet, numberOf, 0, "loading", 
+							Integer.toString(numberOf), "", "", "", "", "", CardDbAdapter.NOONECARES, -1);
 					lWishlist.add(0, cd);
 					FetchPriceTask loadPrice = new FetchPriceTask(lWishlist.get(0), aaWishlist);
 					loadPrice.execute();
@@ -414,16 +426,16 @@ public class WishlistActivity extends FamiliarActivity {
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
 		namefield.setText(savedInstanceState.getString("nameBox"));
-		tradePrice.setText(savedInstanceState.getString("totalPrice"));
+		if(showTotalPrice){
+			tradePrice.setText(savedInstanceState.getString("totalPrice"));
+		}
 
 		ArrayList<String> cardDataIn = savedInstanceState.getStringArrayList("wishlistCards");
 		for (String card : cardDataIn) {
 			String[] cardData = card.split("\\|");
-			Long id = Long.parseLong(cardData[0]);
-			int numberOf = Integer.parseInt(cardData[7]);
-			int rarity = Integer.parseInt(cardData[12]);
-			CardData data = new CardData(id, cardData[1], cardData[2], cardData[3], numberOf, Integer.parseInt(cardData[4]),
-					cardData[5], cardData[6], cardData[7], cardData[8], cardData[9], cardData[10], cardData[11], rarity);
+			CardData data = new CardData(Long.parseLong(cardData[0]), cardData[1], cardData[2], cardData[3], Integer.parseInt(cardData[4]), Integer.parseInt(cardData[5]),
+					cardData[6], cardData[7], cardData[8], cardData[9], cardData[10], cardData[11], cardData[12], Integer.parseInt(cardData[13]), 
+					Integer.parseInt(cardData[14]));
 
 			lWishlist.add(data);
 
@@ -443,10 +455,9 @@ public class WishlistActivity extends FamiliarActivity {
 
 		ArrayList<String> cardDataOut = new ArrayList<String>();
 		for (CardData data : lWishlist) {
-			String cardData = String.format("%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s", data.getId().toString(),
-					data.getName(), data.getTcgName(), data.getSetCode(), data.getPrice(), data.getMessage(), data.getNumber(),
-					data.getNumberOf(), data.getType(), data.getCost(), data.getAbility(), data.getP(), data.getT(),
-					Integer.toString(data.getRarity()));
+			String cardData = String.format("%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|", data.getId().toString(), data.getName(), data.getTcgName(),
+					data.getSetCode(), data.getNumberOf(), data.getPrice(), data.getMessage(), data.getNumber(), 
+					data.getType(), data.getCost(), data.getAbility(), data.getP(), data.getT(), Integer.toString(data.getLoyalty()), Integer.toString(data.getRarity()));
 			cardDataOut.add(cardData);
 		}
 		outState.putStringArrayList("wishlistCards", cardDataOut);
@@ -475,11 +486,13 @@ public class WishlistActivity extends FamiliarActivity {
 
 	private void UpdateTotalPrices() {
 		int totalPrice = GetPricesFromTradeList(lWishlist);
-		int color = PriceListHasBadValues(lWishlist) ? mCtx.getResources().getColor(R.color.red) : mCtx.getResources()
-				.getColor(R.color.white);
-		String sTotal = "$" + (totalPrice / 100) + "." + String.format("%02d", (totalPrice % 100));
-		tradePrice.setText(sTotal);
-		tradePrice.setTextColor(color);
+		if(showTotalPrice){
+			int color = PriceListHasBadValues(lWishlist) ? mCtx.getResources().getColor(R.color.red) : mCtx.getResources()
+					.getColor(R.color.white);
+			String sTotal = "$" + (totalPrice / 100) + "." + String.format("%02d", (totalPrice % 100));
+			tradePrice.setText(sTotal);
+			tradePrice.setTextColor(color);
+		}
 	}
 
 	private boolean PriceListHasBadValues(ArrayList<CardData> trade) {
@@ -539,23 +552,24 @@ public class WishlistActivity extends FamiliarActivity {
 
 	private class CardData {
 
-		private Long		id;
-		private String	name;
-		private String	number;
-		private String	tcgName;
-		private String	setCode;
-		private int			numberOf;
-		private int			price;		// In cents
-		private String	message;
-		private String	type;
-		private String	cost;
-		private String	ability;
-		private String	p;
-		private String	t;
-		private int			rarity;
+		private Long id;
+		private String name;
+		private String number;
+		private String tcgName;
+		private String setCode;
+		private int numberOf;
+		private int price;		// In cents
+		private String message;
+		private String type;
+		private String cost;
+		private String ability;
+		private String p;
+		private String t;
+		private int loyalty;
+		private int rarity;
 
-		public CardData(Long id, String name, String tcgName, String setCode, int numberOf, int price, String message,
-				String number, String type, String cost, String ability, String p, String t, int rarity) {
+		public CardData(Long id, String name, String tcgName, String setCode, int numberOf, int price, String message, String number, 
+				String type, String cost, String ability, String p, String t, int loyalty, int rarity) {
 			this.id = id;
 			this.name = name;
 			this.number = number;
@@ -572,6 +586,7 @@ public class WishlistActivity extends FamiliarActivity {
 			this.ability = ability;
 			this.p = p;
 			this.t = t;
+			this.loyalty = loyalty;
 			this.rarity = rarity;
 		}
 
@@ -651,6 +666,14 @@ public class WishlistActivity extends FamiliarActivity {
 			this.t = newT;
 		}
 
+		public int getLoyalty() {
+			return this.loyalty;
+		}
+
+		public void setLoyalty(int newLoyalty) {
+			this.loyalty = newLoyalty;
+		}
+
 		public int getRarity() {
 			return this.rarity;
 		}
@@ -694,8 +717,7 @@ public class WishlistActivity extends FamiliarActivity {
 		public static final String	delimiter	= "%";
 
 		public String toString() {
-			return this.getId() + delimiter + this.getName() + delimiter + this.getSetCode() + delimiter + this.getNumberOf()
-					+ '\n';
+			return this.getId() + delimiter + this.getName() + delimiter + this.getSetCode() + delimiter + this.getNumberOf() + '\n';
 		}
 
 	}
@@ -705,8 +727,8 @@ public class WishlistActivity extends FamiliarActivity {
 		private int									layoutResourceId;
 		private ArrayList<CardData>	items;
 		private Context							mCtx;
-		private Resources						resources;
-		private ImageGetter					imgGetter;
+		private Resources		resources;
+		private ImageGetter	imgGetter;
 
 		public TradeListAdapter(Context context, int textViewResourceId, ArrayList<CardData> items, Resources r) {
 			super(context, textViewResourceId, items);
@@ -732,18 +754,33 @@ public class WishlistActivity extends FamiliarActivity {
 				TextView costField = (TextView) v.findViewById(R.id.cardcost);
 				TextView abilityField = (TextView) v.findViewById(R.id.cardability);
 				TextView setField = (TextView) v.findViewById(R.id.wishlistRowSet);
-				//TextView numberField = (TextView) v.findViewById(R.id.wishlistNumber);
 				TextView priceField = (TextView) v.findViewById(R.id.wishlistRowPrice);
 				TextView pField = (TextView) v.findViewById(R.id.cardp);
+				TextView slashField = (TextView) v.findViewById(R.id.cardslash);
 				TextView tField = (TextView) v.findViewById(R.id.cardt);
 
 				nameField.setText(data.getName());
-				typeField.setText(data.getType());
+				String type = data.getType();
+				// we check the actual values for visibility here (instead of just the verbose flag)
+				// because some card types won't have some of these - i.e. tokens don't have cost, etc.
+				if(type == null || type == "")
+					typeField.setVisibility(View.GONE);
+				else
+					typeField.setText(type);
 				String manaCost = data.getCost();
-				manaCost = manaCost.replace("{", "<img src=\"").replace("}", "\"/>");
-				CharSequence csq = Html.fromHtml(manaCost, imgGetter, null);
-				costField.setText(csq);
-				abilityField.setText(data.getAbility());
+				if(manaCost == null || manaCost == "")
+					costField.setVisibility(View.GONE);
+				else {
+					manaCost = manaCost.replace("{", "<img src=\"").replace("}", "\"/>");
+					costField.setText(Html.fromHtml(manaCost, imgGetter, null));
+				}
+				String ability = data.getAbility();
+				if(ability == null || ability == "")
+					abilityField.setVisibility(View.GONE);
+				else {
+					ability = ability.replace("{", "<img src=\"").replace("}", "\"/>");
+					abilityField.setText(Html.fromHtml(ability, imgGetter, null));
+				}
 				setField.setText(data.getTcgName());
 				char r = (char) data.getRarity();
 				switch (r) {
@@ -763,35 +800,111 @@ public class WishlistActivity extends FamiliarActivity {
 						setField.setTextColor(resources.getColor(R.color.timeshifted));
 						break;
 				}
-
-				//numberField.setText(data.hasPrice() ? data.getNumberOf() + "x" : "");
-				priceField.setText(data.hasPrice() ? data.getPriceString() : data.getMessage());
-
+				priceField.setText(data.getNumberOf() + "x" + (data.hasPrice() ? data.getPriceString() : data.getMessage()));
 				if (data.hasPrice()) {
 					priceField.setTextColor(mCtx.getResources().getColor(R.color.light_gray));
 				}
 				else {
 					priceField.setTextColor(mCtx.getResources().getColor(R.color.red));
 				}
-				pField.setText(data.getP());
-				tField.setText(data.getT());
+				if(verbose){
+					priceField.setGravity(Gravity.CENTER);
+				}else{
+					priceField.setGravity(Gravity.RIGHT);
+				}
+				boolean hidePT = true;
+				try{
+					float p = Float.parseFloat(data.getP());
+					if (p != CardDbAdapter.NOONECARES) {
+						String pow;
+						hidePT = false;
+						if (p == CardDbAdapter.STAR)
+							pow = "*";
+						else if (p == CardDbAdapter.ONEPLUSSTAR)
+							pow = "1+*";
+						else if (p == CardDbAdapter.TWOPLUSSTAR)
+							pow = "2+*";
+						else if (p == CardDbAdapter.SEVENMINUSSTAR)
+							pow = "7-*";
+						else if (p == CardDbAdapter.STARSQUARED)
+							pow = "*^2";
+						else {
+							if (p == (int) p) {
+								pow = Integer.valueOf((int) p).toString();
+							}
+							else {
+								pow = Float.valueOf(p).toString();
+								;
+							}
+						}
+						pField.setText(pow);
+					}
+				} catch(Exception e){} finally{}
+				try {
+					float t = Float.parseFloat(data.getT());
+					if (t != CardDbAdapter.NOONECARES) {
+						String tou;
+						hidePT = false;
+						if (t == CardDbAdapter.STAR)
+							tou = "*";
+						else if (t == CardDbAdapter.ONEPLUSSTAR)
+							tou = "1+*";
+						else if (t == CardDbAdapter.TWOPLUSSTAR)
+							tou = "2+*";
+						else if (t == CardDbAdapter.SEVENMINUSSTAR)
+							tou = "7-*";
+						else if (t == CardDbAdapter.STARSQUARED)
+							tou = "*^2";
+						else {
+							if (t == (int) t) {
+								tou = Integer.valueOf((int) t).toString();
+							}
+							else {
+								tou = Float.valueOf(t).toString();
+								;
+							}
+						}
+						tField.setText(tou);
+					}
+				} catch(Exception e){} finally{}
+				boolean hideLoyalty = true;
+				float l = data.getLoyalty();
+				if (l != -1 && l != CardDbAdapter.NOONECARES) {
+					hideLoyalty = false;
+					if (l == (int) l) {
+						tField.setText(Integer.toString((int) l));
+					}
+					else {
+						tField.setText(Float.toString(l));
+					}
+				}
+				if (!hideLoyalty) {
+					pField.setVisibility(View.GONE);
+					slashField.setVisibility(View.GONE);
+				}
+				else if (hidePT) {
+					pField.setVisibility(View.GONE);
+					slashField.setVisibility(View.GONE);
+					tField.setVisibility(View.GONE);
+				}
 			}
 			return v;
 		}
 	}
 
 	private class FetchPriceTask extends AsyncTask<Void, Void, Integer> {
-		CardData					data;
+		CardData			data;
 		TradeListAdapter	toNotify;
-		String						price		= "";
-		String						setCode	= "";
-		String						tcgName	= "";
-		String						type		= "";
-		String						cost		= "";
-		String						ability	= "";
-		String						p				= "";
-		String						t				= "";
-		int								rarity	= -1;
+		String				price		= "";
+		String				setCode	= "";
+		String				tcgName	= "";
+		String 				type = "";
+		String 				cost = "";
+		String 				ability = "";
+		String 				p = "";
+		String 				t = "";
+		int 				loyalty = CardDbAdapter.NOONECARES;
+		int		 			rarity = -1;
 
 		public FetchPriceTask(CardData _data, TradeListAdapter _toNotify) {
 			data = _data;
@@ -814,16 +927,39 @@ public class WishlistActivity extends FamiliarActivity {
 				ability = data.getAbility();
 				p = data.getP();
 				t = data.getT();
+				loyalty = data.getLoyalty();
 				rarity = data.getRarity();
-
-				if (id.equals(-1) || number.equals("") || setCode.equals("") || tcgName.equals("") || type.equals("")
-						|| cost.equals("") || ability.equals("") || p.equals("") || t.equals("") || rarity == -1) {
+				
+				if (id.equals(-1) || number.equals("") || setCode.equals("") || tcgName.equals("") ||
+						//we skip several of these because some cards won't have most values (like token cards)
+						rarity == -1) {
 					Cursor card;
-					card = mDbHelper.fetchCard(data.getId(),
-							new String[] { CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_SET,
-									CardDbAdapter.KEY_TYPE, CardDbAdapter.KEY_RARITY, CardDbAdapter.KEY_MANACOST,
-									CardDbAdapter.KEY_POWER, CardDbAdapter.KEY_TOUGHNESS, CardDbAdapter.KEY_ABILITY,
-									CardDbAdapter.KEY_NUMBER });
+					String[] columns;
+					if(verbose)
+					{
+						columns = new String[] { CardDbAdapter.KEY_ID
+								, CardDbAdapter.KEY_NAME
+								, CardDbAdapter.KEY_SET
+								, CardDbAdapter.KEY_TYPE
+								, CardDbAdapter.KEY_RARITY
+								, CardDbAdapter.KEY_MANACOST
+								, CardDbAdapter.KEY_POWER
+								, CardDbAdapter.KEY_TOUGHNESS
+								, CardDbAdapter.KEY_LOYALTY
+								, CardDbAdapter.KEY_ABILITY
+								, CardDbAdapter.KEY_NUMBER
+							};
+					}
+					else
+					{
+						columns = new String[] { CardDbAdapter.KEY_ID
+								, CardDbAdapter.KEY_NAME
+								, CardDbAdapter.KEY_SET
+								, CardDbAdapter.KEY_RARITY
+								, CardDbAdapter.KEY_NUMBER
+							};
+					}
+					card = mDbHelper.fetchCard(data.getId(),columns);
 
 					if (card.moveToFirst()) {
 						cardName = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NAME));
@@ -837,19 +973,24 @@ public class WishlistActivity extends FamiliarActivity {
 
 						number = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NUMBER));
 						data.setNumber(number);
-						type = card.getString(card.getColumnIndex(CardDbAdapter.KEY_TYPE));
-						data.setType(type);
-						cost = card.getString(card.getColumnIndex(CardDbAdapter.KEY_MANACOST));
-						data.setCost(cost);
-						ability = card.getString(card.getColumnIndex(CardDbAdapter.KEY_ABILITY));
-						data.setAbility(ability);
-						p = card.getString(card.getColumnIndex(CardDbAdapter.KEY_POWER));
-						data.setP(p);
-						t = card.getString(card.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS));
-						data.setT(t);
 						rarity = card.getInt(card.getColumnIndex(CardDbAdapter.KEY_RARITY));
 						data.setRarity(rarity);
-
+						if(verbose)
+						{
+							type = card.getString(card.getColumnIndex(CardDbAdapter.KEY_TYPE));
+							data.setType(type);
+							cost = card.getString(card.getColumnIndex(CardDbAdapter.KEY_MANACOST));
+							data.setCost(cost);
+							ability = card.getString(card.getColumnIndex(CardDbAdapter.KEY_ABILITY)); 
+							data.setAbility(ability);
+							p = card.getString(card.getColumnIndex(CardDbAdapter.KEY_POWER));
+							data.setP(p);
+							t = card.getString(card.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS));
+							data.setT(t);
+							loyalty = card.getInt(card.getColumnIndex(CardDbAdapter.KEY_LOYALTY));
+							data.setLoyalty(loyalty);
+						}
+						
 						card.deactivate();
 						card.close();
 					}
@@ -875,11 +1016,11 @@ public class WishlistActivity extends FamiliarActivity {
 			try {
 				if (number.contains("b") && CardViewActivity.isTransformable(number, data.setCode)) {
 					priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p="
-							+ mDbHelper.getTransformName(setCode, number.replace("b", "a"))).replace(" ", "%20").replace("ï¿½", "Ae"));
+							+ mDbHelper.getTransformName(setCode, number.replace("b", "a"))).replace(" ", "%20").replace("Æ", "Ae").replace("ï¿½", "Ae"));
 				}
 				else {
 					priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p="
-							+ cardName).replace(" ", "%20").replace("ï¿½", "Ae"));
+							+ cardName).replace(" ", "%20").replace("Æ", "Ae").replace("ï¿½", "Ae"));
 				}
 			}
 			catch (MalformedURLException e) {
@@ -983,7 +1124,7 @@ public class WishlistActivity extends FamiliarActivity {
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu) { 
 		super.onCreateOptionsMenu(menu);
 		MenuInflater inflater = new MenuInflater(this);
 		inflater.inflate(R.menu.wishlist_menu, menu);

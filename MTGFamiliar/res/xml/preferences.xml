@@ -155,6 +155,12 @@
     <PreferenceCategory android:title="@string/main_wishlist">
 
         <CheckBoxPreference
+            android:key="showTotalPriceWishlistPref"
+            android:defaultValue="true"
+            android:title="@string/pref_wishlist_totals_title"
+            android:summary="@string/pref_wishlist_totals_summary" />
+        
+        <CheckBoxPreference
             android:key="verboseWishlistPref"
             android:defaultValue="true"
             android:title="@string/pref_wishlist_details_title"

@@ -25,19 +25,21 @@
 
         <AutoCompleteTextView
             android:id="@+id/namesearch"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:hint="@string/wishlist_name" >
 
             <requestFocus />
         </AutoCompleteTextView>
+    	
+    	<Button
+	        android:id="@+id/addCard"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/wishlist_add_card" />
+        
     </LinearLayout>
-
-    <Button
-        android:id="@+id/addCard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/wishlist_add_card" />
 
     <TextView
         android:id="@+id/priceText"

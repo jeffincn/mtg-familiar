@@ -183,7 +183,7 @@
     
     <!-- Wishlist activity -->
     <string name="wishlist_name">Name</string>
-    <string name="wishlist_add_card">Add Card</string>
+    <string name="wishlist_add_card">Add</string>
    	<string name="wishlist_default_price">$0.00</string>
     <string name="wishlist_default_number_of">1x</string>
     <string name="wishlist_clear_fields">Clear Fields</string>
@@ -283,7 +283,9 @@
     <string name="pref_cat_wishlist">Wishlist</string>
     <string name="pref_wishlist_details_title">Show Details</string>
     <string name="pref_wishlist_details_summary">Display full card details in the wishlist</string>
-
+    <string name="pref_wishlist_totals_title">Show Total Price</string>
+    <string name="pref_wishlist_totals_summary">Display total price summary in the wishlist</string>
+    
     
     <!-- Deprecated -->
     <string name="main_refresh_db">Refresh DB from APK</string>

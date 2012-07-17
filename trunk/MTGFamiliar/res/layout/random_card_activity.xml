@@ -53,7 +53,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
                     style="@style/text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/momirlabel" />
+                    android:text="@string/mojhosto_momir_label" />
 
                 <Spinner
                     android:id="@+id/momir_spinner"
@@ -64,7 +64,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
                     android:id="@+id/momir_button"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/random_creature" />
+                    android:text="@string/mojhosto_random_creature" />
             </LinearLayout>
         </LinearLayout>
 
@@ -93,7 +93,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
                     style="@style/text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/stonehewer_label" />
+                    android:text="@string/mojhosto_stonehewer_label" />
 
                 <Spinner
                     android:id="@+id/stonehewer_spinner"
@@ -104,7 +104,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
                     android:id="@+id/stonehewer_button"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/random_eqipment" />
+                    android:text="@string/mojhosto_random_equipment" />
             </LinearLayout>
         </LinearLayout>
 
@@ -132,13 +132,13 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
                     android:id="@+id/jhorira_instant_button"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/random_instant" />
+                    android:text="@string/mojhosto_random_instants" />
 
                 <Button
                     android:id="@+id/jhorira_sorcery_button"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/random_sorcery" />
+                    android:text="@string/mojhosto_random_sorceries" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

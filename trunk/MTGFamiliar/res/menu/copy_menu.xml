@@ -21,10 +21,10 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
     <item
         android:id="@+id/copy"
-        android:title="@string/copy"/>
+        android:title="@string/card_view_copy"/>
 
     <item
         android:id="@+id/copyall"
-        android:title="@string/copyall"/>
+        android:title="@string/card_view_copy_all"/>
 
 </menu>

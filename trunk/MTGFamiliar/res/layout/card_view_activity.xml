@@ -191,7 +191,7 @@
             android:id="@+id/transformbutton"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/transform"
+            android:text="@string/card_view_transform"
             android:textSize="22dip" />
 
         <LinearLayout
@@ -206,7 +206,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/randomleft"
+                android:text="@string/card_view_left"
                 android:textSize="22dip" />
 
             <Button
@@ -214,7 +214,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/randomright"
+                android:text="@string/card_view_right"
                 android:textSize="22dip" />
         </LinearLayout>
     </LinearLayout>

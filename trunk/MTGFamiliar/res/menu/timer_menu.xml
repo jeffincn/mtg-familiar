@@ -21,10 +21,10 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <item
         android:id="@+id/set_timer_ringtone"
         android:icon="@drawable/menu_music"
-        android:title="@string/rt_set_timer_ringtone"/>
+        android:title="@string/timer_set_ringtone"/>
     
     <item
         android:id="@+id/set_timer_warnings"
         android:icon="@drawable/menu_settings"
-        android:title="@string/rt_set_warnings" />
+        android:title="@string/timer_set_warnings" />
 </menu>

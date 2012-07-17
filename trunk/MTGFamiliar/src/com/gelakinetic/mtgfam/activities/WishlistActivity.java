@@ -160,7 +160,7 @@ public class WishlistActivity extends FamiliarActivity {
 					numberfield.setText("1");
 				}
 				else {
-					Toast.makeText(getApplicationContext(), getString(R.string.type_card_first), Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(), getString(R.string.wishlist_toast_select_card), Toast.LENGTH_SHORT).show();
 				}
 			}
 		});

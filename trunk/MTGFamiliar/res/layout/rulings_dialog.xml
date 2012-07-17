@@ -25,7 +25,7 @@
         android:layout_alignParentTop="true"
         android:layout_margin="5dip"
         android:gravity="center"
-        android:text="@string/rulestitle" />
+        android:text="@string/card_view_rulings_dialog_title" />
 
     <ScrollView
         android:layout_width="match_parent"

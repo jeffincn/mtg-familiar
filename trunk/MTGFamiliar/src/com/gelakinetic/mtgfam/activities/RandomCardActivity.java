@@ -277,13 +277,13 @@ public class RandomCardActivity extends FamiliarActivity {
 		Dialog d = null;
 		if (id == RULESDIALOG) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setNeutralButton("Lets Play!", new DialogInterface.OnClickListener() {
+			builder.setNeutralButton(R.string.dialog_play, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.cancel();
 				}
 			});
-			builder.setMessage(Html.fromHtml(getString(R.string.mojhostorules)));
-			builder.setTitle(R.string.random_rules);
+			builder.setMessage(Html.fromHtml(getString(R.string.mojhosto_rules_text)));
+			builder.setTitle(R.string.mojhosto_rules_title);
 			d = builder.create();
 		}
 		else if (id == MOMIR_IMAGE) {
@@ -316,10 +316,10 @@ public class RandomCardActivity extends FamiliarActivity {
 		else if (id == CORRUPTION) {
 			View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
 			TextView text = (TextView) dialogLayout.findViewById(R.id.corruption_message);
-			text.setText(Html.fromHtml(getString(R.string.corruption_error)));
+			text.setText(Html.fromHtml(getString(R.string.error_corruption)));
 			text.setMovementMethod(LinkMovementMethod.getInstance());
 
-			d = new AlertDialog.Builder(this).setTitle(R.string.corruption_error_title).setView(dialogLayout)
+			d = new AlertDialog.Builder(this).setTitle(R.string.error).setView(dialogLayout)
 					.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
 							finish();

@@ -426,16 +426,16 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			case DIALOG_RESET_CONFIRM:
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder
-						.setMessage(getString(R.string.life_clear_dialog_message))
+						.setMessage(getString(R.string.life_counter_clear_dialog_text))
 						.setCancelable(true)
-						.setPositiveButton(getString(R.string.life_clear_dialog_players_life_button),
+						.setPositiveButton(getString(R.string.dialog_both),
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int id) {
 										ManaPoolActivity.reset(context);
 										reset(EVERYTHING);
 									}
 								})
-						.setNeutralButton(getString(R.string.life_clear_dialog_life_button), new DialogInterface.OnClickListener() {
+						.setNeutralButton(getString(R.string.dialog_life), new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								ManaPoolActivity.reset(context);
 								reset(JUST_TOTALS);
@@ -455,7 +455,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 				}
 
 				builder = new AlertDialog.Builder(this);
-				builder.setTitle(getString(R.string.removeplayer));
+				builder.setTitle(getString(R.string.life_counter_remove_player));
 
 				builder.setItems(names, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {

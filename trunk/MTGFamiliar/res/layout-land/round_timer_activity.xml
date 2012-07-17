@@ -49,7 +49,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
                     android:layout_marginBottom="5dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="@string/howlongistheround" />
+                    android:text="@string/timer_how_long" />
 
                 <TimePicker
                     android:id="@+id/rt_time_picker"
@@ -72,7 +72,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
                     android:layout_height="wrap_content"
                     
                     android:gravity="center_horizontal"
-                    android:text="@string/roundend_text" />
+                    android:text="@string/timer_round_end" />
 
                 <TextView
                     android:id="@+id/rt_time_display"
@@ -81,7 +81,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center_horizontal"
-                    android:text="@string/roundtimer_default_time"
+                    android:text="@string/timer_default_time"
                     android:textSize="30pt" />
 
             </LinearLayout>
@@ -99,7 +99,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="@string/start_timer"
+                android:text="@string/timer_start"
                 android:textSize="24dp" />
         </LinearLayout>
     </LinearLayout>

@@ -38,7 +38,7 @@
                 android:layout_weight="1"
                 android:drawableTop="@drawable/card_search_icon"
                 android:gravity="center"
-                android:text="@string/cardsearch"
+                android:text="@string/main_card_search"
                 android:textSize="30dip" />
 
             <TextView
@@ -50,7 +50,7 @@
                 android:layout_weight="1"
                 android:drawableTop="@drawable/life_counter_icon"
                 android:gravity="center"
-                android:text="@string/lifecounter"
+                android:text="@string/main_life_counter"
                 android:textSize="30dip" >
             </TextView>
 
@@ -63,7 +63,7 @@
                 android:layout_weight="1"
                 android:drawableTop="@drawable/mana_pool_icon"
                 android:gravity="center"
-                android:text="@string/manapool"
+                android:text="@string/main_mana_pool"
                 android:textSize="30dip" />
         </LinearLayout>
 
@@ -82,7 +82,7 @@
                 android:layout_weight="1"
                 android:drawableTop="@drawable/dice_icon"
                 android:gravity="center_horizontal"
-                android:text="@string/random"
+                android:text="@string/main_dice"
                 android:textSize="30dip" />
 
             <TextView
@@ -93,7 +93,7 @@
                 android:layout_weight="1"
                 android:drawableTop="@drawable/trade_icon"
                 android:gravity="center_horizontal"
-                android:text="@string/Trade"
+                android:text="@string/main_trade"
                 android:textSize="30dip" />
 
             <TextView
@@ -104,7 +104,7 @@
                 android:layout_weight="1"
                 android:drawableTop="@drawable/wishlist_icon"
                 android:gravity="center_horizontal"
-                android:text="@string/Wishlist"
+                android:text="@string/main_wishlist"
                 android:textSize="30dip" />
         </LinearLayout>
 
@@ -124,7 +124,7 @@
                 android:layout_weight="1"
                 android:drawableTop="@drawable/round_timer_icon"
                 android:gravity="center"
-                android:text="@string/roundtimer"
+                android:text="@string/main_timer"
                 android:textSize="30dip" />
 
             <TextView
@@ -136,7 +136,7 @@
                 android:layout_weight="1"
                 android:drawableTop="@drawable/rules_icon"
                 android:gravity="center"
-                android:text="@string/rules"
+                android:text="@string/main_rules"
                 android:textSize="30dip" />
 
             <TextView
@@ -148,7 +148,7 @@
                 android:layout_weight="1"
                 android:drawableTop="@drawable/mojhosto_icon"
                 android:gravity="center"
-                android:text="@string/mojhosto_label"
+                android:text="@string/main_mojhosto"
                 android:textSize="30dip" />
             <!--
             <TextView

@@ -858,10 +858,10 @@ public class CardViewActivity extends FamiliarActivity {
 		else if (id == BROKEN_IMAGE) {
 			View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
 			TextView text = (TextView) dialogLayout.findViewById(R.id.corruption_message);
-			text.setText(Html.fromHtml(getString(R.string.brokenImageString)));
+			text.setText(Html.fromHtml(getString(R.string.error_broken_image)));
 			text.setMovementMethod(LinkMovementMethod.getInstance());
 
-			dialog = new AlertDialog.Builder(this).setTitle(R.string.corruption_error_title).setView(dialogLayout)
+			dialog = new AlertDialog.Builder(this).setTitle(R.string.error).setView(dialogLayout)
 					.setPositiveButton(android.R.string.ok, null).create();
 
 			return dialog;
@@ -914,7 +914,7 @@ public class CardViewActivity extends FamiliarActivity {
 			m.setText("$" + XMLhandler.avgprice);
 			h.setText("$" + XMLhandler.hiprice);
 			pricelink.setMovementMethod(LinkMovementMethod.getInstance());
-			pricelink.setText(Html.fromHtml("<a href=\"" + XMLhandler.link + "\">" + getString(R.string.tcgplayerlink)
+			pricelink.setText(Html.fromHtml("<a href=\"" + XMLhandler.link + "\">" + getString(R.string.card_view_price_dialog_link)
 					+ "</a>"));
 			return dialog;
 		}

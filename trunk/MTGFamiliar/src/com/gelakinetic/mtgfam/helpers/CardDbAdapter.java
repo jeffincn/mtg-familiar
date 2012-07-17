@@ -1709,7 +1709,7 @@ public class CardDbAdapter {
 
 	private void showDbErrorToast() {
 		try {
-			Toast.makeText(mCtx, mCtx.getString(R.string.dberror), Toast.LENGTH_LONG).show();
+			Toast.makeText(mCtx, mCtx.getString(R.string.error_database), Toast.LENGTH_LONG).show();
 		}
 		catch (RuntimeException re) {
 			// Eat it; this will happen if we try to toast in a non-UI thread.

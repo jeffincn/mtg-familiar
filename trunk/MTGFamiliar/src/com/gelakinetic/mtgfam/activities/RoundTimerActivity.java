@@ -51,53 +51,53 @@ import com.gelakinetic.mtgfam.helpers.RoundTimerService;
 
 public class RoundTimerActivity extends FamiliarActivity {
 
-	public static String			RESULT_FILTER					= "com.gelakinetic.mtgfam.RESULT_FILTER";
-	public static String			TTS_FILTER						= "com.gelakinetic.mtgfam.TTS_FILTER";
-	public static String			EXTRA_END_TIME				= "EndTime";
+	public static String RESULT_FILTER = "com.gelakinetic.mtgfam.RESULT_FILTER";
+	public static String TTS_FILTER = "com.gelakinetic.mtgfam.TTS_FILTER";
+	public static String EXTRA_END_TIME = "EndTime";
 
-	private static int				RINGTONE_REQUEST_CODE	= 17;
+	private static int RINGTONE_REQUEST_CODE = 17;
 
-	private static int				DIALOG_SET_WARNINGS		= 0;
+	private static int DIALOG_SET_WARNINGS = 0;
 
-	private Handler						timerHandler					= new Handler();
-	private Runnable					updateTimeViewTask		= new Runnable() {
-																										public void run() {
-																											displayTimeLeft();
+	private Handler timerHandler = new Handler();
+	private Runnable updateTimeViewTask = new Runnable() {
+		public void run() {
+			displayTimeLeft();
 
-																											if (endTime > SystemClock.elapsedRealtime()) {
-																												actionButton.setText(R.string.cancel_timer);
-																												timerHandler.postDelayed(updateTimeViewTask, 100);
-																											}
-																											else {
-																												actionButton.setText(R.string.start_timer);
-																											}
-																										}
-																									};
+			if (endTime > SystemClock.elapsedRealtime()) {
+				actionButton.setText(R.string.timer_cancel);
+				timerHandler.postDelayed(updateTimeViewTask, 100);
+			}
+			else {
+				actionButton.setText(R.string.timer_start);
+			}
+		}
+	};
 
-	private TimePicker				picker;
-	private Button						actionButton;
-	private TextView					timeView;
+	private TimePicker picker;
+	private Button actionButton;
+	private TextView timeView;
 
-	private long							endTime;
-	private boolean						updatingDisplay;
-	private boolean						ttsInitialized				= false;
+	private long endTime;
+	private boolean updatingDisplay;
+	private boolean ttsInitialized = false;
 
-	private BroadcastReceiver	resultReceiver				= new BroadcastReceiver() {
-																										@Override
-																										public void onReceive(Context context, Intent intent) {
-																											endTime = intent.getLongExtra(RoundTimerService.EXTRA_END_TIME,
-																													SystemClock.elapsedRealtime());
-																											startUpdatingDisplay();
-																										}
-																									};
+	private BroadcastReceiver resultReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			endTime = intent.getLongExtra(RoundTimerService.EXTRA_END_TIME,
+					SystemClock.elapsedRealtime());
+			startUpdatingDisplay();
+		}
+	};
 
-	private BroadcastReceiver	ttsReceiver						= new BroadcastReceiver() {
-																										@Override
-																										public void onReceive(Context context, Intent intent) {
-																											ttsInitialized = intent.getBooleanExtra(
-																													RoundTimerService.EXTRA_TTS_INITIALIZED, false);
-																										}
-																									};
+	private BroadcastReceiver ttsReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			ttsInitialized = intent.getBooleanExtra(
+					RoundTimerService.EXTRA_TTS_INITIALIZED, false);
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -210,7 +210,7 @@ public class RoundTimerActivity extends FamiliarActivity {
 			final CheckBox chkTen = (CheckBox) v.findViewById(R.id.timer_pref_ten);
 			final CheckBox chkFive = (CheckBox) v.findViewById(R.id.timer_pref_five);
 
-			dialog = new AlertDialog.Builder(this).setView(v).setTitle(R.string.rt_warning_dialog_title)
+			dialog = new AlertDialog.Builder(this).setView(v).setTitle(R.string.timer_warning_dialog_title)
 					.setPositiveButton("OK", new OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
 							SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(RoundTimerActivity.this)
@@ -262,7 +262,7 @@ public class RoundTimerActivity extends FamiliarActivity {
 			Intent i = new Intent(RoundTimerService.CANCEL_FILTER);
 			sendBroadcast(i);
 
-			actionButton.setText(R.string.start_timer);
+			actionButton.setText(R.string.timer_start);
 		}
 		else {
 			// We're not running, so this command is start
@@ -283,7 +283,7 @@ public class RoundTimerActivity extends FamiliarActivity {
 			sendBroadcast(i);
 
 			startUpdatingDisplay();
-			actionButton.setText(R.string.cancel_timer);
+			actionButton.setText(R.string.timer_cancel);
 		}
 	}
 

@@ -8,18 +8,18 @@
         android:id="@+id/timer_pref_fifteen"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/tts_pref_fifteen_minutes" />
+        android:text="@string/pref_fifteen_minutes_title" />
     
     <CheckBox
         android:id="@+id/timer_pref_ten"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/tts_pref_ten_minutes" />
+        android:text="@string/pref_ten_minutes_title" />
     
     <CheckBox
         android:id="@+id/timer_pref_five"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/tts_pref_five_minutes" />
+        android:text="@string/pref_five_minutes_title" />
 
 </LinearLayout>

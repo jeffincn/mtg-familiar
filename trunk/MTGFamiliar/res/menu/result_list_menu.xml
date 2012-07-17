@@ -21,6 +21,6 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <item
         android:id="@+id/search_menu_random_search"
         android:icon="@drawable/menu_random"
-        android:title="@string/randomButton"></item>
+        android:title="@string/search_randomize"></item>
 
 </menu>

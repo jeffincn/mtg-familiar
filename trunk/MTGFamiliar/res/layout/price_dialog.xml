@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="5dip"
         android:gravity="center"
-        android:text="@string/pricetitle" />
+        android:text="@string/card_view_price_dialog_title" />
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -34,7 +34,7 @@
             style="@style/text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/low" />
+            android:text="@string/card_view_price_dialog_low" />
 
         <TextView
             android:id="@+id/low"
@@ -57,7 +57,7 @@
             style="@style/text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/med" />
+            android:text="@string/card_view_price_dialog_medium" />
 
         <TextView
             android:id="@+id/med"
@@ -81,7 +81,7 @@
             style="@style/text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/high" />
+            android:text="@string/card_view_price_dialog_high" />
 
         <TextView
             android:id="@+id/high"

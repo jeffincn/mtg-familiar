@@ -40,7 +40,7 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
 	 * super.onCreateOptionsMenu should always be called from FamiliarActivities
 	 */
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(R.string.search_hint).setIcon(R.drawable.menu_search)
+		menu.add(R.string.name_search_hint).setIcon(R.drawable.menu_search)
 				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 					@Override
 					public boolean onMenuItemClick(MenuItem item) {

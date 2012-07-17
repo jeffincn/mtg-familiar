@@ -3,11 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical" >
-
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content" android:paddingRight="2dp" android:paddingLeft="2dp">
-
+
         <EditText
             android:id="@+id/traderDialogNumber"
             android:layout_width="0dp"
@@ -20,17 +20,16 @@
             android:text="@string/trader_default_number_of" >
 
             <requestFocus />
-        </EditText>
-
+            
+        </EditText>
         <TextView
             android:id="@+id/traderDialogBy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.09"
             android:gravity="center"
-            android:text="@string/trader_by"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
+            android:text="@string/trader_edit_dialog_x"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
         <EditText
             android:id="@+id/traderDialogPrice"
             android:layout_width="0dp"
@@ -47,14 +46,14 @@
         android:id="@+id/traderDialogChangeSet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/trader_change_set" />
-
+        android:text="@string/trader_edit_dialog_change_set" />
+
     <Button
         android:id="@+id/traderDialogRemove"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/trader_remove" />
-
+        android:text="@string/trader_edit_dialog_remove" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
@@ -64,7 +63,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/trader_done" />
+            android:text="@string/dialog_done" />
 
         <Button
             android:id="@+id/traderDialogCancel"
@@ -72,6 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/dialog_cancel" />
+        
     </LinearLayout>
 
 </LinearLayout>

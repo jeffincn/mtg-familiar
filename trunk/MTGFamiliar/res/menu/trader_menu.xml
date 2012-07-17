@@ -21,22 +21,22 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <item
         android:id="@+id/trader_menu_save"
         android:icon="@drawable/menu_store"
-        android:title="@string/save_trade"/>
+        android:title="@string/trader_save"/>
     <item
         android:id="@+id/trader_menu_load"
         android:icon="@drawable/menu_load"
-        android:title="@string/load_trade"/>
+        android:title="@string/trader_load"/>
     <item
         android:id="@+id/trader_menu_delete"
         android:icon="@drawable/menu_delete"
-        android:title="@string/delete_trade" />
+        android:title="@string/trader_delete" />
     <item
         android:id="@+id/trader_menu_clear"
         android:icon="@drawable/menu_cancel"
-        android:title="@string/clear"/>
+        android:title="@string/trader_clear_fields"/>
     <item
         android:id="@+id/trader_menu_settings"
         android:icon="@drawable/menu_hi_med_low"
-        android:title="@string/trade_price_setting" />
+        android:title="@string/trader_set_pricing" />
 
 </menu>

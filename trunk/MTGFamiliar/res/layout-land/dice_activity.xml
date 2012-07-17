@@ -38,7 +38,7 @@
                 android:layout_weight="8"
                 android:background="@xml/textview_backdrop"
                 android:gravity="center"
-                android:text="@string/zero_str"
+                android:text="@string/mana_pool_zero"
                 android:textSize="70sp" />
 
             <View

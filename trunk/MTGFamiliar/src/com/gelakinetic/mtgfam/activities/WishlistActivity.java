@@ -959,7 +959,7 @@ public class WishlistActivity extends FamiliarActivity {
 								, CardDbAdapter.KEY_NUMBER
 							};
 					}
-					card = mDbHelper.fetchCard(data.getId(),columns);
+					card = mDbHelper.fetchRecentMostCard(data.getName(), columns);
 
 					if (card.moveToFirst()) {
 						cardName = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NAME));

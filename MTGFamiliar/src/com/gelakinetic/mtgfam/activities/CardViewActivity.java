@@ -81,6 +81,9 @@ import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 import com.gelakinetic.mtgfam.helpers.MyApp;
 import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler;
+import com.gelakinetic.mtgfam.helpers.TradeListHelpers;
+import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
+import com.gelakinetic.mtgfam.helpers.WishlistHelpers;
 
 public class CardViewActivity extends FamiliarActivity {
 
@@ -836,6 +839,34 @@ public class CardViewActivity extends FamiliarActivity {
 		}
 	}
 
+	private class WishlistTask extends AsyncTask<String, Integer, Long> {
+
+		@Override
+		protected Long doInBackground(String... params) {
+			CardData data = new TradeListHelpers().new CardData(cardName, null, setCode, 1, 0, "loading", null, null, null, null, null, null,
+					CardDbAdapter.NOONECARES, '-');
+			WishlistHelpers.AppendCard(getApplicationContext(), data);
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Long result) {
+			try {
+				progDialog.dismiss();
+			}
+			catch (IllegalArgumentException e) {
+			}
+
+			Toast.makeText(getApplicationContext(), cardName + " added to wishlist.", Toast.LENGTH_LONG).show();
+		}
+
+		@Override
+		protected void onCancelled() {
+			// TODO something when canceled?
+		}
+
+	}
+	
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		Dialog dialog;
@@ -1059,6 +1090,11 @@ public class CardViewActivity extends FamiliarActivity {
 			case R.id.cardrulings:
 				progDialog.show();
 				asyncTask = new FetchRulingsTask();
+				asyncTask.execute((String[]) null);
+				return true;
+			case R.id.addtowishlist:
+				progDialog.show();
+				asyncTask = new WishlistTask();
 				asyncTask.execute((String[]) null);
 				return true;
 			case R.id.quittosearch:

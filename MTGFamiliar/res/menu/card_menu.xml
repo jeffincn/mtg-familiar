@@ -39,8 +39,11 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:icon="@drawable/menu_rulings"
         android:title="@string/card_view_rulings" />
     <item
+        android:id="@+id/addtowishlist"
+        android:icon="@drawable/menu_addtowishlist"
+        android:title="@string/card_view_addtowishlist" />
+    <item
         android:id="@+id/quittosearch"
         android:icon="@drawable/menu_cancel"
         android:title="@string/card_view_exit"/>
-
 </menu>

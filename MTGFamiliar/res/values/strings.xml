@@ -408,8 +408,9 @@
         <item>2</item>
     </string-array>
     <string-array name="set_spinner">
-        <item >Any Printing</item>
-        <item >First Printing Only</item>
+        <item >Most Recent Printing</item>
+        <item >Original Printing</item>
+        <item >All Printings</item>
         <item >Reprints Only</item>
     </string-array>
     <string-array name="rt_defaulttimes">

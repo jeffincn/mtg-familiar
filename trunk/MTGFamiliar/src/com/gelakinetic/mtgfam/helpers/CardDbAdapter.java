@@ -451,6 +451,7 @@ public class CardDbAdapter {
 	 *           if Card could not be found/retrieved
 	 */
 	public Cursor fetchCard(long id, String[] columns) throws SQLException {
+
 		if (columns == null) {
 			columns = new String[] { KEY_ID, KEY_NAME, KEY_SET, KEY_TYPE, KEY_RARITY, KEY_MANACOST, KEY_CMC, KEY_POWER,
 					KEY_TOUGHNESS, KEY_LOYALTY, KEY_ABILITY, KEY_FLAVOR, KEY_ARTIST, KEY_NUMBER, KEY_COLOR, KEY_MULTIVERSEID };
@@ -471,46 +472,6 @@ public class CardDbAdapter {
 		}
 		return mCursor;
 
-	}
-	
-	public Cursor fetchRecentMostCard(String name, String[] columns) throws SQLException{
-		if (columns == null) {
-			columns = new String[] { KEY_ID, KEY_NAME, KEY_SET, KEY_TYPE, KEY_RARITY, KEY_MANACOST, KEY_CMC, KEY_POWER,
-					KEY_TOUGHNESS, KEY_LOYALTY, KEY_ABILITY, KEY_FLAVOR, KEY_ARTIST, KEY_NUMBER, KEY_COLOR, KEY_MULTIVERSEID };
-		}
-		String sql = "SELECT ";
-				for (int idx = 0; idx < columns.length; idx++){
-					sql += DATABASE_TABLE_CARDS + "." + columns[idx];					
-					
-					if (idx + 1 != columns.length){
-						sql += ", ";
-					}
-				}
-				
-				sql += " FROM "	+ DATABASE_TABLE_CARDS;
-				
-				sql += " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = "
-				+ DATABASE_TABLE_CARDS + "." + KEY_SET;
-				
-				sql += " WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + name
-				+ "' ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC";
-		
-		Cursor mCursor = null;
-		try {
-			//mCursor = mDb.query(true, DATABASE_TABLE_CARDS, columns, KEY_ID + "=" + id, null, null, null, DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC", null);
-			mCursor = mDb.rawQuery(sql, null);
-		}
-		catch (SQLiteException e) {
-			showDbErrorToast();
-		}
-		catch (IllegalStateException e) {
-			showDbErrorToast();
-		}
-
-		if (mCursor != null) {
-			mCursor.moveToFirst();
-		}
-		return mCursor;
 	}
 
 	/**

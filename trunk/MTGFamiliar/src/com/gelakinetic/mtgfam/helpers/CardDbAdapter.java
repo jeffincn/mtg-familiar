@@ -56,9 +56,10 @@ public class CardDbAdapter {
 	public static final int				STARSQUARED										= -1004;
 	public static final int				NOONECARES										= -1005;
 
-	public static final int				ANYPRINTING										= 0;
+	public static final int				MOSTRECENTPRINTING										= 0;
 	public static final int				FIRSTPRINTING									= 1;
-	public static final int				REPRINT												= 2;
+	public static final int				ALLPRINTINGS									= 2;
+	public static final int				REPRINTS												= 3;
 
 	public static final int				AND														= 0;
 	public static final int				OR														= 1;
@@ -954,7 +955,7 @@ public class CardDbAdapter {
 			statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_NUMBER + " NOT LIKE '%b%')";
 		}
 
-		if (set_logic != ANYPRINTING) {
+		if (set_logic != MOSTRECENTPRINTING && set_logic != ALLPRINTINGS) {
 			statement = " JOIN (SELECT iT" + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", MIN(" + DATABASE_TABLE_SETS + "."
 					+ KEY_DATE + ") AS " + KEY_DATE + " FROM " + DATABASE_TABLE_CARDS + " AS iT" + DATABASE_TABLE_CARDS
 					+ " JOIN " + DATABASE_TABLE_SETS + " ON iT" + DATABASE_TABLE_CARDS + "." + KEY_SET + " = "

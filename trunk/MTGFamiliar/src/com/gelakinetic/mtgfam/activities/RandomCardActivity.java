@@ -110,7 +110,7 @@ public class RandomCardActivity extends FamiliarActivity {
 
 				try {
 					Cursor doods = mDbHelper.Search(null, null, "Creature", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-							CardDbAdapter.NOONECARES, null, cmc, "=", null, null, null, null, 0, 0, CardDbAdapter.ANYPRINTING, false,
+							CardDbAdapter.NOONECARES, null, cmc, "=", null, null, null, null, 0, 0, CardDbAdapter.MOSTRECENTPRINTING, false,
 							returnTypes, true);
 
 					int pos = rand.nextInt(doods.getCount());
@@ -145,7 +145,7 @@ public class RandomCardActivity extends FamiliarActivity {
 				try {
 					Cursor equipment = mDbHelper.Search(null, null, "Equipment", "wubrgl", 0, null, CardDbAdapter.NOONECARES,
 							null, CardDbAdapter.NOONECARES, null, cmc + 1, "<", null, null, null, null, 0, 0,
-							CardDbAdapter.ANYPRINTING, false, returnTypes, true);
+							CardDbAdapter.MOSTRECENTPRINTING, false, returnTypes, true);
 
 					int pos = rand.nextInt(equipment.getCount());
 					equipment.moveToPosition(pos);
@@ -171,7 +171,7 @@ public class RandomCardActivity extends FamiliarActivity {
 
 				try {
 					Cursor instants = mDbHelper.Search(null, null, "instant", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-							CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, CardDbAdapter.ANYPRINTING, false,
+							CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, CardDbAdapter.MOSTRECENTPRINTING, false,
 							returnTypes, true);
 
 					// Get 3 random, distinct numbers
@@ -212,7 +212,7 @@ public class RandomCardActivity extends FamiliarActivity {
 
 				try {
 					Cursor sorceries = mDbHelper.Search(null, null, "sorcery", "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-							CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, CardDbAdapter.ANYPRINTING, false,
+							CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, CardDbAdapter.MOSTRECENTPRINTING, false,
 							returnTypes, true);
 
 					// Get 3 random, distinct numbers

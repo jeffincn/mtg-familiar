@@ -285,6 +285,10 @@ public class SearchActivity extends FamiliarActivity {
 		adapter10.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		setspinner.setAdapter(adapter10);
 
+		boolean consolidate=true;
+		consolidate = preferences.getBoolean("consolidateSearch", true);
+		setspinner.setSelection(consolidate?CardDbAdapter.MOSTRECENTPRINTING:CardDbAdapter.ALLPRINTINGS);
+
 		setButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				showDialog(SETLIST);

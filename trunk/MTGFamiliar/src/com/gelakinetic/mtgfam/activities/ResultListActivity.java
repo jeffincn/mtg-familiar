@@ -24,13 +24,11 @@ import java.util.Random;
 
 import android.app.SearchManager;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.MergeCursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -85,26 +83,21 @@ public class ResultListActivity extends FamiliarActivity {
 
 		Bundle extras = intent.getExtras();
 
-		int setLogic = extras.getInt(SearchActivity.SETLOGIC);
-		boolean consolidate = (setLogic==CardDbAdapter.MOSTRECENTPRINTING || setLogic==CardDbAdapter.FIRSTPRINTING)?true:false; 
-		SharedPreferences.Editor edit = preferences.edit();
-		edit.putBoolean("consolidateSearch", consolidate);
-		edit.commit();
-
-
 		if (Intent.ACTION_VIEW.equals(intent.getAction())) {
 			// handles a click on a search suggestion; launches activity to show word
+			boolean consolidate = preferences.getBoolean("consolidateSearch", true);
 			Uri u = intent.getData();
 			id = Long.parseLong(u.getLastPathSegment());
 			String name = mDbHelper.getNameFromId(id);
 			c = mDbHelper.Search(name, null, null, "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-					CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, CardDbAdapter.MOSTRECENTPRINTING, true,
+					CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, CardDbAdapter.ALLPRINTINGS, true,
 					returnTypes, consolidate);
 		}
 		else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+			boolean consolidate = preferences.getBoolean("consolidateSearch", true);
 			String query = intent.getStringExtra(SearchManager.QUERY);
 			c = mDbHelper.Search(query, null, null, "wubrgl", 0, null, CardDbAdapter.NOONECARES, null,
-					CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, CardDbAdapter.MOSTRECENTPRINTING, true,
+					CardDbAdapter.NOONECARES, null, -1, null, null, null, null, null, 0, 0, CardDbAdapter.ALLPRINTINGS, true,
 					returnTypes, consolidate);
 		}
 		else if ((id = extras.getLong("id")) != 0L) {
@@ -120,6 +113,8 @@ public class ResultListActivity extends FamiliarActivity {
 			c = new MergeCursor(cs);
 		}
 		else {
+			int setLogic = extras.getInt(SearchActivity.SETLOGIC);
+			boolean consolidate = (setLogic==CardDbAdapter.MOSTRECENTPRINTING || setLogic==CardDbAdapter.FIRSTPRINTING)?true:false; 
 			c = mDbHelper.Search(extras.getString(SearchActivity.NAME), extras.getString(SearchActivity.TEXT),
 					extras.getString(SearchActivity.TYPE), extras.getString(SearchActivity.COLOR),
 					extras.getInt(SearchActivity.COLORLOGIC), extras.getString(SearchActivity.SET),

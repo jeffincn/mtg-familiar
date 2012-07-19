@@ -132,8 +132,10 @@ public class WishlistActivity extends FamiliarActivity {
 		namefield.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Cursor c = (Cursor) parent.getItemAtPosition(position);
-				selectedId = Long.parseLong(c.getString(c.getColumnIndex(CardDbAdapter.KEY_ID)));
+				
 				selectedName = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
+				c = mDbHelper.fetchCardByName(selectedName);
+				selectedId = Long.parseLong(c.getString(c.getColumnIndex(CardDbAdapter.KEY_ID)));
 			}
 		});
 
@@ -959,7 +961,7 @@ public class WishlistActivity extends FamiliarActivity {
 								, CardDbAdapter.KEY_NUMBER
 							};
 					}
-					card = mDbHelper.fetchRecentMostCard(data.getName(), columns);
+					card = mDbHelper.fetchCard(data.getId(),columns);
 
 					if (card.moveToFirst()) {
 						cardName = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NAME));

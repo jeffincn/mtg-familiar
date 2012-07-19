@@ -18,11 +18,6 @@ along with MTG Familiar. If not, see <http://www.gnu.org/licenses/>.
  */
 package com.gelakinetic.mtgfam.activities;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -64,6 +59,7 @@ import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.FetchPriceTask;
+import com.gelakinetic.mtgfam.helpers.WishlistHelpers;
 
 public class WishlistActivity extends FamiliarActivity {
 	private final static int			DIALOG_UPDATE_CARD		= 1;
@@ -81,7 +77,7 @@ public class WishlistActivity extends FamiliarActivity {
 
 	private EditText							numberfield;
 
-	private int										priceSetting;
+	public int										priceSetting;
 	private boolean								showTotalPrice;
 	private boolean								verbose;
 	private TradeListHelpers			mTradeListHelper;
@@ -95,7 +91,6 @@ public class WishlistActivity extends FamiliarActivity {
 	public static final String		price_invalid					= "Price Invalid";
 
 	private static final int			AVG_PRICE							= 1;
-	private static final String		wishlistName					= "card.wishlist";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -167,66 +162,13 @@ public class WishlistActivity extends FamiliarActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		try {
-			FileOutputStream fos = openFileOutput(wishlistName, Context.MODE_PRIVATE);
-
-			for (int i = lWishlist.size() - 1; i >= 0; i--) {
-				fos.write(lWishlist.get(i).toString().getBytes());
-			}
-			fos.close();
-		}
-		catch (FileNotFoundException e) {
-			Toast.makeText(getApplicationContext(), "FileNotFoundException", Toast.LENGTH_LONG).show();
-		}
-		catch (IOException e) {
-			Toast.makeText(getApplicationContext(), "IOException", Toast.LENGTH_LONG).show();
-		}
+		WishlistHelpers.WriteWishlist(getApplicationContext(),lWishlist);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-
-		// ensure the existence of the wishlist
-		String[] files = fileList();
-		Boolean wishlistExists = false;
-		for (String fileName : files) {
-			if (fileName.equals(wishlistName)) {
-				wishlistExists = true;
-			}
-		}
-		if (wishlistExists) {
-
-			try {
-				BufferedReader br = new BufferedReader(new InputStreamReader(openFileInput(wishlistName)));
-
-				lWishlist.clear();
-
-				String line;
-				String[] parts;
-				while ((line = br.readLine()) != null) {
-					parts = line.split(CardData.delimiter);
-
-					String cardName = parts[0];
-					String cardSet = parts[1];
-					String tcgName = mDbHelper.getTCGname(cardSet);
-					int numberOf = Integer.parseInt(parts[2]);
-
-					CardData cd = mTradeListHelper.new CardData(cardName, tcgName, cardSet, numberOf, 0, "loading", null, null, null, null, null, null,
-							CardDbAdapter.NOONECARES, -1);
-					lWishlist.add(0, cd);
-					FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(lWishlist.get(0), aaWishlist, priceSetting, null, (WishlistActivity) me);
-					loadPrice.execute();
-				}
-			}
-			catch (NumberFormatException e) {
-				Toast.makeText(getApplicationContext(), "NumberFormatException", Toast.LENGTH_LONG).show();
-			}
-			catch (IOException e) {
-				Toast.makeText(getApplicationContext(), "IOException", Toast.LENGTH_LONG).show();
-			}
-			aaWishlist.notifyDataSetChanged();
-		}
+		WishlistHelpers.ReadWishlist(getApplicationContext(), (WishlistActivity) me, mDbHelper, lWishlist, aaWishlist);
 
 		try {
 			dismissDialog(DIALOG_UPDATE_CARD);

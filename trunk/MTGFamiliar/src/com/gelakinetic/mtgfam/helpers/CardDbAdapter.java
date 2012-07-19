@@ -485,11 +485,7 @@ public class CardDbAdapter {
 	 */
 	public Cursor fetchCardByName(String name) throws SQLException {
 		name = name.replace("'", "''").replace("�", "�");
-		String sql = "SELECT " + DATABASE_TABLE_CARDS + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", "
-				+ DATABASE_TABLE_CARDS + "." + KEY_SET + ", " + DATABASE_TABLE_CARDS + "." + KEY_NUMBER + " FROM "
-				+ DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = "
-				+ DATABASE_TABLE_CARDS + "." + KEY_SET + " WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + name
-				+ "' ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC";
+		String sql = "SELECT " + DATABASE_TABLE_CARDS + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " + DATABASE_TABLE_CARDS + "." + KEY_SET + ", " + DATABASE_TABLE_CARDS + "." + KEY_NUMBER + ", "+ DATABASE_TABLE_CARDS + "." + KEY_TYPE + ", " + DATABASE_TABLE_CARDS + "." + KEY_MANACOST + ", " + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + ", " + DATABASE_TABLE_CARDS + "." + KEY_POWER + ", " + DATABASE_TABLE_CARDS + "." + KEY_TOUGHNESS + ", " + DATABASE_TABLE_CARDS + "." + KEY_LOYALTY + ", " + DATABASE_TABLE_CARDS + "." + KEY_RARITY +  " FROM "+ DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = "+ DATABASE_TABLE_CARDS + "." + KEY_SET + " WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + name+ "' ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC";
 		Cursor mCursor = null;
 
 		try {

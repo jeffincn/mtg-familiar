@@ -21,6 +21,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <item
         android:id="@+id/clear_all"
         android:icon="@drawable/menu_cancel"
+        android:showAsAction="always"
         android:title="@string/mana_pool_clear_all"/>
 
 </menu>

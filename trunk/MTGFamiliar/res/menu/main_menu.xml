@@ -27,22 +27,22 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:id="@+id/checkUpdate"
         android:icon="@drawable/menu_update"
         android:title="@string/main_force_update_title"
-        android:showAsAction="ifRoom"/>
+        android:showAsAction="never"/>
     <item
         android:id="@+id/preferences"
         android:icon="@drawable/menu_settings"
         android:title="@string/main_settings_title"
-        android:showAsAction="ifRoom"/>
+        android:showAsAction="always"/>
     <item
         android:id="@+id/donate"
         android:icon="@drawable/menu_donate"
         android:title="@string/main_donate_title"
-        android:showAsAction="ifRoom" />
+        android:showAsAction="never" />
     <item
         android:id="@+id/whatsnew"
         android:icon="@drawable/menu_new"
         android:title="@string/main_whats_new_title"
-        android:showAsAction="ifRoom"/>
+        android:showAsAction="never"/>
     <item
         android:id="@+id/aboutapp"
         android:icon="@drawable/menu_about"

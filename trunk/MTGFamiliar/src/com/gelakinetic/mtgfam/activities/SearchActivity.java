@@ -740,9 +740,6 @@ public class SearchActivity extends FamiliarActivity {
 			case R.id.search_menu_random_search:
 				doSearch(true);
 				return true;
-			case R.id.search_menu_search:
-				doSearch(false);
-				return true;
 			case R.id.search_menu_clear:
 				clear();
 				return true;

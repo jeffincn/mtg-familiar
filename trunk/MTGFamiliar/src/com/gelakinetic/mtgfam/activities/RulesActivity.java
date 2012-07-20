@@ -308,9 +308,6 @@ public class RulesActivity extends FamiliarActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			case R.id.rules_menu_search:
-				showDialog(SEARCH);
-				return true;
 			case R.id.rules_menu_exit:
 				setResult(RESULT_QUIT_TO_MAIN);
 				finish();

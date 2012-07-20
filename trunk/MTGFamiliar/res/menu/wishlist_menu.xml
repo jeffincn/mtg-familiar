@@ -22,10 +22,12 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <item
         android:id="@+id/wishlist_menu_clear"
         android:icon="@drawable/menu_cancel"
+        android:showAsAction="always"
         android:title="@string/wishlist_clear_fields"/>
     <item
         android:id="@+id/wishlist_menu_settings"
         android:icon="@drawable/menu_hi_med_low"
+        android:showAsAction="ifRoom"
         android:title="@string/wishlist_set_pricing" />
 
 </menu>

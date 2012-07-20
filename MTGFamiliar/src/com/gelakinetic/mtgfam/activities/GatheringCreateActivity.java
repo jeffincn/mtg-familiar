@@ -31,6 +31,7 @@ import java.util.Date;
 import org.xmlpull.v1.XmlSerializer;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -51,151 +52,159 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.GatheringsIO;
-import com.gelakinetic.mtgfam.helpers.GatheringsIO.PlayerData;
+import com.gelakinetic.mtgfam.helpers.GatheringsPlayerData;
 
 public class GatheringCreateActivity extends FamiliarActivity {
-	final private static String	FOLDERPATH			= "Gatherings";
-	final private static String	DEFAULTFILE			= "default.info";
-	final private String				name_gathering	= "Please entering a name for the Gathering.";
+	private static final int								DIALOG_SET_NAME				= 0;
+	private static final int								DIALOG_GATHERING_EXIST		= 1;
 
-	private String							loadedGathering;
+	private String							proposedGathering;
 
 	private Context							mCtx;
 	private GatheringsIO				gIO;
 	private LinearLayout				mainLayout;
-
-	private TextView						gatheringName;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.gathering_create_activity);
 
-		gatheringName = (TextView) findViewById(R.id.gathering_name);
-
 		mainLayout = (LinearLayout) findViewById(R.id.gathering_player_list);
 
 		mCtx = this;
 		gIO = new GatheringsIO(mCtx);
-
-		String defaultG = gIO.getDefaultGathering();
-		if (!defaultG.equals("")) {
-			String gName = gIO.ReadGatheringNameFromXML(defaultG);
-			loadedGathering = defaultG;
-			gatheringName.setText(gName);
-			ArrayList<PlayerData> players = gIO.ReadGatheringXML(defaultG);
-			for (PlayerData player : players) {
-				AddPlayerRowFromData(player);
-			}
-		}
-
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 	}
-
+	
 	@Override
-	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-		// Read values from the "savedInstanceState"-object and put them in your
-		// textview
+	protected void onResume() {
+		super.onResume();
+		
+		ArrayList<GatheringsPlayerData> defaultG = gIO.getDefaultGathering();
+
+		for (GatheringsPlayerData player : defaultG) {
+			AddPlayerRowFromData(player);
+		}
 
 	}
-
+	
 	@Override
-	protected void onSaveInstanceState(Bundle outState) {
+	protected void onPause() {
+		super.onPause();
+		
+		int playersCount = mainLayout.getChildCount();
+		ArrayList<GatheringsPlayerData> players = new ArrayList<GatheringsPlayerData>(playersCount);
+		
+		for (int idx = 0; idx < playersCount; idx++) {
+            View player = mainLayout.getChildAt(idx);
+            
+            EditText customName = (EditText) player.findViewById(R.id.custom_name);
+            String name = customName.getText().toString().trim();
+            
+            EditText startingLife = (EditText) player.findViewById(R.id.starting_life);
+            int life = Integer.parseInt(startingLife.getText().toString());
+            
+            players.add(new GatheringsPlayerData(name, life));
+		}
+		
+		gIO.writeDefaultGatheringXML(players);
+		
+		Editor editor = preferences.edit();
+        editor.putString("player_data", null);
+        editor.commit();
+	}
+	
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		Dialog dialog;
+		switch (id) {
+			case DIALOG_SET_NAME:
+				LayoutInflater factory = LayoutInflater.from(this);
+				final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
+				final EditText nameInput = (EditText) textEntryView.findViewById(R.id.player_name);
+				dialog = new AlertDialog.Builder(this).setTitle("Enter Gathering's Name").setView(textEntryView)
+						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) {
+								String gatheringName = nameInput.getText().toString().trim();
+								
+								ArrayList<String> existingGatheringsFiles = gIO.getGatheringFileList();
+								
+								boolean existing = false;
+								for (String existingGatheringFile : existingGatheringsFiles){
+									String givenName = gIO.ReadGatheringNameFromXML(existingGatheringFile);
+									
+									if (gatheringName.equals(givenName)){
+										//throw existing dialog
+										existing = true;
+										proposedGathering = gatheringName;
+										showDialog(DIALOG_GATHERING_EXIST);
+										break;
+									}
+								}
+								
+								if (existingGatheringsFiles.size() <= 0 || existing == false){
+									SaveGathering(gatheringName);
+								}
+							}
+						}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) {
+							}
+						}).create();
 
-		// Save the values you need from your textview into "outState"-object
-		super.onSaveInstanceState(outState);
+				break;
+			case DIALOG_GATHERING_EXIST:
+				LayoutInflater factory2 = LayoutInflater.from(this);
+				final View textEntryView2 = factory2.inflate(R.layout.corruption_layout, null);
+				final TextView text = (TextView) textEntryView2.findViewById(R.id.corruption_message);
+				text.setText("This Gathering already exists, overwrite existing file?");
+				dialog = new AlertDialog.Builder(this).setTitle("Overwrite Existing Gathering?").setView(textEntryView2)
+						.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) {
+								gIO.DeleteGatheringByName(proposedGathering);
+								SaveGathering(proposedGathering);
+							}
+						}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) {
+							}
+						}).create();
+
+				break;
+			default:
+				dialog = null;
+		}
+		return dialog;
 	}
 
-	private String writeGatheringXML() {
-		int players = mainLayout.getChildCount();
-		int defaultPlayers = 1;
-
-		XmlSerializer serializer = Xml.newSerializer();
-		StringWriter writer = new StringWriter();
-		try {
-			serializer.setOutput(writer);
-			serializer.startDocument("UTF-8", true);
-
-			serializer.startTag("", "gathering");
-			serializer.startTag("", "name");
-			serializer.text(gatheringName.getText().toString().trim());
-			serializer.endTag("", "name");
-
-			serializer.startTag("", "players");
-			// serializer.attribute("", "number", String.valueOf(players));
-
-			for (int idx = 0; idx < players; idx++) {
-				View player = mainLayout.getChildAt(idx);
-
-				RadioGroup nameSelection = (RadioGroup) player.findViewById(R.id.radioGroupName);
-				String defaultname = ((nameSelection.getCheckedRadioButtonId() == R.id.defaultNameRadio) ? "true" : "false");
-
-				EditText customName = (EditText) player.findViewById(R.id.custom_name);
-				String name = customName.getText().toString().trim();
-				if (name == null)
-					name = "";
-
-				if (defaultname.equals("true")) {
-					name = "Player " + defaultPlayers;
-					defaultPlayers++;
-				}
-
-				EditText startingLife = (EditText) player.findViewById(R.id.starting_life);
-				String life = startingLife.getText().toString();
-				if (life == null || life == "")
-					life = "0";
-
-				serializer.startTag("", "player");
-				serializer.startTag("", "name");
-				serializer.attribute("", "default", defaultname);
-				serializer.text(name);
-				serializer.endTag("", "name");
-
-				serializer.startTag("", "startinglife");
-				serializer.text(String.valueOf(life));
-				serializer.endTag("", "startinglife");
-
-				serializer.endTag("", "player");
-			}
-			serializer.endTag("", "players");
-			serializer.endTag("", "gathering");
-			serializer.endDocument();
-
-			Editor editor = preferences.edit();
-			editor.putString("player_data", null);
-			editor.commit();
-
-			return writer.toString();
+	private void SaveGathering(String _gatheringName){
+		int playersCount = mainLayout.getChildCount();
+		ArrayList<GatheringsPlayerData> players = new ArrayList<GatheringsPlayerData>(playersCount);
+		
+		for (int idx = 0; idx < playersCount; idx++) {
+            View player = mainLayout.getChildAt(idx);
+            
+            EditText customName = (EditText) player.findViewById(R.id.custom_name);
+            String name = customName.getText().toString().trim();
+            
+            EditText startingLife = (EditText) player.findViewById(R.id.starting_life);
+            int life = Integer.parseInt(startingLife.getText().toString());
+            
+            players.add(new GatheringsPlayerData(name, life));
 		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		
+		gIO.writeGatheringXML(players, _gatheringName);
 	}
-
-	private void AddPlayerRowFromData(PlayerData _player) {
+	
+	private void AddPlayerRowFromData(GatheringsPlayerData _player) {
 		LayoutInflater inf = getLayoutInflater();
 		View v = inf.inflate(R.layout.gathering_create_player_row, null);
+		
 		TextView name = (TextView) v.findViewById(R.id.custom_name);
-		final RadioGroup nameGroup = (RadioGroup) v.findViewById(R.id.radioGroupName);
-
-		if (!_player.getIsDefaultName()) {
-			name.setText(_player.getName());
-
-			nameGroup.check(R.id.customNameRadio);
-		}
-		name.setOnFocusChangeListener(new OnFocusChangeListener() {
-
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					nameGroup.check(R.id.customNameRadio);
-				}
-			}
-		});
+		name.setText(_player.getName());
+		
 		TextView life = (TextView) v.findViewById(R.id.starting_life);
 		life.setText(String.valueOf(_player.getStartingLife()));
 
@@ -211,21 +220,29 @@ public class GatheringCreateActivity extends FamiliarActivity {
 		// Handle item selection
 		switch (item.getItemId()) {
 			case R.id.gdelete_gathering:
-				if (loadedGathering == null)
-					return true;
-
-				String gatheringNameInFile = gIO.ReadGatheringNameFromXML(loadedGathering);
-				if (gatheringNameInFile.equals(gatheringName.getText().toString())) {
-					gIO.DeleteGathering(loadedGathering);
-					RemoveAllPlayerRows();
-					gatheringName.setText("");
+				ArrayList<String> dGatherings = gIO.getGatheringFileList();
+				final String[] dfGatherings = dGatherings.toArray(new String[dGatherings.size()]);
+				final String[] dProperNames = new String[dGatherings.size()];
+				for (int idx = 0; idx < dGatherings.size(); idx++) {
+					dProperNames[idx] = gIO.ReadGatheringNameFromXML(dGatherings.get(idx));
 				}
+
+				AlertDialog.Builder dbuilder = new AlertDialog.Builder(mCtx);
+				dbuilder.setTitle("Delete a Gathering");
+				dbuilder.setItems(dProperNames, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialogInterface, int item) {
+						gIO.DeleteGathering(dfGatherings[item]);
+						return;
+					}
+				});
+				dbuilder.create().show();
 				return true;
 			case R.id.gremove_player:
 				mainLayout.removeViewAt(mainLayout.getChildCount() - 1);
 				return true;
 			case R.id.gadd_player:
-				AddPlayerRowFromData(gIO.new PlayerData());
+				int playersCount = mainLayout.getChildCount();
+				AddPlayerRowFromData(new GatheringsPlayerData("Player " + String.valueOf(playersCount + 1), 20));
 				return true;
 			case R.id.gload_gathering:
 				ArrayList<String> gatherings = gIO.getGatheringFileList();
@@ -241,11 +258,8 @@ public class GatheringCreateActivity extends FamiliarActivity {
 					public void onClick(DialogInterface dialogInterface, int item) {
 						RemoveAllPlayerRows();
 
-						loadedGathering = fGatherings[item];
-						gatheringName.setText(properNames[item]);
-
-						ArrayList<PlayerData> players = gIO.ReadGatheringXML(fGatherings[item]);
-						for (PlayerData player : players) {
+						ArrayList<GatheringsPlayerData> players = gIO.ReadGatheringXML(fGatherings[item]);
+						for (GatheringsPlayerData player : players) {
 							AddPlayerRowFromData(player);
 						}
 						return;
@@ -254,46 +268,16 @@ public class GatheringCreateActivity extends FamiliarActivity {
 				builder.create().show();
 				return true;
 			case R.id.gsave_gathering:
-				if (gatheringName.getText().toString().trim().equals("")) {
-					Toast.makeText(getApplicationContext(), name_gathering, Toast.LENGTH_LONG).show();
-				}
-
-				try {
-					Date date = new Date();
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddkkmmss");
-
-					String gathering = sdf.format(date);
-
-					File path = new File(getFilesDir(), FOLDERPATH);
-					if (!path.exists())
-						if (path.mkdirs() == false)
-							throw new FileNotFoundException("Folders not made");
-
-					File file = new File(path, gathering + ".xml");
-
-					String string = writeGatheringXML();
-
-					BufferedWriter out = new BufferedWriter(new FileWriter(file));
-
-					out.write(string);
-					out.close();
-
-					// Write out the new default
-					File namedDefault = new File(path, DEFAULTFILE);
-					out = new BufferedWriter(new FileWriter(namedDefault));
-					out.write(file.getName());
-					out.close();
-				}
-				catch (FileNotFoundException e) {
-					e.printStackTrace();
-				}
-				catch (IOException e) {
-					e.printStackTrace();
-				}
-
-				Intent i = new Intent(this, NPlayerLifeActivity.class);
-				finish();
-				startActivity(i);
+				
+				showDialog(DIALOG_SET_NAME);
+				
+				Editor editor = preferences.edit();
+				editor.putString("player_data", null);
+				editor.commit();
+				
+//				Intent i = new Intent(this, NPlayerLifeActivity.class);
+//				finish();
+//				startActivity(i);
 
 				return true;
 			default:

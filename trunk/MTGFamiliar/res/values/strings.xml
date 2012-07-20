@@ -151,11 +151,10 @@
     
     <!-- Default gathering activity -->
     <string name="gathering_name_hint">Gathering\'s Name</string>
-    <string name="gathering_default_name">Default Name</string>
-    <string name="gathering_custom_name">Custom Name</string>
+    <string name="gathering_custom_name">Name</string>
     <string name="gathering_starting_life">Starting Life</string>
     <string name="gathering_starting_life_default">20</string>
-    <string name="gathering_save">Set and Save Gathering</string>
+    <string name="gathering_save">Save Gathering</string>
     <string name="gathering_load">Load Gathering</string>
     <string name="gathering_delete">Delete Gathering</string>
     <string name="gathering_remove_player">Remove a Player</string>

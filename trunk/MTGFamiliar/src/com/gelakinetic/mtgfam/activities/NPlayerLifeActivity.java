@@ -59,6 +59,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.GatheringsIO;
+import com.gelakinetic.mtgfam.helpers.GatheringsPlayerData;
 
 public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListener {
 
@@ -286,14 +287,11 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			boolean addedPlayers = false;
 
 			try {
-				String dGathering = gIO.getDefaultGathering();
-				if (!dGathering.equals("")) {
-					ArrayList<GatheringsIO.PlayerData> loadedPlayers = gIO.ReadGatheringXML(dGathering);
-					players = new ArrayList<Player>(loadedPlayers.size());
-					for (GatheringsIO.PlayerData player : loadedPlayers) {
-						addPlayer(player.getName(), player.getStartingLife(), INITIAL_POISON, null, null, (Context) this);
-						addedPlayers = true;
-					}
+				ArrayList<GatheringsPlayerData> dGatherings = gIO.getDefaultGathering();
+				players = new ArrayList<Player>(dGatherings.size());
+				for (GatheringsPlayerData player : dGatherings) {
+					addPlayer(player.getName(), player.getStartingLife(), INITIAL_POISON, null, null, (Context) this);
+					addedPlayers = true;
 				}
 			}
 			catch (Exception e) {

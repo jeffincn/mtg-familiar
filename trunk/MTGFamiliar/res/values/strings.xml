@@ -254,8 +254,8 @@
     <string name="pref_cat_life_counter">Life Counter</string>
     <string name="pref_wake_lock_title">Wake Lock</string>
     <string name="pref_wake_lock_summary">Force the life counter screen to never go to sleep</string>
-    <string name="pref_compact_mode_title">Compact Mode</string>
-    <string name="pref_compact_mode_summary">Display the life counter in compact mode (no history)</string>
+    <string name="pref_display_mode_title">Display Mode</string>
+    <string name="pref_display_mode_summary">Choose how to display the Life Counter</string>
     
     <string name="pref_cat_timer">Round Timer</string>
     <string name="pref_default_time_title">Default Round Length</string>
@@ -459,5 +459,15 @@
         <item>5</item>
         <item>7</item>
         <item>14</item>
+    </string-array>
+    <string-array name="display_array_entries">
+        <item >Normal</item>
+        <item >Compact</item>
+        <item >Commander</item>
+    </string-array>
+    <string-array name="display_array_values">
+        <item >1</item>
+        <item >2</item>
+        <item >3</item>
     </string-array>
 </resources>

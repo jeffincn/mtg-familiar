@@ -1,10 +1,8 @@
 package com.gelakinetic.mtgfam.helpers;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -22,15 +20,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlSerializer;
 
-import com.gelakinetic.mtgfam.R;
-
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.preference.PreferenceManager;
 import android.util.Xml;
-import android.view.View;
-import android.widget.EditText;
 
 public class GatheringsIO {
 	final private static String	FOLDERPATH	= "Gatherings";
@@ -63,6 +54,24 @@ public class GatheringsIO {
 		}
 
 		return players;
+	}
+	
+	public int getNumberOfGatherings() {
+		File path = new File(ctx.getFilesDir(), FOLDERPATH);
+		if (!path.exists()) {
+			return 0;
+		}
+		
+		File[] gatheringList = path.listFiles();
+		
+		int count = 0;
+		for (int idx = 0; idx < gatheringList.length; idx++) {
+			if (gatheringList[idx].getName().equals(DEFAULTFILE + ".xml")) {
+				continue;
+			}
+			count++;
+		}
+		return count;
 	}
 
 	public ArrayList<String> getGatheringFileList() {

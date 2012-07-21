@@ -18,32 +18,17 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.gelakinetic.mtgfam.activities;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-
-import org.xmlpull.v1.XmlSerializer;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-import android.util.Xml;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnFocusChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,6 +42,7 @@ import com.gelakinetic.mtgfam.helpers.GatheringsPlayerData;
 public class GatheringCreateActivity extends FamiliarActivity {
 	private static final int								DIALOG_SET_NAME				= 0;
 	private static final int								DIALOG_GATHERING_EXIST		= 1;
+	private static final String								NO_GATHERINGS_EXIST			= "No Gatherings exist.";
 
 	private String							proposedGathering;
 
@@ -220,6 +206,11 @@ public class GatheringCreateActivity extends FamiliarActivity {
 		// Handle item selection
 		switch (item.getItemId()) {
 			case R.id.gdelete_gathering:
+				if (gIO.getNumberOfGatherings() <= 0){
+					Toast.makeText(this, NO_GATHERINGS_EXIST, Toast.LENGTH_LONG).show();
+					return true;
+				}
+				
 				ArrayList<String> dGatherings = gIO.getGatheringFileList();
 				final String[] dfGatherings = dGatherings.toArray(new String[dGatherings.size()]);
 				final String[] dProperNames = new String[dGatherings.size()];
@@ -237,7 +228,7 @@ public class GatheringCreateActivity extends FamiliarActivity {
 				});
 				dbuilder.create().show();
 				return true;
-			case R.id.gremove_player:
+			case R.id.gremove_player:			
 				mainLayout.removeViewAt(mainLayout.getChildCount() - 1);
 				return true;
 			case R.id.gadd_player:
@@ -245,6 +236,11 @@ public class GatheringCreateActivity extends FamiliarActivity {
 				AddPlayerRowFromData(new GatheringsPlayerData("Player " + String.valueOf(playersCount + 1), 20));
 				return true;
 			case R.id.gload_gathering:
+				if (gIO.getNumberOfGatherings() <= 0){
+					Toast.makeText(this, NO_GATHERINGS_EXIST, Toast.LENGTH_LONG).show();
+					return true;
+				}
+				
 				ArrayList<String> gatherings = gIO.getGatheringFileList();
 				final String[] fGatherings = gatherings.toArray(new String[gatherings.size()]);
 				final String[] properNames = new String[gatherings.size()];

@@ -62,12 +62,7 @@
             android:defaultValue="true"
             android:title="@string/pref_wake_lock_title"
             android:summary="@string/pref_wake_lock_summary" />
-        
-        <CheckBoxPreference 
-            android:key="compactMode"
-            android:defaultValue="false" 
-            android:title="@string/pref_compact_mode_title"
-            android:summary="@string/pref_compact_mode_summary" />
+        <ListPreference android:entries="@array/display_array_entries" android:entryValues="@array/display_array_values" android:title="@string/pref_display_mode_title" android:summary="@string/pref_display_mode_summary" android:key="displayMode" android:defaultValue="1"/>
     
     </PreferenceCategory>
     

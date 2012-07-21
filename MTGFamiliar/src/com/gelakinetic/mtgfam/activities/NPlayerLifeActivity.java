@@ -51,6 +51,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,6 +77,11 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	protected static final int							EVERYTHING						= 0;
 	protected static final int							JUST_TOTALS						= 1;
 
+	private String 													displayMode;
+	private static final String										normalDisplay = "1";
+	private static final String										compactDisplay = "2";
+	private static final String										commanderDisplay = "3";
+	
 	private int															playerWidth;
 	private int															playerHeight;
 	private LinearLayout										mainLayout;
@@ -84,7 +90,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 
 	private int															orientation;
 	private boolean													canGetLock;
-	private boolean													compactMode;
+
 	private Editor													editor;
 	private ImageView												lifeButton;
 	private ImageView												poisonButton;
@@ -136,7 +142,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		listSizeWidth = -10;
 
 		canGetLock = preferences.getBoolean("wakelock", true);
-		compactMode = preferences.getBoolean("compactMode", false);
+		displayMode = preferences.getString("displayMode", "1");
 		editor = preferences.edit();
 
 		poisonButton = (ImageView) findViewById(R.id.poison_button);
@@ -562,7 +568,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 
 		players.add(p);
 
-		if (compactMode && orientation != LANDSCAPE) {
+		if (displayMode.equals(compactDisplay) && orientation != LANDSCAPE) {
 			p.hideHistory();
 
 			if (playersInRow == 0) {
@@ -580,25 +586,58 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 				doublePlayer = null;
 				playersInRow = 0;
 			}
+		} else if (displayMode.equals(commanderDisplay) && orientation != LANDSCAPE){
+			LinearLayout halfFillLayout = (LinearLayout) inflater.inflate(R.layout.life_counter_player_double_row, null);
+			LinearLayout playerPlacement = (LinearLayout) halfFillLayout.findViewById(R.id.playerLeft);
+			LinearLayout commanderPlacement = (LinearLayout) halfFillLayout.findViewById(R.id.playerRight);
+			
+			LinearLayout lifeHistoryParent = (LinearLayout) (layout.findViewById(R.id.player_history)).getParent();
+			lifeHistoryParent.setVisibility(View.GONE);
+			playerPlacement.addView(layout);
+			
+			RelativeLayout commander = (RelativeLayout) inflater.inflate(R.layout.n_player_commander_life_tracker, null);
+			commanderPlacement.addView(commander);
+			
+			ListView commanderList = (ListView) commander.findViewById(R.id.edh_list);
+			p.addCommanderView(commanderList);
+			for(Player addTo : players){
+				addTo.commanderDamage.add(0);
+			}
+			
+			mainLayout.addView(halfFillLayout);
+
 		}
 		else {
 			mainLayout.addView(layout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
+
 		}
 	}
 
 	private void removePlayer(int index) {
-		mainLayout.removeView(players.get(index).layout);
-		players.remove(index);
+
 
 		// Rather then go through all the logic of finding the removed player, and
 		// adjusting the locations
 		// of all the player views, just restart the activity when in compact mode,
 		// this will adjust the
 		// layouts to not have a blank area when players are removed.
-		if (compactMode) {
+		if (displayMode.equals(compactDisplay)) {
+			mainLayout.removeView(players.get(index).layout);
+			players.remove(index);
+			
 			Intent intent = getIntent();
 			finish();
 			startActivity(intent);
+		} else if (displayMode.equals(commanderDisplay)){
+			mainLayout.removeView((View)players.get(index).layout.getParent().getParent());
+			players.remove(index);
+			
+			for (Player removeFrom : players){
+				removeFrom.commanderDamage.remove(index);
+			}
+		} else {
+			mainLayout.removeView(players.get(index).layout);
+			players.remove(index);
 		}
 	}
 
@@ -624,6 +663,47 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		finish();
 
 		startActivity(intent);
+	}
+	
+	private class CommanderAdapter extends BaseAdapter {
+		private Context						context;
+		
+		public CommanderAdapter(Context _context){
+			context = _context; 
+		}
+		
+		public int getCount() {
+			return players.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return null;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return 0;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			TextView name, damage;
+			LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			View v = vi.inflate(R.layout.commander_adapter_row, null);
+			ArrayList<Integer> row = players.get(position).commanderDamage;
+			name = (TextView) v.findViewById(R.id.commander_player_name);
+			damage = (TextView) v.findViewById(R.id.commander_damage);
+			if (name == null || damage == null) {
+				TextView error = new TextView(context);
+				error.setText("ERROR!");
+				return error;
+			}
+			name.setText(players.get(position).name);
+			damage.setText(String.valueOf(row.get(position)));
+			
+			return v;
+		}
 	}
 
 	private class HistoryAdapter extends BaseAdapter {
@@ -843,6 +923,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		public int				life;
 		public int				defaultLife;
 		public int				poison;
+		public ArrayList<Integer> commanderDamage;
 		public Player			me;
 
 		public TextView		TVname;
@@ -854,6 +935,8 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		private Button		plusButton5;
 		private ListView	history;
 		private HistoryAdapter	lifeAdapter, poisonAdapter;
+		private CommanderAdapter commanderAdapter;
+		private ListView   commanderDamageLayout;
 		private LinearLayout		layout;
 
 		public static final int	CONSTRAINT_POISON	= 0, CONSTRAINT_LIFE = Integer.MAX_VALUE - 1;
@@ -865,6 +948,13 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			poison = p;
 			this.lifeAdapter = new HistoryAdapter(context, life);
 			this.poisonAdapter = new HistoryAdapter(context, poison);
+			
+			this.commanderAdapter = new CommanderAdapter(context);
+			commanderDamage = new ArrayList<Integer>();
+			for(int idx = 0; idx < players.size(); idx++){
+				commanderDamage.add(0);
+			}
+			
 			me = this;
 
 			if (lhist != null) {
@@ -908,6 +998,12 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 
 		public void hideHistory() {
 			((View) history.getParent()).setVisibility(View.GONE);
+		}
+		
+		public void addCommanderView(ListView rl){
+			commanderDamageLayout = rl;
+			
+			commanderDamageLayout.setAdapter(this.commanderAdapter);
 		}
 
 		public void addOutputViews(TextView n, TextView l, ListView lv) {

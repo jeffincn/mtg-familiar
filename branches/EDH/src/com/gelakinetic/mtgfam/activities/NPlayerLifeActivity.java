@@ -33,6 +33,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
@@ -568,48 +569,54 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 
 		players.add(p);
 
-		if (displayMode.equals(compactDisplay) && orientation != LANDSCAPE) {
-			p.hideHistory();
-
-			if (playersInRow == 0) {
-				doublePlayer = (LinearLayout) inflater.inflate(R.layout.life_counter_player_double_row, null);
-				LinearLayout playerPlacement = (LinearLayout) doublePlayer.findViewById(R.id.playerLeft);
-				playerPlacement.addView(layout);
-
-				mainLayout.addView(doublePlayer);
-				playersInRow++;
+		
+		boolean normalMode = true;
+		if (displayMode.equals(compactDisplay)) {
+			if (orientation != LANDSCAPE){
+				normalMode = false;
+				p.hideHistory();
+	
+				if (playersInRow == 0) {
+					doublePlayer = (LinearLayout) inflater.inflate(R.layout.life_counter_player_double_row, null);
+					LinearLayout playerPlacement = (LinearLayout) doublePlayer.findViewById(R.id.playerLeft);
+					playerPlacement.addView(layout);
+	
+					mainLayout.addView(doublePlayer);
+					playersInRow++;
+				}
+				else if (playersInRow == 1) {
+					LinearLayout playerPlacement = (LinearLayout) doublePlayer.findViewById(R.id.playerRight);
+					playerPlacement.addView(layout);
+	
+					doublePlayer = null;
+					playersInRow = 0;
+				}
+			} else {
+				Toast.makeText(mCtx, "Compact Mode usable in portrait rotation only.", Toast.LENGTH_LONG).show();
 			}
-			else if (playersInRow == 1) {
-				LinearLayout playerPlacement = (LinearLayout) doublePlayer.findViewById(R.id.playerRight);
-				playerPlacement.addView(layout);
-
-				doublePlayer = null;
-				playersInRow = 0;
+		} else if (displayMode.equals(commanderDisplay)) {
+			if (orientation != PORTRAIT){
+				normalMode = false;
+				LinearLayout lifeHistoryParent = (LinearLayout) (layout.findViewById(R.id.player_history)).getParent();
+				ListView history = (ListView) (layout.findViewById(R.id.player_history));
+				history.setVisibility(View.GONE);
+				
+				LinearLayout commander = (LinearLayout) inflater.inflate(R.layout.n_player_commander_life_tracker, null);
+				lifeHistoryParent.addView(commander);
+				
+				ListView commanderList = (ListView) commander.findViewById(R.id.edh_list);
+				p.addCommanderView(commanderList);
+				for(Player addTo : players){
+					addTo.commanderDamage.add(0);
+				}
+				
+				mainLayout.addView(layout);
+			} else {
+				Toast.makeText(mCtx, "Commander Mode usable in landscape rotation only.", Toast.LENGTH_LONG).show();
 			}
-		} else if (displayMode.equals(commanderDisplay) && orientation != LANDSCAPE){
-			LinearLayout halfFillLayout = (LinearLayout) inflater.inflate(R.layout.life_counter_player_double_row, null);
-			LinearLayout playerPlacement = (LinearLayout) halfFillLayout.findViewById(R.id.playerLeft);
-			LinearLayout commanderPlacement = (LinearLayout) halfFillLayout.findViewById(R.id.playerRight);
-			
-			LinearLayout lifeHistoryParent = (LinearLayout) (layout.findViewById(R.id.player_history)).getParent();
-			lifeHistoryParent.setVisibility(View.GONE);
-			playerPlacement.addView(layout);
-			
-			RelativeLayout commander = (RelativeLayout) inflater.inflate(R.layout.n_player_commander_life_tracker, null);
-			commanderPlacement.addView(commander);
-			
-			ListView commanderList = (ListView) commander.findViewById(R.id.edh_list);
-			p.addCommanderView(commanderList);
-			for(Player addTo : players){
-				addTo.commanderDamage.add(0);
-			}
-			
-			mainLayout.addView(halfFillLayout);
-
 		}
-		else {
+		if (displayMode.equals(normalDisplay) || normalMode == true) {
 			mainLayout.addView(layout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
-
 		}
 	}
 
@@ -667,13 +674,21 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	
 	private class CommanderAdapter extends BaseAdapter {
 		private Context						context;
+		private Player						parentPlayer;
+		private int 						selectedPlayer;
 		
-		public CommanderAdapter(Context _context){
+		public CommanderAdapter(Context _context, Player _parentPlayer){
 			context = _context; 
+			parentPlayer = _parentPlayer;
+			selectedPlayer = -1;
 		}
 		
 		public int getCount() {
 			return players.size();
+		}
+		
+		public void changeSelectedPlayer(int _position){
+			selectedPlayer = _position;
 		}
 
 		@Override
@@ -691,7 +706,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			TextView name, damage;
 			LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			View v = vi.inflate(R.layout.commander_adapter_row, null);
-			ArrayList<Integer> row = players.get(position).commanderDamage;
+			ArrayList<Integer> row = parentPlayer.commanderDamage;
 			name = (TextView) v.findViewById(R.id.commander_player_name);
 			damage = (TextView) v.findViewById(R.id.commander_damage);
 			if (name == null || damage == null) {
@@ -701,6 +716,11 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			}
 			name.setText(players.get(position).name);
 			damage.setText(String.valueOf(row.get(position)));
+			
+			if (selectedPlayer == position){
+				name.setBackgroundColor(Color.BLUE);
+				damage.setBackgroundColor(Color.BLUE);
+			}
 			
 			return v;
 		}
@@ -937,6 +957,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		private HistoryAdapter	lifeAdapter, poisonAdapter;
 		private CommanderAdapter commanderAdapter;
 		private ListView   commanderDamageLayout;
+		private int 		selectedPlayer; //-1 me
 		private LinearLayout		layout;
 
 		public static final int	CONSTRAINT_POISON	= 0, CONSTRAINT_LIFE = Integer.MAX_VALUE - 1;
@@ -949,11 +970,12 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			this.lifeAdapter = new HistoryAdapter(context, life);
 			this.poisonAdapter = new HistoryAdapter(context, poison);
 			
-			this.commanderAdapter = new CommanderAdapter(context);
+			this.commanderAdapter = new CommanderAdapter(context, this);
 			commanderDamage = new ArrayList<Integer>();
 			for(int idx = 0; idx < players.size(); idx++){
 				commanderDamage.add(0);
 			}
+			selectedPlayer = -1;
 			
 			me = this;
 
@@ -1000,10 +1022,40 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			((View) history.getParent()).setVisibility(View.GONE);
 		}
 		
+		private void changeSelectedPlayer(int _player){
+			selectedPlayer = _player;
+			commanderAdapter.changeSelectedPlayer(_player);
+			commanderAdapter.notifyDataSetChanged();
+			
+			if (_player == -1){
+				TVlife.setBackgroundColor(Color.BLUE);
+			} else{
+				TVlife.setBackgroundColor(Color.TRANSPARENT);
+			}
+				
+		}
+		
 		public void addCommanderView(ListView rl){
 			commanderDamageLayout = rl;
 			
 			commanderDamageLayout.setAdapter(this.commanderAdapter);
+			
+			commanderDamageLayout.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+				@Override
+				public void onItemClick(AdapterView<?> arg0, View arg1,
+						int arg2, long arg3) {
+					changeSelectedPlayer(arg2);
+				}
+				
+			});
+			
+			TVlife.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					changeSelectedPlayer(-1);
+				}
+			});
+			
 		}
 
 		public void addOutputViews(TextView n, TextView l, ListView lv) {
@@ -1080,6 +1132,14 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		}
 
 		private void incrementValue(int type, int delta) {
+			if (displayMode.equals(commanderDisplay) && (selectedPlayer != -1)) {
+				int value = commanderDamage.get(selectedPlayer); 
+				value += delta;
+				commanderDamage.set(selectedPlayer, value);
+				commanderAdapter.notifyDataSetChanged();
+				
+				return;
+			} 
 			int value = 0;
 			switch (type) {
 				case LIFE:

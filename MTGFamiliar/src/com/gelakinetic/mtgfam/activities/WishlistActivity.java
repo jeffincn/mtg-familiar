@@ -249,7 +249,7 @@ public class WishlistActivity extends FamiliarActivity {
 						String userInputPrice = priceText.getText().toString();
 						double uIP;
 						try {
-							uIP = Long.parseLong(userInputPrice);
+							uIP = Double.parseDouble(userInputPrice);
 							// Clear the message so the user's specified price will display
 							lList.get(position).message = ("");
 						}

@@ -20,7 +20,6 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <item
         android:id="@+id/trader_menu_save"
-        android:icon="@drawable/menu_store"
         android:showAsAction="never"
         android:title="@string/trader_save"/>
     <item
@@ -30,7 +29,6 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:title="@string/trader_load"/>
     <item
         android:id="@+id/trader_menu_delete"
-        android:icon="@drawable/menu_delete"
         android:showAsAction="never"
         android:title="@string/trader_delete" />
     <item
@@ -40,7 +38,6 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:title="@string/trader_clear_fields"/>
     <item
         android:id="@+id/trader_menu_settings"
-        android:icon="@drawable/menu_hi_med_low"
         android:showAsAction="never"
         android:title="@string/trader_set_pricing" />
 

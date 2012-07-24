@@ -290,7 +290,7 @@
     <string name="pref_wishlist_totals_summary">Display total price summary in the wishlist</string>
     
     
-    <!-- Deprecated -->
+    <!-- Debug -->
     <string name="main_refresh_db">Refresh DB from APK</string>
     <string name="main_build_db">Build DB from Web</string>
     

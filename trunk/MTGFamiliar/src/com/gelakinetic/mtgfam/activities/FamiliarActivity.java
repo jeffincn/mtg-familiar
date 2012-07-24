@@ -52,6 +52,8 @@ public abstract class FamiliarActivity extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 		me = this;
 		mCtx = this;
+		
+		getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 

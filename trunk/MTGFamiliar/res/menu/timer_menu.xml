@@ -27,6 +27,6 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <item
         android:id="@+id/set_timer_warnings"
         android:icon="@drawable/menu_settings"
-        android:showAsAction="ifRoom"
+        android:showAsAction="always"
         android:title="@string/timer_set_warnings" />
 </menu>

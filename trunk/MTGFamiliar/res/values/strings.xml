@@ -23,6 +23,12 @@
     <string name="dialog_life">Life</string>
     <string name="dialog_thanks">Thanks Anyway!</string>
     <string name="dialog_play">Let\'s Play!</string>
+    <string name="update_updates">Checking for updates…</string>
+    <string name="update_legality">Checking legality…</string>
+    <string name="update_cards">Checking for new cards…</string>
+    <string name="update_parse_cards">Parsing %s</string>
+    <string name="update_rules">Checking for new comprehensive rules…</string>
+    <string name="update_parse_rules">Parsing comprehensive rules</string>
     <string name="error">Error</string>
     <string name="error_database">A database error occurred. If it persists, try clearing the app data from the Android settings menu.</string>
     <string name="error_corruption">Whoops! It looks like an important part of this app has been corrupted and doesn\'t work anymore.
@@ -33,6 +39,7 @@
     <string name="error_broken_image">Congratulations, you found a NullPointerException! This should never happen, and we\'re not sure how, or why,
 		you found it. Please send us an email at &lt;a href="mailto:mtg.familiar@gmail.com">mtg.familiar@gmail.com&lt;/a> so we can track this bug
 		and fix it. Thanks!</string>
+	<string name="error_rules_parsing">Errors occurred while parsing the comprehensive rules. To try again, please perform a force update.</string>
     
     
     <!-- Placeholder text -->

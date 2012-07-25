@@ -67,9 +67,9 @@ public abstract class FamiliarActivity extends SherlockActivity {
 			// Only update the banning list if it hasn't been updated recently
 			long curTime = new Date().getTime();
 			int updatefrequency = Integer.valueOf(preferences.getString("updatefrequency", "3"));
-			int lastLegalityUpdate = preferences.getInt("lastLegalityUpdate", 0);
+			long lastLegalityUpdate = preferences.getLong("lastLegalityUpdate", 0);
 			// days to ms
-			if (((int) (curTime * .001) - lastLegalityUpdate) > (updatefrequency * 24 * 60 * 60)) {
+			if ((curTime - lastLegalityUpdate) > (updatefrequency * 24 * 60 * 60 * 1000)) {
 				//If we should be updating, check to see if we already are
 				MyApp appState = (MyApp)getApplicationContext();
 				boolean update;
@@ -146,7 +146,7 @@ public abstract class FamiliarActivity extends SherlockActivity {
 	}
 
 	public class OTATask extends AsyncTask<Void, String, Long> {
-
+		
 		@Override
 		protected void onPreExecute() {
 
@@ -156,7 +156,6 @@ public abstract class FamiliarActivity extends SherlockActivity {
 			progDialogSpinner.setCancelable(false);
 			progDialogSpinner.setOnCancelListener(new OnCancelListener() {
 				public void onCancel(DialogInterface pd) {
-					// TODO when the dialog is dismissed
 					asyncTask.cancel(true);
 				}
 			});
@@ -176,7 +175,6 @@ public abstract class FamiliarActivity extends SherlockActivity {
 			progDialogHorizontal.setCancelable(false);
 			progDialogHorizontal.setOnCancelListener(new OnCancelListener() {
 				public void onCancel(DialogInterface pd) {
-					// TODO when the dialog is dismissed
 					asyncTask.cancel(true);
 				}
 			});
@@ -203,32 +201,32 @@ public abstract class FamiliarActivity extends SherlockActivity {
 				me.setRequestedOrientation(me.getRequestedOrientation());
 			}
 
-			progDialog.setMessage("Checking for Updates");
+			progDialog.setMessage(mCtx.getString(R.string.update_updates));
 			progDialog.show();
 		}
 
 		@Override
 		protected Long doInBackground(Void... params) {
+			
+			this.publishProgress(new String[] { "indeterminate", mCtx.getString(R.string.update_legality) });
 
-			this.publishProgress(new String[] { "indeterminate", "Checking Legality" });
-
-			try {
+			try {				
 				ArrayList<String[]> patchInfo = JsonParser.readUpdateJsonStream(preferences);
 
 				URL legal = new URL("https://sites.google.com/site/mtgfamiliar/manifests/legality.json");
 				InputStream in = new BufferedInputStream(legal.openStream());
 				JsonParser.readLegalityJsonStream(in, mDbHelper, preferences);
 
-				this.publishProgress(new String[] { "determinate", "Checking for New Cards" });
+				this.publishProgress(new String[] { "indeterminate", mCtx.getString(R.string.update_cards) });
 
 				if (patchInfo != null) {
-
+					
 					for (int i = 0; i < patchInfo.size(); i++) {
 						String[] set = patchInfo.get(i);
 						if (!mDbHelper.doesSetExist(set[2])) {
 							try {
 								GZIPInputStream gis = new GZIPInputStream(new URL(set[1]).openStream());
-								JsonParser.readCardJsonStream(gis, this, set[0], mDbHelper);
+								JsonParser.readCardJsonStream(gis, this, set[0], mDbHelper, mCtx);
 							}
 							catch (MalformedURLException e) {
 								// Log.e("JSON error", e.toString());
@@ -248,21 +246,32 @@ public abstract class FamiliarActivity extends SherlockActivity {
 				// eat it
 			}
 
-			this.publishProgress(new String[] { "determinate", "Checking for New Comprehensive Rules" });
+			this.publishProgress(new String[] { "indeterminate", mCtx.getString(R.string.update_rules) });
 
 			long lastRulesUpdate = preferences.getLong("lastRulesUpdate", defaultLastRulesUpdate);
-			RulesParser rp = new RulesParser(new Date(lastRulesUpdate), mDbHelper, this);
+			RulesParser rp = new RulesParser(new Date(lastRulesUpdate), mDbHelper, mCtx, this);
+			boolean newRulesParsed = false;
 			if (rp.needsToUpdate()) {
 				if (rp.parseRules()) {
-					// TODO - loadRulesAndGlossary() returns an error code; use it?
-					rp.loadRulesAndGlossary();
+					int code = rp.loadRulesAndGlossary();
+					
+					//Only save the timestamp of this if the update was 100% successful; if
+					//something went screwy, we should let them know and try again next update.
+					if(code == RulesParser.SUCCESS) {
+						newRulesParsed = true;	
+					}
+					else {
+						//TODO - We should indicate failure here somehow (toasts don't work in the async task)
+					}
 				}
 			}
 
 			long curTime = new Date().getTime();
 			SharedPreferences.Editor editor = preferences.edit();
-			editor.putInt("lastLegalityUpdate", (int) (curTime * .001));
-			editor.putLong("lastRulesUpdate", curTime);
+			editor.putLong("lastLegalityUpdate", curTime);
+			if(newRulesParsed) {
+				editor.putLong("lastRulesUpdate", curTime);
+			}
 			editor.commit();
 
 			return null;
@@ -321,7 +330,7 @@ public abstract class FamiliarActivity extends SherlockActivity {
 		}
 
 		@Override
-		protected void onCancelled() {
+		protected void onCancelled() {			
 			MyApp appState = (MyApp)getApplicationContext();
 			appState.setUpdating(false);
 			appState.setUpdatingActivity(null);

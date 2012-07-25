@@ -63,6 +63,7 @@ import com.gelakinetic.mtgfam.helpers.GatheringsIO;
 import com.gelakinetic.mtgfam.helpers.GatheringsPlayerData;
 
 public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListener {
+	private static final String								NO_GATHERINGS_EXIST			= "No Gatherings exist.";
 
 	private static final int								DIALOG_RESET_CONFIRM	= 0;
 	private static final int								DIALOG_REMOVE_PLAYER	= 1;
@@ -1251,8 +1252,43 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 				return true;
 			case R.id.change_gathering:
 				Intent i = new Intent(this, GatheringCreateActivity.class);
-				finish();
+				//finish();
 				startActivity(i);
+				return true;
+			case R.id.set_gathering:
+				if (gIO.getNumberOfGatherings() <= 0){
+					Toast.makeText(this, NO_GATHERINGS_EXIST, Toast.LENGTH_LONG).show();
+					return true;
+				}
+				
+				ArrayList<String> gatherings = gIO.getGatheringFileList();
+				final String[] fGatherings = gatherings.toArray(new String[gatherings.size()]);
+				final String[] properNames = new String[gatherings.size()];
+				for (int idx = 0; idx < gatherings.size(); idx++) {
+					properNames[idx] = gIO.ReadGatheringNameFromXML(gatherings.get(idx));
+				}
+
+				AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
+				builder.setTitle("Load a Gathering");
+				builder.setItems(properNames, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialogInterface, int item) {
+						int playerNum = players.size();
+						for (int i = playerNum - 1; i >= 0; i--) {
+							removePlayer(i);
+						}
+
+						ArrayList<GatheringsPlayerData> players = gIO.ReadGatheringXML(fGatherings[item]);
+						for (GatheringsPlayerData player : players) {
+							addPlayer(player.getName(), player.getStartingLife(), INITIAL_POISON, null, null, anchor);
+						}
+
+						Intent intent = getIntent();
+						finish();
+						startActivity(intent);
+						return;
+					}
+				});
+				builder.create().show();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

@@ -36,13 +36,10 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <style name="defaultStyle" parent="android:Theme.NoTitleBar">
         <item name="android:windowBackground">@drawable/black_background</item>
     </style>
-
-    <style name="Theme.Transparent" parent="android:Theme">
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:backgroundDimEnabled">false</item>
+<!-- 
+        <item name="android:windowBackground">@color/black</item> -->
+    <style name="Theme.ForceOverflowBlack" parent="@style/Theme.Sherlock.ForceOverflow">
+        <item name="android:colorBackground">@color/black</item>
     </style>
     <!-- <item name="android:windowIsFloating">true</item> -->
 

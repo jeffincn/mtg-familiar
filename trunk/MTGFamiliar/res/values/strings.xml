@@ -471,11 +471,11 @@
     <string-array name="display_array_entries">
         <item >Normal</item>
         <item >Compact</item>
-        <item >Commander</item>
+        <!-- <item >Commander</item> -->
     </string-array>
     <string-array name="display_array_values">
         <item >1</item>
         <item >2</item>
-        <item >3</item>
+        <!-- <item >3</item> -->
     </string-array>
 </resources>

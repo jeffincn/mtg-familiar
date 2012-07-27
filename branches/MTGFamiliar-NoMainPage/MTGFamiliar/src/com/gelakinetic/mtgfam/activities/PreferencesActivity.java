@@ -23,13 +23,13 @@ import android.app.Instrumentation;
 import android.os.Bundle;
 import android.view.KeyEvent;
 
-import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.gelakinetic.mtgfam.R;
+import com.slidingmenu.lib.app.SlidingPreferenceActivity;
 
-public class PreferencesActivity extends SherlockPreferenceActivity {
+public class PreferencesActivity extends SlidingPreferenceActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.preferences);

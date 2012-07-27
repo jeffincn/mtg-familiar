@@ -49,6 +49,7 @@ import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.JsonParser;
 import com.gelakinetic.mtgfam.helpers.MyApp;
+import com.gelakinetic.mtgfam.helpers.RoundTimerService;
 import com.gelakinetic.mtgfam.helpers.RulesParser;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingActivity;
@@ -67,12 +68,12 @@ public class FamiliarActivity extends SlidingActivity {
 	protected Context												mCtx;
 	private PackageInfo	pInfo;
 
-	private static final int	ABOUTDIALOG			= 0;
-	private static final int	CHANGELOGDIALOG	= 1;
-	private static final int	DONATEDIALOG		= 2;
-	
+	private static final int	ABOUTDIALOG			= 100;
+	private static final int	CHANGELOGDIALOG	= 101;
+	private static final int	DONATEDIALOG		= 102;
+
 	private static final int	TTS_CHECK_CODE	= 23;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -89,18 +90,24 @@ public class FamiliarActivity extends SlidingActivity {
 		me = this;
 		mCtx = this;
 
+		mDbHelper = new CardDbAdapter(this);
+		mDbHelper.openWritable();
+
+		Intent i = new Intent(this, RoundTimerService.class);
+		startService(i);
+
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+		// NOTE: This needs to be updated with every release
+		Calendar c = Calendar.getInstance();
+		c.set(2012, Calendar.JUNE, 9, 0, 0, 0);
+		defaultLastRulesUpdate = c.getTimeInMillis();
 
 		if (preferences.getLong("lastRulesUpdate", 0) == 0) {
 			SharedPreferences.Editor edit = preferences.edit();
 			edit.putLong("lastRulesUpdate", defaultLastRulesUpdate);
 			edit.commit();
 		}
-		
-		// NOTE: This needs to be updated with every release
-		Calendar c = Calendar.getInstance();
-		c.set(2012, Calendar.JUNE, 9, 0, 0, 0);
-		defaultLastRulesUpdate = c.getTimeInMillis();
 
 		boolean autoupdate = preferences.getBoolean("autoupdate", true);
 		if (autoupdate) {
@@ -134,8 +141,29 @@ public class FamiliarActivity extends SlidingActivity {
 			}
 		}
 
-		mDbHelper = new CardDbAdapter(this);
-		mDbHelper.openWritable();
+		try {
+			pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+		}
+		catch (NameNotFoundException e) {
+			pInfo = null;
+		}
+
+		int lastVersion = preferences.getInt("lastVersion", 0);
+		if (pInfo.versionCode != lastVersion) {
+			showDialog(CHANGELOGDIALOG);
+			SharedPreferences.Editor editor = preferences.edit();
+			editor.putInt("lastVersion", pInfo.versionCode);
+			editor.commit();
+		}
+
+		try {
+			Intent tts = new Intent();
+			tts.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+			startActivityForResult(tts, TTS_CHECK_CODE);
+		}
+		catch (ActivityNotFoundException anf) {
+			showTtsWarningIfShould();
+		}
 
 		TextView search = (TextView) findViewById(R.id.cardsearch);
 		TextView rules = (TextView) findViewById(R.id.rules);
@@ -261,30 +289,6 @@ public class FamiliarActivity extends SlidingActivity {
 				toggle();
 			}
 		});
-		
-		try {
-			pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-		}
-		catch (NameNotFoundException e) {
-			pInfo = null;
-		}
-
-		int lastVersion = preferences.getInt("lastVersion", 0);
-		if (pInfo.versionCode != lastVersion) {
-			showDialog(CHANGELOGDIALOG);
-			SharedPreferences.Editor editor = preferences.edit();
-			editor.putInt("lastVersion", pInfo.versionCode);
-			editor.commit();
-		}
-		
-		try {
-			Intent tts = new Intent();
-			tts.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
-			startActivityForResult(tts, TTS_CHECK_CODE);
-		}
-		catch (ActivityNotFoundException anf) {
-			showTtsWarningIfShould();
-		}
 	}
 
 	@Override
@@ -523,86 +527,92 @@ public class FamiliarActivity extends SlidingActivity {
 			appState.setUpdatingActivity(null);
 		}
 	}
-	
+
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		switch(id) {
+			case DONATEDIALOG: {
+				builder.setTitle("Donate to the Devs");
+				builder.setNeutralButton(R.string.dialog_thanks, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+					}
+				});
 
-		if (id == DONATEDIALOG) {
-			builder.setTitle("Donate to the Devs");
-			builder.setNeutralButton(R.string.dialog_thanks, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					dialog.cancel();
+				LayoutInflater inflater = getLayoutInflater();
+				View dialoglayout = inflater.inflate(R.layout.about_dialog, (ViewGroup) findViewById(R.id.dialog_layout_root));
+
+				TextView text = (TextView) dialoglayout.findViewById(R.id.aboutfield);
+				text.setText(Html.fromHtml(getString(R.string.main_donate_text)));
+				text.setMovementMethod(LinkMovementMethod.getInstance());
+
+				text.setTextSize(15);
+
+				ImageView paypal = (ImageView) dialoglayout.findViewById(R.id.imageview1);
+				paypal.setImageResource(R.drawable.paypal);
+				paypal.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri
+								.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ALR4TSXWPPHUL"));
+
+						startActivity(myIntent);
+					}
+				});
+				((ImageView) dialoglayout.findViewById(R.id.imageview2)).setVisibility(View.GONE);
+
+				builder.setView(dialoglayout);
+				return builder.create();
+			}
+			case ABOUTDIALOG: {
+				// You have to catch the exception because the package stuff is all
+				// run-time
+				if (pInfo != null) {
+					builder.setTitle("About " + getString(R.string.app_name) + " " + pInfo.versionName);
 				}
-			});
-
-			LayoutInflater inflater = getLayoutInflater();
-			View dialoglayout = inflater.inflate(R.layout.about_dialog, (ViewGroup) findViewById(R.id.dialog_layout_root));
-
-			TextView text = (TextView) dialoglayout.findViewById(R.id.aboutfield);
-			text.setText(Html.fromHtml(getString(R.string.main_donate_text)));
-			text.setMovementMethod(LinkMovementMethod.getInstance());
-
-			text.setTextSize(15);
-
-			ImageView paypal = (ImageView) dialoglayout.findViewById(R.id.imageview1);
-			paypal.setImageResource(R.drawable.paypal);
-			paypal.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-					Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri
-							.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ALR4TSXWPPHUL"));
-
-					startActivity(myIntent);
+				else {
+					builder.setTitle("About " + getString(R.string.app_name));
 				}
-			});
-			((ImageView) dialoglayout.findViewById(R.id.imageview2)).setVisibility(View.GONE);
 
-			builder.setView(dialoglayout);
+				builder.setNeutralButton("Thanks!", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+					}
+				});
+
+				LayoutInflater inflater = getLayoutInflater();
+				View dialoglayout = inflater.inflate(R.layout.about_dialog, (ViewGroup) findViewById(R.id.dialog_layout_root));
+
+				TextView text = (TextView) dialoglayout.findViewById(R.id.aboutfield);
+				text.setText(Html.fromHtml(getString(R.string.main_about_text)));
+				text.setMovementMethod(LinkMovementMethod.getInstance());
+
+				builder.setView(dialoglayout);
+				return builder.create();
+			}
+			case CHANGELOGDIALOG: {
+				if (pInfo != null) {
+					builder.setTitle("What's New in Version " + pInfo.versionName);
+				}
+				else {
+					builder.setTitle("What's New");
+				}
+
+				builder.setNeutralButton("Enjoy!", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+					}
+				});
+
+				builder.setMessage(Html.fromHtml(getString(R.string.main_whats_new_text)));
+				return builder.create();
+			}
+			default: {
+				return null;
+			}
 		}
-		else if (id == ABOUTDIALOG) {
-			// You have to catch the exception because the package stuff is all
-			// run-time
-			if (pInfo != null) {
-				builder.setTitle("About " + getString(R.string.app_name) + " " + pInfo.versionName);
-			}
-			else {
-				builder.setTitle("About " + getString(R.string.app_name));
-			}
-
-			builder.setNeutralButton("Thanks!", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					dialog.cancel();
-				}
-			});
-
-			LayoutInflater inflater = getLayoutInflater();
-			View dialoglayout = inflater.inflate(R.layout.about_dialog, (ViewGroup) findViewById(R.id.dialog_layout_root));
-
-			TextView text = (TextView) dialoglayout.findViewById(R.id.aboutfield);
-			text.setText(Html.fromHtml(getString(R.string.main_about_text)));
-			text.setMovementMethod(LinkMovementMethod.getInstance());
-
-			builder.setView(dialoglayout);
-		}
-		else if (id == CHANGELOGDIALOG) {
-			if (pInfo != null) {
-				builder.setTitle("What's New in Version " + pInfo.versionName);
-			}
-			else {
-				builder.setTitle("What's New");
-			}
-
-			builder.setNeutralButton("Enjoy!", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					dialog.cancel();
-				}
-			});
-
-			builder.setMessage(Html.fromHtml(getString(R.string.main_whats_new_text)));
-		}
-		return builder.create();
 	}
-	
+
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -629,15 +639,15 @@ public class FamiliarActivity extends SlidingActivity {
 
 			// Then display a dialog informing them of TTS
 			AlertDialog dialog = new Builder(this)
-					.setTitle("Text-to-Speech")
-					.setMessage(
-							"This application has text-to-speech capability for some of its features, but you don't "
-									+ "seem to have it installed. If you want to install it, use the \"Install Text-to-Speech\" link "
-									+ "in the settings menu.").setPositiveButton("OK", new OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							// Do nothing, just dismiss
-						}
-					}).create();
+			.setTitle("Text-to-Speech")
+			.setMessage(
+					"This application has text-to-speech capability for some of its features, but you don't "
+							+ "seem to have it installed. If you want to install it, use the \"Install Text-to-Speech\" link "
+							+ "in the settings menu.").setPositiveButton("OK", new OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+									// Do nothing, just dismiss
+								}
+							}).create();
 
 			dialog.show();
 		}

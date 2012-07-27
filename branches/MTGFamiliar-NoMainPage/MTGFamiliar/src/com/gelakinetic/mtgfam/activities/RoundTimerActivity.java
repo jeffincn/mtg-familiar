@@ -57,7 +57,7 @@ public class RoundTimerActivity extends FamiliarActivity {
 
 	private static int RINGTONE_REQUEST_CODE = 17;
 
-	private static int DIALOG_SET_WARNINGS = 0;
+	private static final int DIALOG_SET_WARNINGS = 0;
 
 	private Handler timerHandler = new Handler();
 	private Runnable updateTimeViewTask = new Runnable() {
@@ -138,12 +138,12 @@ public class RoundTimerActivity extends FamiliarActivity {
 		Intent i = new Intent(RoundTimerService.REQUEST_FILTER);
 		sendBroadcast(i);
 		updatingDisplay = true; // So onResume() doesn't start the updates before we
-														// get the response broadcast
+		// get the response broadcast
 
 		if (preferences.getBoolean("hasTts", false)) {
 			i = new Intent(RoundTimerService.TTS_INITIALIZED_FILTER); // Find out if
-																																// TTS is
-																																// initialized
+			// TTS is
+			// initialized
 			sendBroadcast(i);
 		}
 	}
@@ -160,7 +160,7 @@ public class RoundTimerActivity extends FamiliarActivity {
 	protected void onPause() {
 		super.onPause();
 		updatingDisplay = false; // So we resume the updates when we resume the
-															// activity
+		// activity
 	}
 
 	@Override
@@ -203,26 +203,30 @@ public class RoundTimerActivity extends FamiliarActivity {
 
 	@Override
 	public Dialog onCreateDialog(int id) {
-		Dialog dialog = null;
-		if (id == DIALOG_SET_WARNINGS) {
-			final View v = View.inflate(this, R.layout.timer_warning_dialog, null);
-			final CheckBox chkFifteen = (CheckBox) v.findViewById(R.id.timer_pref_fifteen);
-			final CheckBox chkTen = (CheckBox) v.findViewById(R.id.timer_pref_ten);
-			final CheckBox chkFive = (CheckBox) v.findViewById(R.id.timer_pref_five);
+		switch(id){
+			case DIALOG_SET_WARNINGS: {
+				final View v = View.inflate(this, R.layout.timer_warning_dialog, null);
+				final CheckBox chkFifteen = (CheckBox) v.findViewById(R.id.timer_pref_fifteen);
+				final CheckBox chkTen = (CheckBox) v.findViewById(R.id.timer_pref_ten);
+				final CheckBox chkFive = (CheckBox) v.findViewById(R.id.timer_pref_five);
 
-			dialog = new AlertDialog.Builder(this).setView(v).setTitle(R.string.timer_warning_dialog_title)
-					.setPositiveButton("OK", new OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(RoundTimerActivity.this)
-									.edit();
-							edit.putBoolean("fifteenMinutePref", chkFifteen.isChecked());
-							edit.putBoolean("tenMinutePref", chkTen.isChecked());
-							edit.putBoolean("fiveMinutePref", chkFive.isChecked());
-							edit.commit();
-						}
-					}).create();
+				AlertDialog dialog = new AlertDialog.Builder(this).setView(v).setTitle(R.string.timer_warning_dialog_title)
+						.setPositiveButton("OK", new OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(RoundTimerActivity.this)
+										.edit();
+								edit.putBoolean("fifteenMinutePref", chkFifteen.isChecked());
+								edit.putBoolean("tenMinutePref", chkTen.isChecked());
+								edit.putBoolean("fiveMinutePref", chkFive.isChecked());
+								edit.commit();
+							}
+						}).create();
+				return dialog;
+			}
+			default: {
+				return super.onCreateDialog(id);
+			}
 		}
-		return dialog;
 	}
 
 	@Override
@@ -267,7 +271,7 @@ public class RoundTimerActivity extends FamiliarActivity {
 		else {
 			// We're not running, so this command is start
 			picker.clearFocus(); // This forces the inner value to update, in case the
-														// user typed it in manually
+			// user typed it in manually
 			int hours = picker.getCurrentHour();
 			int minutes = picker.getCurrentMinute();
 

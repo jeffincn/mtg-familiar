@@ -419,11 +419,8 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
-		final Context context = (Context) this;
-		Dialog dialog;
-		String[] names;
 		switch (id) {
-			case DIALOG_RESET_CONFIRM:
+			case DIALOG_RESET_CONFIRM: {
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder
 						.setMessage(getString(R.string.life_counter_clear_dialog_text))
@@ -431,13 +428,13 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 						.setPositiveButton(getString(R.string.dialog_both),
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int id) {
-										ManaPoolActivity.reset(context);
+										ManaPoolActivity.reset(mCtx);
 										reset(EVERYTHING);
 									}
 								})
 						.setNeutralButton(getString(R.string.dialog_life), new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								ManaPoolActivity.reset(context);
+								ManaPoolActivity.reset(mCtx);
 								reset(JUST_TOTALS);
 							}
 						}).setNegativeButton(getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
@@ -445,16 +442,15 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 								dialog.cancel();
 							}
 						});
-
-				dialog = builder.create();
-				break;
-			case DIALOG_REMOVE_PLAYER:
-				names = new String[players.size()];
+				return builder.create();
+			}
+			case DIALOG_REMOVE_PLAYER: {
+				String[] names = new String[players.size()];
 				for (int i = 0; i < players.size(); i++) {
 					names[i] = players.get(i).name;
 				}
 
-				builder = new AlertDialog.Builder(this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle(getString(R.string.life_counter_remove_player));
 
 				builder.setItems(names, new DialogInterface.OnClickListener() {
@@ -466,13 +462,13 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 					}
 				});
 
-				dialog = builder.create();
-				break;
-			case DIALOG_SET_NAME:
+				return builder.create();
+			}
+			case DIALOG_SET_NAME: {
 				LayoutInflater factory = LayoutInflater.from(this);
 				final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
 				nameInput = (EditText) textEntryView.findViewById(R.id.player_name);
-				dialog = new AlertDialog.Builder(this).setTitle("Enter Name").setView(textEntryView)
+				AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Enter Name").setView(textEntryView)
 						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
 								if (playerToHaveNameChanged == null) {
@@ -491,12 +487,12 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 							public void onClick(DialogInterface dialog, int whichButton) {
 							}
 						}).create();
-
-				break;
-			default:
-				dialog = null;
+				return dialog;
+			}
+			default: {
+				return super.onCreateDialog(id);
+			}
 		}
-		return dialog;
 	}
 
 	private void update() {

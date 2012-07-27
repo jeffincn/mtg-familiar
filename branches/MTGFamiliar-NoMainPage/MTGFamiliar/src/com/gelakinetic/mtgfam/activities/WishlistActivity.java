@@ -246,8 +246,6 @@ public class WishlistActivity extends FamiliarActivity {
 	}
 
 	protected Dialog onCreateDialog(int id) {
-		Dialog dialog;
-		AlertDialog.Builder builder;
 		switch (id) {
 			case DIALOG_UPDATE_CARD: {
 				final int position = positionForDialog;
@@ -264,10 +262,10 @@ public class WishlistActivity extends FamiliarActivity {
 				final EditText numberOf = (EditText) view.findViewById(R.id.traderDialogNumber);
 				final EditText priceText = (EditText) view.findViewById(R.id.traderDialogPrice);
 
-				builder = new AlertDialog.Builder(WishlistActivity.this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(WishlistActivity.this);
 				builder.setTitle(lList.get(position).getName()).setView(view);
 
-				dialog = builder.create();
+				AlertDialog dialog = builder.create();
 
 				String numberOfStr = String.valueOf(numberOfCards);
 				numberOf.setText(numberOfStr);
@@ -336,10 +334,10 @@ public class WishlistActivity extends FamiliarActivity {
 				});
 
 				dialog.show();
-				break;
+				return dialog;
 			}
 			case DIALOG_PRICE_SETTING: {
-				builder = new AlertDialog.Builder(this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
 				builder.setTitle("Price Options");
 				builder.setSingleChoiceItems(new String[] { "Low", "Average", "High" }, priceSetting,
@@ -366,7 +364,7 @@ public class WishlistActivity extends FamiliarActivity {
 							}
 						});
 
-				dialog = builder.create();
+				AlertDialog dialog = builder.create();
 
 				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 					public void onDismiss(DialogInterface dialog) {
@@ -375,13 +373,12 @@ public class WishlistActivity extends FamiliarActivity {
 				});
 
 				dialog.show();
-				break;
+				return dialog;
 			}
 			default: {
-				dialog = null;
+				return super.onCreateDialog(id);
 			}
 		}
-		return dialog;
 	}
 
 	protected void ChangeSet(final int _position) {

@@ -19,19 +19,14 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.helpers.RoundTimerService;
 
 public class MainActivity extends FamiliarActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.blank_activity);
-
-		Intent i = new Intent(this, RoundTimerService.class);
-		startService(i);
 	}
 }

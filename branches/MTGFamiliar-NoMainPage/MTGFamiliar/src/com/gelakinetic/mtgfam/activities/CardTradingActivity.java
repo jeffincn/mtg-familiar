@@ -255,8 +255,6 @@ public class CardTradingActivity extends FamiliarActivity {
 	}
 
 	protected Dialog onCreateDialog(int id) {
-		Dialog dialog;
-		AlertDialog.Builder builder;
 		switch (id) {
 			case DIALOG_UPDATE_CARD: {
 				final int position = positionForDialog;
@@ -274,10 +272,10 @@ public class CardTradingActivity extends FamiliarActivity {
 				final EditText numberOf = (EditText) view.findViewById(R.id.traderDialogNumber);
 				final EditText priceText = (EditText) view.findViewById(R.id.traderDialogPrice);
 
-				builder = new AlertDialog.Builder(CardTradingActivity.this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(CardTradingActivity.this);
 				builder.setTitle(lSide.get(position).getName()).setView(view);
 
-				dialog = builder.create();
+				Dialog dialog = builder.create();
 
 				String numberOfStr = String.valueOf(numberOfCards);
 				numberOf.setText(numberOfStr);
@@ -346,10 +344,10 @@ public class CardTradingActivity extends FamiliarActivity {
 				});
 
 				dialog.show();
-				break;
+				return dialog;
 			}
 			case DIALOG_PRICE_SETTING: {
-				builder = new AlertDialog.Builder(this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
 				builder.setTitle("Price Options");
 				builder.setSingleChoiceItems(new String[] { "Low", "Average", "High" }, priceSetting,
@@ -383,7 +381,7 @@ public class CardTradingActivity extends FamiliarActivity {
 							}
 						});
 
-				dialog = builder.create();
+				Dialog dialog = builder.create();
 
 				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 					public void onDismiss(DialogInterface dialog) {
@@ -392,10 +390,10 @@ public class CardTradingActivity extends FamiliarActivity {
 				});
 
 				dialog.show();
-				break;
+				return dialog;
 			}
 			case DIALOG_SAVE_TRADE: {
-				builder = new AlertDialog.Builder(this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
 				builder.setTitle("Save Trade");
 				builder.setMessage("Enter the trade's name");
@@ -423,14 +421,14 @@ public class CardTradingActivity extends FamiliarActivity {
 					}
 				});
 
-				dialog = builder.create();
+				Dialog dialog = builder.create();
 
 				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 					public void onDismiss(DialogInterface dialog) {
 						removeDialog(DIALOG_SAVE_TRADE);
 					}
 				});
-				break;
+				return dialog;
 			}
 			case DIALOG_LOAD_TRADE: {
 				String[] files = fileList();
@@ -440,17 +438,18 @@ public class CardTradingActivity extends FamiliarActivity {
 						validFiles.add(fileName.substring(0, fileName.indexOf(tradeExtension)));
 					}
 				}
-
+				
+				Dialog dialog;
 				if (validFiles.size() == 0) {
 					dialog = null;
 					Toast.makeText(getApplicationContext(), "No Saved Trades", Toast.LENGTH_LONG).show();
-					break;
+					return null;
 				}
 
 				final String[] tradeNames = new String[validFiles.size()];
 				validFiles.toArray(tradeNames);
 
-				builder = new AlertDialog.Builder(this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle("Select A Trade");
 				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
@@ -476,7 +475,7 @@ public class CardTradingActivity extends FamiliarActivity {
 						removeDialog(DIALOG_LOAD_TRADE);
 					}
 				});
-				break;
+				return dialog;
 			}
 			case DIALOG_DELETE_TRADE: {
 				String[] files = fileList();
@@ -487,16 +486,17 @@ public class CardTradingActivity extends FamiliarActivity {
 					}
 				}
 
+				Dialog dialog;
 				if (validFiles.size() == 0) {
 					dialog = null;
 					Toast.makeText(getApplicationContext(), "No Saved Trades", Toast.LENGTH_LONG).show();
-					break;
+					return null;
 				}
 
 				final String[] tradeNamesD = new String[validFiles.size()];
 				validFiles.toArray(tradeNamesD);
 
-				builder = new AlertDialog.Builder(this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle("Delete A Trade");
 				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
@@ -517,13 +517,12 @@ public class CardTradingActivity extends FamiliarActivity {
 						removeDialog(DIALOG_DELETE_TRADE);
 					}
 				});
-				break;
+				return dialog;
 			}
 			default: {
-				dialog = null;
+				return super.onCreateDialog(id);
 			}
 		}
-		return dialog;
 	}
 
 	protected void SaveTrade(String _tradeName) {

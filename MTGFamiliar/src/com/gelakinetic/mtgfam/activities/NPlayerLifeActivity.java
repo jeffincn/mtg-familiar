@@ -297,7 +297,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 				ArrayList<GatheringsPlayerData> dGatherings = gIO.getDefaultGathering();
 				players = new ArrayList<Player>(dGatherings.size());
 				for (GatheringsPlayerData player : dGatherings) {
-					addPlayer(player.getName(), player.getStartingLife(), INITIAL_POISON, null, null, (Context) this);
+					addPlayer(player.getName(), player.getStartingLife(), INITIAL_POISON, null, null, (Context) this, player.getStartingLife());
 					addedPlayers = true;
 				}
 			}
@@ -343,7 +343,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 					phist = null;
 				}
 
-				addPlayer(data[0], Integer.parseInt(data[1]), Integer.parseInt(data[3]), lhist, phist, (Context) this);
+				addPlayer(data[0], Integer.parseInt(data[1]), Integer.parseInt(data[3]), lhist, phist, (Context) this, Integer.parseInt(data[5]));
 				numPlayers++;
 			}
 			String lastName = players.get(players.size() - 1).name;
@@ -547,6 +547,10 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	}
 
 	private void addPlayer(String name, int initialLife, int initialPoison, int[] lhist, int[] phist, Context context) {
+		addPlayer(name, initialLife, initialPoison, lhist, phist, context, INITIAL_LIFE);
+	}
+	
+	private void addPlayer(String name, int initialLife, int initialPoison, int[] lhist, int[] phist, Context context, int defaultLife) {
 		LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		LinearLayout layout;
 		if (orientation == LANDSCAPE) {
@@ -560,7 +564,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		if (name == null) {
 			name = "Player " + numPlayers;
 		}
-		Player p = new Player(name, initialLife, initialPoison, lhist, phist, context);
+		Player p = new Player(name, initialLife, initialPoison, lhist, phist, context, defaultLife);
 		p.addButtons((Button) layout.findViewById(R.id.player_minus1), (Button) layout.findViewById(R.id.player_plus1),
 				(Button) layout.findViewById(R.id.player_minus5), (Button) layout.findViewById(R.id.player_plus5));
 		p.addOutputViews((TextView) layout.findViewById(R.id.player_name),
@@ -942,10 +946,10 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 
 		public static final int	CONSTRAINT_POISON	= 0, CONSTRAINT_LIFE = Integer.MAX_VALUE - 1;
 
-		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context) {
+		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context, int _defaultLife) {
 			name = n;
 			life = l;
-			defaultLife = l;
+			defaultLife = _defaultLife;
 			poison = p;
 			this.lifeAdapter = new HistoryAdapter(context, life);
 			this.poisonAdapter = new HistoryAdapter(context, poison);
@@ -970,6 +974,10 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			else {
 				this.poisonAdapter = new HistoryAdapter(context, poison);
 			}
+		}
+		
+		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context) {
+			this(n, l, p, lhist, phist, context, INITIAL_LIFE);
 		}
 
 		public void setLayoutSize(int listSizeWidth, int listSizeHeight) {
@@ -1178,6 +1186,8 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 					data += "," + i.get(0);
 				}
 			}
+			
+			data += ";" + defaultLife;
 
 			return data + ";\n";
 		}
@@ -1189,6 +1199,9 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			data += ";";
 
 			data += INITIAL_POISON + ";";
+			
+			data += ";" + defaultLife;
+			
 			return data + ";\n";
 		}
 

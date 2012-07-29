@@ -133,7 +133,7 @@
     <string name="card_view_change_set">Change Set</string>
     <string name="card_view_legality">Legality</string>
     <string name="card_view_rulings">Card Rulings</string>
-    <string name="card_view_addtowishlist">Add to Wishlist</string>
+    <string name="card_view_wishlist">Wishlist</string>
     <string name="card_view_exit">Exit Results</string>
     <string name="card_view_price_dialog_title">TCGPlayer.com Prices</string>
     <string name="card_view_price_dialog_low">Low:</string>

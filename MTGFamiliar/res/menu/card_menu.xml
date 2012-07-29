@@ -43,7 +43,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <item
         android:id="@+id/addtowishlist"
         android:showAsAction="never"
-        android:title="@string/card_view_addtowishlist" />
+        android:title="@string/card_view_wishlist" />
     <item
         android:id="@+id/quittosearch"
         android:showAsAction="never"

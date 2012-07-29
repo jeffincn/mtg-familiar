@@ -58,8 +58,10 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.Html;
 import android.text.Html.ImageGetter;
+import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -67,6 +69,7 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -871,7 +874,7 @@ public class CardViewActivity extends FamiliarActivity {
 			//clone to prevent iteration exception
 			//overwrite the place holder if it's on the wish list
 			for(CardData card: (ArrayList<CardData>)lWishlist.clone()){
-				if(card.name==cardName){
+				if(card.name.equals(cardName)){
 					lWishlist.remove(card);
 					lCardlist.set(setCodes.indexOf(card.setCode),card);
 				}
@@ -1056,11 +1059,6 @@ public class CardViewActivity extends FamiliarActivity {
 
 				dialog.setContentView(R.layout.card_setwishlist_dialog);
 
-				dialog.setOnCancelListener(new OnCancelListener() { 
-					@Override
-					public void onCancel(DialogInterface dialog) {
-						persistWishlist();					
-				}});
 				dialog.setOnDismissListener(new OnDismissListener() {
 					@Override
 					public void onDismiss(DialogInterface dialog) {
@@ -1070,6 +1068,13 @@ public class CardViewActivity extends FamiliarActivity {
 				lvSets = (ListView) dialog.findViewById(R.id.setList);
 				aaSetList = new SetListAdapter(mCtx, R.layout.card_setwishlist_row, lCardlist, this.getResources());
 				lvSets.setAdapter(aaSetList);
+				
+				Button done = (Button) dialog.findViewById(R.id.done);
+				done.setOnClickListener(new OnClickListener(){
+					@Override
+					public void onClick(View arg0) {
+						dismissDialog(WISHLIST_COUNTS);
+					}});
 
 				return dialog;
 			} catch (SQLException e) {
@@ -1080,15 +1085,11 @@ public class CardViewActivity extends FamiliarActivity {
 	}
 
 	public void persistWishlist(){
-		//TODO: This fires, but lCardlist hasn't been updated with updated numbers?
 		for(CardData card:(ArrayList<CardData>)lCardlist.clone()){
 			if(card.numberOf==0)
 				lCardlist.remove(card);
 		}
-		//TODO: and this ends up empty because the counts are zero (if it wasn't on the wish list to start with)
-		Toast.makeText(getApplicationContext(), "Reduced Cardlist size "+String.valueOf(lCardlist.size()), Toast.LENGTH_LONG).show();
-
-		//TODO: and this is odd, but addAll is returning false - possibly because there's nothing to add?
+		Toast.makeText(getApplicationContext(), String.valueOf(lCardlist.size()) + " versions of " + cardName + " now on wishlist.", Toast.LENGTH_LONG).show();
 		if(lWishlist.addAll(0,lCardlist))
 			WishlistHelpers.WriteWishlist(getApplicationContext(),lWishlist);
 	}
@@ -1238,9 +1239,45 @@ public class CardViewActivity extends FamiliarActivity {
 
 				setField.setText(data.tcgName);
 				numberField.setText(String.valueOf(data.numberOf));
+				numberField.addTextChangedListener(new WishlistNumberTextWatcher(numberField,data));
 			}
 			return v;
 		}
 	}
 
+	private class WishlistNumberTextWatcher implements TextWatcher { 
+		 
+	    private EditText editText;  
+	    private CardData card; 
+	 
+	    public WishlistNumberTextWatcher(EditText e, CardData card) 
+	    { 
+	        this.editText = e; 
+	        this.card = card; 
+	    } 
+	 
+	    @Override 
+	    public void afterTextChanged(Editable arg0) { 
+	        String text = arg0.toString(); 
+	        if(text != null && text.length() > 0) 
+	        { 
+	            int val; 
+	            try 
+	            { 
+	                val = Integer.parseInt(text); 
+	            } 
+	            catch(NumberFormatException e) 
+	            { 
+	                val = 0; 
+	            } 
+	            card.numberOf = val;
+	        } 
+	    }
+
+		@Override
+		public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {}
+
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before, int count) {} 
+	}
 }

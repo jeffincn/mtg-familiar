@@ -76,8 +76,10 @@ public class WishlistHelpers {
 					CardData cd = tradeListHelper.new CardData(cardName, tcgName, cardSet, numberOf, 0, "loading", null, null, null, null, null, null,
 							CardDbAdapter.NOONECARES, -1);
 					lWishlist.add(0, cd);
-					FetchPriceTask loadPrice = tradeListHelper.new FetchPriceTask(lWishlist.get(0), _toNotify, activity.priceSetting, null, activity);
-					loadPrice.execute();
+					if(_toNotify != null){
+						FetchPriceTask loadPrice = tradeListHelper.new FetchPriceTask(lWishlist.get(0), _toNotify, activity.priceSetting, null, activity);
+						loadPrice.execute();
+					}
 				}
 			}
 			catch (NumberFormatException e) {
@@ -86,7 +88,8 @@ public class WishlistHelpers {
 			catch (IOException e) {
 				Toast.makeText(mCtx, "IOException", Toast.LENGTH_LONG).show();
 			}
-			_toNotify.notifyDataSetChanged();
+			if(_toNotify != null)
+				_toNotify.notifyDataSetChanged();
 		}
 	}
 }

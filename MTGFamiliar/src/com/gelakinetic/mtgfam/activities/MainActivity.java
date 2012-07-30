@@ -45,6 +45,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.RoundTimerService;
+import com.gelakinetic.mtgfam.helpers.DbUpdaterService;
 
 public class MainActivity extends FamiliarActivity {
 	private static final int	ABOUTDIALOG			= 0;
@@ -324,8 +325,9 @@ public class MainActivity extends FamiliarActivity {
 				editor.putLong("lastLegalityUpdate", 0);
 				editor.commit();
 
-				asyncTask = new OTATask();
-				asyncTask.execute((Void[]) null);
+                startService(new Intent(this, DbUpdaterService.class));
+				//asyncTask = new OTATask();
+				//asyncTask.execute((Void[]) null);
 				return true;
 			case R.id.preferences:
 				startActivity(new Intent().setClass(this, PreferencesActivity.class));

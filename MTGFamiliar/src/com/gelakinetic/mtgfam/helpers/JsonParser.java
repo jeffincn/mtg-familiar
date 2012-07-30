@@ -36,7 +36,11 @@ import com.google.gson.stream.JsonToken;
 
 public class JsonParser {
 
-	public static void readCardJsonStream(InputStream in, OTATask task, String setName, CardDbAdapter mDbHelper, Context context)
+    public interface CardProgressReporter {
+        void reportJsonCardProgress(String... args);
+    }
+
+	public static void readCardJsonStream(InputStream in, CardProgressReporter progReport, String setName, CardDbAdapter mDbHelper, Context context)
 			throws IOException {
 		String dialogText = String.format(context.getString(R.string.update_parse_cards), setName);
 		
@@ -49,7 +53,7 @@ public class JsonParser {
 		reader.beginObject();
 		s = reader.nextName();
 
-		task.publicPublishProgress("determinate", "");
+		progReport.reportJsonCardProgress("determinate", "");
 		reader.beginObject();
 		while (reader.hasNext()) {
 
@@ -271,7 +275,7 @@ public class JsonParser {
 							mDbHelper.createCard(c);
 							// mMain.cardAdded();
 							elementsParsed++;
-							task.publicPublishProgress(new String[] { dialogText, dialogText,
+							progReport.reportJsonCardProgress(new String[] { dialogText, dialogText,
 									"" + (int) Math.round(100 * elementsParsed / (double) numTotalElements) });
 							reader.endObject();
 						}

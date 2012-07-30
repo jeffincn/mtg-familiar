@@ -13,9 +13,10 @@ import java.util.zip.GZIPInputStream;
 import android.app.Instrumentation;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnKeyListener;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -29,7 +30,9 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.gelakinetic.mtgfam.R;
+import com.gelakinetic.mtgfam.helpers.BuildDate;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
+import com.gelakinetic.mtgfam.helpers.DbUpdaterService;
 import com.gelakinetic.mtgfam.helpers.JsonParser;
 import com.gelakinetic.mtgfam.helpers.MyApp;
 import com.gelakinetic.mtgfam.helpers.RulesParser;
@@ -39,7 +42,6 @@ public abstract class FamiliarActivity extends SherlockActivity {
 	private ProgressDialog									progDialogSpinner;
 	private ProgressDialog									progDialogHorizontal;
 	private ProgressDialog									progDialog;
-	private long														defaultLastRulesUpdate;
 	protected AsyncTask<Void, String, Long>	asyncTask;
 
 	protected FamiliarActivity							me;
@@ -56,11 +58,6 @@ public abstract class FamiliarActivity extends SherlockActivity {
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-		// NOTE: This needs to be updated with every release
-		Calendar c = Calendar.getInstance();
-		c.set(2012, Calendar.JUNE, 9, 0, 0, 0);
-		defaultLastRulesUpdate = c.getTimeInMillis();
 
 		boolean autoupdate = preferences.getBoolean("autoupdate", true);
 		if (autoupdate) {
@@ -82,14 +79,15 @@ public abstract class FamiliarActivity extends SherlockActivity {
 					else {
 						update = false;
 						if(appState.getUpdatingActivity() != this) {
-							finish();
+							//finish();
 						}
 					}
 				}
 				
 				if(update) {
-					asyncTask = new OTATask();
-					asyncTask.execute((Void[]) null);
+                    startService(new Intent(this, DbUpdaterService.class));
+					//asyncTask = new OTATask();
+					//asyncTask.execute((Void[]) null);
 				}
 			}
 		}
@@ -145,7 +143,8 @@ public abstract class FamiliarActivity extends SherlockActivity {
 		}
 	}
 
-	public class OTATask extends AsyncTask<Void, String, Long> {
+	public class OTATask extends AsyncTask<Void, String, Long>
+            implements JsonParser.CardProgressReporter, RulesParser.ProgressReporter {
 		
 		@Override
 		protected void onPreExecute() {
@@ -248,7 +247,7 @@ public abstract class FamiliarActivity extends SherlockActivity {
 
 			this.publishProgress(new String[] { "indeterminate", mCtx.getString(R.string.update_rules) });
 
-			long lastRulesUpdate = preferences.getLong("lastRulesUpdate", defaultLastRulesUpdate);
+			long lastRulesUpdate = preferences.getLong("lastRulesUpdate", BuildDate.get(mCtx).getTime());
 			RulesParser rp = new RulesParser(new Date(lastRulesUpdate), mDbHelper, mCtx, this);
 			boolean newRulesParsed = false;
 			if (rp.needsToUpdate()) {
@@ -277,9 +276,12 @@ public abstract class FamiliarActivity extends SherlockActivity {
 			return null;
 		}
 
-		public void publicPublishProgress(String... values) {
+        public void reportRulesProgress(String... values) {
 			this.publishProgress(values);
-		}
+        }
+        public void reportJsonCardProgress(String... values) {
+			this.publishProgress(values);
+        }
 
 		@Override
 		protected void onProgressUpdate(String... values) {

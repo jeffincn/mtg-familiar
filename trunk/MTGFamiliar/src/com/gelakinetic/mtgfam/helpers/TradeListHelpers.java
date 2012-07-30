@@ -80,7 +80,10 @@ public class TradeListHelpers {
 				tcgName = data.tcgName;
 				if (cardNumber == null || setCode.equals("") || tcgName.equals("")) {
 					Cursor card;
-					card = mDbHelper.fetchCardByName(data.name);
+					if(setCode.equals(""))
+						card = mDbHelper.fetchCardByName(data.name);
+					else
+						card = mDbHelper.fetchCardByNameAndSet(data.name, setCode);
 					if (card.moveToFirst()) {
 						cardName = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NAME));
 //						if (data.setCode.equals("")) {

@@ -517,6 +517,28 @@ public class CardDbAdapter {
 		return mCursor;
 	}
 
+	public Cursor fetchCardByNameAndSet(String name, String setCode) throws SQLException {
+		name = name.replace("'", "''").replace("�", "�");
+		String sql = "SELECT " + DATABASE_TABLE_CARDS + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " + DATABASE_TABLE_CARDS + "." + KEY_SET + ", " + DATABASE_TABLE_CARDS + "." + KEY_NUMBER + ", "+ DATABASE_TABLE_CARDS + "." + KEY_TYPE + ", " + DATABASE_TABLE_CARDS + "." + KEY_MANACOST + ", " + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + ", " + DATABASE_TABLE_CARDS + "." + KEY_POWER + ", " + DATABASE_TABLE_CARDS + "." + KEY_TOUGHNESS + ", " + DATABASE_TABLE_CARDS + "." + KEY_LOYALTY + ", " + DATABASE_TABLE_CARDS + "." + KEY_RARITY +  " FROM "+ DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = "+ DATABASE_TABLE_CARDS + "." + KEY_SET +
+				" WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + name+ "' AND " + DATABASE_TABLE_CARDS + "." + KEY_SET + " = '" + setCode + "' ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC";
+		Cursor mCursor = null;
+
+		try {
+			mCursor = mDb.rawQuery(sql, null);
+		}
+		catch (SQLiteException e) {
+			showDbErrorToast();
+		}
+		catch (IllegalStateException e) {
+			showDbErrorToast();
+		}
+
+		if (mCursor != null) {
+			mCursor.moveToFirst();
+		}
+		return mCursor;
+	}
+
 	public long fetchIdByName(String name) throws SQLException {
 		name = name.replace("'", "''").replace("�", "�");
 		String statement = "(" + KEY_NAME + " = '" + name + "')";

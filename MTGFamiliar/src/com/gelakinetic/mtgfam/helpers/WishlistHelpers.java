@@ -70,7 +70,10 @@ public class WishlistHelpers {
 
 					String cardName = parts[0];
 					String cardSet = parts[1];
-					String tcgName = mDbHelper.getTCGname(cardSet);
+					String tcgName ="";
+					try{
+						tcgName = mDbHelper.getTCGname(cardSet);
+					}catch(Exception e){}
 					int numberOf = Integer.parseInt(parts[2]);
 
 					CardData cd = tradeListHelper.new CardData(cardName, tcgName, cardSet, numberOf, 0, "loading", null, null, null, null, null, null,

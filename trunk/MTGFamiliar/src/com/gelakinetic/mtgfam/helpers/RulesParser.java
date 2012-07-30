@@ -25,7 +25,7 @@ public class RulesParser {
 	private String									rulesUrl;
 	private CardDbAdapter						mDbHelper;
 	private Context context;
-	private OTATask									task;
+	private ProgressReporter									progReport;
 	private ArrayList<RuleItem>			rules;
 	private ArrayList<GlossaryItem>	glossary;
 
@@ -58,12 +58,16 @@ public class RulesParser {
 	 **/
 	public static int								FAILURE								= 2;
 
-	public RulesParser(Date lastUpdated, CardDbAdapter mDbHelper, Context context, OTATask otaTask) {
+    public interface ProgressReporter {
+        void reportRulesProgress(String... args);
+    }
+
+	public RulesParser(Date lastUpdated, CardDbAdapter mDbHelper, Context context, ProgressReporter progReport) {
 		this.lastUpdated = lastUpdated;
 		this.rulesUrl = null;
 		this.mDbHelper = mDbHelper;
 		this.context = context;
-		this.task = otaTask;
+		this.progReport = progReport;
 
 		this.rules = new ArrayList<RuleItem>();
 		this.glossary = new ArrayList<GlossaryItem>();
@@ -300,8 +304,8 @@ public class RulesParser {
 			int numTotalElements = rules.size() + glossary.size();
 			int elementsParsed = 0;
 			String dialogText = context.getString(R.string.update_parse_rules);
-			task.publicPublishProgress("determinate", "");
-			task.publicPublishProgress(new String[] { dialogText, dialogText,
+			progReport.reportRulesProgress("determinate", "");
+			progReport.reportRulesProgress(new String[] { dialogText, dialogText,
 					"" + (int) Math.round(100 * elementsParsed / (double) numTotalElements) });
 			// main.setNumCards(rules.size() + glossary.size());
 
@@ -314,7 +318,7 @@ public class RulesParser {
 				}
 				finally {
 					elementsParsed++;
-					task.publicPublishProgress(new String[] { dialogText, dialogText,
+					progReport.reportRulesProgress(new String[] { dialogText, dialogText,
 							"" + (int) Math.round(100 * elementsParsed / (double) numTotalElements) });
 				}
 			}
@@ -329,17 +333,17 @@ public class RulesParser {
 				}
 				finally {
 					elementsParsed++;
-					task.publicPublishProgress(new String[] { dialogText, dialogText,
+					progReport.reportRulesProgress(new String[] { dialogText, dialogText,
 							"" + (int) Math.round(100 * elementsParsed / (double) numTotalElements) });
 				}
 			}
 
-//			task.publicPublishProgress(new String[] { "Done Parsing Comprehensive Rules", "Done Parsing Comprehensive Rules",
+//			progReport.reportRulesProgress(new String[] { "Done Parsing Comprehensive Rules", "Done Parsing Comprehensive Rules",
 //					"0" });
 			return statusCode;
 		}
 		catch (SQLiteException sqe) {
-//			task.publicPublishProgress(new String[] { "Done Parsing Comprehensive Rules", "Done Parsing Comprehensive Rules",
+//			progReport.reportRulesProgress(new String[] { "Done Parsing Comprehensive Rules", "Done Parsing Comprehensive Rules",
 //					"0" });
 			return FAILURE;
 		}

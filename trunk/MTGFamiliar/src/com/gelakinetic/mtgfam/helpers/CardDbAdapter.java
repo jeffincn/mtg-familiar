@@ -238,6 +238,18 @@ public class CardDbAdapter {
 		return this;
 	}
 
+    public CardDbAdapter openTransactional() throws SQLException {
+		mDbHelper = new DatabaseHelper(mCtx);
+		mDb = mDbHelper.getWritableDatabase();
+        mDb.execSQL("BEGIN DEFERRED TRANSACTION");
+		return this;
+    }
+
+    public void closeTransactional() throws SQLException {
+        mDb.execSQL("COMMIT");
+        mDbHelper.close();
+    }
+
 	public void close() {
 		mDbHelper.close();
 	}

@@ -246,6 +246,12 @@
     
     
     <!-- Preferences -->
+    <string name="pref_screen_general">General Settings</string>
+    <string name="pref_screen_search">Search &amp; Results</string>
+    <string name="pref_screen_counter">Life Counter</string>
+    <string name="pref_screen_timer">Round Timer</string>
+    <string name="pref_screen_trade_wishlist">Trade &amp; Wishlist</string>
+    
     <string name="pref_cat_updates">Database Updates</string>
     <string name="pref_auto_updates_title">Automatic Updates</string>
     <string name="pref_auto_updates_summary">Check for new sets and bannings when the app opens</string>

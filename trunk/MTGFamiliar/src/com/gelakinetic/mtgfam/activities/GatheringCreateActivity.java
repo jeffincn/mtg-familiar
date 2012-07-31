@@ -29,6 +29,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +45,8 @@ public class GatheringCreateActivity extends FamiliarActivity {
 	private static final int								DIALOG_SET_NAME				= 0;
 	private static final int								DIALOG_GATHERING_EXIST		= 1;
 	private static final String								NO_GATHERINGS_EXIST			= "No Gatherings exist.";
+	private static final String								TOAST_NO_NAME				= "Please include a name for the Gathering.";
+															
 
 	private String							proposedGathering;
 
@@ -72,39 +76,11 @@ public class GatheringCreateActivity extends FamiliarActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
-//		ArrayList<GatheringsPlayerData> defaultG = gIO.getDefaultGathering();
-//
-//		for (GatheringsPlayerData player : defaultG) {
-//			AddPlayerRowFromData(player);
-//		}
-
 	}
 	
 	@Override
 	protected void onPause() {
 		super.onPause();
-		
-//		int playersCount = mainLayout.getChildCount();
-//		ArrayList<GatheringsPlayerData> players = new ArrayList<GatheringsPlayerData>(playersCount);
-//		
-//		for (int idx = 0; idx < playersCount; idx++) {
-//            View player = mainLayout.getChildAt(idx);
-//            
-//            EditText customName = (EditText) player.findViewById(R.id.custom_name);
-//            String name = customName.getText().toString().trim();
-//            
-//            EditText startingLife = (EditText) player.findViewById(R.id.starting_life);
-//            int life = Integer.parseInt(startingLife.getText().toString());
-//            
-//            players.add(new GatheringsPlayerData(name, life));
-//		}
-//		
-//		gIO.writeDefaultGatheringXML(players);
-//		
-//		Editor editor = preferences.edit();
-//        editor.putString("player_data", null);
-//        editor.commit();
 	}
 	
 	@Override
@@ -115,10 +91,16 @@ public class GatheringCreateActivity extends FamiliarActivity {
 				LayoutInflater factory = LayoutInflater.from(this);
 				final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
 				final EditText nameInput = (EditText) textEntryView.findViewById(R.id.player_name);
+				nameInput.setText(proposedGathering);
 				dialog = new AlertDialog.Builder(this).setTitle("Enter Gathering's Name").setView(textEntryView)
 						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
 								String gatheringName = nameInput.getText().toString().trim();
+								if (gatheringName.length() <= 0){
+									Toast.makeText(mCtx, TOAST_NO_NAME, Toast.LENGTH_LONG).show();
+									return;
+								}
+								
 								
 								ArrayList<String> existingGatheringsFiles = gIO.getGatheringFileList();
 								
@@ -138,8 +120,6 @@ public class GatheringCreateActivity extends FamiliarActivity {
 								if (existingGatheringsFiles.size() <= 0 || existing == false){
 									SaveGathering(gatheringName);
 								}
-								
-								proposedGathering = "";
 							}
 						}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
@@ -171,6 +151,11 @@ public class GatheringCreateActivity extends FamiliarActivity {
 	}
 
 	private void SaveGathering(String _gatheringName){
+		if (_gatheringName.length() <= 0){
+			Toast.makeText(mCtx, TOAST_NO_NAME, Toast.LENGTH_LONG).show();
+			return;
+		}
+		
 		int playersCount = mainLayout.getChildCount();
 		ArrayList<GatheringsPlayerData> players = new ArrayList<GatheringsPlayerData>(playersCount);
 		

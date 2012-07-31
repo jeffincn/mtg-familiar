@@ -291,26 +291,8 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		String lifeData = preferences.getString(PLAYER_DATA, null);
 
 		if (lifeData == null || lifeData.length() == 0) {
-			boolean addedPlayers = false;
-
-			try {
-				ArrayList<GatheringsPlayerData> dGatherings = gIO.getDefaultGathering();
-				players = new ArrayList<Player>(dGatherings.size());
-				for (GatheringsPlayerData player : dGatherings) {
-					addPlayer(player.getName(), player.getStartingLife(), INITIAL_POISON, null, null, (Context) this, player.getStartingLife());
-					addedPlayers = true;
-				}
-			}
-			catch (Exception e) {
-				players.clear();
-				players = new ArrayList<Player>(2);
-				addedPlayers = false;
-			}
-
-			if (addedPlayers == false) {
-				addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, (Context) this);
-				addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, (Context) this);
-			}
+			addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, (Context) this);
+			addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, (Context) this);
 		}
 		else if (players.size() == 0) {
 			numPlayers = 0;
@@ -343,7 +325,14 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 					phist = null;
 				}
 
-				addPlayer(data[0], Integer.parseInt(data[1]), Integer.parseInt(data[3]), lhist, phist, (Context) this, Integer.parseInt(data[5]));
+				int lifeDefault = 20;
+				try{
+					lifeDefault = Integer.parseInt(data[5]);
+				} catch (Exception e) {
+					lifeDefault = 20;
+				}
+				
+				addPlayer(data[0], Integer.parseInt(data[1]), Integer.parseInt(data[3]), lhist, phist, (Context) this, lifeDefault);
 				numPlayers++;
 			}
 			String lastName = players.get(players.size() - 1).name;

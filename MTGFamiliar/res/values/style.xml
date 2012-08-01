@@ -17,7 +17,7 @@
      limitations under the License.
 -->
 
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="text" parent="@android:style/TextAppearance.Medium">
         <item name="android:layout_width">fill_parent</item>
@@ -90,6 +90,14 @@
 
     <style name="actionbar_ProgressBar" parent="@style/Widget.Sherlock.ProgressBar.Horizontal">
         <item name="android:progressDrawable">@drawable/progress_horizontal_actionbar</item>
+    </style>
+    
+    <style name="notification_title">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="notification_text">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
 </resources>

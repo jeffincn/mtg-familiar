@@ -64,9 +64,9 @@ public abstract class FamiliarActivity extends SherlockActivity {
 			// Only update the banning list if it hasn't been updated recently
 			long curTime = new Date().getTime();
 			int updatefrequency = Integer.valueOf(preferences.getString("updatefrequency", "3"));
-			long lastLegalityUpdate = preferences.getLong("lastLegalityUpdate", 0);
+			int lastLegalityUpdate = preferences.getInt("lastLegalityUpdate", 0);
 			// days to ms
-			if ((curTime - lastLegalityUpdate) > (updatefrequency * 24 * 60 * 60 * 1000)) {
+			if (((curTime / 1000) - lastLegalityUpdate) > (updatefrequency * 24 * 60 * 60)) {
 				//If we should be updating, check to see if we already are
 				MyApp appState = (MyApp)getApplicationContext();
 				boolean update;
@@ -267,7 +267,7 @@ public abstract class FamiliarActivity extends SherlockActivity {
 
 			long curTime = new Date().getTime();
 			SharedPreferences.Editor editor = preferences.edit();
-			editor.putLong("lastLegalityUpdate", curTime);
+			editor.putInt("lastLegalityUpdate", (int)(curTime / 1000));
 			if(newRulesParsed) {
 				editor.putLong("lastRulesUpdate", curTime);
 			}

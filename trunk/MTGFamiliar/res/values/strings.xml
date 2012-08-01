@@ -23,8 +23,11 @@
     <string name="dialog_life">Life</string>
     <string name="dialog_thanks">Thanks Anyway!</string>
     <string name="dialog_play">Let\'s Play!</string>
-    <string name="update_notification">Updating cards, legality, and rules</string>
+    <string name="update_notification">Checking for database updates</string>
+    <string name="update_updating_set">Adding %s…</string>
+    <string name="update_updating_rules">Updating comprehensive rules…</string>
     <string name="update_added">Added</string>
+    <string name="update_added_rules">new comprehensive rules</string>
     <string name="update_updates">Checking for updates…</string>
     <string name="update_legality">Checking legality…</string>
     <string name="update_cards">Checking for new cards…</string>

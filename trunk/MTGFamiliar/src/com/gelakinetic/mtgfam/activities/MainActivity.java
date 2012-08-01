@@ -322,7 +322,7 @@ public class MainActivity extends FamiliarActivity {
 			case R.id.checkUpdate:
 				// Set the last legality update time back to zero on a forced update
 				SharedPreferences.Editor editor = preferences.edit();
-				editor.putLong("lastLegalityUpdate", 0);
+				editor.putInt("lastLegalityUpdate", 0);
 				editor.commit();
 
                 startService(new Intent(this, DbUpdaterService.class));

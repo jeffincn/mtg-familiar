@@ -130,6 +130,7 @@ public class CardTradingActivity extends FamiliarActivity {
 		lvTradeRight.setAdapter(aaTradeRight);
 
 		bAddTradeLeft.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				if (namefield.getText().toString().length() > 0) {
 					String numberOfFromField = numberfield.getText().toString();
@@ -154,6 +155,7 @@ public class CardTradingActivity extends FamiliarActivity {
 		});
 
 		bAddTradeRight.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				if (namefield.getText().toString().length() > 0) {
 					String numberOfFromField = numberfield.getText().toString();
@@ -178,6 +180,7 @@ public class CardTradingActivity extends FamiliarActivity {
 		});
 
 		lvTradeLeft.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 				sideForDialog = "left";
 				positionForDialog = arg2;
@@ -185,6 +188,7 @@ public class CardTradingActivity extends FamiliarActivity {
 			}
 		});
 		lvTradeRight.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 				sideForDialog = "right";
 				positionForDialog = arg2;
@@ -245,6 +249,7 @@ public class CardTradingActivity extends FamiliarActivity {
 		SaveTrade(autosaveName + tradeExtension);
 	}
 
+	@Override
 	protected Dialog onCreateDialog(int id) {
 		Dialog dialog;
 		AlertDialog.Builder builder;
@@ -279,6 +284,7 @@ public class CardTradingActivity extends FamiliarActivity {
 				priceText.setSelection(priceNumberStr.length());
 
 				removeAll.setOnClickListener(new OnClickListener() {
+					@Override
 					public void onClick(View v) {
 						lSide.remove(position);
 						aaSide.notifyDataSetChanged();
@@ -288,6 +294,7 @@ public class CardTradingActivity extends FamiliarActivity {
 				});
 
 				changeSet.setOnClickListener(new OnClickListener() {
+					@Override
 					public void onClick(View v) {
 						removeDialog(DIALOG_UPDATE_CARD);
 						ChangeSet(side, position);
@@ -295,12 +302,14 @@ public class CardTradingActivity extends FamiliarActivity {
 				});
 
 				cancelbtn.setOnClickListener(new OnClickListener() {
+					@Override
 					public void onClick(View v) {
 						removeDialog(DIALOG_UPDATE_CARD);
 					}
 				});
 
 				donebtn.setOnClickListener(new OnClickListener() {
+					@Override
 					public void onClick(View v) {
 
 						// validate number of cards text
@@ -331,6 +340,7 @@ public class CardTradingActivity extends FamiliarActivity {
 				});
 
 				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					@Override
 					public void onDismiss(DialogInterface dialog) {
 						removeDialog(DIALOG_UPDATE_CARD);
 					}
@@ -344,6 +354,7 @@ public class CardTradingActivity extends FamiliarActivity {
 
 				builder.setTitle("Price Options");
 				builder.setSingleChoiceItems(new String[] { "Low", "Average", "High" }, priceSetting, new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						priceSetting = which;
 						dialog.dismiss();
@@ -375,6 +386,7 @@ public class CardTradingActivity extends FamiliarActivity {
 				dialog = builder.create();
 
 				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					@Override
 					public void onDismiss(DialogInterface dialog) {
 						removeDialog(DIALOG_PRICE_SETTING);
 					}
@@ -396,6 +408,7 @@ public class CardTradingActivity extends FamiliarActivity {
 				builder.setView(input);
 
 				builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int whichButton) {
 						String tradeName = input.getText().toString();
 
@@ -407,6 +420,7 @@ public class CardTradingActivity extends FamiliarActivity {
 				});
 
 				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int whichButton) {
 						// Canceled.
 					}
@@ -415,6 +429,7 @@ public class CardTradingActivity extends FamiliarActivity {
 				dialog = builder.create();
 
 				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					@Override
 					public void onDismiss(DialogInterface dialog) {
 						removeDialog(DIALOG_SAVE_TRADE);
 					}
@@ -442,11 +457,13 @@ public class CardTradingActivity extends FamiliarActivity {
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Select A Trade");
 				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int whichButton) {
 						// Canceled.
 					}
 				});
 				builder.setItems(tradeNames, new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface di, int which) {
 
 						LoadTrade(tradeNames[which] + tradeExtension);
@@ -461,6 +478,7 @@ public class CardTradingActivity extends FamiliarActivity {
 				dialog = builder.create();
 
 				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					@Override
 					public void onDismiss(DialogInterface dialog) {
 						removeDialog(DIALOG_LOAD_TRADE);
 					}
@@ -488,11 +506,13 @@ public class CardTradingActivity extends FamiliarActivity {
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Delete A Trade");
 				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int whichButton) {
 						// Canceled.
 					}
 				});
 				builder.setItems(tradeNamesD, new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface di, int which) {
 						File toDelete = new File(getFilesDir(), tradeNamesD[which] + tradeExtension);
 						toDelete.delete();
@@ -502,6 +522,7 @@ public class CardTradingActivity extends FamiliarActivity {
 				dialog = builder.create();
 
 				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					@Override
 					public void onDismiss(DialogInterface dialog) {
 						removeDialog(DIALOG_DELETE_TRADE);
 					}
@@ -603,6 +624,7 @@ public class CardTradingActivity extends FamiliarActivity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
 		builder.setTitle("Pick a Set");
 		builder.setItems(aSets, new DialogInterface.OnClickListener() {
+			@Override
 			public void onClick(DialogInterface dialogInterface, int item) {
 				if (_side.equals("left")) {
 					lTradeLeft.get(_position).setCode = (aSetCodes[item]);

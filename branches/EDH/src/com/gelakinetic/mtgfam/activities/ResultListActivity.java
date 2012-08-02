@@ -143,6 +143,7 @@ public class ResultListActivity extends FamiliarActivity {
 			}
 			else {
 				lv.setOnItemClickListener(new OnItemClickListener() {
+					@Override
 					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 						Intent i = new Intent(mCtx, CardViewActivity.class);
 						i.putExtra("id", id);

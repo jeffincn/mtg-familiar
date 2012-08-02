@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright 2011 Adam Feinstein and April King.
+     File created by the Android Action Bar Style Generator
 
-This file is part of MTG Familiar.
+     Copyright (C) 2012 readyState Software Ltd
 
-MTG Familiar is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-MTG Familiar is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+  
+          http://www.apache.org/licenses/LICENSE-2.0
+  
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
 -->
-<resources>
+
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="text" parent="@android:style/TextAppearance.Medium">
         <item name="android:layout_width">fill_parent</item>
@@ -25,7 +25,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:textSize">24dp</item>
     </style>
-    
+
     <style name="CardViewText" parent="@android:style/TextAppearance.Medium">
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -33,17 +33,71 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         <item name="android:textSize">24dp</item>
     </style>
 
-    <style name="defaultStyle" parent="android:Theme.NoTitleBar">
-        <item name="android:windowBackground">@drawable/black_background</item>
+    <style name="Theme.ForceOverflowBlack" parent="@style/Theme.Sherlock.ForceOverflow">
+        <item name="actionBarItemBackground">@drawable/selectable_background_actionbar</item>
+        <item name="popupMenuStyle">@style/actionbar_PopupMenu</item>
+        <item name="dropDownListViewStyle">@style/actionbar_DropDownListView</item>
+        <item name="actionBarTabStyle">@style/actionbar_ActionBarTabStyle</item>
+        <item name="actionDropDownStyle">@style/actionbar_DropDownNav</item>
+        <item name="actionBarStyle">@style/actionbar_solid_ActionBar</item>
+        <item name="android:actionBarItemBackground">@drawable/selectable_background_actionbar</item>
+        <item name="android:popupMenuStyle">@style/actionbar_PopupMenu</item>
+        <item name="android:dropDownListViewStyle">@style/actionbar_DropDownListView</item>
+        <item name="android:actionBarTabStyle">@style/actionbar_ActionBarTabStyle</item>
+        <item name="android:actionDropDownStyle">@style/actionbar_DropDownNav</item>
+        <item name="android:actionBarStyle">@style/actionbar_solid_ActionBar</item>
+        <item name="android:panelBackground">@drawable/menu_hardkey_panel_actionbar</item>
+        <item name="android:colorBackground">@color/black</item>
     </style>
 
-    <style name="Theme.Transparent" parent="android:Theme">
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:backgroundDimEnabled">false</item>
+    <style name="actionbar_solid_ActionBar" parent="@style/Widget.Sherlock.ActionBar.Solid">
+        <item name="background">@drawable/ab_solid_actionbar</item>
+        <item name="backgroundStacked">@drawable/ab_stacked_solid_actionbar</item>
+        <item name="backgroundSplit">@drawable/ab_bottom_solid_actionbar</item>
+        <item name="progressBarStyle">@style/actionbar_ProgressBar</item>
+        <item name="android:background">@drawable/ab_solid_actionbar</item>
+        <item name="android:backgroundStacked">@drawable/ab_stacked_solid_actionbar</item>
+        <item name="android:backgroundSplit">@drawable/ab_bottom_solid_actionbar</item>
+        <item name="android:progressBarStyle">@style/actionbar_ProgressBar</item>
     </style>
-    <!-- <item name="android:windowIsFloating">true</item> -->
+
+    <style name="actionbar_transparent_ActionBar" parent="@style/Widget.Sherlock.ActionBar">
+        <item name="background">@drawable/ab_transparent_actionbar</item>
+        <item name="progressBarStyle">@style/actionbar_ProgressBar</item>
+        <item name="android:background">@drawable/ab_transparent_actionbar</item>
+        <item name="android:progressBarStyle">@style/actionbar_ProgressBar</item>
+    </style>
+
+    <style name="actionbar_PopupMenu" parent="@style/Widget.Sherlock.ListPopupWindow">
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_actionbar</item>
+    </style>
+
+    <style name="actionbar_DropDownListView" parent="@style/Widget.Sherlock.ListView.DropDown">
+        <item name="android:listSelector">@drawable/selectable_background_actionbar</item>
+    </style>
+
+    <style name="actionbar_ActionBarTabStyle" parent="@style/Widget.Sherlock.ActionBar.TabView">
+        <item name="background">@drawable/tab_indicator_ab_actionbar</item>
+        <item name="android:background">@drawable/tab_indicator_ab_actionbar</item>
+    </style>
+
+    <style name="actionbar_DropDownNav" parent="@style/Widget.Sherlock.Spinner.DropDown.ActionBar">
+        <item name="background">@drawable/spinner_background_ab_actionbar</item>
+        <item name="android:background">@drawable/spinner_background_ab_actionbar</item>
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_actionbar</item>
+        <item name="android:dropDownSelector">@drawable/selectable_background_actionbar</item>
+    </style>
+
+    <style name="actionbar_ProgressBar" parent="@style/Widget.Sherlock.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/progress_horizontal_actionbar</item>
+    </style>
+    
+    <style name="notification_title">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="notification_text">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
 
 </resources>

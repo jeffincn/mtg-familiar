@@ -34,7 +34,6 @@ import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -42,7 +41,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -123,6 +121,7 @@ public class WishlistActivity extends FamiliarActivity {
 		}
 
 		bAdd.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				if (namefield.getText().length() > 0) {
 					String numberOfFromField = numberfield.getText().toString();
@@ -150,6 +149,7 @@ public class WishlistActivity extends FamiliarActivity {
 		});
 
 		lvWishlist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 				positionForDialog = arg2;
 				showDialog(DIALOG_UPDATE_CARD);
@@ -182,6 +182,7 @@ public class WishlistActivity extends FamiliarActivity {
 		}
 	}
 
+	@Override
 	protected Dialog onCreateDialog(int id) {
 		Dialog dialog;
 		AlertDialog.Builder builder;
@@ -215,6 +216,7 @@ public class WishlistActivity extends FamiliarActivity {
 				priceText.setSelection(priceNumberStr.length());
 
 				removeAll.setOnClickListener(new OnClickListener() {
+					@Override
 					public void onClick(View v) {
 						lList.remove(position);
 						aaList.notifyDataSetChanged();
@@ -224,6 +226,7 @@ public class WishlistActivity extends FamiliarActivity {
 				});
 
 				changeSet.setOnClickListener(new OnClickListener() {
+					@Override
 					public void onClick(View v) {
 						removeDialog(DIALOG_UPDATE_CARD);
 						ChangeSet(position);
@@ -231,12 +234,14 @@ public class WishlistActivity extends FamiliarActivity {
 				});
 
 				cancelbtn.setOnClickListener(new OnClickListener() {
+					@Override
 					public void onClick(View v) {
 						removeDialog(DIALOG_UPDATE_CARD);
 					}
 				});
 
 				donebtn.setOnClickListener(new OnClickListener() {
+					@Override
 					public void onClick(View v) {
 
 						// validate number of cards text
@@ -249,7 +254,7 @@ public class WishlistActivity extends FamiliarActivity {
 						String userInputPrice = priceText.getText().toString();
 						double uIP;
 						try {
-							uIP = Long.parseLong(userInputPrice);
+							uIP = Double.parseDouble(userInputPrice);
 							// Clear the message so the user's specified price will display
 							lList.get(position).message = ("");
 						}
@@ -267,6 +272,7 @@ public class WishlistActivity extends FamiliarActivity {
 				});
 
 				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					@Override
 					public void onDismiss(DialogInterface dialog) {
 						removeDialog(DIALOG_UPDATE_CARD);
 					}
@@ -280,6 +286,7 @@ public class WishlistActivity extends FamiliarActivity {
 
 				builder.setTitle("Price Options");
 				builder.setSingleChoiceItems(new String[] { "Low", "Average", "High" }, priceSetting, new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						priceSetting = which;
 						dialog.dismiss();
@@ -304,6 +311,7 @@ public class WishlistActivity extends FamiliarActivity {
 				dialog = builder.create();
 
 				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					@Override
 					public void onDismiss(DialogInterface dialog) {
 						removeDialog(DIALOG_PRICE_SETTING);
 					}
@@ -342,6 +350,7 @@ public class WishlistActivity extends FamiliarActivity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
 		builder.setTitle("Pick a Set");
 		builder.setItems(aSets, new DialogInterface.OnClickListener() {
+			@Override
 			public void onClick(DialogInterface dialogInterface, int item) {
 				lWishlist.get(_position).setCode = (aSetCodes[item]);
 				lWishlist.get(_position).tcgName = (aSets[item]);

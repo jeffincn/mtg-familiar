@@ -45,6 +45,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.RoundTimerService;
+import com.gelakinetic.mtgfam.helpers.DbUpdaterService;
 
 public class MainActivity extends FamiliarActivity {
 	private static final int	ABOUTDIALOG			= 0;
@@ -80,6 +81,7 @@ public class MainActivity extends FamiliarActivity {
 		wishlist = (TextView) findViewById(R.id.wishlist);
 
 		nbplayerbutton.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(mCtx, NPlayerLifeActivity.class);
 				startActivity(i);
@@ -87,6 +89,7 @@ public class MainActivity extends FamiliarActivity {
 		});
 
 		search.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(mCtx, SearchActivity.class);
 				startActivity(i);
@@ -94,6 +97,7 @@ public class MainActivity extends FamiliarActivity {
 		});
 
 		rules.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(mCtx, RulesActivity.class);
 				startActivity(i);
@@ -101,6 +105,7 @@ public class MainActivity extends FamiliarActivity {
 		});
 
 		rng.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(mCtx, DiceActivity.class);
 				startActivity(i);
@@ -108,6 +113,7 @@ public class MainActivity extends FamiliarActivity {
 		});
 
 		manapool.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(mCtx, ManaPoolActivity.class);
 				startActivity(i);
@@ -115,6 +121,7 @@ public class MainActivity extends FamiliarActivity {
 		});
 
 		randomCard.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(mCtx, RandomCardActivity.class);
 				startActivity(i);
@@ -122,6 +129,7 @@ public class MainActivity extends FamiliarActivity {
 		});
 
 		roundTimer.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(mCtx, RoundTimerActivity.class);
 				startActivity(i);
@@ -129,6 +137,7 @@ public class MainActivity extends FamiliarActivity {
 		});
 
 		trader.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(mCtx, CardTradingActivity.class);
 				startActivity(i);
@@ -136,6 +145,7 @@ public class MainActivity extends FamiliarActivity {
 		});
 
 		wishlist.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(mCtx, WishlistActivity.class);
 				startActivity(i);
@@ -214,6 +224,7 @@ public class MainActivity extends FamiliarActivity {
 							"This application has text-to-speech capability for some of its features, but you don't "
 									+ "seem to have it installed. If you want to install it, use the \"Install Text-to-Speech\" link "
 									+ "in the settings menu.").setPositiveButton("OK", new OnClickListener() {
+						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							// Do nothing, just dismiss
 						}
@@ -235,6 +246,7 @@ public class MainActivity extends FamiliarActivity {
 		if (id == DONATEDIALOG) {
 			builder.setTitle("Donate to the Devs");
 			builder.setNeutralButton(R.string.dialog_thanks, new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.cancel();
 				}
@@ -252,6 +264,7 @@ public class MainActivity extends FamiliarActivity {
 			ImageView paypal = (ImageView) dialoglayout.findViewById(R.id.imageview1);
 			paypal.setImageResource(R.drawable.paypal);
 			paypal.setOnClickListener(new View.OnClickListener() {
+				@Override
 				public void onClick(View v) {
 					Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri
 							.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ALR4TSXWPPHUL"));
@@ -274,6 +287,7 @@ public class MainActivity extends FamiliarActivity {
 			}
 
 			builder.setNeutralButton("Thanks!", new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.cancel();
 				}
@@ -297,6 +311,7 @@ public class MainActivity extends FamiliarActivity {
 			}
 
 			builder.setNeutralButton("Enjoy!", new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.cancel();
 				}
@@ -321,11 +336,12 @@ public class MainActivity extends FamiliarActivity {
 			case R.id.checkUpdate:
 				// Set the last legality update time back to zero on a forced update
 				SharedPreferences.Editor editor = preferences.edit();
-				editor.putLong("lastLegalityUpdate", 0);
+				editor.putInt("lastLegalityUpdate", 0);
 				editor.commit();
 
-				asyncTask = new OTATask();
-				asyncTask.execute((Void[]) null);
+                startService(new Intent(this, DbUpdaterService.class));
+				//asyncTask = new OTATask();
+				//asyncTask.execute((Void[]) null);
 				return true;
 			case R.id.preferences:
 				startActivity(new Intent().setClass(this, PreferencesActivity.class));

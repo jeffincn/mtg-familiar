@@ -49,6 +49,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -64,6 +65,7 @@ import com.gelakinetic.mtgfam.helpers.GatheringsIO;
 import com.gelakinetic.mtgfam.helpers.GatheringsPlayerData;
 
 public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListener {
+	private static final String								NO_GATHERINGS_EXIST			= "No Gatherings exist.";
 
 	private static final int								DIALOG_RESET_CONFIRM	= 0;
 	private static final int								DIALOG_REMOVE_PLAYER	= 1;
@@ -87,6 +89,8 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	private int															playerHeight;
 	private LinearLayout										mainLayout;
 	private LinearLayout										doublePlayer;
+	private GridView											edhGrid;
+	private CommanderAdapter									commanderAdapter;
 	private int															playersInRow;
 
 	private int															orientation;
@@ -215,6 +219,10 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 									p.poisonAdapter.commit();
 								}
 							}
+							
+							if (displayMode.equals(commanderDisplay)){
+								commanderAdapter.notifyDataSetChanged();
+							}
 						}
 					});
 				}
@@ -280,6 +288,17 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		}
 
 		mainLayout = (LinearLayout) findViewById(R.id.playerList);
+		if (displayMode.equals(commanderDisplay)){
+			LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			LinearLayout edhLayout = (LinearLayout) inflater.inflate(R.layout.life_counter_player_edh_row_bot, null);
+			mainLayout.addView(edhLayout);
+			edhGrid = (GridView) edhLayout.findViewById(R.id.edh_grid);
+			
+			commanderAdapter = new CommanderAdapter(mCtx);
+			edhGrid.setAdapter(commanderAdapter);
+		}
+		
+		
 		playersInRow = 0;
 
 		if (canGetLock) {
@@ -291,26 +310,8 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		String lifeData = preferences.getString(PLAYER_DATA, null);
 
 		if (lifeData == null || lifeData.length() == 0) {
-			boolean addedPlayers = false;
-
-			try {
-				ArrayList<GatheringsPlayerData> dGatherings = gIO.getDefaultGathering();
-				players = new ArrayList<Player>(dGatherings.size());
-				for (GatheringsPlayerData player : dGatherings) {
-					addPlayer(player.getName(), player.getStartingLife(), INITIAL_POISON, null, null, (Context) this);
-					addedPlayers = true;
-				}
-			}
-			catch (Exception e) {
-				players.clear();
-				players = new ArrayList<Player>(2);
-				addedPlayers = false;
-			}
-
-			if (addedPlayers == false) {
-				addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, (Context) this);
-				addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, (Context) this);
-			}
+			addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, (Context) this);
+			addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, (Context) this);
 		}
 		else if (players.size() == 0) {
 			numPlayers = 0;
@@ -343,7 +344,14 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 					phist = null;
 				}
 
-				addPlayer(data[0], Integer.parseInt(data[1]), Integer.parseInt(data[3]), lhist, phist, (Context) this);
+				int lifeDefault = 20;
+				try{
+					lifeDefault = Integer.parseInt(data[5]);
+				} catch (Exception e) {
+					lifeDefault = 20;
+				}
+				
+				addPlayer(data[0], Integer.parseInt(data[1]), Integer.parseInt(data[3]), lhist, phist, (Context) this, lifeDefault);
 				numPlayers++;
 			}
 			String lastName = players.get(players.size() - 1).name;
@@ -547,6 +555,10 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	}
 
 	private void addPlayer(String name, int initialLife, int initialPoison, int[] lhist, int[] phist, Context context) {
+		addPlayer(name, initialLife, initialPoison, lhist, phist, context, INITIAL_LIFE);
+	}
+	
+	private void addPlayer(String name, int initialLife, int initialPoison, int[] lhist, int[] phist, Context context, int defaultLife) {
 		LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		LinearLayout layout;
 		if (orientation == LANDSCAPE) {
@@ -560,7 +572,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		if (name == null) {
 			name = "Player " + numPlayers;
 		}
-		Player p = new Player(name, initialLife, initialPoison, lhist, phist, context);
+		Player p = new Player(name, initialLife, initialPoison, lhist, phist, context, defaultLife);
 		p.addButtons((Button) layout.findViewById(R.id.player_minus1), (Button) layout.findViewById(R.id.player_plus1),
 				(Button) layout.findViewById(R.id.player_minus5), (Button) layout.findViewById(R.id.player_plus5));
 		p.addOutputViews((TextView) layout.findViewById(R.id.player_name),
@@ -595,25 +607,9 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 				Toast.makeText(mCtx, "Compact Mode usable in portrait rotation only.", Toast.LENGTH_LONG).show();
 			}
 		} else if (displayMode.equals(commanderDisplay)) {
-			if (orientation != PORTRAIT){
-				normalMode = false;
-				LinearLayout lifeHistoryParent = (LinearLayout) (layout.findViewById(R.id.player_history)).getParent();
-				ListView history = (ListView) (layout.findViewById(R.id.player_history));
-				history.setVisibility(View.GONE);
-				
-				LinearLayout commander = (LinearLayout) inflater.inflate(R.layout.n_player_commander_life_tracker, null);
-				lifeHistoryParent.addView(commander);
-				
-				ListView commanderList = (ListView) commander.findViewById(R.id.edh_list);
-				p.addCommanderView(commanderList);
-				for(Player addTo : players){
-					addTo.commanderDamage.add(0);
-				}
-				
-				mainLayout.addView(layout);
-			} else {
-				Toast.makeText(mCtx, "Commander Mode usable in landscape rotation only.", Toast.LENGTH_LONG).show();
-			}
+			normalMode = false;
+			layout.setVisibility(View.GONE);
+			mainLayout.addView(layout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
 		}
 		if (displayMode.equals(normalDisplay) || normalMode == true) {
 			mainLayout.addView(layout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
@@ -674,21 +670,13 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	
 	private class CommanderAdapter extends BaseAdapter {
 		private Context						context;
-		private Player						parentPlayer;
-		private int 						selectedPlayer;
 		
-		public CommanderAdapter(Context _context, Player _parentPlayer){
+		public CommanderAdapter(Context _context){
 			context = _context; 
-			parentPlayer = _parentPlayer;
-			selectedPlayer = -1;
 		}
 		
 		public int getCount() {
 			return players.size();
-		}
-		
-		public void changeSelectedPlayer(int _position){
-			selectedPlayer = _position;
 		}
 
 		@Override
@@ -705,25 +693,47 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		public View getView(int position, View convertView, ViewGroup parent) {
 			TextView name, damage;
 			LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			View v = vi.inflate(R.layout.commander_adapter_row, null);
-			ArrayList<Integer> row = parentPlayer.commanderDamage;
-			name = (TextView) v.findViewById(R.id.commander_player_name);
-			damage = (TextView) v.findViewById(R.id.commander_damage);
+			View v = vi.inflate(R.layout.life_counter_player_edh_player_row, null);
+			name = (TextView) v.findViewById(R.id.edh_player_row_name);
+			damage = (TextView) v.findViewById(R.id.edh_player_row_life);
 			if (name == null || damage == null) {
 				TextView error = new TextView(context);
 				error.setText("ERROR!");
 				return error;
 			}
 			name.setText(players.get(position).name);
-			damage.setText(String.valueOf(row.get(position)));
+			damage.setText(String.valueOf(players.get(position).life));
+			final int pos = position;
 			
-			if (selectedPlayer == position){
-				name.setBackgroundColor(Color.BLUE);
-				damage.setBackgroundColor(Color.BLUE);
-			}
+			name.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					change_visible_edh_player(pos);
+				}
+			});
+			damage.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					synchronized (timerLock) {
+						timerValue = timerStart;
+					}
+					players.get(pos).incrementValue(LIFE, -1);
+					players.get(pos).refreshTextViews();
+				}
+			});
 			
 			return v;
 		}
+	}
+	
+	private void change_visible_edh_player(int _which){
+		for(Player player : players){
+			player.layout.setVisibility(View.GONE);
+		}
+		
+		players.get(_which).layout.setVisibility(View.VISIBLE);
 	}
 
 	private class HistoryAdapter extends BaseAdapter {
@@ -955,27 +965,22 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		private Button		plusButton5;
 		private ListView	history;
 		private HistoryAdapter	lifeAdapter, poisonAdapter;
-		private CommanderAdapter commanderAdapter;
-		private ListView   commanderDamageLayout;
-		private int 		selectedPlayer; //-1 me
 		private LinearLayout		layout;
 
 		public static final int	CONSTRAINT_POISON	= 0, CONSTRAINT_LIFE = Integer.MAX_VALUE - 1;
 
-		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context) {
+		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context, int _defaultLife) {
 			name = n;
 			life = l;
-			defaultLife = l;
+			defaultLife = _defaultLife;
 			poison = p;
 			this.lifeAdapter = new HistoryAdapter(context, life);
 			this.poisonAdapter = new HistoryAdapter(context, poison);
 			
-			this.commanderAdapter = new CommanderAdapter(context, this);
 			commanderDamage = new ArrayList<Integer>();
 			for(int idx = 0; idx < players.size(); idx++){
 				commanderDamage.add(0);
 			}
-			selectedPlayer = -1;
 			
 			me = this;
 
@@ -991,6 +996,10 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			else {
 				this.poisonAdapter = new HistoryAdapter(context, poison);
 			}
+		}
+		
+		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context) {
+			this(n, l, p, lhist, phist, context, INITIAL_LIFE);
 		}
 
 		public void setLayoutSize(int listSizeWidth, int listSizeHeight) {
@@ -1020,42 +1029,6 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 
 		public void hideHistory() {
 			((View) history.getParent()).setVisibility(View.GONE);
-		}
-		
-		private void changeSelectedPlayer(int _player){
-			selectedPlayer = _player;
-			commanderAdapter.changeSelectedPlayer(_player);
-			commanderAdapter.notifyDataSetChanged();
-			
-			if (_player == -1){
-				TVlife.setBackgroundColor(Color.BLUE);
-			} else{
-				TVlife.setBackgroundColor(Color.TRANSPARENT);
-			}
-				
-		}
-		
-		public void addCommanderView(ListView rl){
-			commanderDamageLayout = rl;
-			
-			commanderDamageLayout.setAdapter(this.commanderAdapter);
-			
-			commanderDamageLayout.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1,
-						int arg2, long arg3) {
-					changeSelectedPlayer(arg2);
-				}
-				
-			});
-			
-			TVlife.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-					changeSelectedPlayer(-1);
-				}
-			});
-			
 		}
 
 		public void addOutputViews(TextView n, TextView l, ListView lv) {
@@ -1132,14 +1105,6 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		}
 
 		private void incrementValue(int type, int delta) {
-			if (displayMode.equals(commanderDisplay) && (selectedPlayer != -1)) {
-				int value = commanderDamage.get(selectedPlayer); 
-				value += delta;
-				commanderDamage.set(selectedPlayer, value);
-				commanderAdapter.notifyDataSetChanged();
-				
-				return;
-			} 
 			int value = 0;
 			switch (type) {
 				case LIFE:
@@ -1237,6 +1202,8 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 					data += "," + i.get(0);
 				}
 			}
+			
+			data += ";" + defaultLife;
 
 			return data + ";\n";
 		}
@@ -1248,6 +1215,9 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			data += ";";
 
 			data += INITIAL_POISON + ";";
+			
+			data += ";" + defaultLife;
+			
 			return data + ";\n";
 		}
 
@@ -1311,8 +1281,43 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 				return true;
 			case R.id.change_gathering:
 				Intent i = new Intent(this, GatheringCreateActivity.class);
-				finish();
+				//finish();
 				startActivity(i);
+				return true;
+			case R.id.set_gathering:
+				if (gIO.getNumberOfGatherings() <= 0){
+					Toast.makeText(this, NO_GATHERINGS_EXIST, Toast.LENGTH_LONG).show();
+					return true;
+				}
+				
+				ArrayList<String> gatherings = gIO.getGatheringFileList();
+				final String[] fGatherings = gatherings.toArray(new String[gatherings.size()]);
+				final String[] properNames = new String[gatherings.size()];
+				for (int idx = 0; idx < gatherings.size(); idx++) {
+					properNames[idx] = gIO.ReadGatheringNameFromXML(gatherings.get(idx));
+				}
+
+				AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
+				builder.setTitle("Load a Gathering");
+				builder.setItems(properNames, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialogInterface, int item) {
+						int playerNum = players.size();
+						for (int i = playerNum - 1; i >= 0; i--) {
+							removePlayer(i);
+						}
+
+						ArrayList<GatheringsPlayerData> players = gIO.ReadGatheringXML(fGatherings[item]);
+						for (GatheringsPlayerData player : players) {
+							addPlayer(player.getName(), player.getStartingLife(), INITIAL_POISON, null, null, anchor);
+						}
+
+						Intent intent = getIntent();
+						finish();
+						startActivity(intent);
+						return;
+					}
+				});
+				builder.create().show();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

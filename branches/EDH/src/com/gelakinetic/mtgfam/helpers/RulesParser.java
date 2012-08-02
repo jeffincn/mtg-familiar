@@ -12,9 +12,10 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.content.Context;
 import android.database.sqlite.SQLiteException;
 
-import com.gelakinetic.mtgfam.activities.FamiliarActivity.OTATask;
+import com.gelakinetic.mtgfam.R;
 
 public class RulesParser {
 
@@ -22,7 +23,8 @@ public class RulesParser {
 	private Date										lastUpdated;
 	private String									rulesUrl;
 	private CardDbAdapter						mDbHelper;
-	private OTATask									task;
+	private Context context;
+	private ProgressReporter									progReport;
 	private ArrayList<RuleItem>			rules;
 	private ArrayList<GlossaryItem>	glossary;
 
@@ -41,25 +43,30 @@ public class RulesParser {
 	// Result codes
 	/**
 	 * Returned from fetchAndLoad() if everything works correctly.
-	 */
+	 **/
 	public static int								SUCCESS								= 0;
 
 	/**
 	 * Returned from fetchAndLoad() if some of the rules/terms failed, but some
 	 * succeeded.
-	 */
+	 **/
 	public static int								ERRORS								= 1;
 
 	/**
 	 * Returned from fetchAndLoad() if a catastrophic failure occurs.
-	 */
+	 **/
 	public static int								FAILURE								= 2;
 
-	public RulesParser(Date lastUpdated, CardDbAdapter mDbHelper, OTATask otaTask) {
+    public interface ProgressReporter {
+        void reportRulesProgress(String... args);
+    }
+
+	public RulesParser(Date lastUpdated, CardDbAdapter mDbHelper, Context context, ProgressReporter progReport) {
 		this.lastUpdated = lastUpdated;
 		this.rulesUrl = null;
 		this.mDbHelper = mDbHelper;
-		this.task = otaTask;
+		this.context = context;
+		this.progReport = progReport;
 
 		this.rules = new ArrayList<RuleItem>();
 		this.glossary = new ArrayList<GlossaryItem>();
@@ -295,7 +302,9 @@ public class RulesParser {
 			int statusCode = SUCCESS;
 			int numTotalElements = rules.size() + glossary.size();
 			int elementsParsed = 0;
-			task.publicPublishProgress(new String[] { "Parsing Comprehensive Rules", "Parsing Comprehensive Rules",
+			String dialogText = context.getString(R.string.update_parse_rules);
+			progReport.reportRulesProgress("determinate", "");
+			progReport.reportRulesProgress(new String[] { dialogText, dialogText,
 					"" + (int) Math.round(100 * elementsParsed / (double) numTotalElements) });
 			// main.setNumCards(rules.size() + glossary.size());
 
@@ -308,7 +317,7 @@ public class RulesParser {
 				}
 				finally {
 					elementsParsed++;
-					task.publicPublishProgress(new String[] { "Parsing Comprehensive Rules", "Parsing Comprehensive Rules",
+					progReport.reportRulesProgress(new String[] { dialogText, dialogText,
 							"" + (int) Math.round(100 * elementsParsed / (double) numTotalElements) });
 				}
 			}
@@ -323,18 +332,18 @@ public class RulesParser {
 				}
 				finally {
 					elementsParsed++;
-					task.publicPublishProgress(new String[] { "Parsing Comprehensive Rules", "Parsing Comprehensive Rules",
+					progReport.reportRulesProgress(new String[] { dialogText, dialogText,
 							"" + (int) Math.round(100 * elementsParsed / (double) numTotalElements) });
 				}
 			}
 
-			task.publicPublishProgress(new String[] { "Done Parsing Comprehensive Rules", "Done Parsing Comprehensive Rules",
-					"0" });
+//			progReport.reportRulesProgress(new String[] { "Done Parsing Comprehensive Rules", "Done Parsing Comprehensive Rules",
+//					"0" });
 			return statusCode;
 		}
 		catch (SQLiteException sqe) {
-			task.publicPublishProgress(new String[] { "Done Parsing Comprehensive Rules", "Done Parsing Comprehensive Rules",
-					"0" });
+//			progReport.reportRulesProgress(new String[] { "Done Parsing Comprehensive Rules", "Done Parsing Comprehensive Rules",
+//					"0" });
 			return FAILURE;
 		}
 	}

@@ -5,27 +5,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteException;
-import android.os.AsyncTask;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
-import com.gelakinetic.mtgfam.activities.CardTradingActivity;
-import com.gelakinetic.mtgfam.activities.CardViewActivity;
 import com.gelakinetic.mtgfam.activities.WishlistActivity;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.FetchPriceTask;
@@ -85,14 +70,19 @@ public class WishlistHelpers {
 
 					String cardName = parts[0];
 					String cardSet = parts[1];
-					String tcgName = mDbHelper.getTCGname(cardSet);
+					String tcgName ="";
+					try{
+						tcgName = mDbHelper.getTCGname(cardSet);
+					}catch(Exception e){}
 					int numberOf = Integer.parseInt(parts[2]);
 
 					CardData cd = tradeListHelper.new CardData(cardName, tcgName, cardSet, numberOf, 0, "loading", null, null, null, null, null, null,
 							CardDbAdapter.NOONECARES, -1);
 					lWishlist.add(0, cd);
-					FetchPriceTask loadPrice = tradeListHelper.new FetchPriceTask(lWishlist.get(0), _toNotify, activity.priceSetting, null, activity);
-					loadPrice.execute();
+					if(_toNotify != null){
+						FetchPriceTask loadPrice = tradeListHelper.new FetchPriceTask(lWishlist.get(0), _toNotify, activity.priceSetting, null, activity);
+						loadPrice.execute();
+					}
 				}
 			}
 			catch (NumberFormatException e) {
@@ -101,7 +91,8 @@ public class WishlistHelpers {
 			catch (IOException e) {
 				Toast.makeText(mCtx, "IOException", Toast.LENGTH_LONG).show();
 			}
-			_toNotify.notifyDataSetChanged();
+			if(_toNotify != null)
+				_toNotify.notifyDataSetChanged();
 		}
 	}
 }

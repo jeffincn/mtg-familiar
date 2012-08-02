@@ -276,6 +276,7 @@ public class RoundTimerService extends Service implements OnInitListener {
 
 	private Handler							cleanupHandler					= new Handler();
 	private Runnable						cleanupTask							= new Runnable() {
+																												@Override
 																												public void run() {
 																													if (player != null) // We
 																																							// don't
@@ -364,6 +365,7 @@ public class RoundTimerService extends Service implements OnInitListener {
 	}
 
 	// @Override
+	@Override
 	public void onInit(int status) {
 		ttsInitialized = true;
 	}

@@ -29,6 +29,7 @@ public class ImageGetterHelper {
 
 	public static ImageGetter GlyphGetter(final Resources r) {
 		return new ImageGetter() {
+			@Override
 			public Drawable getDrawable(String source) {
 				Drawable d = null;
 				source = source.replace("/", "");

@@ -38,6 +38,7 @@ public class WidgetSearchActivity extends FamiliarActivity {
 
 		searchButton.setOnClickListener(new OnClickListener() {
 
+			@Override
 			public void onClick(View v) {
 				doSearch();
 			}
@@ -46,6 +47,7 @@ public class WidgetSearchActivity extends FamiliarActivity {
 		registerForContextMenu(resultList);
 
 		resultList.setOnItemClickListener(new OnItemClickListener() {
+			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Intent i = new Intent(mCtx, CardViewActivity.class);
 				i.putExtra("id", id);
@@ -57,16 +59,19 @@ public class WidgetSearchActivity extends FamiliarActivity {
 
 		namefield.addTextChangedListener(new TextWatcher() {
 
+			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				if (s.length() > 0) {
 					new AutocompleteQueryTask().execute(s.toString());
 				}
 			}
 
+			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
 			}
 
+			@Override
 			public void afterTextChanged(Editable s) {
 
 			}

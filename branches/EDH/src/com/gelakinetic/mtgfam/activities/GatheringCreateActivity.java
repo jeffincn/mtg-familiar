@@ -23,7 +23,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,6 +42,8 @@ public class GatheringCreateActivity extends FamiliarActivity {
 	private static final int								DIALOG_SET_NAME				= 0;
 	private static final int								DIALOG_GATHERING_EXIST		= 1;
 	private static final String								NO_GATHERINGS_EXIST			= "No Gatherings exist.";
+	private static final String								TOAST_NO_NAME				= "Please include a name for the Gathering.";
+															
 
 	private String							proposedGathering;
 
@@ -59,6 +60,9 @@ public class GatheringCreateActivity extends FamiliarActivity {
 
 		mCtx = this;
 		gIO = new GatheringsIO(mCtx);
+		
+		AddPlayerRowFromData(new GatheringsPlayerData("Player 1", 20));
+		AddPlayerRowFromData(new GatheringsPlayerData("Player 2", 20));
 	}
 
 	@Override
@@ -69,39 +73,11 @@ public class GatheringCreateActivity extends FamiliarActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
-		ArrayList<GatheringsPlayerData> defaultG = gIO.getDefaultGathering();
-
-		for (GatheringsPlayerData player : defaultG) {
-			AddPlayerRowFromData(player);
-		}
-
 	}
 	
 	@Override
 	protected void onPause() {
 		super.onPause();
-		
-		int playersCount = mainLayout.getChildCount();
-		ArrayList<GatheringsPlayerData> players = new ArrayList<GatheringsPlayerData>(playersCount);
-		
-		for (int idx = 0; idx < playersCount; idx++) {
-            View player = mainLayout.getChildAt(idx);
-            
-            EditText customName = (EditText) player.findViewById(R.id.custom_name);
-            String name = customName.getText().toString().trim();
-            
-            EditText startingLife = (EditText) player.findViewById(R.id.starting_life);
-            int life = Integer.parseInt(startingLife.getText().toString());
-            
-            players.add(new GatheringsPlayerData(name, life));
-		}
-		
-		gIO.writeDefaultGatheringXML(players);
-		
-		Editor editor = preferences.edit();
-        editor.putString("player_data", null);
-        editor.commit();
 	}
 	
 	@Override
@@ -112,10 +88,17 @@ public class GatheringCreateActivity extends FamiliarActivity {
 				LayoutInflater factory = LayoutInflater.from(this);
 				final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
 				final EditText nameInput = (EditText) textEntryView.findViewById(R.id.player_name);
+				nameInput.setText(proposedGathering);
 				dialog = new AlertDialog.Builder(this).setTitle("Enter Gathering's Name").setView(textEntryView)
 						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+							@Override
 							public void onClick(DialogInterface dialog, int whichButton) {
 								String gatheringName = nameInput.getText().toString().trim();
+								if (gatheringName.length() <= 0){
+									Toast.makeText(mCtx, TOAST_NO_NAME, Toast.LENGTH_LONG).show();
+									return;
+								}
+								
 								
 								ArrayList<String> existingGatheringsFiles = gIO.getGatheringFileList();
 								
@@ -137,6 +120,7 @@ public class GatheringCreateActivity extends FamiliarActivity {
 								}
 							}
 						}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+							@Override
 							public void onClick(DialogInterface dialog, int whichButton) {
 							}
 						}).create();
@@ -149,11 +133,13 @@ public class GatheringCreateActivity extends FamiliarActivity {
 				text.setText("This Gathering already exists, overwrite existing file?");
 				dialog = new AlertDialog.Builder(this).setTitle("Overwrite Existing Gathering?").setView(textEntryView2)
 						.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+							@Override
 							public void onClick(DialogInterface dialog, int whichButton) {
 								gIO.DeleteGatheringByName(proposedGathering);
 								SaveGathering(proposedGathering);
 							}
 						}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+							@Override
 							public void onClick(DialogInterface dialog, int whichButton) {
 							}
 						}).create();
@@ -166,6 +152,11 @@ public class GatheringCreateActivity extends FamiliarActivity {
 	}
 
 	private void SaveGathering(String _gatheringName){
+		if (_gatheringName.length() <= 0){
+			Toast.makeText(mCtx, TOAST_NO_NAME, Toast.LENGTH_LONG).show();
+			return;
+		}
+		
 		int playersCount = mainLayout.getChildCount();
 		ArrayList<GatheringsPlayerData> players = new ArrayList<GatheringsPlayerData>(playersCount);
 		
@@ -221,6 +212,7 @@ public class GatheringCreateActivity extends FamiliarActivity {
 				AlertDialog.Builder dbuilder = new AlertDialog.Builder(mCtx);
 				dbuilder.setTitle("Delete a Gathering");
 				dbuilder.setItems(dProperNames, new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialogInterface, int item) {
 						gIO.DeleteGathering(dfGatherings[item]);
 						return;
@@ -228,8 +220,26 @@ public class GatheringCreateActivity extends FamiliarActivity {
 				});
 				dbuilder.create().show();
 				return true;
-			case R.id.gremove_player:			
-				mainLayout.removeViewAt(mainLayout.getChildCount() - 1);
+			case R.id.gremove_player:
+				ArrayList<String> names = new ArrayList<String>();
+				for (int idx = 0; idx < mainLayout.getChildCount(); idx++){
+		            View player = mainLayout.getChildAt(idx);
+		            
+		            EditText customName = (EditText) player.findViewById(R.id.custom_name);
+		            names.add(customName.getText().toString().trim());
+				}
+				final String[] aNames = names.toArray(new String[names.size()]);
+				
+				AlertDialog.Builder builderRemove = new AlertDialog.Builder(mCtx);
+				builderRemove.setTitle("Load a Gathering");
+				builderRemove.setItems(aNames, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialogInterface, int item) {
+						mainLayout.removeViewAt(item);
+						return;
+					}
+				});
+				builderRemove.create().show();
 				return true;
 			case R.id.gadd_player:
 				int playersCount = mainLayout.getChildCount();
@@ -251,6 +261,7 @@ public class GatheringCreateActivity extends FamiliarActivity {
 				AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
 				builder.setTitle("Load a Gathering");
 				builder.setItems(properNames, new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialogInterface, int item) {
 						RemoveAllPlayerRows();
 
@@ -266,10 +277,6 @@ public class GatheringCreateActivity extends FamiliarActivity {
 			case R.id.gsave_gathering:
 				
 				showDialog(DIALOG_SET_NAME);
-				
-				Editor editor = preferences.edit();
-				editor.putString("player_data", null);
-				editor.commit();
 				
 //				Intent i = new Intent(this, NPlayerLifeActivity.class);
 //				finish();

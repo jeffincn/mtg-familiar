@@ -136,6 +136,7 @@ public class SearchActivity extends FamiliarActivity {
 		// So pressing enter does the search
 		namefield.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
 		namefield.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
 			public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
 				if (arg1 == EditorInfo.IME_ACTION_SEARCH) {
 					searchbutton.performClick();
@@ -146,6 +147,7 @@ public class SearchActivity extends FamiliarActivity {
 		});
 
 		textfield.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
 			public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
 				if (arg1 == EditorInfo.IME_ACTION_SEARCH) {
 					searchbutton.performClick();
@@ -156,6 +158,7 @@ public class SearchActivity extends FamiliarActivity {
 		});
 
 		supertypefield.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
 			public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
 				if (arg1 == EditorInfo.IME_ACTION_SEARCH) {
 					searchbutton.performClick();
@@ -171,6 +174,7 @@ public class SearchActivity extends FamiliarActivity {
 		supertypefield.setAdapter(supertypeadapter);
 
 		subtypefield.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
 			public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
 				if (arg1 == EditorInfo.IME_ACTION_SEARCH) {
 					searchbutton.performClick();
@@ -181,6 +185,7 @@ public class SearchActivity extends FamiliarActivity {
 		});
 
 		flavorfield.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
 			public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
 				if (arg1 == EditorInfo.IME_ACTION_SEARCH) {
 					searchbutton.performClick();
@@ -191,6 +196,7 @@ public class SearchActivity extends FamiliarActivity {
 		});
 
 		artistfield.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
 			public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
 				if (arg1 == EditorInfo.IME_ACTION_SEARCH) {
 					searchbutton.performClick();
@@ -290,24 +296,28 @@ public class SearchActivity extends FamiliarActivity {
 		setspinner.setSelection(consolidate?CardDbAdapter.MOSTRECENTPRINTING:CardDbAdapter.ALLPRINTINGS);
 
 		setButton.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				showDialog(SETLIST);
 			}
 		});
 
 		formatButton.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				showDialog(FORMATLIST);
 			}
 		});
 
 		rarityButton.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				showDialog(RARITYLIST);
 			}
 		});
 
 		searchbutton.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				doSearch(false);
 			}
@@ -361,6 +371,7 @@ public class SearchActivity extends FamiliarActivity {
 				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
 		formatDialog = new AlertDialog.Builder(this).setTitle("Formats")
 				.setSingleChoiceItems(formatNames, selectedFormat, new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						selectedFormat = which;
 					}
@@ -370,6 +381,7 @@ public class SearchActivity extends FamiliarActivity {
 				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
 
 		setDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
 			public void onDismiss(DialogInterface arg0) {
 				setButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
 				for (int i = 0; i < setChecked.length; i++) {
@@ -381,6 +393,7 @@ public class SearchActivity extends FamiliarActivity {
 		});
 
 		formatDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
 			public void onDismiss(DialogInterface arg0) {
 				formatButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
 				if (selectedFormat != -1) {
@@ -390,6 +403,7 @@ public class SearchActivity extends FamiliarActivity {
 		});
 
 		rarityDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
 			public void onDismiss(DialogInterface arg0) {
 				rarityButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
 				for (int i = 0; i < rarityChecked.length; i++) {
@@ -606,6 +620,7 @@ public class SearchActivity extends FamiliarActivity {
 
 			AlertDialog dialog = new AlertDialog.Builder(this).setTitle(R.string.error)
 					.setView(dialogLayout).setPositiveButton(R.string.dialog_ok, new OnClickListener() {
+						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							finish();
 						}
@@ -616,6 +631,7 @@ public class SearchActivity extends FamiliarActivity {
 	}
 
 	public class DialogSelectionClickHandler implements DialogInterface.OnMultiChoiceClickListener {
+		@Override
 		public void onClick(DialogInterface dialog, int clicked, boolean selected) {
 
 			// called when something checked;
@@ -623,6 +639,7 @@ public class SearchActivity extends FamiliarActivity {
 	}
 
 	public class DialogButtonClickHandler implements DialogInterface.OnClickListener {
+		@Override
 		public void onClick(DialogInterface dialog, int clicked) {
 			switch (clicked) {
 				case DialogInterface.BUTTON_POSITIVE:
@@ -689,6 +706,7 @@ public class SearchActivity extends FamiliarActivity {
 				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
 		formatDialog = new AlertDialog.Builder(this).setTitle("Formats")
 				.setSingleChoiceItems(formatNames, selectedFormat, new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						selectedFormat = which;
 					}
@@ -698,6 +716,7 @@ public class SearchActivity extends FamiliarActivity {
 				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
 
 		setDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
 			public void onDismiss(DialogInterface arg0) {
 				setButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
 				for (int i = 0; i < setChecked.length; i++) {
@@ -709,6 +728,7 @@ public class SearchActivity extends FamiliarActivity {
 		});
 
 		formatDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
 			public void onDismiss(DialogInterface arg0) {
 				formatButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
 				if (selectedFormat != -1) {
@@ -718,6 +738,7 @@ public class SearchActivity extends FamiliarActivity {
 		});
 
 		rarityDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
 			public void onDismiss(DialogInterface arg0) {
 				rarityButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
 				for (int i = 0; i < rarityChecked.length; i++) {

@@ -25,7 +25,9 @@ import android.util.Xml;
 
 public class GatheringsIO {
 	final private static String	FOLDERPATH	= "Gatherings";
-	final private static String	DEFAULTFILE	= "default";
+	final private static String	DEFAULTFILE	= "KENNESSAS";
+								//If someone happens to also name their file this without ever reading 
+								//this comment I'll donate my latest mythic rare to them. (Not really.)
 	Context											ctx;
 
 	public GatheringsIO(Context _ctx) {
@@ -223,10 +225,10 @@ public class GatheringsIO {
 
 				Element name = (Element) el.getElementsByTagName("name").item(0);
 				String customName = "";
-				customName = (String) name.getChildNodes().item(0).getNodeValue();
+				customName = name.getChildNodes().item(0).getNodeValue();
 
 				Element life = (Element) el.getElementsByTagName("startinglife").item(0);
-				String sLife = (String) life.getChildNodes().item(0).getNodeValue();
+				String sLife = life.getChildNodes().item(0).getNodeValue();
 				int startingLife = Integer.parseInt(sLife);
 
 				GatheringsPlayerData player = new GatheringsPlayerData();
@@ -280,6 +282,10 @@ public class GatheringsIO {
 		// int numOfPlayers = Integer.parseInt(playerList.getAttribute("number"));
 
 		Element name = (Element) docEle.getElementsByTagName("name").item(0);
+		
+		if (name.getChildNodes().item(0) == null){
+			return "";
+		}
 		String gatheringName = name.getChildNodes().item(0).getNodeValue();
 
 		return gatheringName;

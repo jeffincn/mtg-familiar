@@ -26,16 +26,23 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.gelakinetic.mtgfam.activities.FamiliarActivity.OTATask;
+import com.gelakinetic.mtgfam.R;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 
 public class JsonParser {
 
-	public static void readCardJsonStream(InputStream in, OTATask task, String setName, CardDbAdapter mDbHelper)
+    public interface CardProgressReporter {
+        void reportJsonCardProgress(String... args);
+    }
+
+	public static void readCardJsonStream(InputStream in, CardProgressReporter progReport, String setName, CardDbAdapter mDbHelper, Context context)
 			throws IOException {
+		String dialogText = String.format(context.getString(R.string.update_parse_cards), setName);
+		
 		JsonReader reader = new JsonReader(new InputStreamReader(in, "ISO-8859-1"));
 		String s, s1, s2, ptstr;
 
@@ -45,6 +52,7 @@ public class JsonParser {
 		reader.beginObject();
 		s = reader.nextName();
 
+		progReport.reportJsonCardProgress("determinate", "");
 		reader.beginObject();
 		while (reader.hasNext()) {
 
@@ -266,7 +274,7 @@ public class JsonParser {
 							mDbHelper.createCard(c);
 							// mMain.cardAdded();
 							elementsParsed++;
-							task.publicPublishProgress(new String[] { "Parsing " + setName, "Parsing " + setName,
+							progReport.reportJsonCardProgress(new String[] { dialogText, dialogText,
 									"" + (int) Math.round(100 * elementsParsed / (double) numTotalElements) });
 							reader.endObject();
 						}
@@ -281,7 +289,7 @@ public class JsonParser {
 			}
 		}
 		reader.endObject();
-		task.publicPublishProgress(new String[] { "Done Parsing " + setName, "Done Parsing " + setName, "0" });
+		//task.publicPublishProgress(new String[] { "Done Parsing " + setName, "Done Parsing " + setName, "0" });
 		reader.close();
 		return;
 	}

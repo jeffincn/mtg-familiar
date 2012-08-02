@@ -230,14 +230,17 @@ public class ResultListAdapter extends SimpleCursorAdapter implements SectionInd
 		}
 	}
 
+	@Override
 	public int getPositionForSection(int section) {
 		return alphaIndexer.getPositionForSection(section); // use the indexer
 	}
 
+	@Override
 	public int getSectionForPosition(int position) {
 		return alphaIndexer.getSectionForPosition(position); // use the indexer
 	}
 
+	@Override
 	public Object[] getSections() {
 		return alphaIndexer.getSections(); // use the indexer
 	}

@@ -75,6 +75,7 @@ public class DiceActivity extends FamiliarActivity {
 			}
 			if (d2AsCoin) {
 				d2.setOnClickListener(new View.OnClickListener() {
+					@Override
 					public void onClick(View view) {
 						anchor.flipCoin();
 					}
@@ -82,6 +83,7 @@ public class DiceActivity extends FamiliarActivity {
 			}
 			else {
 				d2.setOnClickListener(new View.OnClickListener() {
+					@Override
 					public void onClick(View view) {
 						anchor.rollDie(2);
 					}
@@ -90,6 +92,7 @@ public class DiceActivity extends FamiliarActivity {
 		}
 		if (d4 != null) {
 			d4.setOnClickListener(new View.OnClickListener() {
+				@Override
 				public void onClick(View view) {
 					anchor.rollDie(4);
 				}
@@ -97,6 +100,7 @@ public class DiceActivity extends FamiliarActivity {
 		}
 		if (d6 != null) {
 			d6.setOnClickListener(new View.OnClickListener() {
+				@Override
 				public void onClick(View view) {
 					anchor.rollDie(6);
 				}
@@ -104,6 +108,7 @@ public class DiceActivity extends FamiliarActivity {
 		}
 		if (d8 != null) {
 			d8.setOnClickListener(new View.OnClickListener() {
+				@Override
 				public void onClick(View view) {
 					anchor.rollDie(8);
 				}
@@ -111,6 +116,7 @@ public class DiceActivity extends FamiliarActivity {
 		}
 		if (d10 != null) {
 			d10.setOnClickListener(new View.OnClickListener() {
+				@Override
 				public void onClick(View view) {
 					anchor.rollDie(10);
 				}
@@ -118,6 +124,7 @@ public class DiceActivity extends FamiliarActivity {
 		}
 		if (d12 != null) {
 			d12.setOnClickListener(new View.OnClickListener() {
+				@Override
 				public void onClick(View view) {
 					anchor.rollDie(12);
 				}
@@ -125,6 +132,7 @@ public class DiceActivity extends FamiliarActivity {
 		}
 		if (d20 != null) {
 			d20.setOnClickListener(new View.OnClickListener() {
+				@Override
 				public void onClick(View view) {
 					anchor.rollDie(20);
 				}
@@ -132,6 +140,7 @@ public class DiceActivity extends FamiliarActivity {
 		}
 		if (d100 != null) {
 			d100.setOnClickListener(new View.OnClickListener() {
+				@Override
 				public void onClick(View view) {
 					anchor.rollDie(100);
 				}
@@ -144,8 +153,10 @@ public class DiceActivity extends FamiliarActivity {
 		if (dieOutput != null) {
 			dieOutput.setText("");
 			scheduler.schedule(new Runnable() {
+				@Override
 				public void run() {
 					handler.post(new Runnable() {
+						@Override
 						public void run() {
 							dieOutput.setText("" + (r.nextInt(f_d) + 1));
 						}
@@ -164,8 +175,10 @@ public class DiceActivity extends FamiliarActivity {
 			}
 			final String f_output = output;
 			scheduler.schedule(new Runnable() {
+				@Override
 				public void run() {
 					handler.post(new Runnable() {
+						@Override
 						public void run() {
 							dieOutput.setText(f_output);
 						}

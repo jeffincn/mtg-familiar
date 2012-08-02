@@ -75,16 +75,19 @@ public class RandomCardActivity extends FamiliarActivity {
 		jhoiraImage = (ImageView) findViewById(R.id.imageViewJho);
 
 		momirImage.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				showDialog(MOMIR_IMAGE);
 			}
 		});
 		stonehewerImage.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				showDialog(STONEHEWER_IMAGE);
 			}
 		});
 		jhoiraImage.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				showDialog(JHOIRA_IMAGE);
 			}
@@ -97,6 +100,7 @@ public class RandomCardActivity extends FamiliarActivity {
 
 		momirButton.setOnClickListener(new View.OnClickListener() {
 
+			@Override
 			public void onClick(View v) {
 				int cmc;
 				try {
@@ -131,6 +135,7 @@ public class RandomCardActivity extends FamiliarActivity {
 
 		stonehewerButton.setOnClickListener(new View.OnClickListener() {
 
+			@Override
 			public void onClick(View v) {
 				int cmc;
 				try {
@@ -165,6 +170,7 @@ public class RandomCardActivity extends FamiliarActivity {
 
 		jhoiraInstantButton.setOnClickListener(new View.OnClickListener() {
 
+			@Override
 			public void onClick(View v) {
 
 				String[] returnTypes = new String[] { CardDbAdapter.KEY_NAME };
@@ -206,6 +212,7 @@ public class RandomCardActivity extends FamiliarActivity {
 
 		jhoiraSorceryButton.setOnClickListener(new View.OnClickListener() {
 
+			@Override
 			public void onClick(View v) {
 
 				String[] returnTypes = new String[] { CardDbAdapter.KEY_NAME };
@@ -278,6 +285,7 @@ public class RandomCardActivity extends FamiliarActivity {
 		if (id == RULESDIALOG) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setNeutralButton(R.string.dialog_play, new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.cancel();
 				}
@@ -321,6 +329,7 @@ public class RandomCardActivity extends FamiliarActivity {
 
 			d = new AlertDialog.Builder(this).setTitle(R.string.error).setView(dialogLayout)
 					.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
+						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							finish();
 						}

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/edh_player_row"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@xml/textview_backdrop"
+    android:orientation="horizontal"
+    android:weightSum="1" >
+
+    <TextView
+        android:id="@+id/edh_player_row_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight=".3"
+        android:text="@string/name_search_hint" />
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="fill_parent"
+        android:background="#4fa5d5" />
+
+    <TextView
+        android:id="@+id/edh_player_row_life"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight=".7"
+        android:gravity="center"
+        android:text="@string/life_counter_twenty" />
+
+</LinearLayout>

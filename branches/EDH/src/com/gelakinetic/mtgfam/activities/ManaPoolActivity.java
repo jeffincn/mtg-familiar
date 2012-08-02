@@ -97,6 +97,7 @@ public class ManaPoolActivity extends FamiliarActivity {
 		}
 
 		whiteMinus.setOnClickListener(new Button.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				white--;
 				if (white < 0) {
@@ -106,6 +107,7 @@ public class ManaPoolActivity extends FamiliarActivity {
 			}
 		});
 		blueMinus.setOnClickListener(new Button.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				blue--;
 				if (blue < 0) {
@@ -115,6 +117,7 @@ public class ManaPoolActivity extends FamiliarActivity {
 			}
 		});
 		blackMinus.setOnClickListener(new Button.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				black--;
 				if (black < 0) {
@@ -124,6 +127,7 @@ public class ManaPoolActivity extends FamiliarActivity {
 			}
 		});
 		redMinus.setOnClickListener(new Button.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				red--;
 				if (red < 0) {
@@ -133,6 +137,7 @@ public class ManaPoolActivity extends FamiliarActivity {
 			}
 		});
 		greenMinus.setOnClickListener(new Button.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				green--;
 				if (green < 0) {
@@ -142,6 +147,7 @@ public class ManaPoolActivity extends FamiliarActivity {
 			}
 		});
 		colorlessMinus.setOnClickListener(new Button.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				colorless--;
 				if (colorless < 0) {
@@ -151,6 +157,7 @@ public class ManaPoolActivity extends FamiliarActivity {
 			}
 		});
 		spellMinus.setOnClickListener(new Button.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				spell--;
 				if (spell < 0) {
@@ -160,6 +167,7 @@ public class ManaPoolActivity extends FamiliarActivity {
 			}
 		});
 		whiteMinus.setOnLongClickListener(new Button.OnLongClickListener() {
+			@Override
 			public boolean onLongClick(View view) {
 				white = 0;
 				update();
@@ -167,6 +175,7 @@ public class ManaPoolActivity extends FamiliarActivity {
 			}
 		});
 		blueMinus.setOnLongClickListener(new Button.OnLongClickListener() {
+			@Override
 			public boolean onLongClick(View view) {
 				blue = 0;
 				update();
@@ -174,6 +183,7 @@ public class ManaPoolActivity extends FamiliarActivity {
 			}
 		});
 		blackMinus.setOnLongClickListener(new Button.OnLongClickListener() {
+			@Override
 			public boolean onLongClick(View view) {
 				black = 0;
 				update();
@@ -181,6 +191,7 @@ public class ManaPoolActivity extends FamiliarActivity {
 			}
 		});
 		redMinus.setOnLongClickListener(new Button.OnLongClickListener() {
+			@Override
 			public boolean onLongClick(View view) {
 				red = 0;
 				update();
@@ -188,6 +199,7 @@ public class ManaPoolActivity extends FamiliarActivity {
 			}
 		});
 		greenMinus.setOnLongClickListener(new Button.OnLongClickListener() {
+			@Override
 			public boolean onLongClick(View view) {
 				green = 0;
 				update();
@@ -195,6 +207,7 @@ public class ManaPoolActivity extends FamiliarActivity {
 			}
 		});
 		colorlessMinus.setOnLongClickListener(new Button.OnLongClickListener() {
+			@Override
 			public boolean onLongClick(View view) {
 				colorless = 0;
 				update();
@@ -202,6 +215,7 @@ public class ManaPoolActivity extends FamiliarActivity {
 			}
 		});
 		spellMinus.setOnLongClickListener(new Button.OnLongClickListener() {
+			@Override
 			public boolean onLongClick(View view) {
 				spell = 0;
 				update();
@@ -210,42 +224,49 @@ public class ManaPoolActivity extends FamiliarActivity {
 		});
 
 		whitePlus.setOnClickListener(new Button.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				white++;
 				update();
 			}
 		});
 		bluePlus.setOnClickListener(new Button.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				blue++;
 				update();
 			}
 		});
 		blackPlus.setOnClickListener(new Button.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				black++;
 				update();
 			}
 		});
 		redPlus.setOnClickListener(new Button.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				red++;
 				update();
 			}
 		});
 		greenPlus.setOnClickListener(new Button.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				green++;
 				update();
 			}
 		});
 		colorlessPlus.setOnClickListener(new Button.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				colorless++;
 				update();
 			}
 		});
 		spellPlus.setOnClickListener(new Button.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				spell++;
 				update();

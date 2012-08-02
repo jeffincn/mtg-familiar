@@ -172,6 +172,7 @@ public class RulesActivity extends FamiliarActivity {
 						// This only happens for rule items with no subcategory, so the cast
 						// should be safe
 						list.setOnItemClickListener(new OnItemClickListener() {
+							@Override
 							public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 								DisplayItem item = rules.get(position);
 								Intent i = new Intent(RulesActivity.this, RulesActivity.class);
@@ -256,6 +257,7 @@ public class RulesActivity extends FamiliarActivity {
 			final EditText input = (EditText) v.findViewById(R.id.keyword_search_field);
 			builder.setView(v);
 			builder.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
+				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					String keyword = input.getText().toString().trim();
 					if (keyword.length() < 3) {
@@ -272,6 +274,7 @@ public class RulesActivity extends FamiliarActivity {
 				}
 			});
 			builder.setNegativeButton(R.string.dialog_cancel, new OnClickListener() {
+				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					// Do nothing
 				}
@@ -286,6 +289,7 @@ public class RulesActivity extends FamiliarActivity {
 
 			result = new AlertDialog.Builder(this).setTitle(R.string.error).setView(dialogLayout)
 					.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
+						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							finish();
 						}
@@ -408,10 +412,12 @@ public class RulesActivity extends FamiliarActivity {
 			return this.subcategory;
 		}
 
+		@Override
 		public String getText() {
 			return this.rulesText;
 		}
 
+		@Override
 		public String getHeader() {
 			if (this.subcategory == -1) {
 				return String.valueOf(this.category) + ".";
@@ -424,6 +430,7 @@ public class RulesActivity extends FamiliarActivity {
 			}
 		}
 
+		@Override
 		public boolean isClickable() {
 			return this.entry == null || this.entry.length() == 0;
 		}
@@ -446,14 +453,17 @@ public class RulesActivity extends FamiliarActivity {
 			this.clickable = clickable;
 		}
 
+		@Override
 		public String getText() {
 			return this.definition;
 		}
 
+		@Override
 		public String getHeader() {
 			return this.term;
 		}
 
+		@Override
 		public boolean isClickable() {
 			return this.clickable;
 		}
@@ -533,6 +543,7 @@ public class RulesActivity extends FamiliarActivity {
 			return v;
 		}
 
+		@Override
 		public int getPositionForSection(int section) {
 			if (this.alphaIndex == null) {
 				return 0;
@@ -542,6 +553,7 @@ public class RulesActivity extends FamiliarActivity {
 			}
 		}
 
+		@Override
 		public int getSectionForPosition(int position) {
 			if (this.alphaIndex == null) {
 				return 0;
@@ -551,6 +563,7 @@ public class RulesActivity extends FamiliarActivity {
 			}
 		}
 
+		@Override
 		public Object[] getSections() {
 			if (this.alphaIndex == null) {
 				return null;

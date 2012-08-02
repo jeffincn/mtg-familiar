@@ -14,6 +14,7 @@ import com.gelakinetic.mtgfam.activities.WidgetSearchActivity;
 
 public class MTGFamiliarAppWidgetProvider extends AppWidgetProvider {
 
+	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 		final int N = appWidgetIds.length;
 

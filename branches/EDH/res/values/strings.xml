@@ -23,6 +23,17 @@
     <string name="dialog_life">Life</string>
     <string name="dialog_thanks">Thanks Anyway!</string>
     <string name="dialog_play">Let\'s Play!</string>
+    <string name="update_notification">Checking for database updates</string>
+    <string name="update_updating_set">Adding %s…</string>
+    <string name="update_updating_rules">Updating comprehensive rules…</string>
+    <string name="update_added">Added</string>
+    <string name="update_added_rules">new comprehensive rules</string>
+    <string name="update_updates">Checking for updates…</string>
+    <string name="update_legality">Checking legality…</string>
+    <string name="update_cards">Checking for new cards…</string>
+    <string name="update_parse_cards">Parsing %s</string>
+    <string name="update_rules">Checking for new comprehensive rules…</string>
+    <string name="update_parse_rules">Parsing comprehensive rules</string>
     <string name="error">Error</string>
     <string name="error_database">A database error occurred. If it persists, try clearing the app data from the Android settings menu.</string>
     <string name="error_corruption">Whoops! It looks like an important part of this app has been corrupted and doesn\'t work anymore.
@@ -33,6 +44,7 @@
     <string name="error_broken_image">Congratulations, you found a NullPointerException! This should never happen, and we\'re not sure how, or why,
 		you found it. Please send us an email at &lt;a href="mailto:mtg.familiar@gmail.com">mtg.familiar@gmail.com&lt;/a> so we can track this bug
 		and fix it. Thanks!</string>
+	<string name="error_rules_parsing">Errors occurred while parsing the comprehensive rules. To try again, please perform a force update.</string>
     
     
     <!-- Placeholder text -->
@@ -126,7 +138,7 @@
     <string name="card_view_change_set">Change Set</string>
     <string name="card_view_legality">Legality</string>
     <string name="card_view_rulings">Card Rulings</string>
-    <string name="card_view_addtowishlist">Add to Wishlist</string>
+    <string name="card_view_wishlist">Wishlist</string>
     <string name="card_view_exit">Exit Results</string>
     <string name="card_view_price_dialog_title">TCGPlayer.com Prices</string>
     <string name="card_view_price_dialog_low">Low:</string>
@@ -143,7 +155,8 @@
     <string name="life_counter_minus_one">-1</string>
     <string name="life_counter_minus_five">-5</string>
     <string name="life_counter_announce_life">Announce Life Totals</string>
-    <string name="life_counter_change_default_gathering">Change Default Gathering</string>
+    <string name="life_counter_change_default_gathering">Edit Gatherings</string>
+    <string name="life_counter_set_gathering">Set Current Gathering</string>
     <string name="life_counter_remove_player">Remove a Player</string>
     <string name="life_counter_add_player">Add a Player</string>
     <string name="life_counter_clear_dialog_text">Clear life totals or players?\nMana pool will also be cleared.</string>
@@ -236,6 +249,12 @@
     
     
     <!-- Preferences -->
+    <string name="pref_screen_general">General Settings</string>
+    <string name="pref_screen_search">Search &amp; Results</string>
+    <string name="pref_screen_counter">Life Counter</string>
+    <string name="pref_screen_timer">Round Timer</string>
+    <string name="pref_screen_trade_wishlist">Trade &amp; Wishlist</string>
+    
     <string name="pref_cat_updates">Database Updates</string>
     <string name="pref_auto_updates_title">Automatic Updates</string>
     <string name="pref_auto_updates_summary">Check for new sets and bannings when the app opens</string>
@@ -290,7 +309,7 @@
     <string name="pref_wishlist_totals_summary">Display total price summary in the wishlist</string>
     
     
-    <!-- Deprecated -->
+    <!-- Debug -->
     <string name="main_refresh_db">Refresh DB from APK</string>
     <string name="main_build_db">Build DB from Web</string>
     

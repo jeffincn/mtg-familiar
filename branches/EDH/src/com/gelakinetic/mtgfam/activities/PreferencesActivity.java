@@ -30,6 +30,7 @@ import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.gelakinetic.mtgfam.R;
 
 public class PreferencesActivity extends SherlockPreferenceActivity {
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.preferences);
@@ -39,6 +40,7 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
 	 * Always add a virtual search key to the menu on the actionbar
 	 * super.onCreateOptionsMenu should always be called from FamiliarActivities
 	 */
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(R.string.name_search_hint).setIcon(R.drawable.menu_search)
 				.setOnMenuItemClickListener(new OnMenuItemClickListener() {

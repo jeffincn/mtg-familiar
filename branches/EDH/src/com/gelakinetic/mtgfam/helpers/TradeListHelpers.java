@@ -50,10 +50,10 @@ public class TradeListHelpers {
 			data = _data;
 			toNotify = _toNotify;
 			if(wa != null){
-				mCtx = (Context)wa;
+				mCtx = wa;
 			}
 			if(cta != null){
-				mCtx = (Context)cta;
+				mCtx = cta;
 			}
 			priceSetting = ps;
 			this.cta = cta;
@@ -80,7 +80,10 @@ public class TradeListHelpers {
 				tcgName = data.tcgName;
 				if (cardNumber == null || setCode.equals("") || tcgName.equals("")) {
 					Cursor card;
-					card = mDbHelper.fetchCardByName(data.name);
+					if(setCode.equals(""))
+						card = mDbHelper.fetchCardByName(data.name);
+					else
+						card = mDbHelper.fetchCardByNameAndSet(data.name, setCode);
 					if (card.moveToFirst()) {
 						cardName = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NAME));
 //						if (data.setCode.equals("")) {
@@ -277,6 +280,7 @@ public class TradeListHelpers {
 
 		public static final String	delimiter	= "%";
 
+		@Override
 		public String toString() {
 			return this.name + delimiter + this.setCode + delimiter + this.numberOf + '\n';
 		}

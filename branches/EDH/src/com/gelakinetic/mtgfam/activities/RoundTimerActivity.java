@@ -61,6 +61,7 @@ public class RoundTimerActivity extends FamiliarActivity {
 
 	private Handler timerHandler = new Handler();
 	private Runnable updateTimeViewTask = new Runnable() {
+		@Override
 		public void run() {
 			displayTimeLeft();
 
@@ -128,6 +129,7 @@ public class RoundTimerActivity extends FamiliarActivity {
 
 		this.actionButton = (Button) findViewById(R.id.rt_action_button);
 		actionButton.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				startCancelClick(v);
 			}
@@ -212,6 +214,7 @@ public class RoundTimerActivity extends FamiliarActivity {
 
 			dialog = new AlertDialog.Builder(this).setView(v).setTitle(R.string.timer_warning_dialog_title)
 					.setPositiveButton("OK", new OnClickListener() {
+						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(RoundTimerActivity.this)
 									.edit();

@@ -11,22 +11,48 @@
 	along with MTG Familiar. If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
-    <ListView
-        android:id="@+id/setList"
+    <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        tools:listitem="@layout/card_setwishlist_row" />
+        android:layout_above="@+id/buttonsLayout"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true" >
 
-    <Button
-        android:id="@+id/done"
-        android:layout_width="fill_parent"
+        <LinearLayout
+	        android:id="@+id/setList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+        </LinearLayout>
+
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/buttonsLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/dialog_done" />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true" >
 
-</LinearLayout>
+        <Button
+            android:id="@+id/done"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/dialog_done" />
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/dialog_cancel" />
+    </LinearLayout>
+
+</RelativeLayout>

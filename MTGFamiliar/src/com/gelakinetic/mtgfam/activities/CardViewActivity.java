@@ -49,8 +49,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
-import android.content.DialogInterface.OnDismissListener;
-import android.content.res.Resources;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -58,24 +56,16 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.Html;
 import android.text.Html.ImageGetter;
-import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -91,8 +81,6 @@ import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 import com.gelakinetic.mtgfam.helpers.MyApp;
 import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler;
-import com.gelakinetic.mtgfam.helpers.TradeListHelpers;
-import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
 import com.gelakinetic.mtgfam.helpers.WishlistHelpers;
 
 public class CardViewActivity extends FamiliarActivity {
@@ -135,8 +123,6 @@ public class CardViewActivity extends FamiliarActivity {
 	private Button rightRandom;
 	private ImageView cardpic;
 	private ImageView DialogImageView;
-	private ListView lvSets;
-	private SetListAdapter aaSetList;
 
 	// Stuff for AsyncTasks
 	private BitmapDrawable cardPicture;
@@ -144,8 +130,6 @@ public class CardViewActivity extends FamiliarActivity {
 	private String[] formats;
 	private TCGPlayerXMLHandler XMLhandler;
 	public ArrayList<Ruling> rulingsArrayList;
-	private ArrayList<CardData> lWishlist;
-	private ArrayList<CardData> lCardlist;
 	private ProgressDialog progDialog;
 	AsyncTask<String, Integer, Long> asyncTask;
 
@@ -846,58 +830,6 @@ public class CardViewActivity extends FamiliarActivity {
 		}
 	}
 
-	private class WishlistTask extends AsyncTask<String, Integer, Long> {
-
-		@Override
-		protected Long doInBackground(String... params) {
-			lCardlist = new ArrayList<CardData>();
-			lWishlist = new ArrayList<CardData>();
-			Cursor c = mDbHelper.fetchCardByName(cardName);
-			ArrayList<String> setCodes = new ArrayList<String>();
-			
-			//make a place holder item for each version set of this card
-			while (!c.isAfterLast()) {
-				String setCode=c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET));
-				String tcgName=mDbHelper.getTCGname(setCode);
-				setCodes.add(setCode);
-
-				lCardlist.add(new TradeListHelpers().new CardData(cardName, tcgName, setCode, 0,
-						0, "loading", null, null, null, null, null, null,
-						CardDbAdapter.NOONECARES, '-'));
-				c.moveToNext();
-			}
-			c.deactivate();
-			c.close();
-
-			WishlistHelpers.ReadWishlist(getApplicationContext(), null, mDbHelper, lWishlist, null);
-			//split this card from the rest of the wish list
-			//clone to prevent iteration exception
-			//overwrite the place holder if it's on the wish list
-			for(CardData card: (ArrayList<CardData>)lWishlist.clone()){
-				if(card.name.equals(cardName)){
-					lWishlist.remove(card);
-					lCardlist.set(setCodes.indexOf(card.setCode),card);
-				}
-			}
-
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Long result) {
-			try {
-				progDialog.dismiss();
-			} catch (IllegalArgumentException e) {
-			}
-			showDialog(WISHLIST_COUNTS);
-		}
-
-		@Override
-		protected void onCancelled() {
-		}
-
-	}
-
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		Dialog dialog;
@@ -1048,50 +980,11 @@ public class CardViewActivity extends FamiliarActivity {
 									+ multiverseId + ">Gatherer Page</a>"));
 
 			return dialog;
-		} else if (id == WISHLIST_COUNTS) {
-			if (lCardlist == null || lCardlist.size() == 0) {
-				return null;
 			}
-			try {
-
-				dialog = new Dialog(this);
-				dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-				dialog.setContentView(R.layout.card_setwishlist_dialog);
-
-				dialog.setOnDismissListener(new OnDismissListener() {
-					@Override
-					public void onDismiss(DialogInterface dialog) {
-						persistWishlist();					
-				}});
-
-				lvSets = (ListView) dialog.findViewById(R.id.setList);
-				aaSetList = new SetListAdapter(mCtx, R.layout.card_setwishlist_row, lCardlist, this.getResources());
-				lvSets.setAdapter(aaSetList);
-				
-				Button done = (Button) dialog.findViewById(R.id.done);
-				done.setOnClickListener(new OnClickListener(){
-					@Override
-					public void onClick(View arg0) {
-						dismissDialog(WISHLIST_COUNTS);
-					}});
-
-				return dialog;
-			} catch (SQLException e) {
-				// Should we do something here?
-			}
+		else if (id == WISHLIST_COUNTS) {
+			return (new WishlistHelpers()).getDialog(cardName, this);
 		}
 		return null;
-	}
-
-	public void persistWishlist(){
-		for(CardData card:(ArrayList<CardData>)lCardlist.clone()){
-			if(card.numberOf==0)
-				lCardlist.remove(card);
-		}
-		Toast.makeText(getApplicationContext(), String.valueOf(lCardlist.size()) + " versions of " + cardName + " now on wishlist.", Toast.LENGTH_LONG).show();
-		if(lWishlist.addAll(0,lCardlist))
-			WishlistHelpers.WriteWishlist(getApplicationContext(),lWishlist);
 	}
 
 	@Override
@@ -1176,9 +1069,10 @@ public class CardViewActivity extends FamiliarActivity {
 			asyncTask.execute((String[]) null);
 			return true;
 		case R.id.addtowishlist:
-			progDialog.show();
-			asyncTask = new WishlistTask();
-			asyncTask.execute((String[]) null);
+//			progDialog.show();
+//			asyncTask = new WishlistTask();
+//			asyncTask.execute((String[]) null);
+			showDialog(WISHLIST_COUNTS);
 			return true;
 		case R.id.quittosearch:
 			MyApp appState = ((MyApp) getApplicationContext());
@@ -1207,77 +1101,5 @@ public class CardViewActivity extends FamiliarActivity {
 		MenuInflater inflater = new MenuInflater(this);
 		inflater.inflate(R.menu.card_menu, menu);
 		return true;
-	}
-
-	private class SetListAdapter extends ArrayAdapter<CardData> {
-
-		private int									layoutResourceId;
-		private ArrayList<CardData>	items;
-		private Context							mCtx;
-		private Resources						resources;
-
-		public SetListAdapter(Context context, int textViewResourceId, ArrayList<CardData> items, Resources r) {
-			super(context, textViewResourceId, items);
-
-			this.mCtx = context;
-			this.layoutResourceId = textViewResourceId;
-			this.items = items;
-			resources = r;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			View v = convertView;
-			if (v == null) {
-				LayoutInflater inf = getLayoutInflater();
-				v = inf.inflate(layoutResourceId, null);
-			}
-			CardData data = items.get(position);
-			if (data != null) {
-				EditText numberField = (EditText) v.findViewById(R.id.numberInput);
-				TextView setField = (TextView) v.findViewById(R.id.cardset);
-
-				setField.setText(data.tcgName);
-				numberField.setText(String.valueOf(data.numberOf));
-				numberField.addTextChangedListener(new WishlistNumberTextWatcher(numberField,data));
-			}
-			return v;
-		}
-	}
-
-	private class WishlistNumberTextWatcher implements TextWatcher { 
-		 
-	    private EditText editText;  
-	    private CardData card; 
-	 
-	    public WishlistNumberTextWatcher(EditText e, CardData card) 
-	    { 
-	        this.editText = e; 
-	        this.card = card; 
-	    } 
-	 
-	    @Override 
-	    public void afterTextChanged(Editable arg0) { 
-	        String text = arg0.toString(); 
-	        if(text != null && text.length() > 0) 
-	        { 
-	            int val; 
-	            try 
-	            { 
-	                val = Integer.parseInt(text); 
-	            } 
-	            catch(NumberFormatException e) 
-	            { 
-	                val = 0; 
-	            } 
-	            card.numberOf = val;
-	        } 
-	    }
-
-		@Override
-		public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {}
-
-		@Override
-		public void onTextChanged(CharSequence s, int start, int before, int count) {} 
 	}
 }

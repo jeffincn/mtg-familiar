@@ -270,6 +270,12 @@ public class TradeListHelpers {
 			this.message = message;
 		}
 
+		public CardData(String cardName, String cardSet, int numberOf) {
+			this.name = cardName;
+			this.numberOf = numberOf;
+			this.setCode = cardSet;
+		}
+
 		public String getPriceString() {
 			return "$" + String.valueOf(this.price / 100) + "." + String.format("%02d", this.price % 100);
 		}
@@ -286,12 +292,6 @@ public class TradeListHelpers {
 
 		public String toString(int side) {
 			return side + delimiter + this.name + delimiter + this.setCode + delimiter + this.numberOf + '\n';
-		}
-
-		public void getExtendedData() {
-			// TODO Auto-generated method stub
-			long multiverseID = 0;
-			System.out.print(multiverseID);
 		}
 	}
 }

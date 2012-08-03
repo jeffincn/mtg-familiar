@@ -34,7 +34,6 @@ import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -42,7 +41,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -130,12 +128,9 @@ public class WishlistActivity extends FamiliarActivity {
 						numberOfFromField = "1";
 					}
 					int numberOf = Integer.parseInt(numberOfFromField);
-
-					CardData data = mTradeListHelper.new CardData(namefield.getText().toString(), null, null, numberOf, 0, "loading", null, null, null, null, null, null,
-							CardDbAdapter.NOONECARES, '-');
-
-					data.getExtendedData();
-
+					
+					CardData data = mTradeListHelper.new CardData(namefield.getText().toString(), "", "", numberOf, 0, "loading", null);
+					
 					lWishlist.add(0, data);
 					aaWishlist.notifyDataSetChanged();
 					FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(data, aaWishlist, priceSetting, null, (WishlistActivity) me);

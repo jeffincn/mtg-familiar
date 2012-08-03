@@ -46,7 +46,7 @@ public abstract class FamiliarActivity extends SherlockActivity {
 
 	protected FamiliarActivity							me;
 	protected static SharedPreferences			preferences;
-	protected CardDbAdapter									mDbHelper;
+	public CardDbAdapter										mDbHelper;
 	protected Context												mCtx;
 
 	@Override

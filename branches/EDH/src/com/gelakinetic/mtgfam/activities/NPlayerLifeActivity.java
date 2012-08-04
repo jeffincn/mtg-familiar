@@ -54,6 +54,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -289,10 +290,15 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 
 		mainLayout = (LinearLayout) findViewById(R.id.playerList);
 		if (displayMode.equals(commanderDisplay)){
+			ScrollView parent = (ScrollView) mainLayout.getParent();
+			mainLayout = (LinearLayout) findViewById(R.id.info_layout);
+			parent.setVisibility(View.GONE);
+			
+			
 			LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			LinearLayout edhLayout = (LinearLayout) inflater.inflate(R.layout.life_counter_player_edh_row_bot, null);
-			mainLayout.addView(edhLayout);
 			edhGrid = (GridView) edhLayout.findViewById(R.id.edh_grid);
+			mainLayout.addView(edhLayout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
 			
 			commanderAdapter = new CommanderAdapter(mCtx);
 			edhGrid.setAdapter(commanderAdapter);
@@ -379,8 +385,16 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		}
 
 		FrameLayout fl = (FrameLayout) findViewById(R.id.playerScrollView);
+			
 		listSizeWidth = fl.getWidth();
 		listSizeHeight = fl.getHeight();
+		
+		if(displayMode.equals(commanderDisplay)){
+			LinearLayout info = (LinearLayout) findViewById(R.id.info_layout);
+			listSizeWidth = info.getWidth();
+			listSizeHeight = info.getHeight();
+		}
+		
 
 		if (orientation == LANDSCAPE) {
 			listSizeHeight = LayoutParams.FILL_PARENT;
@@ -415,6 +429,11 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 
 		for (Player p : players) {
 			p.setLayoutSize(listSizeWidth, listSizeHeight);
+		}
+		
+		if(displayMode.equals(commanderDisplay)){
+			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(listSizeWidth, listSizeHeight);
+			((LinearLayout)edhGrid.getParent()).setLayoutParams(layoutParams);
 		}
 	}
 
@@ -610,6 +629,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			normalMode = false;
 			layout.setVisibility(View.GONE);
 			mainLayout.addView(layout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
+			commanderAdapter.notifyDataSetChanged();
 		}
 		if (displayMode.equals(normalDisplay) || normalMode == true) {
 			mainLayout.addView(layout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
@@ -634,10 +654,6 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		} else if (displayMode.equals(commanderDisplay)){
 			mainLayout.removeView((View)players.get(index).layout.getParent().getParent());
 			players.remove(index);
-			
-			for (Player removeFrom : players){
-				removeFrom.commanderDamage.remove(index);
-			}
 		} else {
 			mainLayout.removeView(players.get(index).layout);
 			players.remove(index);

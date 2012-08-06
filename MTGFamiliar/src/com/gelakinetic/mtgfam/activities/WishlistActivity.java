@@ -276,6 +276,7 @@ public class WishlistActivity extends FamiliarActivity {
 
 								ArrayList<CardData> cardlist = cardSetWishlists.get(positionForDialog);
 								CardSetAdapter aaCardSet = aaCardSets.get(positionForDialog);
+								int totalCards = 0;
 								for (int i = 0; i < lvSets.getChildCount(); i++) {
 									View v = lvSets.getChildAt(i);
 									int numberField;
@@ -288,6 +289,7 @@ public class WishlistActivity extends FamiliarActivity {
 									CardData cd = cardlist.get(i);
 									int prior = cd.numberOf;
 									cd.numberOf = numberField;
+									totalCards += numberField;
 									if(prior != numberField && numberField != 0){
 										cd.message = ("loading");
 										FetchPriceTask task = mTradeListHelper.new FetchPriceTask(cd, aaCardSet, priceSetting, null, (WishlistActivity) me);
@@ -295,7 +297,13 @@ public class WishlistActivity extends FamiliarActivity {
 									}
 									cardlist.set(i,cd);
 								}
-								aaCardSet.notifyDataSetChanged();
+								if (totalCards == 0) {
+									cardSetNames.remove(positionForDialog);
+									cardSetWishlists.remove(positionForDialog);
+									aaCardSets.remove(positionForDialog);
+									cardNames.remove(positionForDialog);
+								} else
+									aaCardSet.notifyDataSetChanged();
 								aaWishlist.notifyDataSetChanged();
 								break;
 						}

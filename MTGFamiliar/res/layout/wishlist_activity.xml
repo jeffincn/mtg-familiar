@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" 
     android:layout_gravity="top"
-    android:baselineAligned="false" >
-    
+    android:baselineAligned="false"
+    android:orientation="vertical" >
+
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
-        <EditText
+
+        <EditText
             android:id="@+id/numberInput"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
@@ -20,25 +22,23 @@
             android:inputType="number"
             android:maxLength="2"
             android:selectAllOnFocus="true" >
-
         </EditText>
 
         <AutoCompleteTextView
             android:id="@+id/namesearch"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:hint="@string/wishlist_name" >
 
             <requestFocus />
         </AutoCompleteTextView>
-    	
-    	<Button
-	        android:id="@+id/addCard"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/wishlist_add_card" />
-        
+
+        <Button
+            android:id="@+id/addCard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/wishlist_add_card" />
     </LinearLayout>
 
     <TextView
@@ -53,10 +53,9 @@
         android:id="@+id/wishlist"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_gravity="clip_horizontal"
         android:layout_weight="1"
-        android:layout_gravity="clip_horizontal" >
-
-        <!-- Preview: listitem=@layout/wishlist_row -->
+        tools:listitem="@layout/wishlist_row" >
     </ListView>
 
 </LinearLayout>

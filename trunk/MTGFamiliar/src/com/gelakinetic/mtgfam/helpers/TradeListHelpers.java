@@ -38,7 +38,7 @@ public class TradeListHelpers {
 
 	public class FetchPriceTask extends AsyncTask<Void, Void, Integer> {
 		CardData					data;
-		ArrayAdapter<CardData>	toNotify;
+		ArrayAdapter	toNotify;
 		String						price		= "";
 		CardDbAdapter mDbHelper;
 		Context mCtx;
@@ -46,7 +46,7 @@ public class TradeListHelpers {
 		private WishlistActivity wa;
 		private CardTradingActivity cta;
 		
-		public FetchPriceTask(CardData _data, ArrayAdapter<CardData> _toNotify, int ps, CardTradingActivity cta, WishlistActivity wa) {
+		public FetchPriceTask(CardData _data, ArrayAdapter _toNotify, int ps, CardTradingActivity cta, WishlistActivity wa) {
 			data = _data;
 			toNotify = _toNotify;
 			if(wa != null){
@@ -75,10 +75,10 @@ public class TradeListHelpers {
 			String tcgName;
 			try {
 				cardName = data.name;
-				cardNumber = data.cardNumber;
-				setCode = data.setCode;
-				tcgName = data.tcgName;
-				if (cardNumber == null || setCode.equals("") || tcgName.equals("")) {
+				cardNumber = data.cardNumber == null ? "" : data.cardNumber;
+				setCode = data.setCode == null ? "" : data.setCode;
+				tcgName = data.tcgName == null ? "" : data.tcgName;
+				if (cardNumber.equals("") || setCode.equals("") || tcgName.equals("")) {
 					Cursor card;
 					if(setCode.equals(""))
 						card = mDbHelper.fetchCardByName(data.name);
@@ -175,7 +175,9 @@ public class TradeListHelpers {
 			else if(cta != null){
 				cta.UpdateTotalPrices();
 			}
-			toNotify.notifyDataSetChanged();
+			try {
+				toNotify.notifyDataSetChanged();
+			}catch (Exception e){}
 		}
 
 		String fetchPrice(URL _priceURL) {

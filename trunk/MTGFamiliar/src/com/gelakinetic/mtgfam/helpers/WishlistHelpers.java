@@ -200,6 +200,7 @@ public class WishlistHelpers {
 						// otherwise the changed values will persist in the dialog even if
 						// they arent saved
 						fillWishlistDialog();
+						bindWishlistRows();
 						break;
 					case DONE:
 					default:

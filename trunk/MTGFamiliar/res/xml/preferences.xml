@@ -207,13 +207,13 @@
 	
 	        <CheckBoxPreference
 	            android:key="showTotalPriceWishlistPref"
-	            android:defaultValue="true"
+	            android:defaultValue="false"
 	            android:title="@string/pref_wishlist_totals_title"
 	            android:summary="@string/pref_wishlist_totals_summary" />
 	        
 	        <CheckBoxPreference
 	            android:key="verboseWishlistPref"
-	            android:defaultValue="true"
+	            android:defaultValue="false"
 	            android:title="@string/pref_wishlist_details_title"
 	            android:summary="@string/pref_wishlist_details_summary" />
 	        

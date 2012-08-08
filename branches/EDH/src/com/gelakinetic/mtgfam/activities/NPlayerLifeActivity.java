@@ -73,6 +73,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	private static final int								DIALOG_SET_NAME				= 2;
 	private static final int								LIFE									= 0;
 	private static final int								POISON								= 1;
+	private static final int								COMMANDER							= 2;
 	public static final int									INITIAL_LIFE					= 20;
 	public static final int									INITIAL_POISON				= 0;
 	public static final int									TERMINAL_LIFE					= 0;
@@ -357,7 +358,22 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 					lifeDefault = 20;
 				}
 				
-				addPlayer(data[0], Integer.parseInt(data[1]), Integer.parseInt(data[3]), lhist, phist, (Context) this, lifeDefault);
+				int[] cLife;
+				try {
+					String[] commanderLifeString = data[6].split(",");
+					cLife = new int[commanderLifeString.length];
+					for (int idx = 0; idx < commanderLifeString.length; idx++) {
+						cLife[idx] = Integer.parseInt(commanderLifeString[idx]);
+					}
+				}
+				catch (NumberFormatException e){
+					cLife = null;
+				}
+				catch (ArrayIndexOutOfBoundsException e) {
+					cLife = null;
+				}
+				
+				addPlayer(data[0], Integer.parseInt(data[1]), Integer.parseInt(data[3]), lhist, phist, (Context) this, lifeDefault, cLife);
 				numPlayers++;
 			}
 			String lastName = players.get(players.size() - 1).name;
@@ -370,7 +386,11 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			}
 		}
 
-		setType(activeType);
+		if (displayMode.equals(commanderDisplay)){
+			setType(COMMANDER);
+		} else {
+			setType(activeType);
+		}
 	}
 
 	@Override
@@ -553,6 +573,14 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	}
 
 	private void setType(int type) {
+		if (type == COMMANDER){
+			for (Player p : players){
+				p.setAdapter(COMMANDER);
+			}
+			activeType = LIFE;
+			return;
+		}		
+		
 		activeType = type;
 
 		switch (activeType) {
@@ -574,10 +602,10 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	}
 
 	private void addPlayer(String name, int initialLife, int initialPoison, int[] lhist, int[] phist, Context context) {
-		addPlayer(name, initialLife, initialPoison, lhist, phist, context, INITIAL_LIFE);
+		addPlayer(name, initialLife, initialPoison, lhist, phist, context, INITIAL_LIFE, null);
 	}
 	
-	private void addPlayer(String name, int initialLife, int initialPoison, int[] lhist, int[] phist, Context context, int defaultLife) {
+	private void addPlayer(String name, int initialLife, int initialPoison, int[] lhist, int[] phist, Context context, int defaultLife, int[] clife) {
 		LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		LinearLayout layout;
 		if (orientation == LANDSCAPE) {
@@ -591,7 +619,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		if (name == null) {
 			name = "Player " + numPlayers;
 		}
-		Player p = new Player(name, initialLife, initialPoison, lhist, phist, context, defaultLife);
+		Player p = new Player(name, initialLife, initialPoison, lhist, phist, context, defaultLife, clife);
 		p.addButtons((Button) layout.findViewById(R.id.player_minus1), (Button) layout.findViewById(R.id.player_plus1),
 				(Button) layout.findViewById(R.id.player_minus5), (Button) layout.findViewById(R.id.player_plus5));
 		p.addOutputViews((TextView) layout.findViewById(R.id.player_name),
@@ -630,6 +658,14 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			layout.setVisibility(View.GONE);
 			mainLayout.addView(layout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
 			commanderAdapter.notifyDataSetChanged();
+			
+			if (players.size() == 1){
+				layout.setVisibility(View.VISIBLE);
+			}
+			
+			for(int idx = 0; idx < players.size(); idx++){
+				players.get(idx).commanderDamage.add(0);
+			}
 		}
 		if (displayMode.equals(normalDisplay) || normalMode == true) {
 			mainLayout.addView(layout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
@@ -684,6 +720,63 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		startActivity(intent);
 	}
 	
+	private class CommanderPlayerAdapter extends BaseAdapter {
+		private Context						context;
+		private Player						owningPlayer;
+		
+		public CommanderPlayerAdapter(Context _context, Player _owningPlayer){
+			context = _context;
+			owningPlayer = _owningPlayer;
+		}
+		
+		public int getCount() {
+			return players.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return null;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return 0;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			TextView name;
+			final Button damage;
+			LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			View v = vi.inflate(R.layout.life_counter_player_edh_commander_row, null);
+			name = (TextView) v.findViewById(R.id.edh_commander_row_name);
+			damage = (Button) v.findViewById(R.id.edh_commander_damage_button);
+			if (name == null || damage == null) {
+				TextView error = new TextView(context);
+				error.setText("ERROR!");
+				return error;
+			}
+			name.setText(players.get(position).name);
+			damage.setText(String.valueOf(owningPlayer.commanderDamage.get(position)));
+			
+			final int pos = position;
+			
+			damage.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					synchronized (timerLock) {
+						timerValue = timerStart;
+					}					
+					owningPlayer.incrementCommanderValue(pos, -1);
+					owningPlayer.refreshTextViews();
+				}
+			});
+			
+			return v;
+		}
+	}
+	
 	private class CommanderAdapter extends BaseAdapter {
 		private Context						context;
 		
@@ -721,24 +814,24 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			damage.setText(String.valueOf(players.get(position).life));
 			final int pos = position;
 			
-			name.setOnClickListener(new View.OnClickListener() {
+			v.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
 				public void onClick(View v) {
 					change_visible_edh_player(pos);
 				}
 			});
-			damage.setOnClickListener(new View.OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					synchronized (timerLock) {
-						timerValue = timerStart;
-					}
-					players.get(pos).incrementValue(LIFE, -1);
-					players.get(pos).refreshTextViews();
-				}
-			});
+//			damage.setOnClickListener(new View.OnClickListener() {
+//				
+//				@Override
+//				public void onClick(View v) {
+//					synchronized (timerLock) {
+//						timerValue = timerStart;
+//					}
+//					players.get(pos).incrementValue(LIFE, -1);
+//					players.get(pos).refreshTextViews();
+//				}
+//			});
 			
 			return v;
 		}
@@ -981,11 +1074,12 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		private Button		plusButton5;
 		private ListView	history;
 		private HistoryAdapter	lifeAdapter, poisonAdapter;
+		private CommanderPlayerAdapter commanderAdapter;
 		private LinearLayout		layout;
 
 		public static final int	CONSTRAINT_POISON	= 0, CONSTRAINT_LIFE = Integer.MAX_VALUE - 1;
 
-		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context, int _defaultLife) {
+		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context, int _defaultLife, int[] clife) {
 			name = n;
 			life = l;
 			defaultLife = _defaultLife;
@@ -997,7 +1091,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			for(int idx = 0; idx < players.size(); idx++){
 				commanderDamage.add(0);
 			}
-			
+
 			me = this;
 
 			if (lhist != null) {
@@ -1012,10 +1106,21 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			else {
 				this.poisonAdapter = new HistoryAdapter(context, poison);
 			}
+			
+			if (clife != null) {
+				commanderDamage = new ArrayList<Integer>();
+				for(int idx = 0; idx < players.size(); idx++){
+					commanderDamage.add(clife[idx]);
+				}
+				this.commanderAdapter = new CommanderPlayerAdapter(context, this);
+			} 
+			else {
+				this.commanderAdapter = new CommanderPlayerAdapter(context, this);
+			}
 		}
 		
 		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context) {
-			this(n, l, p, lhist, phist, context, INITIAL_LIFE);
+			this(n, l, p, lhist, phist, context, INITIAL_LIFE, null);
 		}
 
 		public void setLayoutSize(int listSizeWidth, int listSizeHeight) {
@@ -1038,6 +1143,9 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 					break;
 				case POISON:
 					history.setAdapter(this.poisonAdapter);
+					break;
+				case COMMANDER:
+					history.setAdapter(this.commanderAdapter);
 					break;
 			}
 			history.invalidate();
@@ -1076,6 +1184,8 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 							totalAtPosition = poisonAdapter.clearToPosition(arg2);
 							poison = totalAtPosition;
 							break;
+						case COMMANDER:
+							return false;
 					}
 					refreshTextViews();
 					return false;
@@ -1093,7 +1203,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		}
 
 		public void refreshTextViews() {
-			TVname.setText(name);
+			TVname.setText(name);			
 			if (activeType == LIFE) {
 				TVlife.setText("" + life);
 				TVlife.setTextColor(0xFFFFFFFF);
@@ -1139,6 +1249,14 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 					break;
 			}
 			setValue(type, value + delta);
+		}
+		
+		private void incrementCommanderValue(int fromCommander, int delta) {
+			int currentDamage = commanderDamage.get(fromCommander);
+			commanderDamage.set(fromCommander, currentDamage + delta);
+			commanderAdapter.notifyDataSetChanged();
+			
+			incrementValue(LIFE, delta);
 		}
 
 		public void addButtons(Button minus1, Button plus1, Button minus5, Button plus5) {
@@ -1220,6 +1338,17 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			}
 			
 			data += ";" + defaultLife;
+			first = true;
+			for (Integer i : commanderDamage) {
+				if (first) {
+					first = false;
+					data += ";" + i;
+				}
+				else {
+					data += "," + i;
+				}
+			}
+			
 
 			return data + ";\n";
 		}

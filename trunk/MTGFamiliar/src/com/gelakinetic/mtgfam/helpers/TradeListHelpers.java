@@ -16,7 +16,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.os.AsyncTask;
+import android.widget.Adapter;
 import android.widget.ArrayAdapter;
+import android.widget.BaseExpandableListAdapter;
 
 import com.gelakinetic.mtgfam.activities.CardTradingActivity;
 import com.gelakinetic.mtgfam.activities.CardViewActivity;
@@ -38,7 +40,7 @@ public class TradeListHelpers {
 
 	public class FetchPriceTask extends AsyncTask<Void, Void, Integer> {
 		CardData					data;
-		ArrayAdapter	toNotify;
+		Object	toNotify;
 		String						price		= "";
 		CardDbAdapter mDbHelper;
 		Context mCtx;
@@ -46,7 +48,7 @@ public class TradeListHelpers {
 		private WishlistActivity wa;
 		private CardTradingActivity cta;
 		
-		public FetchPriceTask(CardData _data, ArrayAdapter _toNotify, int ps, CardTradingActivity cta, WishlistActivity wa) {
+		public FetchPriceTask(CardData _data, Object _toNotify, int ps, CardTradingActivity cta, WishlistActivity wa) {
 			data = _data;
 			toNotify = _toNotify;
 			if(wa != null){
@@ -176,7 +178,10 @@ public class TradeListHelpers {
 				cta.UpdateTotalPrices();
 			}
 			try {
-				toNotify.notifyDataSetChanged();
+				if (toNotify instanceof ArrayAdapter<?>)
+					((ArrayAdapter<CardData>) toNotify).notifyDataSetChanged();
+				else
+					((BaseExpandableListAdapter) toNotify).notifyDataSetChanged();
 			}catch (Exception e){}
 		}
 

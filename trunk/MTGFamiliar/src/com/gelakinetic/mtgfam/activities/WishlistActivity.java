@@ -35,13 +35,13 @@ import android.text.Html.ImageGetter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -66,12 +66,11 @@ public class WishlistActivity extends FamiliarActivity {
 
 	private Button							bAdd;
 	private TextView						tradePrice;
-	private ListView						lvWishlist;
-	private WishListAdapter					aaWishlist;
+	private ExpandableListView				expWishist;
+	private WishlistAdapter					aaExpWishlist;
 	private ArrayList<String>				cardNames;
 	private ArrayList<ArrayList<String>>	cardSetNames;
-	private ArrayList<ArrayList<CardData>>	cardSetWishlists;
-	private ArrayList<CardSetAdapter>		aaCardSets;
+	private static ArrayList<ArrayList<CardData>>	cardSetWishlists;
 
 	private EditText						numberfield;
 
@@ -109,12 +108,8 @@ public class WishlistActivity extends FamiliarActivity {
 		cardNames = new ArrayList<String>();
 		cardSetNames = new ArrayList<ArrayList<String>>();
 		cardSetWishlists = new ArrayList<ArrayList<CardData>>();
-		aaCardSets = new ArrayList<CardSetAdapter>();
 		bAdd = (Button) findViewById(R.id.addCard);
 		tradePrice = (TextView) findViewById(R.id.priceText);
-		lvWishlist = (ListView) findViewById(R.id.wishlist);
-		aaWishlist = new WishListAdapter(mCtx, R.layout.wishlist_row, cardSetWishlists, this.getResources());
-		lvWishlist.setAdapter(aaWishlist);
 
 		if (!showTotalPrice) {
 			tradePrice.setVisibility(View.GONE);
@@ -136,7 +131,7 @@ public class WishlistActivity extends FamiliarActivity {
 							CardDbAdapter.NOONECARES, '-');
 					
 					AddCardOrUpdateSetCounts(data);
-					aaWishlist.notifyDataSetChanged();
+					aaExpWishlist.notifyDataSetChanged();
 
 					namefield.setText("");
 					numberfield.setText("1");
@@ -148,6 +143,31 @@ public class WishlistActivity extends FamiliarActivity {
 		});
 
 		priceSetting = Integer.parseInt(preferences.getString("tradePrice", String.valueOf(AVG_PRICE)));
+		
+		expWishist = (ExpandableListView) this.findViewById(R.id.wishlist);
+       
+		expWishist.setGroupIndicator(null);
+		expWishist.setChildIndicator(null);
+		expWishist.setDividerHeight(0);
+        
+		aaExpWishlist = new WishlistAdapter(this,expWishist);
+		expWishist.setAdapter(aaExpWishlist);
+
+		expWishist.setOnChildClickListener(
+			new OnChildClickListener() {
+	            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+					try {
+						removeDialog(DIALOG_UPDATE_CARD);
+					}
+					catch (IllegalArgumentException e) {
+					}
+					positionForDialog = groupPosition;
+					showDialog(DIALOG_UPDATE_CARD);
+	            	return false;
+	            }
+	        }
+		);
+
 	}
 
 	@Override
@@ -155,13 +175,10 @@ public class WishlistActivity extends FamiliarActivity {
 		super.onPause();
 		ArrayList<CardData> lWishlist=new ArrayList<CardData>();
 		for(ArrayList<CardData> lCardlist : cardSetWishlists){
-			//trim all the 0-count cards
-			for(CardData card:(ArrayList<CardData>)lCardlist.clone()){
-				if(card.numberOf==0)
-					lCardlist.remove(card);
-			}
 			//add all the non-zeros to the persistence list
-			lWishlist.addAll(lCardlist);
+			for(CardData card:lCardlist)
+				if(card.numberOf!=0)
+					lWishlist.add(card);
 		}
 		WishlistHelpers.WriteWishlist(getApplicationContext(),lWishlist);
 	}
@@ -174,12 +191,10 @@ public class WishlistActivity extends FamiliarActivity {
 		WishlistHelpers.ReadWishlist(getApplicationContext(), (WishlistActivity) me, mDbHelper, lWishlist);
 
 		//split each card into its own mini-list
-		//clone to prevent iteration exception
-		//overwrite the place holder if it's on the wish list
 		for(CardData card: (ArrayList<CardData>)lWishlist){
 			AddCardOrUpdateSetCounts(card);
 		}		
-		aaWishlist.notifyDataSetChanged();
+		aaExpWishlist.notifyDataSetChanged();
 		lWishlist.clear();
 		
 		try {
@@ -224,8 +239,6 @@ public class WishlistActivity extends FamiliarActivity {
 			cardSetNames.add(setCodes);
 			cardSetWishlists.add(lCardlist);
 
-			CardSetAdapter aaCardSet = new CardSetAdapter(mCtx, R.layout.wishlist_cardset_row, lCardlist, this.getResources());
-			aaCardSets.add(aaCardSet);
 			position=cardNames.indexOf(card.name);
 		}
 		else
@@ -247,10 +260,10 @@ public class WishlistActivity extends FamiliarActivity {
 		cardSetWishlists.set(position,lCardlist);
 		//we bind to the first card in the card list, so ensure that it has details if we're showing those details
 		if(ensureFirst && position != 0 && verbose){
-			FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(lCardlist.get(0), aaCardSets.get(0), priceSetting, null, (WishlistActivity) me);
+			FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(lCardlist.get(0), aaExpWishlist, priceSetting, null, (WishlistActivity) me);
 			loadPrice.execute();
 		}
-		FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(card, aaCardSets.get(position), priceSetting, null, (WishlistActivity) me);
+		FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(card, aaExpWishlist, priceSetting, null, (WishlistActivity) me);
 		loadPrice.execute();
 	}
 
@@ -275,7 +288,6 @@ public class WishlistActivity extends FamiliarActivity {
 								LinearLayout lvSets = (LinearLayout) dlg.findViewById(R.id.setList);
 
 								ArrayList<CardData> cardlist = cardSetWishlists.get(positionForDialog);
-								CardSetAdapter aaCardSet = aaCardSets.get(positionForDialog);
 								int totalCards = 0;
 								for (int i = 0; i < lvSets.getChildCount(); i++) {
 									View v = lvSets.getChildAt(i);
@@ -292,7 +304,7 @@ public class WishlistActivity extends FamiliarActivity {
 									totalCards += numberField;
 									if(prior != numberField && numberField != 0){
 										cd.message = ("loading");
-										FetchPriceTask task = mTradeListHelper.new FetchPriceTask(cd, aaCardSet, priceSetting, null, (WishlistActivity) me);
+										FetchPriceTask task = mTradeListHelper.new FetchPriceTask(cd, aaExpWishlist, priceSetting, null, (WishlistActivity) me);
 										task.execute();
 									}
 									cardlist.set(i,cd);
@@ -300,11 +312,9 @@ public class WishlistActivity extends FamiliarActivity {
 								if (totalCards == 0) {
 									cardSetNames.remove(positionForDialog);
 									cardSetWishlists.remove(positionForDialog);
-									aaCardSets.remove(positionForDialog);
 									cardNames.remove(positionForDialog);
-								} else
-									aaCardSet.notifyDataSetChanged();
-								aaWishlist.notifyDataSetChanged();
+								}
+								aaExpWishlist.notifyDataSetChanged();
 								break;
 						}
 					}
@@ -326,13 +336,12 @@ public class WishlistActivity extends FamiliarActivity {
 							for (CardData data : cardSetWishlists.get(i)) {
 								if(data.numberOf > 0){
 									data.message = ("loading");
-									FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaCardSets.get(i), priceSetting, null, (WishlistActivity) me);
+									FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaExpWishlist, priceSetting, null, (WishlistActivity) me);
 									task.execute();
 								}
 							}
-							aaCardSets.get(i).notifyDataSetChanged();
 						}
-						aaWishlist.notifyDataSetChanged();
+						aaExpWishlist.notifyDataSetChanged();
 
 						// And also update the preference
 						SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(WishlistActivity.this).edit();
@@ -370,9 +379,9 @@ public class WishlistActivity extends FamiliarActivity {
 			tradePrice.setText(sTotal);
 			tradePrice.setTextColor(color);
 		}
-		aaWishlist.notifyDataSetChanged();
-		lvWishlist.invalidate();
-		lvWishlist.postInvalidate();
+		aaExpWishlist.notifyDataSetChanged();
+		expWishist.invalidate();
+		expWishist.postInvalidate();
 	}
 
 	private boolean PriceListsHaveBadValues(ArrayList<ArrayList<CardData>> cardlists) {
@@ -406,25 +415,25 @@ public class WishlistActivity extends FamiliarActivity {
 					if (message.compareTo(card_not_found) == 0) {
 						cardlist.remove(data);
 						i--;
-						aaWishlist.notifyDataSetChanged();
+						aaExpWishlist.notifyDataSetChanged();
 						Toast.makeText(getApplicationContext(), data.name + ": " + card_not_found, Toast.LENGTH_LONG).show();
 					}
 					else if (message.compareTo(mangled_url) == 0) {
 						cardlist.remove(data);
 						i--;
-						aaWishlist.notifyDataSetChanged();
+						aaExpWishlist.notifyDataSetChanged();
 						Toast.makeText(getApplicationContext(), data.name + ": " + mangled_url, Toast.LENGTH_LONG).show();
 					}
 					else if (message.compareTo(database_busy) == 0) {
 						cardlist.remove(data);
 						i--;
-						aaWishlist.notifyDataSetChanged();
+						aaExpWishlist.notifyDataSetChanged();
 						Toast.makeText(getApplicationContext(), data.name + ": " + database_busy, Toast.LENGTH_LONG).show();
 					}
 					else if (message.compareTo(card_dne) == 0) {
 						cardlist.remove(data);
 						i--;
-						aaWishlist.notifyDataSetChanged();
+						aaExpWishlist.notifyDataSetChanged();
 						Toast.makeText(getApplicationContext(), data.name + ": " + card_dne, Toast.LENGTH_LONG).show();
 					}
 					else if (message.compareTo(fetch_failed) == 0) {
@@ -436,30 +445,95 @@ public class WishlistActivity extends FamiliarActivity {
 		return totalPrice;
 	}
 
-	private class WishListAdapter extends ArrayAdapter<ArrayList<CardData>> {
 
-		private int								layoutResourceId;
-		private ArrayList<ArrayList<CardData>>	items;
+	class WishlistAdapter extends BaseExpandableListAdapter {
+
+	    private Resources resources;
+	    ExpandableListView _list;
 		private ImageGetter						imgGetter;
 
-		public WishListAdapter(Context context, int textViewResourceId, ArrayList<ArrayList<CardData>> items, Resources r) {
-			super(context, textViewResourceId, items);
+	    public WishlistAdapter(Context context, ExpandableListView list) {
+	        _list=list;
+	        resources = context.getResources();
+			this.imgGetter = ImageGetterHelper.GlyphGetter(resources);
+	    }
 
-			this.layoutResourceId = textViewResourceId;
-			this.items = items;
-			this.imgGetter = ImageGetterHelper.GlyphGetter(r);
-		}
+	    public Object getChild(int groupPosition, int childPosition) {
+	        return null;
+	    }
 
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
+	    public long getChildId(int groupPosition, int childPosition) {
+	        return 0;
+	    }
+
+	    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+			View v = convertView;
+			CardData data = WishlistActivity.cardSetWishlists.get(groupPosition).get(childPosition);
+			//empty view for 0-count rows
+			if (data == null || data.numberOf == 0) 
+				v = new View(mCtx);
+			else {
+				LayoutInflater inf = getLayoutInflater();
+				v = inf.inflate(R.layout.wishlist_cardset_row, null);
+				TextView setField = (TextView) v.findViewById(R.id.wishlistRowSet);
+				TextView priceField = (TextView) v.findViewById(R.id.wishlistRowPrice);
+
+				setField.setText(data.tcgName);
+				char r = (char) data.rarity;
+				switch (r) {
+					case 'C':
+						setField.setTextColor(resources.getColor(R.color.common));
+						break;
+					case 'U':
+						setField.setTextColor(resources.getColor(R.color.uncommon));
+						break;
+					case 'R':
+						setField.setTextColor(resources.getColor(R.color.rare));
+						break;
+					case 'M':
+						setField.setTextColor(resources.getColor(R.color.mythic));
+						break;
+					case 'T':
+						setField.setTextColor(resources.getColor(R.color.timeshifted));
+						break;
+				}
+				priceField.setText(data.numberOf + "x" + (data.hasPrice() ? data.getPriceString() : data.message));
+				if (data.hasPrice()) {
+					priceField.setTextColor(resources.getColor(R.color.light_gray));
+				}
+				else {
+					priceField.setTextColor(resources.getColor(R.color.red));
+				}
+			}
+			return v;
+	    }
+
+	    public int getChildrenCount(int groupPosition) {
+	        return WishlistActivity.cardSetWishlists.get(groupPosition).size();
+	    }
+
+	    public Object getGroup(int groupPosition) {
+	        return null;
+	    }
+
+	    public int getGroupCount() {
+	        return WishlistActivity.cardSetWishlists.size();
+	    }
+
+	    public long getGroupId(int groupPosition) {
+	        return 0;
+	    }    
+	    
+	    @Override
+	    public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 			View v = convertView;
 			if (v == null) {
 				LayoutInflater inf = getLayoutInflater();
-				v = inf.inflate(layoutResourceId, null);
+				v = inf.inflate(R.layout.wishlist_row, null);
 			}
-			CardData data = items.get(position).get(0);
+			CardData data = WishlistActivity.cardSetWishlists.get(groupPosition).get(0);
 			if (data != null) {
-				final int pos = position; 
+				final int pos = groupPosition; 
 				View.OnClickListener onClick = new View.OnClickListener() {
 					public void onClick(View v) {
 						try {
@@ -470,17 +544,6 @@ public class WishlistActivity extends FamiliarActivity {
 						positionForDialog = pos;
 						showDialog(DIALOG_UPDATE_CARD);
 					}}; 
-				AdapterView.OnItemClickListener onItemClick = new AdapterView.OnItemClickListener() {
-					public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-						try {
-							removeDialog(DIALOG_UPDATE_CARD);
-						}
-						catch (IllegalArgumentException e) {
-						}
-						//we don't care which of the sets they click, just open the dialog for the card
-						positionForDialog = pos;
-						showDialog(DIALOG_UPDATE_CARD);
-					}};
 					
 				TextView nameField = (TextView) v.findViewById(R.id.wishlistRowName);
 				TextView typeField = (TextView) v.findViewById(R.id.cardtype);
@@ -619,88 +682,29 @@ public class WishlistActivity extends FamiliarActivity {
 					slashField.setVisibility(View.GONE);
 					tField.setVisibility(View.GONE);
 				}
-				ListView lvSetlist = (ListView) v.findViewById(R.id.setlist);
-				lvSetlist.setOnItemClickListener(onItemClick);
-				lvSetlist.setAdapter(aaCardSets.get(position));
 			}
+	        _list.expandGroup(groupPosition);  //used to Expand the child list automatically at the time of displaying
 			return v;
-		}
+	    }
+
+	    public boolean hasStableIds() {
+	        return false;
+	    }
+
+	    public boolean isChildSelectable(int groupPosition, int childPosition) {
+	        return true;
+	    }
 	}
 
-	private class CardSetAdapter extends ArrayAdapter<CardData> {
-
-		private int						layoutResourceId;
-		private ArrayList<CardData>		items;
-		private Context					mCtx;
-		private Resources				resources;
-
-		public CardSetAdapter(Context context, int textViewResourceId, ArrayList<CardData> items, Resources r) {
-			super(context, textViewResourceId, items);
-
-			this.mCtx = context;
-			this.layoutResourceId = textViewResourceId;
-			this.items = items;
-			resources = r;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			View v = convertView;
-			if (v == null) {
-				LayoutInflater inf = getLayoutInflater();
-				v = inf.inflate(layoutResourceId, null);
-			}
-			CardData data = items.get(position);
-			if (data.numberOf == 0)
-				v.setVisibility(View.GONE);
-			else {
-				if (data != null) {
-					TextView setField = (TextView) v.findViewById(R.id.wishlistRowSet);
-					TextView priceField = (TextView) v.findViewById(R.id.wishlistRowPrice);
-	
-					setField.setText(data.tcgName);
-					char r = (char) data.rarity;
-					switch (r) {
-						case 'C':
-							setField.setTextColor(resources.getColor(R.color.common));
-							break;
-						case 'U':
-							setField.setTextColor(resources.getColor(R.color.uncommon));
-							break;
-						case 'R':
-							setField.setTextColor(resources.getColor(R.color.rare));
-							break;
-						case 'M':
-							setField.setTextColor(resources.getColor(R.color.mythic));
-							break;
-						case 'T':
-							setField.setTextColor(resources.getColor(R.color.timeshifted));
-							break;
-					}
-					priceField.setText(data.numberOf + "x" + (data.hasPrice() ? data.getPriceString() : data.message));
-					if (data.hasPrice()) {
-						priceField.setTextColor(mCtx.getResources().getColor(R.color.light_gray));
-					}
-					else {
-						priceField.setTextColor(mCtx.getResources().getColor(R.color.red));
-					}
-				}
-			}
-			return v;
-		}
-	}
-	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
 			case R.id.wishlist_menu_clear:
-
 				cardNames.clear();
 				cardSetNames.clear();
 				cardSetWishlists.clear();
-				aaCardSets.clear();
-				aaWishlist.notifyDataSetChanged();
+				aaExpWishlist.notifyDataSetChanged();
 				UpdateTotalPrices();
 				return true;
 			case R.id.wishlist_menu_settings:

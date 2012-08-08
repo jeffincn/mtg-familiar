@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:gravity="left|right"
     android:orientation="vertical" >
 
@@ -81,14 +81,5 @@
             android:text="@string/ph_toughness"
             android:textAppearance="?android:attr/textAppearanceSmall" />
     </LinearLayout>
-
-    <ListView
-        android:id="@+id/setlist"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="clip_horizontal"
-        android:layout_weight="1"
-        tools:listitem="@layout/wishlist_cardset_row" >
-    </ListView>
 
 </LinearLayout>

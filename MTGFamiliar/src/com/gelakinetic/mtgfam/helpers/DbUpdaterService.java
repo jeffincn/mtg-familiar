@@ -43,15 +43,15 @@ import com.gelakinetic.mtgfam.activities.MainActivity;
 
 public class DbUpdaterService extends IntentService {
 
-    public static final int CHECKING_NOTIFICATION = 31;
-    public static final int UPDATING_NOTIFICATION = 32;
-    public static final int UPDATED_NOTIFICATION = 33;
+    public static final int STATUS_NOTIFICATION = 31;
+    public static final int UPDATED_NOTIFICATION = 32;
 
     protected SharedPreferences mPreferences;
     protected CardDbAdapter mDbHelper;
     protected NotificationManager mNotificationManager;
     protected PendingIntent mNotificationIntent;
 
+    protected Notification mUpdateNotification;
     protected Handler mHandler = new Handler();
     protected Runnable mProgressUpdater;
     
@@ -71,6 +71,11 @@ public class DbUpdaterService extends IntentService {
 
 		Intent intent = new Intent(this, MainActivity.class);
 		mNotificationIntent = PendingIntent.getActivity(this, 0, intent, 0);
+		
+    	mUpdateNotification = new Notification(R.drawable.rt_notification_icon, getString(R.string.update_notification), System.currentTimeMillis());
+    	mUpdateNotification.flags |= Notification.FLAG_ONGOING_EVENT;
+    	mUpdateNotification.flags |= Notification.FLAG_ONLY_ALERT_ONCE;
+    	mUpdateNotification.setLatestEventInfo(this, getString(R.string.app_name), getString(R.string.update_notification), mNotificationIntent);
     }
 
     @Override
@@ -78,7 +83,7 @@ public class DbUpdaterService extends IntentService {
         
         //this.publishProgress(new String[] { "indeterminate", mCtx.getString(R.string.update_legality) });
 
-        showCheckingNotification();
+        showStatusNotification();
 
         ArrayList<String> updatedStuff = new ArrayList<String>();
         ProgressReporter reporter = new ProgressReporter();
@@ -99,8 +104,7 @@ public class DbUpdaterService extends IntentService {
                     String[] set = patchInfo.get(i);
                     if (!mDbHelper.doesSetExist(set[2])) {
                         try {
-                        	cancelCheckingNotification();
-                        	showUpdatingNotification(String.format(getString(R.string.update_updating_set), set[0]));
+                        	switchToUpdating(String.format(getString(R.string.update_updating_set), set[0]));
                             GZIPInputStream gis = new GZIPInputStream(new URL(set[1]).openStream());
                             JsonParser.readCardJsonStream(gis, reporter, set[0], mDbHelper, this);
                             updatedStuff.add(set[0]);
@@ -111,8 +115,8 @@ public class DbUpdaterService extends IntentService {
                         catch (IOException e) {
                             // Log.e("JSON error", e.toString());
                         }
-                        cancelUpdatingNotification();
-                        showCheckingNotification();
+                        
+                        switchToChecking();
                     }
                 }
                 JsonParser.readTCGNameJsonStream(mPreferences, mDbHelper);
@@ -132,8 +136,7 @@ public class DbUpdaterService extends IntentService {
         boolean newRulesParsed = false;
         if (rp.needsToUpdate()) {
             if (rp.parseRules()) {
-            	cancelCheckingNotification();
-            	showUpdatingNotification(getString(R.string.update_updating_rules));
+            	switchToUpdating(getString(R.string.update_updating_rules));
                 int code = rp.loadRulesAndGlossary();
                 
                 //Only save the timestamp of this if the update was 100% successful; if
@@ -145,8 +148,8 @@ public class DbUpdaterService extends IntentService {
                 else {
                     //TODO - We should indicate failure here somehow (toasts don't work in the async task)
                 }
-                cancelUpdatingNotification();
-                showCheckingNotification();
+                
+                switchToChecking();
             }
         }
 
@@ -160,56 +163,45 @@ public class DbUpdaterService extends IntentService {
 
         mDbHelper.closeTransactional();
 
-        cancelCheckingNotification();
+        cancelStatusNotification();
         showUpdatedNotification(updatedStuff);
 
         return;
     }
-
-    protected void showCheckingNotification() {
-
-        String title = getString(R.string.app_name);
-        String body = getString(R.string.update_notification);
-
-		Notification notification = new Notification(
-                R.drawable.rt_notification_icon, body,
-                System.currentTimeMillis());
-		notification.flags |= Notification.FLAG_ONGOING_EVENT;
-		notification.setLatestEventInfo(this,
-                title, body, mNotificationIntent);
-
-        mNotificationManager.notify(CHECKING_NOTIFICATION, notification);
-    }
-
-    protected void cancelCheckingNotification() {
-        mNotificationManager.cancel(CHECKING_NOTIFICATION);
+    
+    protected void showStatusNotification() {
+    	mNotificationManager.notify(STATUS_NOTIFICATION, mUpdateNotification);
     }
     
-    protected void showUpdatingNotification(String title) {
-		final Notification notification = new Notification(R.drawable.rt_notification_icon, title, System.currentTimeMillis());
+    protected void cancelStatusNotification() {
+    	mNotificationManager.cancel(STATUS_NOTIFICATION);
+    }
+    
+    protected void switchToChecking() {
+    	mHandler.removeCallbacks(mProgressUpdater);
+    	mUpdateNotification.setLatestEventInfo(this, getString(R.string.app_name), getString(R.string.update_notification), mNotificationIntent);
+    	
+    	mNotificationManager.notify(STATUS_NOTIFICATION, mUpdateNotification);
+    }
+    
+    protected void switchToUpdating(String title) {
     	final RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.progress_notification);
     	contentView.setProgressBar(R.id.progress_notification_bar, 100, 0, false);
     	contentView.setTextViewText(R.id.progress_notification_title, title);
-    	notification.contentView = contentView;
-    	notification.contentIntent = mNotificationIntent;
-    	notification.flags |= Notification.FLAG_ONGOING_EVENT;
-    	notification.flags |= Notification.FLAG_ONLY_ALERT_ONCE;
     	
-    	mNotificationManager.notify(UPDATING_NOTIFICATION, notification);
+    	mUpdateNotification.contentView = contentView;
+    	mUpdateNotification.contentIntent = mNotificationIntent;
+    	
+    	mNotificationManager.notify(STATUS_NOTIFICATION, mUpdateNotification);
     	
     	mProgressUpdater = new Runnable() {    		
 			public void run() {
 				contentView.setProgressBar(R.id.progress_notification_bar, 100, mProgress, false);
-				mNotificationManager.notify(UPDATING_NOTIFICATION, notification);
+				mNotificationManager.notify(STATUS_NOTIFICATION, mUpdateNotification);
 				mHandler.postDelayed(mProgressUpdater, 200);
 			}
 		};
 		mHandler.postDelayed(mProgressUpdater, 200);
-    }
-    
-    protected void cancelUpdatingNotification() {
-    	mNotificationManager.cancel(UPDATING_NOTIFICATION);
-    	mHandler.removeCallbacks(mProgressUpdater);
     }
 
     protected void showUpdatedNotification(List<String> newStuff) {
@@ -226,12 +218,9 @@ public class DbUpdaterService extends IntentService {
             }
         }
 
-		Notification notification = new Notification(
-                R.drawable.rt_notification_icon, body,
-                System.currentTimeMillis());
+		Notification notification = new Notification(R.drawable.rt_notification_icon, body, System.currentTimeMillis());
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
-		notification.setLatestEventInfo(this,
-                title, body, mNotificationIntent);
+		notification.setLatestEventInfo(this, title, body, mNotificationIntent);
 
         mNotificationManager.notify(UPDATED_NOTIFICATION, notification);
     }

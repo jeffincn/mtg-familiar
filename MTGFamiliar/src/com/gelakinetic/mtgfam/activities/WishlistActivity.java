@@ -88,6 +88,7 @@ public class WishlistActivity extends FamiliarActivity {
 	public static final String				price_invalid			= "Price Invalid";
 
 	private static final int				AVG_PRICE				= 1;
+	private boolean							doneLoading				= false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -167,7 +168,6 @@ public class WishlistActivity extends FamiliarActivity {
 	            }
 	        }
 		);
-
 	}
 
 	@Override
@@ -186,6 +186,7 @@ public class WishlistActivity extends FamiliarActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		doneLoading = false;
 		ArrayList<CardData> lWishlist = new ArrayList<CardData>();
 
 		WishlistHelpers.ReadWishlist(getApplicationContext(), (WishlistActivity) me, mDbHelper, lWishlist);
@@ -193,7 +194,7 @@ public class WishlistActivity extends FamiliarActivity {
 		//split each card into its own mini-list
 		for(CardData card: (ArrayList<CardData>)lWishlist){
 			AddCardOrUpdateSetCounts(card);
-		}		
+		}
 		aaExpWishlist.notifyDataSetChanged();
 		lWishlist.clear();
 		
@@ -207,6 +208,7 @@ public class WishlistActivity extends FamiliarActivity {
 		}
 		catch (IllegalArgumentException e) {
 		}
+		doneLoading = true;
 	}
 	
 	private void AddCardOrUpdateSetCounts(CardData card){
@@ -268,103 +270,105 @@ public class WishlistActivity extends FamiliarActivity {
 	}
 
 	protected Dialog onCreateDialog(int id) {
-		Dialog dialog;
-		AlertDialog.Builder builder;
-		switch (id) {
-			case DIALOG_UPDATE_CARD: {
-				final WishlistHelpers wh =new WishlistHelpers(); 
-				dialog = (wh).getDialog(cardNames.get(positionForDialog), this, cardSetWishlists.get(positionForDialog));
-				dialog.show();
-
-				final Dialog dlg = dialog;
-				dialog.setOnDismissListener(new OnDismissListener() {
-					@Override
-					public void onDismiss(DialogInterface di) {
-						switch (wh.dismissReason) {
-							case 2:
-								break;
-							case 1:
-							default:
-								LinearLayout lvSets = (LinearLayout) dlg.findViewById(R.id.setList);
-
-								ArrayList<CardData> cardlist = cardSetWishlists.get(positionForDialog);
-								int totalCards = 0;
-								for (int i = 0; i < lvSets.getChildCount(); i++) {
-									View v = lvSets.getChildAt(i);
-									int numberField;
-									try{
-										numberField = Integer.valueOf(((EditText) v.findViewById(R.id.numberInput)).getText().toString());
+		Dialog dialog = null;
+		if(doneLoading){
+			AlertDialog.Builder builder;
+			switch (id) {
+				case DIALOG_UPDATE_CARD: {
+					final WishlistHelpers wh =new WishlistHelpers(); 
+					dialog = (wh).getDialog(cardNames.get(positionForDialog), this, cardSetWishlists.get(positionForDialog));
+					dialog.show();
+	
+					final Dialog dlg = dialog;
+					dialog.setOnDismissListener(new OnDismissListener() {
+						@Override
+						public void onDismiss(DialogInterface di) {
+							switch (wh.dismissReason) {
+								case 2:
+									break;
+								case 1:
+								default:
+									LinearLayout lvSets = (LinearLayout) dlg.findViewById(R.id.setList);
+	
+									ArrayList<CardData> cardlist = cardSetWishlists.get(positionForDialog);
+									int totalCards = 0;
+									for (int i = 0; i < lvSets.getChildCount(); i++) {
+										View v = lvSets.getChildAt(i);
+										int numberField;
+										try{
+											numberField = Integer.valueOf(((EditText) v.findViewById(R.id.numberInput)).getText().toString());
+										}
+										catch(NumberFormatException e){
+											numberField = 0;
+										}
+										CardData cd = cardlist.get(i);
+										int prior = cd.numberOf;
+										cd.numberOf = numberField;
+										totalCards += numberField;
+										if(prior != numberField && numberField != 0){
+											cd.message = ("loading");
+											FetchPriceTask task = mTradeListHelper.new FetchPriceTask(cd, aaExpWishlist, priceSetting, null, (WishlistActivity) me);
+											task.execute();
+										}
+										cardlist.set(i,cd);
 									}
-									catch(NumberFormatException e){
-										numberField = 0;
+									if (totalCards == 0) {
+										cardSetNames.remove(positionForDialog);
+										cardSetWishlists.remove(positionForDialog);
+										cardNames.remove(positionForDialog);
 									}
-									CardData cd = cardlist.get(i);
-									int prior = cd.numberOf;
-									cd.numberOf = numberField;
-									totalCards += numberField;
-									if(prior != numberField && numberField != 0){
-										cd.message = ("loading");
-										FetchPriceTask task = mTradeListHelper.new FetchPriceTask(cd, aaExpWishlist, priceSetting, null, (WishlistActivity) me);
-										task.execute();
-									}
-									cardlist.set(i,cd);
-								}
-								if (totalCards == 0) {
-									cardSetNames.remove(positionForDialog);
-									cardSetWishlists.remove(positionForDialog);
-									cardNames.remove(positionForDialog);
-								}
-								aaExpWishlist.notifyDataSetChanged();
-								break;
-						}
-					}
-				});
-				
-				break;
-			}
-			case DIALOG_PRICE_SETTING: {
-				builder = new AlertDialog.Builder(this);
-
-				builder.setTitle("Price Options");
-				builder.setSingleChoiceItems(new String[] { "Low", "Average", "High" }, priceSetting, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						priceSetting = which;
-						dialog.dismiss();
-
-						// Update ALL the prices (for non-zero counts)!
-						for (int i = 0; i < cardNames.size(); i++){
-							for (CardData data : cardSetWishlists.get(i)) {
-								if(data.numberOf > 0){
-									data.message = ("loading");
-									FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaExpWishlist, priceSetting, null, (WishlistActivity) me);
-									task.execute();
-								}
+									aaExpWishlist.notifyDataSetChanged();
+									break;
 							}
 						}
-						aaExpWishlist.notifyDataSetChanged();
-
-						// And also update the preference
-						SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(WishlistActivity.this).edit();
-						edit.putString("tradePrice", String.valueOf(priceSetting));
-						edit.commit();
-
-						removeDialog(DIALOG_PRICE_SETTING);
-					}
-				});
-
-				dialog = builder.create();
-
-				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-					public void onDismiss(DialogInterface dialog) {
-						removeDialog(DIALOG_PRICE_SETTING);
-					}
-				});
-
-				dialog.show();
-				break;
-			}
-			default: {
-				dialog = null;
+					});
+					
+					break;
+				}
+				case DIALOG_PRICE_SETTING: {
+					builder = new AlertDialog.Builder(this);
+	
+					builder.setTitle("Price Options");
+					builder.setSingleChoiceItems(new String[] { "Low", "Average", "High" }, priceSetting, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							priceSetting = which;
+							dialog.dismiss();
+	
+							// Update ALL the prices (for non-zero counts)!
+							for (int i = 0; i < cardNames.size(); i++){
+								for (CardData data : cardSetWishlists.get(i)) {
+									if(data.numberOf > 0){
+										data.message = ("loading");
+										FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaExpWishlist, priceSetting, null, (WishlistActivity) me);
+										task.execute();
+									}
+								}
+							}
+							aaExpWishlist.notifyDataSetChanged();
+	
+							// And also update the preference
+							SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(WishlistActivity.this).edit();
+							edit.putString("tradePrice", String.valueOf(priceSetting));
+							edit.commit();
+	
+							removeDialog(DIALOG_PRICE_SETTING);
+						}
+					});
+	
+					dialog = builder.create();
+	
+					dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+						public void onDismiss(DialogInterface dialog) {
+							removeDialog(DIALOG_PRICE_SETTING);
+						}
+					});
+	
+					dialog.show();
+					break;
+				}
+				default: {
+					dialog = null;
+				}
 			}
 		}
 		return dialog;

@@ -62,7 +62,6 @@ public class MainActivity extends FamiliarActivity {
 	private TextView					roundTimer;
 	private TextView					trader;
 	private TextView					wishlist;
-	private long							defaultLastRulesUpdate;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -142,12 +141,6 @@ public class MainActivity extends FamiliarActivity {
 				startActivity(i);
 			}
 		});
-
-		if (preferences.getLong("lastRulesUpdate", 0) == 0) {
-			SharedPreferences.Editor edit = preferences.edit();
-			edit.putLong("lastRulesUpdate", defaultLastRulesUpdate);
-			edit.commit();
-		}
 
 		try {
 			pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);

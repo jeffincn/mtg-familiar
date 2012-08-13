@@ -39,6 +39,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
+import com.gelakinetic.mtgfam.activities.SearchActivity.SearchCriteria;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.MyApp;
 import com.gelakinetic.mtgfam.helpers.ResultListAdapter;
@@ -113,18 +114,19 @@ public class ResultListActivity extends FamiliarActivity {
 			c = new MergeCursor(cs);
 		}
 		else {
-			int setLogic = extras.getInt(SearchActivity.SETLOGIC);
+			SearchCriteria criteria = (SearchCriteria) extras.getSerializable(SearchActivity.CRITERIA);
+			int setLogic = criteria.Set_Logic;
 			boolean consolidate = (setLogic==CardDbAdapter.MOSTRECENTPRINTING || setLogic==CardDbAdapter.FIRSTPRINTING)?true:false; 
-			c = mDbHelper.Search(extras.getString(SearchActivity.NAME), extras.getString(SearchActivity.TEXT),
-					extras.getString(SearchActivity.TYPE), extras.getString(SearchActivity.COLOR),
-					extras.getInt(SearchActivity.COLORLOGIC), extras.getString(SearchActivity.SET),
-					extras.getFloat(SearchActivity.POW_CHOICE), extras.getString(SearchActivity.POW_LOGIC),
-					extras.getFloat(SearchActivity.TOU_CHOICE), extras.getString(SearchActivity.TOU_LOGIC),
-					extras.getInt(SearchActivity.CMC), extras.getString(SearchActivity.CMC_LOGIC),
-					extras.getString(SearchActivity.FORMAT), extras.getString(SearchActivity.RARITY),
-					extras.getString(SearchActivity.FLAVOR), extras.getString(SearchActivity.ARTIST),
-					extras.getInt(SearchActivity.TYPELOGIC), extras.getInt(SearchActivity.TEXTLOGIC),
-					extras.getInt(SearchActivity.SETLOGIC), true, returnTypes, consolidate);
+			c = mDbHelper.Search(criteria.Name, criteria.Text,
+					criteria.Type, criteria.Color,
+					criteria.Color_Logic, criteria.Set,
+					criteria.Pow_Choice, criteria.Pow_Logic,
+					criteria.Tou_Choice, criteria.Tou_Logic,
+					criteria.Cmc, criteria.Cmc_Logic,
+					criteria.Format, criteria.Rarity,
+					criteria.Flavor, criteria.Artist,
+					criteria.Type_Logic, criteria.Text_Logic,
+					criteria.Set_Logic, true, returnTypes, consolidate);
 		}
 
 		if (c == null || c.getCount() == 0) {

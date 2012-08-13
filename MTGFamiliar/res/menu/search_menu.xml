@@ -30,4 +30,16 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:showAsAction="always"
         android:title="@string/search_clear_fields"/>
 
+    <item
+        android:id="@+id/search_menu_save_defaults"
+        android:icon="@drawable/menu_settings"
+        android:showAsAction="always"
+        android:title="@string/search_save_defaults"/>
+    
+    <item
+        android:id="@+id/search_menu_load_defaults"
+        android:icon="@drawable/menu_load"
+        android:showAsAction="always"
+        android:title="@string/search_load_defaults"/>
+        
 </menu>

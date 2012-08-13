@@ -16,6 +16,7 @@ import android.widget.ListView;
 
 import com.actionbarsherlock.view.Menu;
 import com.gelakinetic.mtgfam.R;
+import com.gelakinetic.mtgfam.activities.SearchActivity.SearchCriteria;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.ResultListAdapter;
 
@@ -91,28 +92,11 @@ public class WidgetSearchActivity extends FamiliarActivity {
 		}
 
 		Intent i = new Intent(mCtx, ResultListActivity.class);
-
-		i.putExtra(SearchActivity.NAME, name);
-		i.putExtra(SearchActivity.TEXT, (String) null);
-		i.putExtra(SearchActivity.TYPE, (String) null);
-		i.putExtra(SearchActivity.COLOR, "wubrgl");
-		i.putExtra(SearchActivity.COLORLOGIC, 0);
-		i.putExtra(SearchActivity.SET, (String) null);
-		i.putExtra(SearchActivity.FORMAT, (String) null);
-		i.putExtra(SearchActivity.POW_CHOICE, (float) CardDbAdapter.NOONECARES);
-		i.putExtra(SearchActivity.POW_LOGIC, (String) null);
-		i.putExtra(SearchActivity.TOU_CHOICE, (float) CardDbAdapter.NOONECARES);
-		i.putExtra(SearchActivity.TOU_LOGIC, (String) null);
-		i.putExtra(SearchActivity.CMC, -1);
-		i.putExtra(SearchActivity.CMC_LOGIC, (String) null);
-		i.putExtra(SearchActivity.RARITY, (String) null);
-		i.putExtra(SearchActivity.ARTIST, (String) null);
-		i.putExtra(SearchActivity.FLAVOR, (String) null);
+		SearchCriteria criteria = new SearchCriteria();
+		criteria.Name = name;
+		
+		i.putExtra(SearchActivity.CRITERIA,criteria);
 		i.putExtra(SearchActivity.RANDOM, false);
-		// Lines below added by Reuben Kriegel
-		i.putExtra(SearchActivity.TYPELOGIC, 0);
-		i.putExtra(SearchActivity.TEXTLOGIC, 0);
-		// End addition
 		startActivityForResult(i, 0);
 	}
 

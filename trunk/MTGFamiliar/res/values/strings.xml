@@ -126,6 +126,8 @@
     <string name="search_search">Search!</string>
     <string name="search_randomize">Randomize!</string>
     <string name="search_clear_fields">Clear Fields</string>
+    <string name="search_save_defaults">Save Defaults</string>
+    <string name="search_load_defaults">Load Defaults</string>
     <string name="search_toast_no_results">No search reesults found.</string>
     
     

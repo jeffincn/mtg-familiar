@@ -21,7 +21,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <item
         android:id="@+id/search_menu_random_search"
         android:icon="@drawable/menu_random"
-        android:showAsAction="always"
+        android:showAsAction="ifRoom"
         android:title="@string/search_randomize"></item>
 
     <item
@@ -33,13 +33,13 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <item
         android:id="@+id/search_menu_save_defaults"
         android:icon="@drawable/menu_settings"
-        android:showAsAction="always"
+        android:showAsAction="never"
         android:title="@string/search_save_defaults"/>
     
     <item
         android:id="@+id/search_menu_load_defaults"
         android:icon="@drawable/menu_load"
-        android:showAsAction="always"
+        android:showAsAction="never"
         android:title="@string/search_load_defaults"/>
         
 </menu>

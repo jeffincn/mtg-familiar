@@ -98,7 +98,7 @@ public class WishlistActivity extends FamiliarActivity {
 		mTradeListHelper = new TradeListHelpers();
 
 		showTotalPrice = preferences.getBoolean("showTotalPriceWishlistPref", false);
-		verbose = preferences.getBoolean("verboseWishlistPref", true);
+		verbose = preferences.getBoolean("verboseWishlistPref", false);
 
 		namefield = (AutoCompleteTextView) findViewById(R.id.namesearch);
 		namefield.setAdapter(new AutocompleteCursorAdapter(this, null));

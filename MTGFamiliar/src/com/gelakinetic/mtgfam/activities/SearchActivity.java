@@ -957,12 +957,13 @@ public class SearchActivity extends FamiliarActivity {
 			case R.id.search_menu_clear:
 				clear();
 				return true;
-			case R.id.search_menu_save_defaults:
-				persistOptions();
-				return true;
-			case R.id.search_menu_load_defaults:
-				fetchPersistedOptions();
-				return true;
+			//To be uncommented for 1.9
+//			case R.id.search_menu_save_defaults:
+//				persistOptions();
+//				return true;
+//			case R.id.search_menu_load_defaults:
+//				fetchPersistedOptions();
+//				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}

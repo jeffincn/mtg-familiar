@@ -28,14 +28,17 @@ import java.util.concurrent.TimeUnit;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.os.PowerManager.WakeLock;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
@@ -61,6 +64,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.GatheringsIO;
 import com.gelakinetic.mtgfam.helpers.GatheringsPlayerData;
+import com.gelakinetic.mtgfam.helpers.RoundTimerService;
 
 public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListener {
 	private static final String								NO_GATHERINGS_EXIST			= "No Gatherings exist.";
@@ -126,12 +130,44 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	private boolean													ttsInitialized				= false;
 
 	private GatheringsIO										gIO;
+	
+	private LinearLayout timerLayout;
+	private TextView timerText;
+	private boolean updatingDisplay;
+	private long endTime;
+	private Handler timerHandler;
+	private Runnable timerUpdate = new Runnable() {
+		@Override
+		public void run() {
+			displayTimeLeft();
+
+			if (endTime > SystemClock.elapsedRealtime()) {
+				timerLayout.setVisibility(View.VISIBLE);
+				timerHandler.postDelayed(timerUpdate, 200);
+			}
+			else {
+				timerLayout.setVisibility(View.GONE);
+			}
+		}
+	};
+	private BroadcastReceiver endTimeReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			endTime = intent.getLongExtra(RoundTimerService.EXTRA_END_TIME,
+					SystemClock.elapsedRealtime());
+			startUpdatingDisplay();
+		}
+	};
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.n_player_life_activity);
+		
+		timerHandler = new Handler();
+		
+		registerReceiver(endTimeReceiver, new IntentFilter(RoundTimerActivity.RESULT_FILTER));
 
 		gIO = new GatheringsIO(getApplicationContext());
 
@@ -151,6 +187,9 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		dieButton = (ImageView) findViewById(R.id.die_button);
 		poolButton = (ImageView) findViewById(R.id.pool_button);
 		resetButton = (ImageView) findViewById(R.id.reset_button);
+		
+		timerText = (TextView) findViewById(R.id.life_counter_timer_display);
+		timerLayout = (LinearLayout) findViewById(R.id.life_counter_timer_layout);
 
 		anchor = this;
 
@@ -228,6 +267,10 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		if (preferences.getBoolean("hasTts", false)) {
 			tts = new TextToSpeech(this, this);
 		}
+		
+		Intent i = new Intent(RoundTimerService.REQUEST_FILTER);
+		sendBroadcast(i);
+		updatingDisplay = true;
 	}
 
 	@Override
@@ -237,12 +280,15 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		if (tts != null) {
 			tts.shutdown();
 		}
+		unregisterReceiver(endTimeReceiver);
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-
+		
+		updatingDisplay = false;
+		
 		if (canGetLock) {
 			wl.release();
 		}
@@ -262,6 +308,10 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	@Override
 	public void onResume() {
 		super.onResume();
+		
+		if (!updatingDisplay) {
+			startUpdatingDisplay();
+		}
 
 		try {
 			dismissDialog(DIALOG_RESET_CONFIRM);
@@ -1313,5 +1363,49 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		MenuInflater inflater = new MenuInflater(this);
 		inflater.inflate(R.menu.life_counter_menu, menu);
 		return true;
+	}
+	
+	private void startUpdatingDisplay() {
+		updatingDisplay = true;
+		displayTimeLeft();
+		timerHandler.removeCallbacks(timerUpdate);
+		timerHandler.postDelayed(timerUpdate, 200);
+	}
+	
+	private void displayTimeLeft() {
+		long timeLeftMillis = endTime - SystemClock.elapsedRealtime();
+		String timeLeftStr = "";
+
+		if (timeLeftMillis <= 0) {
+			timeLeftStr = "00:00:00";
+		}
+		else {
+			long timeLeftInSecs = (timeLeftMillis / 1000);
+
+			// This is a slight hack to handle the fact that it always rounds down. It
+			// makes the clock look much nicer this way.
+			timeLeftInSecs++;
+
+			String hours = String.valueOf(timeLeftInSecs / (3600));
+			String minutes = String.valueOf((timeLeftInSecs % 3600) / 60);
+			String seconds = String.valueOf(timeLeftInSecs % 60);
+
+			if (hours.length() == 1) {
+				timeLeftStr += "0";
+			}
+			timeLeftStr += hours + ":";
+
+			if (minutes.length() == 1) {
+				timeLeftStr += "0";
+			}
+			timeLeftStr += minutes + ":";
+
+			if (seconds.length() == 1) {
+				timeLeftStr += "0";
+			}
+			timeLeftStr += seconds;
+		}
+
+		timerText.setText(timeLeftStr);
 	}
 }

@@ -81,7 +81,8 @@
   	<!-- 1.8  -->
  	- Create a Gathering: Set life counter defaults for different groups&lt;br />&lt;br />
  	- Wishlist: Add cards from the card\'s menu&lt;br />&lt;br />
- 	- Life Counter Compact Mode: Fit four players on the same screen&lt;br />&lt;br /> 
+ 	- Life Counter Compact Mode: Fit four players on the same screen&lt;br />&lt;br />
+ 	- Round timer display in the life counter: No need to switch to check the clock&lt;br />&lt;br /> 
  	- Actionbar for everybody! Ice Cream Sandwitch UI goodness&lt;br />&lt;br /> 
  	- Brand new updater: faster and out of the way&lt;br />&lt;br /> 
  	- Database stability improvements and bugfixes 
@@ -158,6 +159,7 @@
     <string name="life_counter_plus_five">+5</string>
     <string name="life_counter_minus_one">-1</string>
     <string name="life_counter_minus_five">-5</string>
+    <string name="life_counter_round_end">Round ends in:</string>
     <string name="life_counter_announce_life">Announce Life Totals</string>
     <string name="life_counter_change_default_gathering">Edit Gatherings</string>
     <string name="life_counter_set_gathering">Set Current Gathering</string>

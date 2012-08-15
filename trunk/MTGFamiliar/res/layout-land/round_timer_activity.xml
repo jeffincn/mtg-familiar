@@ -100,7 +100,8 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
                 android:layout_width="fill_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="2.5"
-                android:gravity="center"
+                android:gravity="right|center_vertical"
+                android:paddingRight="10dp"
                 android:text="@string/timer_round_end" />
 
             <TextView
@@ -109,7 +110,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
+                android:gravity="left|center_vertical"
                 android:text="@string/timer_default_time"
                 android:textSize="30pt" />
 

@@ -138,7 +138,7 @@
 	            android:title="@string/pref_display_mode_title"
 	            android:summary="@string/pref_display_mode_summary"
 	            android:key="displayMode"
-	            android:defaultValue="1"/>
+	            android:defaultValue="0"/>
 	    
 	    </PreferenceCategory>
         	    

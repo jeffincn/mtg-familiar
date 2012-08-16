@@ -75,6 +75,7 @@ import com.gelakinetic.mtgfam.helpers.TradeListHelpers.FetchPriceTask;
 
 public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListener {
 	private static final String								NO_GATHERINGS_EXIST			= "No Gatherings exist.";
+	private static final String								DISPLAY_MODE_UNSUPPORTED	= "Current display mode is not supported in this orientation. Switching to normal display mode.";
 
 	private static final int								DIALOG_RESET_CONFIRM	= 0;
 	private static final int								DIALOG_REMOVE_PLAYER	= 1;
@@ -193,8 +194,13 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		listSizeWidth = -10;
 
 		canGetLock = preferences.getBoolean("wakelock", true);
-		displayMode = Integer.parseInt(preferences.getString("displayMode", String.valueOf(normalDisplay)));
+		displayMode = Integer.parseInt(preferences.getString("displayMode", String.valueOf(normalDisplay)));		
 		editor = preferences.edit();
+		
+		if (orientation == LANDSCAPE && displayMode == compactDisplay){
+			displayMode = normalDisplay; 
+			Toast.makeText(mCtx, DISPLAY_MODE_UNSUPPORTED, Toast.LENGTH_LONG).show();
+		}
 
 		poisonButton = (ImageView) findViewById(R.id.poison_button);
 		lifeButton = (ImageView) findViewById(R.id.life_button);

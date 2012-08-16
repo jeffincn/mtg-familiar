@@ -38,8 +38,8 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
-import android.os.SystemClock;
 import android.os.PowerManager.WakeLock;
+import android.os.SystemClock;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.view.LayoutInflater;
@@ -140,6 +140,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		@Override
 		public void run() {
 			displayTimeLeft();
+			//Log.i("LifeCounter", "Updating time");
 
 			if (endTime > SystemClock.elapsedRealtime()) {
 				timerLayout.setVisibility(View.VISIBLE);
@@ -147,6 +148,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			}
 			else {
 				timerLayout.setVisibility(View.GONE);
+				timerHandler.removeCallbacks(timerUpdate);
 			}
 		}
 	};
@@ -288,6 +290,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		super.onPause();
 		
 		updatingDisplay = false;
+		timerHandler.removeCallbacks(timerUpdate);
 		
 		if (canGetLock) {
 			wl.release();

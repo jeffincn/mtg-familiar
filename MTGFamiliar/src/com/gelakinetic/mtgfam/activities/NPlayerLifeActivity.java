@@ -42,6 +42,7 @@ import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,6 +59,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.ActionBarSherlock;
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -131,11 +134,10 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 
 	private GatheringsIO										gIO;
 	
-	private LinearLayout timerLayout;
-	private TextView timerText;
 	private boolean updatingDisplay;
 	private long endTime;
 	private Handler timerHandler;
+	private boolean	timeShowing;
 	private Runnable timerUpdate = new Runnable() {
 		@Override
 		public void run() {
@@ -143,11 +145,13 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			//Log.i("LifeCounter", "Updating time");
 
 			if (endTime > SystemClock.elapsedRealtime()) {
-				timerLayout.setVisibility(View.VISIBLE);
+				getSupportActionBar().setDisplayShowTitleEnabled(true);
+				timeShowing = true;
 				timerHandler.postDelayed(timerUpdate, 200);
 			}
 			else {
-				timerLayout.setVisibility(View.GONE);
+				timeShowing = false;
+				getSupportActionBar().setDisplayShowTitleEnabled(false);
 				timerHandler.removeCallbacks(timerUpdate);
 			}
 		}
@@ -166,6 +170,9 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.n_player_life_activity);
+		
+		timeShowing = false;
+		getSupportActionBar().setDisplayShowTitleEnabled(false);
 		
 		timerHandler = new Handler();
 		
@@ -190,10 +197,11 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		poolButton = (ImageView) findViewById(R.id.pool_button);
 		resetButton = (ImageView) findViewById(R.id.reset_button);
 		
-		timerText = (TextView) findViewById(R.id.life_counter_timer_display);
-		timerLayout = (LinearLayout) findViewById(R.id.life_counter_timer_layout);
-
 		anchor = this;
+		
+//		ActionBar ab = getSupportActionBar();
+//		ab.setDisplayShowTitleEnabled(true);
+//		ab.setTitle("title");
 
 		poisonButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
@@ -1409,6 +1417,8 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 			timeLeftStr += seconds;
 		}
 
-		timerText.setText(timeLeftStr);
+		if(timeShowing){
+			getSupportActionBar().setTitle(timeLeftStr);
+		}
 	}
 }

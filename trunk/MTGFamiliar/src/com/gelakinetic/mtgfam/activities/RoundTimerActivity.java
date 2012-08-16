@@ -63,6 +63,7 @@ public class RoundTimerActivity extends FamiliarActivity {
 	private Runnable updateTimeViewTask = new Runnable() {
 		public void run() {
 			displayTimeLeft();
+			//Log.i("RoundTimer", "Updating time");
 
 			if (endTime > SystemClock.elapsedRealtime()) {
 				actionButton.setText(R.string.timer_cancel);
@@ -70,6 +71,7 @@ public class RoundTimerActivity extends FamiliarActivity {
 			}
 			else {
 				actionButton.setText(R.string.timer_start);
+				timerHandler.removeCallbacks(updateTimeViewTask);
 			}
 		}
 	};
@@ -159,6 +161,7 @@ public class RoundTimerActivity extends FamiliarActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
+		timerHandler.removeCallbacks(updateTimeViewTask);
 		updatingDisplay = false; // So we resume the updates when we resume the
 															// activity
 	}

@@ -33,6 +33,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -40,6 +41,7 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
@@ -68,6 +70,8 @@ import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.GatheringsIO;
 import com.gelakinetic.mtgfam.helpers.GatheringsPlayerData;
 import com.gelakinetic.mtgfam.helpers.RoundTimerService;
+import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
+import com.gelakinetic.mtgfam.helpers.TradeListHelpers.FetchPriceTask;
 
 public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListener {
 	private static final String								NO_GATHERINGS_EXIST			= "No Gatherings exist.";
@@ -75,6 +79,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	private static final int								DIALOG_RESET_CONFIRM	= 0;
 	private static final int								DIALOG_REMOVE_PLAYER	= 1;
 	private static final int								DIALOG_SET_NAME				= 2;
+	private static final int								DIALOG_CHANGE_DISPLAY	= 3;
 	private static final int								LIFE									= 0;
 	private static final int								POISON								= 1;
 	public static final int									INITIAL_LIFE					= 20;
@@ -85,10 +90,10 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	protected static final int							EVERYTHING						= 0;
 	protected static final int							JUST_TOTALS						= 1;
 
-	private String 													displayMode;
-	private static final String										normalDisplay = "1";
-	private static final String										compactDisplay = "2";
-	private static final String										commanderDisplay = "3";
+	private int 													displayMode;
+	private static final int										normalDisplay = 0;
+	private static final int										compactDisplay = 1;
+	private static final int										commanderDisplay = 2;
 	
 	private int															playerWidth;
 	private int															playerHeight;
@@ -188,7 +193,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		listSizeWidth = -10;
 
 		canGetLock = preferences.getBoolean("wakelock", true);
-		displayMode = preferences.getString("displayMode", "1");
+		displayMode = Integer.parseInt(preferences.getString("displayMode", String.valueOf(normalDisplay)));
 		editor = preferences.edit();
 
 		poisonButton = (ImageView) findViewById(R.id.poison_button);
@@ -548,6 +553,36 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 						}).create();
 
 				break;
+			case DIALOG_CHANGE_DISPLAY:
+				builder = new AlertDialog.Builder(this);
+
+				builder.setTitle(R.string.pref_display_mode_title);
+				builder.setSingleChoiceItems(getResources().getStringArray(R.array.display_array_entries), displayMode, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						displayMode = which;
+
+						Intent i = new Intent(NPlayerLifeActivity.this, NPlayerLifeActivity.class);
+						finish();
+						startActivity(i);
+						
+						// And also update the preference
+						editor.putString("displayMode", String.valueOf(displayMode));
+						editor.commit();
+
+						removeDialog(DIALOG_CHANGE_DISPLAY);
+					}
+				});
+
+				dialog = builder.create();
+
+				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					public void onDismiss(DialogInterface dialog) {
+						removeDialog(DIALOG_CHANGE_DISPLAY);
+					}
+				});
+
+				dialog.show();
+				break;
 			default:
 				dialog = null;
 		}
@@ -623,7 +658,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 
 		players.add(p);
 
-		if (displayMode.equals(compactDisplay) && orientation != LANDSCAPE) {
+		if (displayMode == compactDisplay && orientation != LANDSCAPE) {
 			p.hideHistory();
 
 			if (playersInRow == 0) {
@@ -641,7 +676,7 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 				doublePlayer = null;
 				playersInRow = 0;
 			}
-		} else if (displayMode.equals(commanderDisplay) && orientation != LANDSCAPE){
+		} else if (displayMode == commanderDisplay && orientation != LANDSCAPE){
 			LinearLayout halfFillLayout = (LinearLayout) inflater.inflate(R.layout.life_counter_player_double_row, null);
 			LinearLayout playerPlacement = (LinearLayout) halfFillLayout.findViewById(R.id.playerLeft);
 			LinearLayout commanderPlacement = (LinearLayout) halfFillLayout.findViewById(R.id.playerRight);
@@ -676,14 +711,14 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		// of all the player views, just restart the activity when in compact mode,
 		// this will adjust the
 		// layouts to not have a blank area when players are removed.
-		if (displayMode.equals(compactDisplay)) {
+		if (displayMode == compactDisplay) {
 			mainLayout.removeView(players.get(index).layout);
 			players.remove(index);
 			
 			Intent intent = getIntent();
 			finish();
 			startActivity(intent);
-		} else if (displayMode.equals(commanderDisplay)){
+		} else if (displayMode == commanderDisplay){
 			mainLayout.removeView((View)players.get(index).layout.getParent().getParent());
 			players.remove(index);
 			
@@ -1352,6 +1387,9 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 					}
 				});
 				builder.create().show();
+				return true;
+			case R.id.display_mode:
+				showDialog(DIALOG_CHANGE_DISPLAY);
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

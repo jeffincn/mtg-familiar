@@ -497,7 +497,7 @@ public class CardDbAdapter {
 	 *           if Card could not be found/retrieved
 	 */
 	public Cursor fetchCardByName(String name) throws SQLException {
-		name = name.replace("'", "''").replace("ï¿½", "ï¿½");
+		name = name.replace("'", "''").replace("æ", "Æ");
 		String sql = "SELECT " + DATABASE_TABLE_CARDS + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " + DATABASE_TABLE_CARDS + "." + KEY_SET + ", " + DATABASE_TABLE_CARDS + "." + KEY_NUMBER + ", "+ DATABASE_TABLE_CARDS + "." + KEY_TYPE + ", " + DATABASE_TABLE_CARDS + "." + KEY_MANACOST + ", " + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + ", " + DATABASE_TABLE_CARDS + "." + KEY_POWER + ", " + DATABASE_TABLE_CARDS + "." + KEY_TOUGHNESS + ", " + DATABASE_TABLE_CARDS + "." + KEY_LOYALTY + ", " + DATABASE_TABLE_CARDS + "." + KEY_RARITY +  " FROM "+ DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = "+ DATABASE_TABLE_CARDS + "." + KEY_SET + " WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + name+ "' ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC";
 		Cursor mCursor = null;
 
@@ -518,7 +518,7 @@ public class CardDbAdapter {
 	}
 
 	public Cursor fetchCardByNameAndSet(String name, String setCode) throws SQLException {
-		name = name.replace("'", "''").replace("ï¿½", "ï¿½");
+		name = name.replace("'", "''").replace("æ", "Æ");
 		String sql = "SELECT " + DATABASE_TABLE_CARDS + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " + DATABASE_TABLE_CARDS + "." + KEY_SET + ", " + DATABASE_TABLE_CARDS + "." + KEY_NUMBER + ", "+ DATABASE_TABLE_CARDS + "." + KEY_TYPE + ", " + DATABASE_TABLE_CARDS + "." + KEY_MANACOST + ", " + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + ", " + DATABASE_TABLE_CARDS + "." + KEY_POWER + ", " + DATABASE_TABLE_CARDS + "." + KEY_TOUGHNESS + ", " + DATABASE_TABLE_CARDS + "." + KEY_LOYALTY + ", " + DATABASE_TABLE_CARDS + "." + KEY_RARITY +  " FROM "+ DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = "+ DATABASE_TABLE_CARDS + "." + KEY_SET +
 				" WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + name+ "' AND " + DATABASE_TABLE_CARDS + "." + KEY_SET + " = '" + setCode + "' ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC";
 		Cursor mCursor = null;
@@ -540,7 +540,7 @@ public class CardDbAdapter {
 	}
 
 	public long fetchIdByName(String name) throws SQLException {
-		name = name.replace("'", "''").replace("ï¿½", "ï¿½");
+		name = name.replace("'", "''").replace("æ", "Æ");
 		String statement = "(" + KEY_NAME + " = '" + name + "')";
 		Cursor mCursor = null;
 		try {
@@ -604,7 +604,7 @@ public class CardDbAdapter {
 		Cursor mCursor = null;
 
 		if (cardname != null)
-			cardname = cardname.replace("'", "''").replace("ï¿½", "ï¿½").trim();
+			cardname = cardname.replace("'", "''").replace("æ", "Æ").trim();
 
 		String sql = "SELECT MIN(" + KEY_ID + ") AS " + KEY_ID + ", " + KEY_NAME + " FROM " + DATABASE_TABLE_CARDS
 				+ " WHERE " + KEY_NAME + " LIKE '" + cardname + "%' GROUP BY " + KEY_NAME + " ORDER BY " + KEY_NAME;
@@ -632,7 +632,7 @@ public class CardDbAdapter {
 		Cursor mCursor = null;
 
 		if (cardname != null)
-			cardname = cardname.replace("'", "''").replace("ï¿½", "ï¿½").trim();
+			cardname = cardname.replace("'", "''").replace("æ", "Æ").trim();
 		if (cardtext != null)
 			cardtext = cardtext.replace("'", "''").trim();
 		if (cardtype != null)
@@ -1047,7 +1047,7 @@ public class CardDbAdapter {
 		Cursor mCursor = null;
 
 		if (cardname != null)
-			cardname = cardname.replace("'", "''").replace("ï¿½", "ï¿½").trim();
+			cardname = cardname.replace("'", "''").replace("æ", "Æ").trim();
 
 		String statement = " WHERE 1=1";
 
@@ -1175,7 +1175,7 @@ public class CardDbAdapter {
 	public static final int	RESTRICTED	= 2;
 
 	public int checkLegality(String mCardName, String format) {
-		mCardName = mCardName.replace("'", "''").replace("ï¿½", "ï¿½");
+		mCardName = mCardName.replace("'", "''").replace("æ", "Æ");
 		format = format.replace("'", "''"); // Just to be safe; remember Bobby
 																				// Tables
 		try {
@@ -1518,7 +1518,7 @@ public class CardDbAdapter {
 	 * @return Cursor over all words that match, or null if none found.
 	 */
 	public Cursor getWordMatches(String query, String[] columns) {
-		String selection = KEY_NAME + " LIKE '" + query.replace("'", "''").replace("ï¿½", "ï¿½").trim() + "%'";
+		String selection = KEY_NAME + " LIKE '" + query.replace("'", "''").replace("æ", "Æ").trim() + "%'";
 		String[] selectionArgs = null;
 
 		return query(selection, selectionArgs, columns);

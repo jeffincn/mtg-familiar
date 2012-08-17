@@ -22,7 +22,6 @@ package com.gelakinetic.mtgfam.helpers;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -102,7 +101,7 @@ public class ResultListAdapter extends SimpleCursorAdapter implements SectionInd
 				String name = c.getString(c.getColumnIndex(from[i]));
 				hideCost = false;
 				name = name.replace("{", "<img src=\"").replace("}", "\"/>");
-				CharSequence csq = Html.fromHtml(name, imgGetter, null);
+				CharSequence csq = ImageGetterHelper.jellyBeanHack(name, imgGetter, null);
 				textfield.setText(csq);
 			}
 			else if (CardDbAdapter.KEY_SET.equals(from[i])) {
@@ -137,7 +136,7 @@ public class ResultListAdapter extends SimpleCursorAdapter implements SectionInd
 				String name = c.getString(c.getColumnIndex(from[i]));
 				hideAbility = false;
 				name = name.replace("{", "<img src=\"").replace("}", "\"/>");
-				CharSequence csq = Html.fromHtml(name, imgGetter, null);
+				CharSequence csq = ImageGetterHelper.jellyBeanHack(name, imgGetter, null);
 				textfield.setText(csq);
 			}
 			else if (CardDbAdapter.KEY_POWER.equals(from[i])) {

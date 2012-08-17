@@ -30,7 +30,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.view.Window;
@@ -45,6 +44,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
+import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 
 public class RandomCardActivity extends FamiliarActivity {
 	private static final int		RULESDIALOG				= 0;
@@ -282,7 +282,7 @@ public class RandomCardActivity extends FamiliarActivity {
 					dialog.cancel();
 				}
 			});
-			builder.setMessage(Html.fromHtml(getString(R.string.mojhosto_rules_text)));
+			builder.setMessage(ImageGetterHelper.jellyBeanHack(getString(R.string.mojhosto_rules_text)));
 			builder.setTitle(R.string.mojhosto_rules_title);
 			d = builder.create();
 		}
@@ -316,7 +316,7 @@ public class RandomCardActivity extends FamiliarActivity {
 		else if (id == CORRUPTION) {
 			View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
 			TextView text = (TextView) dialogLayout.findViewById(R.id.corruption_message);
-			text.setText(Html.fromHtml(getString(R.string.error_corruption)));
+			text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.error_corruption)));
 			text.setMovementMethod(LinkMovementMethod.getInstance());
 
 			d = new AlertDialog.Builder(this).setTitle(R.string.error).setView(dialogLayout)

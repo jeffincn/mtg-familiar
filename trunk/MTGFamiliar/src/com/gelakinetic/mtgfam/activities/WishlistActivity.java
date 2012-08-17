@@ -24,13 +24,12 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.DialogInterface.OnDismissListener;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -578,7 +577,7 @@ public class WishlistActivity extends FamiliarActivity {
 				else {
 					costField.setVisibility(View.VISIBLE);
 					manaCost = manaCost.replace("{", "<img src=\"").replace("}", "\"/>");
-					costField.setText(Html.fromHtml(manaCost, imgGetter, null));
+					costField.setText(ImageGetterHelper.jellyBeanHack(manaCost, imgGetter, null));
 					costField.setOnClickListener(onClick);
 				}
 				String ability = data.ability;
@@ -588,7 +587,7 @@ public class WishlistActivity extends FamiliarActivity {
 				else {
 					abilityField.setVisibility(View.VISIBLE);
 					ability = ability.replace("{", "<img src=\"").replace("}", "\"/>");
-					abilityField.setText(Html.fromHtml(ability, imgGetter, null));
+					abilityField.setText(ImageGetterHelper.jellyBeanHack(ability, imgGetter, null));
 					abilityField.setOnClickListener(onClick);
 				}
 				boolean hidePT = true;

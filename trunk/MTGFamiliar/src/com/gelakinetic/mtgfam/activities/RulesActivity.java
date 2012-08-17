@@ -34,7 +34,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
@@ -281,7 +280,7 @@ public class RulesActivity extends FamiliarActivity {
 		else if (id == CORRUPTION) {
 			View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
 			TextView text = (TextView) dialogLayout.findViewById(R.id.corruption_message);
-			text.setText(Html.fromHtml(getString(R.string.error_corruption)));
+			text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.error_corruption)));
 			text.setMovementMethod(LinkMovementMethod.getInstance());
 
 			result = new AlertDialog.Builder(this).setTitle(R.string.error).setView(dialogLayout)
@@ -337,7 +336,7 @@ public class RulesActivity extends FamiliarActivity {
 		encodedInput = hyperlinkPattern.matcher(encodedInput).replaceAll("\\<a href=\"http://$2$3\"\\>$2$3\\</a\\>");
 		encodedInput = encodedInput.replace("{", "").replace("}", "");
 
-		CharSequence cs = Html.fromHtml(encodedInput, imgGetter, null);
+		CharSequence cs = ImageGetterHelper.jellyBeanHack(encodedInput, imgGetter, null);
 		SpannableString result = new SpannableString(cs);
 
 		if (linkify) {

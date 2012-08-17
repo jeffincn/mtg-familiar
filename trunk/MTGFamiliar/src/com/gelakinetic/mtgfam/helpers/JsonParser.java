@@ -30,7 +30,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.activities.FamiliarActivity.OTATask;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 

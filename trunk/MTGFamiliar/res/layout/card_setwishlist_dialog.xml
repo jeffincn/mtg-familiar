@@ -40,6 +40,14 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true" >
 
+        
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/dialog_cancel" />
+        
         <Button
             android:id="@+id/done"
             android:layout_width="0dp"
@@ -47,12 +55,6 @@
             android:layout_weight="1"
             android:text="@string/dialog_done" />
 
-        <Button
-            android:id="@+id/cancel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/dialog_cancel" />
     </LinearLayout>
 
 </RelativeLayout>

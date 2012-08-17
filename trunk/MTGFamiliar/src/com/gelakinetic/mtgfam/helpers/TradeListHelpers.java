@@ -16,7 +16,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.os.AsyncTask;
-import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 

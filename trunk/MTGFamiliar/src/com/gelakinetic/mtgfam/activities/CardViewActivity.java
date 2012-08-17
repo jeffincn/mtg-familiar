@@ -282,7 +282,7 @@ public class CardViewActivity extends FamiliarActivity {
 				.getString(c.getColumnIndex(CardDbAdapter.KEY_MANACOST));
 		sCost = sCost.replace("{", "<img src=\"").replace("}", "\"/>");
 
-		CharSequence csCost = Html.fromHtml(sCost, imgGetter, null);
+		CharSequence csCost = ImageGetterHelper.jellyBeanHack(sCost, imgGetter, null);
 
 		c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
 
@@ -294,12 +294,12 @@ public class CardViewActivity extends FamiliarActivity {
 		String sAbility = c
 				.getString(c.getColumnIndex(CardDbAdapter.KEY_ABILITY))
 				.replace("{", "<img src=\"").replace("}", "\"/>");
-		CharSequence csAbility = Html.fromHtml(sAbility, imgGetter, null);
+		CharSequence csAbility = ImageGetterHelper.jellyBeanHack(sAbility, imgGetter, null);
 		ability.setText(csAbility);
 
 		String sFlavor = c
 				.getString(c.getColumnIndex(CardDbAdapter.KEY_FLAVOR));
-		CharSequence csFlavor = Html.fromHtml(sFlavor, imgGetter, null);
+		CharSequence csFlavor = ImageGetterHelper.jellyBeanHack(sFlavor, imgGetter, null);
 		flavor.setText(csFlavor);
 
 		artist.setText(c.getString(c.getColumnIndex(CardDbAdapter.KEY_ARTIST)));
@@ -521,7 +521,7 @@ public class CardViewActivity extends FamiliarActivity {
 				if (setCode.equals("PP2")) {
 					picurl = "http://magiccards.info/extras/plane/planechase-2012-edition/"
 							+ cardName + ".jpg";
-					picurl = picurl.replace(" ", "-").replace("ï¿½", "Ae")
+					picurl = picurl.replace(" ", "-").replace("Æ", "Ae")
 							.replace("?", "").replace(",", "").replace("'", "")
 							.replace("!", "");
 				} else if (setCode.equals("PCP")) {
@@ -543,13 +543,13 @@ public class CardViewActivity extends FamiliarActivity {
 						picurl = "http://magiccards.info/extras/plane/planechase/"
 								+ cardName + ".jpg";
 					}
-					picurl = picurl.replace(" ", "-").replace("ï¿½", "Ae")
+					picurl = picurl.replace(" ", "-").replace("Æ", "Ae")
 							.replace("?", "").replace(",", "").replace("'", "")
 							.replace("!", "");
 				} else if (setCode.equals("ARS")) {
 					picurl = "http://magiccards.info/extras/scheme/archenemy/"
 							+ cardName + ".jpg";
-					picurl = picurl.replace(" ", "-").replace("ï¿½", "Ae")
+					picurl = picurl.replace(" ", "-").replace("Æ", "Ae")
 							.replace("?", "").replace(",", "").replace("'", "")
 							.replace("!", "");
 				} else {
@@ -680,7 +680,7 @@ public class CardViewActivity extends FamiliarActivity {
 				priceurl = new URL(new String(
 						"http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s="
 								+ tcgname + "&p=" + tcgCardName).replace(" ",
-						"%20").replace("ï¿½", "Ae"));
+						"%20").replace("Æ", "Ae"));
 
 				// Get a SAXParser from the SAXPArserFactory.
 				SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -853,7 +853,7 @@ public class CardViewActivity extends FamiliarActivity {
 					R.layout.corruption_layout, null);
 			TextView text = (TextView) dialogLayout
 					.findViewById(R.id.corruption_message);
-			text.setText(Html.fromHtml(getString(R.string.error_broken_image)));
+			text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.error_broken_image)));
 			text.setMovementMethod(LinkMovementMethod.getInstance());
 
 			dialog = new AlertDialog.Builder(this).setTitle(R.string.error)
@@ -909,7 +909,7 @@ public class CardViewActivity extends FamiliarActivity {
 			m.setText("$" + XMLhandler.avgprice);
 			h.setText("$" + XMLhandler.hiprice);
 			pricelink.setMovementMethod(LinkMovementMethod.getInstance());
-			pricelink.setText(Html.fromHtml("<a href=\"" + XMLhandler.link
+			pricelink.setText(ImageGetterHelper.jellyBeanHack("<a href=\"" + XMLhandler.link
 					+ "\">" + getString(R.string.card_view_price_dialog_link)
 					+ "</a>"));
 			return dialog;
@@ -969,7 +969,7 @@ public class CardViewActivity extends FamiliarActivity {
 				message = message.replace("{", "<img src=\"").replace("}",
 						"\"/>");
 			}
-			CharSequence messageGlyph = Html.fromHtml(message, imgGetter, null);
+			CharSequence messageGlyph = ImageGetterHelper.jellyBeanHack(message, imgGetter, null);
 
 			textViewRules.setText(messageGlyph);
 

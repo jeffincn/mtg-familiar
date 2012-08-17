@@ -32,7 +32,6 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
-import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,8 +43,9 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.helpers.RoundTimerService;
 import com.gelakinetic.mtgfam.helpers.DbUpdaterService;
+import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
+import com.gelakinetic.mtgfam.helpers.RoundTimerService;
 
 public class MainActivity extends FamiliarActivity {
 	private static final int	ABOUTDIALOG			= 0;
@@ -238,7 +238,7 @@ public class MainActivity extends FamiliarActivity {
 			View dialoglayout = inflater.inflate(R.layout.about_dialog, (ViewGroup) findViewById(R.id.dialog_layout_root));
 
 			TextView text = (TextView) dialoglayout.findViewById(R.id.aboutfield);
-			text.setText(Html.fromHtml(getString(R.string.main_donate_text)));
+			text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.main_donate_text)));
 			text.setMovementMethod(LinkMovementMethod.getInstance());
 
 			text.setTextSize(15);
@@ -277,7 +277,7 @@ public class MainActivity extends FamiliarActivity {
 			View dialoglayout = inflater.inflate(R.layout.about_dialog, (ViewGroup) findViewById(R.id.dialog_layout_root));
 
 			TextView text = (TextView) dialoglayout.findViewById(R.id.aboutfield);
-			text.setText(Html.fromHtml(getString(R.string.main_about_text)));
+			text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.main_about_text)));
 			text.setMovementMethod(LinkMovementMethod.getInstance());
 
 			builder.setView(dialoglayout);
@@ -296,7 +296,7 @@ public class MainActivity extends FamiliarActivity {
 				}
 			});
 
-			builder.setMessage(Html.fromHtml(getString(R.string.main_whats_new_text)));
+			builder.setMessage(ImageGetterHelper.jellyBeanHack(getString(R.string.main_whats_new_text)));
 		}
 		return builder.create();
 	}

@@ -21,11 +21,27 @@ package com.gelakinetic.mtgfam.helpers;
 
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.text.Html;
 import android.text.Html.ImageGetter;
+import android.text.Html.TagHandler;
+import android.text.Spanned;
 
 import com.gelakinetic.mtgfam.R;
 
 public class ImageGetterHelper {
+
+	public static Spanned jellyBeanHack(String source) {
+		return jellyBeanHack(source, null, null);
+	}
+
+	public static Spanned jellyBeanHack(String source, ImageGetter imageGetter, TagHandler tagHandler) {
+		// this is a fix for a known jellybean bug
+		if (Build.VERSION.SDK_INT == 16) {
+			source = source.replace("<", " <").replace(">", " >").replace("  ", " ");
+		}
+		return Html.fromHtml(source, imageGetter, tagHandler);
+	}
 
 	public static ImageGetter GlyphGetter(final Resources r) {
 		return new ImageGetter() {
@@ -33,10 +49,9 @@ public class ImageGetterHelper {
 				Drawable d = null;
 				source = source.replace("/", "");
 
-				int[] drawableNums = { R.drawable.zero, R.drawable.one, R.drawable.two, R.drawable.three, R.drawable.four,
-						R.drawable.five, R.drawable.six, R.drawable.seven, R.drawable.eight, R.drawable.nine, R.drawable.ten,
-						R.drawable.eleven, R.drawable.twelve, R.drawable.thirteen, R.drawable.fourteen, R.drawable.fifteen,
-						R.drawable.sixteen, R.drawable.seventeen, R.drawable.eighteen, R.drawable.ninteen, R.drawable.twenty };
+				int[] drawableNums = { R.drawable.zero, R.drawable.one, R.drawable.two, R.drawable.three, R.drawable.four, R.drawable.five, R.drawable.six,
+						R.drawable.seven, R.drawable.eight, R.drawable.nine, R.drawable.ten, R.drawable.eleven, R.drawable.twelve, R.drawable.thirteen,
+						R.drawable.fourteen, R.drawable.fifteen, R.drawable.sixteen, R.drawable.seventeen, R.drawable.eighteen, R.drawable.ninteen, R.drawable.twenty };
 
 				if (source.equalsIgnoreCase("w")) {
 					d = r.getDrawable(R.drawable.w);

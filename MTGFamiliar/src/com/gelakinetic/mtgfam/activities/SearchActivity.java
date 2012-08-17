@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,7 +40,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.graphics.PorterDuff.Mode;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
 import android.view.View;
@@ -61,6 +59,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.AutocompleteCursorAdapter;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
+import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 
 public class SearchActivity extends FamiliarActivity {
 	public static class SearchCriteria implements Serializable {
@@ -637,7 +636,7 @@ public class SearchActivity extends FamiliarActivity {
 		else if (id == CORRUPTION) {
 			View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
 			TextView text = (TextView) dialogLayout.findViewById(R.id.corruption_message);
-			text.setText(Html.fromHtml(getString(R.string.error_corruption)));
+			text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.error_corruption)));
 			text.setMovementMethod(LinkMovementMethod.getInstance());
 
 			AlertDialog dialog = new AlertDialog.Builder(this).setTitle(R.string.error)

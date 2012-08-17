@@ -16,7 +16,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteException;
 
 import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.activities.FamiliarActivity.OTATask;
 
 public class RulesParser {
 

@@ -223,6 +223,13 @@ public class WishlistActivity extends FamiliarActivity {
 			lCardlist = new ArrayList<CardData>();
 			Cursor c = mDbHelper.fetchCardByName(card.name);
 			
+			if(c.getCount() == 0) {
+				Toast.makeText(this, R.string.wishlist_toast_no_card, Toast.LENGTH_LONG).show();
+				c.deactivate();
+				c.close();
+				return;
+			}
+			
 			//make a place holder item for each version set of this card
 			while (!c.isAfterLast()) {
 				String setCode=c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET));

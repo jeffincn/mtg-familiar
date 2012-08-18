@@ -205,6 +205,7 @@
     <string name="wishlist_clear_fields">Clear Fields</string>
     <string name="wishlist_set_pricing">Set Pricing Option</string>
     <string name="wishlist_toast_select_card">Please enter a card first.</string>
+    <string name="wishlist_toast_no_card">No card found with that name.</string>
     
     
     <!-- Round timer activity -->

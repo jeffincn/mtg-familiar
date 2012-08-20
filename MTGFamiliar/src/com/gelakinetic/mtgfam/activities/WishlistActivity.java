@@ -24,12 +24,13 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnDismissListener;
 import android.content.SharedPreferences;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,7 +66,7 @@ public class WishlistActivity extends FamiliarActivity {
 
 	private Button							bAdd;
 	private TextView						tradePrice;
-	private ExpandableListView				expWishist;
+	private ExpandableListView				expWishlist;
 	private WishlistAdapter					aaExpWishlist;
 	private ArrayList<String>				cardNames;
 	private ArrayList<ArrayList<String>>	cardSetNames;
@@ -144,16 +145,16 @@ public class WishlistActivity extends FamiliarActivity {
 
 		priceSetting = Integer.parseInt(preferences.getString("tradePrice", String.valueOf(AVG_PRICE)));
 		
-		expWishist = (ExpandableListView) this.findViewById(R.id.wishlist);
+		expWishlist = (ExpandableListView) this.findViewById(R.id.wishlist);
        
-		expWishist.setGroupIndicator(null);
-		expWishist.setChildIndicator(null);
-		expWishist.setDividerHeight(0);
+		expWishlist.setGroupIndicator(null);
+		expWishlist.setChildIndicator(null);
+		expWishlist.setDividerHeight(0);
         
-		aaExpWishlist = new WishlistAdapter(this,expWishist);
-		expWishist.setAdapter(aaExpWishlist);
+		aaExpWishlist = new WishlistAdapter(this,expWishlist);
+		expWishlist.setAdapter(aaExpWishlist);
 
-		expWishist.setOnChildClickListener(
+		expWishlist.setOnChildClickListener(
 			new OnChildClickListener() {
 	            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 					try {
@@ -222,13 +223,6 @@ public class WishlistActivity extends FamiliarActivity {
 			setCodes = new ArrayList<String>();
 			lCardlist = new ArrayList<CardData>();
 			Cursor c = mDbHelper.fetchCardByName(card.name);
-			
-			if(c.getCount() == 0) {
-				Toast.makeText(this, R.string.wishlist_toast_no_card, Toast.LENGTH_LONG).show();
-				c.deactivate();
-				c.close();
-				return;
-			}
 			
 			//make a place holder item for each version set of this card
 			while (!c.isAfterLast()) {
@@ -390,8 +384,8 @@ public class WishlistActivity extends FamiliarActivity {
 			tradePrice.setTextColor(color);
 		}
 		aaExpWishlist.notifyDataSetChanged();
-		expWishist.invalidate();
-		expWishist.postInvalidate();
+		expWishlist.invalidate();
+		expWishlist.postInvalidate();
 	}
 
 	private boolean PriceListsHaveBadValues(ArrayList<ArrayList<CardData>> cardlists) {
@@ -584,7 +578,7 @@ public class WishlistActivity extends FamiliarActivity {
 				else {
 					costField.setVisibility(View.VISIBLE);
 					manaCost = manaCost.replace("{", "<img src=\"").replace("}", "\"/>");
-					costField.setText(ImageGetterHelper.jellyBeanHack(manaCost, imgGetter, null));
+					costField.setText(Html.fromHtml(manaCost, imgGetter, null));
 					costField.setOnClickListener(onClick);
 				}
 				String ability = data.ability;
@@ -594,7 +588,7 @@ public class WishlistActivity extends FamiliarActivity {
 				else {
 					abilityField.setVisibility(View.VISIBLE);
 					ability = ability.replace("{", "<img src=\"").replace("}", "\"/>");
-					abilityField.setText(ImageGetterHelper.jellyBeanHack(ability, imgGetter, null));
+					abilityField.setText(Html.fromHtml(ability, imgGetter, null));
 					abilityField.setOnClickListener(onClick);
 				}
 				boolean hidePT = true;
@@ -693,6 +687,8 @@ public class WishlistActivity extends FamiliarActivity {
 					tField.setVisibility(View.GONE);
 				}
 			}
+	        _list.expandGroup(groupPosition);  //used to Expand the child list automatically at the time of displaying
+	        _list.collapseGroup(groupPosition);  //used to Expand the child list automatically at the time of displaying
 	        _list.expandGroup(groupPosition);  //used to Expand the child list automatically at the time of displaying
 			return v;
 	    }

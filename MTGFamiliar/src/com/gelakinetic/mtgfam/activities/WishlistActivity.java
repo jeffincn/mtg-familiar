@@ -224,6 +224,13 @@ public class WishlistActivity extends FamiliarActivity {
 			lCardlist = new ArrayList<CardData>();
 			Cursor c = mDbHelper.fetchCardByName(card.name);
 			
+			if(c.getCount() == 0) {
+				Toast.makeText(this, R.string.wishlist_toast_no_card, Toast.LENGTH_LONG).show();
+				c.deactivate();
+				c.close();
+				return;
+			}
+			
 			//make a place holder item for each version set of this card
 			while (!c.isAfterLast()) {
 				String setCode=c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET));
@@ -578,7 +585,7 @@ public class WishlistActivity extends FamiliarActivity {
 				else {
 					costField.setVisibility(View.VISIBLE);
 					manaCost = manaCost.replace("{", "<img src=\"").replace("}", "\"/>");
-					costField.setText(Html.fromHtml(manaCost, imgGetter, null));
+					costField.setText(ImageGetterHelper.jellyBeanHack(manaCost, imgGetter, null));
 					costField.setOnClickListener(onClick);
 				}
 				String ability = data.ability;
@@ -588,7 +595,7 @@ public class WishlistActivity extends FamiliarActivity {
 				else {
 					abilityField.setVisibility(View.VISIBLE);
 					ability = ability.replace("{", "<img src=\"").replace("}", "\"/>");
-					abilityField.setText(Html.fromHtml(ability, imgGetter, null));
+					abilityField.setText(ImageGetterHelper.jellyBeanHack(ability, imgGetter, null));
 					abilityField.setOnClickListener(onClick);
 				}
 				boolean hidePT = true;

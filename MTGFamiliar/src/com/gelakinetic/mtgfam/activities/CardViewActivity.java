@@ -53,22 +53,26 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -86,71 +90,75 @@ import com.gelakinetic.mtgfam.helpers.WishlistHelpers;
 public class CardViewActivity extends FamiliarActivity {
 
 	// Dont use 0, thats the default when the back key is pressed
-	protected static final int RANDOMLEFT = 2;
-	protected static final int RANDOMRIGHT = 3;
-	protected static final int QUITTOSEARCH = 4;
-	protected static final int SWIPELEFT = 5;
-	protected static final int SWIPERIGHT = 6;
+	protected static final int				RANDOMLEFT			= 2;
+	protected static final int				RANDOMRIGHT			= 3;
+	protected static final int				QUITTOSEARCH		= 4;
+	protected static final int				SWIPELEFT				= 5;
+	protected static final int				SWIPERIGHT			= 6;
 
 	// Dialogs
-	private static final int GETLEGALITY = 0;
-	private static final int GETPRICE = 1;
-	private static final int GETIMAGE = 2;
-	private static final int CHANGESET = 3;
-	private static final int CARDRULINGS = 4;
-	private static final int BROKEN_IMAGE = 5;
-	private static final int WISHLIST_COUNTS = 6;
+	private static final int					GETLEGALITY			= 0;
+	private static final int					GETPRICE				= 1;
+	private static final int					GETIMAGE				= 2;
+	private static final int					CHANGESET				= 3;
+	private static final int					CARDRULINGS			= 4;
+	private static final int					BROKEN_IMAGE		= 5;
+	private static final int					WISHLIST_COUNTS	= 6;
 
 	// Where the card image is loaded to
-	private static final int MAINPAGE = 0;
-	private static final int DIALOG = 1;
+	private static final int					MAINPAGE				= 0;
+	private static final int					DIALOG					= 1;
 
 	// Random useful things
-	private ImageGetter imgGetter;
-	private TextView copyView;
+	private ImageGetter								imgGetter;
+	private TextView									copyView;
 
 	// UI elements
-	private TextView name;
-	private TextView cost;
-	private TextView type;
-	private TextView set;
-	private TextView ability;
-	private TextView pt;
-	private TextView flavor;
-	private TextView artist;
-	private Button transform;
-	private Button leftRandom;
-	private Button rightRandom;
-	private ImageView cardpic;
-	private ImageView DialogImageView;
+	private TextView									name;
+	private TextView									cost;
+	private TextView									type;
+	private TextView									set;
+	private TextView									ability;
+	private TextView									pt;
+	private TextView									flavor;
+	private TextView									artist;
+	private Button										transform;
+	private Button										leftRandom;
+	private Button										rightRandom;
+	private ImageView									cardpic;
+	private ImageView									DialogImageView;
 
 	// Stuff for AsyncTasks
-	private BitmapDrawable cardPicture;
-	private String[] legalities;
-	private String[] formats;
-	private TCGPlayerXMLHandler XMLhandler;
-	public ArrayList<Ruling> rulingsArrayList;
-	private ProgressDialog progDialog;
-	AsyncTask<String, Integer, Long> asyncTask;
+	private BitmapDrawable						cardPicture;
+	private String[]									legalities;
+	private String[]									formats;
+	private TCGPlayerXMLHandler				XMLhandler;
+	public ArrayList<Ruling>					rulingsArrayList;
+	private ProgressDialog						progDialog;
+	AsyncTask<String, Integer, Long>	asyncTask;
 
 	// Card info
-	private long cardID;
-	private String number;
-	private String setCode;
-	private String cardName;
-	private String mtgi_code;
-	private int multiverseId;
+	private long											cardID;
+	private String										number;
+	private String										setCode;
+	private String										cardName;
+	private String										mtgi_code;
+	private int												multiverseId;
 
 	// Preferences
-	private int loadTo;
-	private boolean isRandom;
-	private boolean isSingle;
-	private boolean scroll_results;
+	private int												loadTo;
+	private boolean										isRandom;
+	private boolean										isSingle;
+	private boolean										scroll_results;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.card_view_activity);
+
+		// getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+		// InputMethodManager inputManager = (InputMethodManager)this.getSystemService(Context.INPUT_METHOD_SERVICE);
+		// inputManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 
 		name = (TextView) findViewById(R.id.name);
 		cost = (TextView) findViewById(R.id.cost);
@@ -181,7 +189,8 @@ public class CardViewActivity extends FamiliarActivity {
 		isSingle = extras.getBoolean("IsSingle", false);
 		if (preferences.getBoolean("picFirst", false)) {
 			loadTo = MAINPAGE;
-		} else {
+		}
+		else {
 			loadTo = DIALOG;
 		}
 		scroll_results = preferences.getBoolean("scrollresults", false);
@@ -206,31 +215,38 @@ public class CardViewActivity extends FamiliarActivity {
 		super.onResume();
 		try {
 			dismissDialog(GETLEGALITY);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 		}
 		try {
 			dismissDialog(GETPRICE);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 		}
 		try {
 			dismissDialog(GETIMAGE);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 		}
 		try {
 			dismissDialog(CHANGESET);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 		}
 		try {
 			dismissDialog(CARDRULINGS);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 		}
 		try {
 			dismissDialog(BROKEN_IMAGE);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 		}
 		try {
 			dismissDialog(WISHLIST_COUNTS);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 		}
 	}
 
@@ -256,30 +272,28 @@ public class CardViewActivity extends FamiliarActivity {
 		cardName = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
 		setCode = c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET));
 
-		mtgi_code = mDbHelper.getCodeMtgi(c.getString(c
-				.getColumnIndex(CardDbAdapter.KEY_SET)));
+		mtgi_code = mDbHelper.getCodeMtgi(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)));
 		number = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NUMBER));
 
 		switch ((char) c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY))) {
-		case 'C':
-			set.setTextColor(this.getResources().getColor(R.color.common));
-			break;
-		case 'U':
-			set.setTextColor(this.getResources().getColor(R.color.uncommon));
-			break;
-		case 'R':
-			set.setTextColor(this.getResources().getColor(R.color.rare));
-			break;
-		case 'M':
-			set.setTextColor(this.getResources().getColor(R.color.mythic));
-			break;
-		case 'T':
-			set.setTextColor(this.getResources().getColor(R.color.timeshifted));
-			break;
+			case 'C':
+				set.setTextColor(this.getResources().getColor(R.color.common));
+				break;
+			case 'U':
+				set.setTextColor(this.getResources().getColor(R.color.uncommon));
+				break;
+			case 'R':
+				set.setTextColor(this.getResources().getColor(R.color.rare));
+				break;
+			case 'M':
+				set.setTextColor(this.getResources().getColor(R.color.mythic));
+				break;
+			case 'T':
+				set.setTextColor(this.getResources().getColor(R.color.timeshifted));
+				break;
 		}
 
-		String sCost = c
-				.getString(c.getColumnIndex(CardDbAdapter.KEY_MANACOST));
+		String sCost = c.getString(c.getColumnIndex(CardDbAdapter.KEY_MANACOST));
 		sCost = sCost.replace("{", "<img src=\"").replace("}", "\"/>");
 
 		CharSequence csCost = ImageGetterHelper.jellyBeanHack(sCost, imgGetter, null);
@@ -291,14 +305,11 @@ public class CardViewActivity extends FamiliarActivity {
 		type.setText(c.getString(c.getColumnIndex(CardDbAdapter.KEY_TYPE)));
 		set.setText(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)));
 
-		String sAbility = c
-				.getString(c.getColumnIndex(CardDbAdapter.KEY_ABILITY))
-				.replace("{", "<img src=\"").replace("}", "\"/>");
+		String sAbility = c.getString(c.getColumnIndex(CardDbAdapter.KEY_ABILITY)).replace("{", "<img src=\"").replace("}", "\"/>");
 		CharSequence csAbility = ImageGetterHelper.jellyBeanHack(sAbility, imgGetter, null);
 		ability.setText(csAbility);
 
-		String sFlavor = c
-				.getString(c.getColumnIndex(CardDbAdapter.KEY_FLAVOR));
+		String sFlavor = c.getString(c.getColumnIndex(CardDbAdapter.KEY_FLAVOR));
 		CharSequence csFlavor = ImageGetterHelper.jellyBeanHack(sFlavor, imgGetter, null);
 		flavor.setText(csFlavor);
 
@@ -309,8 +320,8 @@ public class CardViewActivity extends FamiliarActivity {
 		float t = c.getFloat(c.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS));
 		if (loyalty != CardDbAdapter.NOONECARES) {
 			pt.setText(Integer.valueOf(loyalty).toString());
-		} else if (p != CardDbAdapter.NOONECARES
-				&& t != CardDbAdapter.NOONECARES) {
+		}
+		else if (p != CardDbAdapter.NOONECARES && t != CardDbAdapter.NOONECARES) {
 
 			String spt = "";
 
@@ -327,7 +338,8 @@ public class CardViewActivity extends FamiliarActivity {
 			else {
 				if (p == (int) p) {
 					spt += (int) p;
-				} else {
+				}
+				else {
 					spt += p;
 				}
 			}
@@ -347,24 +359,26 @@ public class CardViewActivity extends FamiliarActivity {
 			else {
 				if (t == (int) t) {
 					spt += (int) t;
-				} else {
+				}
+				else {
 					spt += t;
 				}
 			}
 
 			pt.setText(spt);
-		} else {
+		}
+		else {
 			pt.setText("");
 		}
 
-		if (isTransformable(number,
-				c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)))) {
+		if (isTransformable(number, c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)))) {
 			transform.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					cardPicture = null;
 					if (number.contains("a")) {
 						number = number.replace("a", "b");
-					} else if (number.contains("b")) {
+					}
+					else if (number.contains("b")) {
 						number = number.replace("b", "a");
 					}
 					long id = mDbHelper.getTransform(setCode, number);
@@ -372,7 +386,8 @@ public class CardViewActivity extends FamiliarActivity {
 				}
 			});
 			transform.setVisibility(View.VISIBLE);
-		} else {
+		}
+		else {
 			transform.setVisibility(View.GONE);
 		}
 
@@ -393,7 +408,8 @@ public class CardViewActivity extends FamiliarActivity {
 			});
 			leftRandom.setVisibility(View.VISIBLE);
 			rightRandom.setVisibility(View.VISIBLE);
-		} else {
+		}
+		else {
 			leftRandom.setVisibility(View.GONE);
 			rightRandom.setVisibility(View.GONE);
 		}
@@ -409,13 +425,13 @@ public class CardViewActivity extends FamiliarActivity {
 			pt.setVisibility(View.GONE);
 			flavor.setVisibility(View.GONE);
 			artist.setVisibility(View.GONE);
-			((FrameLayout) findViewById(R.id.frameLayout1))
-					.setVisibility(View.GONE);
+			((FrameLayout) findViewById(R.id.frameLayout1)).setVisibility(View.GONE);
 
 			progDialog.show();
 			asyncTask = new FetchPictureTask();
 			asyncTask.execute((String[]) null);
-		} else {
+		}
+		else {
 			((ImageView) findViewById(R.id.cardpic)).setVisibility(View.GONE);
 		}
 
@@ -440,8 +456,7 @@ public class CardViewActivity extends FamiliarActivity {
 			rightRandom.setVisibility(View.VISIBLE);
 		}
 
-		multiverseId = c.getInt(c
-				.getColumnIndex(CardDbAdapter.KEY_MULTIVERSEID));
+		multiverseId = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_MULTIVERSEID));
 
 		c.close();
 	}
@@ -466,21 +481,20 @@ public class CardViewActivity extends FamiliarActivity {
 
 			cFormats.moveToFirst();
 			for (int i = 0; i < cFormats.getCount(); i++) {
-				formats[i] = cFormats.getString(cFormats
-						.getColumnIndex(CardDbAdapter.KEY_NAME));
+				formats[i] = cFormats.getString(cFormats.getColumnIndex(CardDbAdapter.KEY_NAME));
 				switch (mDbHelper.checkLegality(cardName, formats[i])) {
-				case CardDbAdapter.LEGAL:
-					legalities[i] = "Legal";
-					break;
-				case CardDbAdapter.RESTRICTED:
-					legalities[i] = "Restricted";
-					break;
-				case CardDbAdapter.BANNED:
-					legalities[i] = "Banned";
-					break;
-				default:
-					legalities[i] = "Error";
-					break;
+					case CardDbAdapter.LEGAL:
+						legalities[i] = "Legal";
+						break;
+					case CardDbAdapter.RESTRICTED:
+						legalities[i] = "Restricted";
+						break;
+					case CardDbAdapter.BANNED:
+						legalities[i] = "Banned";
+						break;
+					default:
+						legalities[i] = "Error";
+						break;
 				}
 				cFormats.moveToNext();
 			}
@@ -495,7 +509,8 @@ public class CardViewActivity extends FamiliarActivity {
 		protected void onPostExecute(Long result) {
 			try {
 				progDialog.dismiss();
-			} catch (IllegalArgumentException e) {
+			}
+			catch (IllegalArgumentException e) {
 			}
 
 			showDialog(GETLEGALITY);
@@ -510,7 +525,7 @@ public class CardViewActivity extends FamiliarActivity {
 
 	private class FetchPictureTask extends AsyncTask<String, Integer, Long> {
 
-		private String error;
+		private String	error;
 
 		@Override
 		protected Long doInBackground(String... params) {
@@ -519,84 +534,92 @@ public class CardViewActivity extends FamiliarActivity {
 
 				String picurl;
 				if (setCode.equals("PP2")) {
-					picurl = "http://magiccards.info/extras/plane/planechase-2012-edition/"
-							+ cardName + ".jpg";
-					picurl = picurl.replace(" ", "-").replace("Æ", "Ae")
-							.replace("?", "").replace(",", "").replace("'", "")
-							.replace("!", "");
-				} else if (setCode.equals("PCP")) {
+					picurl = "http://magiccards.info/extras/plane/planechase-2012-edition/" + cardName + ".jpg";
+					picurl = picurl.replace(" ", "-").replace("ï¿½", "Ae").replace("?", "").replace(",", "").replace("'", "").replace("!", "");
+				}
+				else if (setCode.equals("PCP")) {
 					if (cardName.equalsIgnoreCase("tazeem")) {
 						cardName = "tazeem-release-promo";
-						picurl = "http://magiccards.info/extras/plane/planechase/"
-								+ cardName + ".jpg";
+						picurl = "http://magiccards.info/extras/plane/planechase/" + cardName + ".jpg";
 					}
 					if (cardName.equalsIgnoreCase("celestine reef")) {
 						cardName = "celestine-reef-pre-release-promo";
-						picurl = "http://magiccards.info/extras/plane/planechase/"
-								+ cardName + ".jpg";
+						picurl = "http://magiccards.info/extras/plane/planechase/" + cardName + ".jpg";
 					}
 					if (cardName.equalsIgnoreCase("horizon boughs")) {
 						cardName = "horizon-boughs-gateway-promo";
-						picurl = "http://magiccards.info/extras/plane/planechase/"
-								+ cardName + ".jpg";
-					} else {
-						picurl = "http://magiccards.info/extras/plane/planechase/"
-								+ cardName + ".jpg";
+						picurl = "http://magiccards.info/extras/plane/planechase/" + cardName + ".jpg";
 					}
-					picurl = picurl.replace(" ", "-").replace("Æ", "Ae")
-							.replace("?", "").replace(",", "").replace("'", "")
-							.replace("!", "");
-				} else if (setCode.equals("ARS")) {
-					picurl = "http://magiccards.info/extras/scheme/archenemy/"
-							+ cardName + ".jpg";
-					picurl = picurl.replace(" ", "-").replace("Æ", "Ae")
-							.replace("?", "").replace(",", "").replace("'", "")
-							.replace("!", "");
-				} else {
-					picurl = "http://magiccards.info/scans/en/" + mtgi_code
-							+ "/" + number + ".jpg";
+					else {
+						picurl = "http://magiccards.info/extras/plane/planechase/" + cardName + ".jpg";
+					}
+					picurl = picurl.replace(" ", "-").replace("ï¿½", "Ae").replace("?", "").replace(",", "").replace("'", "").replace("!", "");
+				}
+				else if (setCode.equals("ARS")) {
+					picurl = "http://magiccards.info/extras/scheme/archenemy/" + cardName + ".jpg";
+					picurl = picurl.replace(" ", "-").replace("ï¿½", "Ae").replace("?", "").replace(",", "").replace("'", "").replace("!", "");
+				}
+				else {
+					picurl = "http://magiccards.info/scans/en/" + mtgi_code + "/" + number + ".jpg";
 				}
 				picurl = picurl.toLowerCase();
 
 				URL u = new URL(picurl);
-				cardPicture = new BitmapDrawable(u.openStream());
+				cardPicture = new BitmapDrawable(me.getResources(), u.openStream());
 				Bitmap bmp = cardPicture.getBitmap();
 
-				Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE))
-						.getDefaultDisplay();
-				int newHeight;
-				int newWidth;
-				float scale;
-				if (display.getWidth() < display.getHeight()) {
-					scale = (display.getWidth() - 20)
-							/ (float) cardPicture.getIntrinsicWidth();
-				} else {
-					scale = (display.getHeight() - 34)
-							/ (float) cardPicture.getIntrinsicHeight();
+				int height = 0, width = 0;
+				float scale = 0;
+				int border = 16;
+				Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+				if (loadTo == MAINPAGE) {
+					Rect rectgle = new Rect();
+					Window window = getWindow();
+					window.getDecorView().getWindowVisibleDisplayFrame(rectgle);
+
+					height = (display.getHeight() - rectgle.top - getSupportActionBar().getHeight()) - border;
+					width = display.getWidth() - border;
 				}
-				newWidth = Math.round(cardPicture.getIntrinsicWidth() * scale);
-				newHeight = Math
-						.round(cardPicture.getIntrinsicHeight() * scale);
+				else if (loadTo == DIALOG) {
+					height = display.getHeight() - border;
+					width = display.getWidth() - border;
+				}
+
+				float screenAspectRatio = (float) height / (float) (width);
+				float cardAspectRatio = (float) cardPicture.getIntrinsicHeight() / (float) cardPicture.getIntrinsicWidth();
+
+				if (screenAspectRatio > cardAspectRatio) {
+					scale = (width) / (float) cardPicture.getIntrinsicWidth();
+				}
+				else {
+					scale = (height) / (float) cardPicture.getIntrinsicHeight();
+				}
+
+				int newWidth = Math.round(cardPicture.getIntrinsicWidth() * scale);
+				int newHeight = Math.round(cardPicture.getIntrinsicHeight() * scale);
 
 				bmp = Bitmap.createScaledBitmap(bmp, newWidth, newHeight, true);
 				cardPicture = new BitmapDrawable(mCtx.getResources(), bmp);
-
-				// Throw this exception to test the dialog
-				// throw(new NullPointerException("seriously"));
-			} catch (FileNotFoundException e) {
+			}
+			catch (FileNotFoundException e) {
 				// internet works, image not found
 				error = "Image Not Found";
-			} catch (ConnectException e) {
+			}
+			catch (ConnectException e) {
 				// no internet
 				error = "No Internet Connection";
-			} catch (UnknownHostException e) {
+			}
+			catch (UnknownHostException e) {
 				// no internet
 				error = "No Internet Connection";
-			} catch (MalformedURLException e) {
+			}
+			catch (MalformedURLException e) {
 				error = "MalformedURLException";
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				error = "No Internet Connection";
-			} catch (NullPointerException e) {
+			}
+			catch (NullPointerException e) {
 				error = "NPE: Image Not Found";
 			}
 			return null;
@@ -606,19 +629,23 @@ public class CardViewActivity extends FamiliarActivity {
 		protected void onPostExecute(Long result) {
 			try {
 				progDialog.dismiss();
-			} catch (IllegalArgumentException e) {
+			}
+			catch (IllegalArgumentException e) {
 			}
 			if (error == null) {
 				if (loadTo == DIALOG) {
 					removeDialog(GETIMAGE);
 					showDialog(GETIMAGE);
-				} else if (loadTo == MAINPAGE) {
+				}
+				else if (loadTo == MAINPAGE) {
 					cardpic.setImageDrawable(cardPicture);
 				}
-			} else {
+			}
+			else {
 				if (error.equalsIgnoreCase("NPE: Image Not Found")) {
 					showDialog(BROKEN_IMAGE);
-				} else {
+				}
+				else {
 					Toast.makeText(mCtx, error, Toast.LENGTH_SHORT).show();
 				}
 				if (loadTo == MAINPAGE) {
@@ -631,8 +658,7 @@ public class CardViewActivity extends FamiliarActivity {
 					pt.setVisibility(View.VISIBLE);
 					flavor.setVisibility(View.VISIBLE);
 					artist.setVisibility(View.VISIBLE);
-					((FrameLayout) findViewById(R.id.frameLayout1))
-							.setVisibility(View.VISIBLE);
+					((FrameLayout) findViewById(R.id.frameLayout1)).setVisibility(View.VISIBLE);
 				}
 			}
 		}
@@ -650,15 +676,14 @@ public class CardViewActivity extends FamiliarActivity {
 				pt.setVisibility(View.VISIBLE);
 				flavor.setVisibility(View.VISIBLE);
 				artist.setVisibility(View.VISIBLE);
-				((FrameLayout) findViewById(R.id.frameLayout1))
-						.setVisibility(View.VISIBLE);
+				((FrameLayout) findViewById(R.id.frameLayout1)).setVisibility(View.VISIBLE);
 			}
 		}
 	}
 
 	private class FetchPriceTask extends AsyncTask<String, Integer, Long> {
 
-		private String error;
+		private String	error;
 
 		@Override
 		protected Long doInBackground(String... params) {
@@ -670,17 +695,16 @@ public class CardViewActivity extends FamiliarActivity {
 				String tcgname = mDbHelper.getTCGname(setCode);
 				String tcgCardName;
 				if (isTransformable(number, setCode) && number.contains("b")) {
-					tcgCardName = mDbHelper.getTransformName(setCode,
-							number.replace("b", "a"));
-				} else if (mDbHelper.isSplitCard(multiverseId)) {
+					tcgCardName = mDbHelper.getTransformName(setCode, number.replace("b", "a"));
+				}
+				else if (mDbHelper.isSplitCard(multiverseId)) {
 					tcgCardName = mDbHelper.getSplitName(multiverseId);
-				} else {
+				}
+				else {
 					tcgCardName = cardName;
 				}
-				priceurl = new URL(new String(
-						"http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s="
-								+ tcgname + "&p=" + tcgCardName).replace(" ",
-						"%20").replace("Æ", "Ae"));
+				priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p=" + tcgCardName).replace(" ", "%20")
+						.replace("ï¿½", "Ae"));
 
 				// Get a SAXParser from the SAXPArserFactory.
 				SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -695,22 +719,28 @@ public class CardViewActivity extends FamiliarActivity {
 				// Parse the xml-data from our URL.
 				xr.parse(new InputSource(priceurl.openStream()));
 				// Parsing has finished.
-			} catch (FileNotFoundException e) {
+			}
+			catch (FileNotFoundException e) {
 				// internet works, price not found
 				error = "Card Price Not Found";
-			} catch (ConnectException e) {
+			}
+			catch (ConnectException e) {
 				// no internet
 				error = "No Internet Connection";
-			} catch (MalformedURLException e) {
+			}
+			catch (MalformedURLException e) {
 				error = "MalformedURLException";
 				XMLhandler = null;
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				error = "No Internet Connection";
 				XMLhandler = null;
-			} catch (SAXException e) {
+			}
+			catch (SAXException e) {
 				error = "SAXException";
 				XMLhandler = null;
-			} catch (ParserConfigurationException e) {
+			}
+			catch (ParserConfigurationException e) {
 				error = "ParserConfigurationException";
 				XMLhandler = null;
 			}
@@ -721,19 +751,19 @@ public class CardViewActivity extends FamiliarActivity {
 		protected void onPostExecute(Long result) {
 			try {
 				progDialog.dismiss();
-			} catch (IllegalArgumentException e) {
+			}
+			catch (IllegalArgumentException e) {
 			}
 
-			if (XMLhandler != null && XMLhandler.hiprice == null
-					&& error == null) {
-				Toast.makeText(mCtx, "Card Price Not Found", Toast.LENGTH_SHORT)
-						.show();
+			if (XMLhandler != null && XMLhandler.hiprice == null && error == null) {
+				Toast.makeText(mCtx, "Card Price Not Found", Toast.LENGTH_SHORT).show();
 				return;
 			}
 			if (error == null) {
 				removeDialog(GETPRICE);
 				showDialog(GETPRICE);
-			} else {
+			}
+			else {
 				Toast.makeText(mCtx, error, Toast.LENGTH_SHORT).show();
 			}
 		}
@@ -746,7 +776,7 @@ public class CardViewActivity extends FamiliarActivity {
 
 	private class FetchRulingsTask extends AsyncTask<String, Integer, Long> {
 
-		private boolean error = false;
+		private boolean	error	= false;
 
 		@Override
 		protected Long doInBackground(String... params) {
@@ -759,36 +789,36 @@ public class CardViewActivity extends FamiliarActivity {
 			rulingsArrayList = new ArrayList<Ruling>();
 
 			try {
-				url = new URL(
-						"http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid="
-								+ multiverseId);
+				url = new URL("http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multiverseId);
 				is = url.openStream(); // throws an IOException
 				dis = new DataInputStream(new BufferedInputStream(is));
 
 				String date = null, ruling;
 				while ((line = dis.readLine()) != null) {
 					if (line.contains("rulingDate") && line.contains("</td>")) {
-						date = (line.replace("<autocard>", "").replace(
-								"</autocard>", "")).split(">")[1].split("<")[0];
+						date = (line.replace("<autocard>", "").replace("</autocard>", "")).split(">")[1].split("<")[0];
 					}
 					if (line.contains("rulingText") && line.contains("</td>")) {
-						ruling = (line.replace("<autocard>", "").replace(
-								"</autocard>", "")).split(">")[1].split("<")[0];
+						ruling = (line.replace("<autocard>", "").replace("</autocard>", "")).split(">")[1].split("<")[0];
 						Ruling r = new Ruling(date, ruling);
 						rulingsArrayList.add(r);
 					}
 				}
-			} catch (MalformedURLException mue) {
+			}
+			catch (MalformedURLException mue) {
 				// mue.printStackTrace();
 				error = true;
-			} catch (IOException ioe) {
+			}
+			catch (IOException ioe) {
 				error = true;
-			} finally {
+			}
+			finally {
 				try {
 					if (is != null) {
 						is.close();
 					}
-				} catch (IOException ioe) {
+				}
+				catch (IOException ioe) {
 					error = true;
 				}
 			}
@@ -800,14 +830,15 @@ public class CardViewActivity extends FamiliarActivity {
 		protected void onPostExecute(Long result) {
 			try {
 				progDialog.dismiss();
-			} catch (IllegalArgumentException e) {
+			}
+			catch (IllegalArgumentException e) {
 			}
 
 			if (!error) {
 				showDialog(CARDRULINGS);
-			} else {
-				Toast.makeText(mCtx, "No Internet Connection",
-						Toast.LENGTH_SHORT).show();
+			}
+			else {
+				Toast.makeText(mCtx, "No Internet Connection", Toast.LENGTH_SHORT).show();
 			}
 		}
 
@@ -818,7 +849,7 @@ public class CardViewActivity extends FamiliarActivity {
 	}
 
 	private static class Ruling {
-		public String date, ruling;
+		public String	date, ruling;
 
 		public Ruling(String d, String r) {
 			date = d;
@@ -836,7 +867,7 @@ public class CardViewActivity extends FamiliarActivity {
 		if (id == GETIMAGE) {
 
 			if (cardPicture == null) {
-				return null;
+				return new Dialog(this);
 			}
 
 			dialog = new Dialog(this);
@@ -848,20 +879,18 @@ public class CardViewActivity extends FamiliarActivity {
 			DialogImageView.setImageDrawable(cardPicture);
 
 			return dialog;
-		} else if (id == BROKEN_IMAGE) {
-			View dialogLayout = getLayoutInflater().inflate(
-					R.layout.corruption_layout, null);
-			TextView text = (TextView) dialogLayout
-					.findViewById(R.id.corruption_message);
+		}
+		else if (id == BROKEN_IMAGE) {
+			View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
+			TextView text = (TextView) dialogLayout.findViewById(R.id.corruption_message);
 			text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.error_broken_image)));
 			text.setMovementMethod(LinkMovementMethod.getInstance());
 
-			dialog = new AlertDialog.Builder(this).setTitle(R.string.error)
-					.setView(dialogLayout)
-					.setPositiveButton(android.R.string.ok, null).create();
+			dialog = new AlertDialog.Builder(this).setTitle(R.string.error).setView(dialogLayout).setPositiveButton(android.R.string.ok, null).create();
 
 			return dialog;
-		} else if (id == GETLEGALITY) {
+		}
+		else if (id == GETLEGALITY) {
 			if (formats == null) {
 				return null;
 			}
@@ -884,12 +913,12 @@ public class CardViewActivity extends FamiliarActivity {
 				fillMaps.add(map);
 			}
 
-			SimpleAdapter adapter = new SimpleAdapter(this, fillMaps,
-					R.layout.legal_row, from, to);
+			SimpleAdapter adapter = new SimpleAdapter(this, fillMaps, R.layout.legal_row, from, to);
 			ListView lv = (ListView) dialog.findViewById(R.id.legallist);
 			lv.setAdapter(adapter);
 			return dialog;
-		} else if (id == GETPRICE) { // price
+		}
+		else if (id == GETPRICE) { // price
 
 			if (XMLhandler == null) {
 				return null;
@@ -909,20 +938,17 @@ public class CardViewActivity extends FamiliarActivity {
 			m.setText("$" + XMLhandler.avgprice);
 			h.setText("$" + XMLhandler.hiprice);
 			pricelink.setMovementMethod(LinkMovementMethod.getInstance());
-			pricelink.setText(ImageGetterHelper.jellyBeanHack("<a href=\"" + XMLhandler.link
-					+ "\">" + getString(R.string.card_view_price_dialog_link)
-					+ "</a>"));
+			pricelink.setText(ImageGetterHelper.jellyBeanHack("<a href=\"" + XMLhandler.link + "\">" + getString(R.string.card_view_price_dialog_link) + "</a>"));
 			return dialog;
-		} else if (id == CHANGESET) {
+		}
+		else if (id == CHANGESET) {
 			try {
 				Cursor c = mDbHelper.fetchCardByName(cardName);
 				Set<String> sets = new LinkedHashSet<String>();
 				Set<Long> cardIds = new LinkedHashSet<Long>();
 				while (!c.isAfterLast()) {
-					if (sets.add(mDbHelper.getTCGname(c.getString(c
-							.getColumnIndex(CardDbAdapter.KEY_SET))))) {
-						cardIds.add(c.getLong(c
-								.getColumnIndex(CardDbAdapter.KEY_ID)));
+					if (sets.add(mDbHelper.getTCGname(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET))))) {
+						cardIds.add(c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID)));
 					}
 					c.moveToNext();
 				}
@@ -934,17 +960,18 @@ public class CardViewActivity extends FamiliarActivity {
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle("Pick a Set");
 				builder.setItems(aSets, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialogInterface,
-							int item) {
+					public void onClick(DialogInterface dialogInterface, int item) {
 						setInfoFromID(aIds[item]);
 					}
 				});
 				dialog = builder.create();
 				return dialog;
-			} catch (SQLException e) {
+			}
+			catch (SQLException e) {
 				// Should we do something here?
 			}
-		} else if (id == CARDRULINGS) {
+		}
+		else if (id == CARDRULINGS) {
 
 			if (rulingsArrayList == null) {
 				return null;
@@ -961,26 +988,23 @@ public class CardViewActivity extends FamiliarActivity {
 			String message = "";
 			if (rulingsArrayList.size() == 0) {
 				message = "No rulings for this card";
-			} else {
+			}
+			else {
 				for (Ruling r : rulingsArrayList) {
 					message += (r.toString() + "<br><br>");
 				}
 
-				message = message.replace("{", "<img src=\"").replace("}",
-						"\"/>");
+				message = message.replace("{", "<img src=\"").replace("}", "\"/>");
 			}
 			CharSequence messageGlyph = ImageGetterHelper.jellyBeanHack(message, imgGetter, null);
 
 			textViewRules.setText(messageGlyph);
 
 			textViewUrl.setMovementMethod(LinkMovementMethod.getInstance());
-			textViewUrl
-					.setText(Html
-							.fromHtml("<a href=http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid="
-									+ multiverseId + ">Gatherer Page</a>"));
+			textViewUrl.setText(Html.fromHtml("<a href=http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multiverseId + ">Gatherer Page</a>"));
 
 			return dialog;
-			}
+		}
 		else if (id == WISHLIST_COUNTS) {
 			return (new WishlistHelpers()).getDialog(cardName, this);
 		}
@@ -988,8 +1012,7 @@ public class CardViewActivity extends FamiliarActivity {
 	}
 
 	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v,
-			ContextMenuInfo menuInfo) {
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 
 		super.onCreateContextMenu(menu, v, menuInfo);
 
@@ -999,7 +1022,7 @@ public class CardViewActivity extends FamiliarActivity {
 		inflater.inflate(R.menu.copy_menu, menu);
 	}
 
-	private static final boolean useOldClipboard = (android.os.Build.VERSION.SDK_INT < 11);
+	private static final boolean	useOldClipboard	= (android.os.Build.VERSION.SDK_INT < 11);
 
 	@SuppressLint("NewApi")
 	@Override
@@ -1013,28 +1036,23 @@ public class CardViewActivity extends FamiliarActivity {
 		// to target the correct SDK.
 		String copyText = "";
 		switch (item.getItemId()) {
-		case R.id.copy:
-			copyText = copyView.getText().toString();
-			break;
-		case R.id.copyall:
-			copyText = name.getText().toString() + '\n'
-					+ cost.getText().toString() + '\n'
-					+ type.getText().toString() + '\n'
-					+ set.getText().toString() + '\n'
-					+ ability.getText().toString() + '\n'
-					+ flavor.getText().toString() + '\n'
-					+ pt.getText().toString() + '\n'
-					+ artist.getText().toString();
-			break;
-		default:
-			return super.onContextItemSelected(item);
+			case R.id.copy:
+				copyText = copyView.getText().toString();
+				break;
+			case R.id.copyall:
+				copyText = name.getText().toString() + '\n' + cost.getText().toString() + '\n' + type.getText().toString() + '\n' + set.getText().toString() + '\n'
+						+ ability.getText().toString() + '\n' + flavor.getText().toString() + '\n' + pt.getText().toString() + '\n' + artist.getText().toString();
+				break;
+			default:
+				return super.onContextItemSelected(item);
 		}
 
 		if (useOldClipboard) {
 			android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 			clipboard.setText(copyText);
 			return true;
-		} else {
+		}
+		else {
 			android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 			clipboard.setText(copyText);
 			return true;
@@ -1045,53 +1063,50 @@ public class CardViewActivity extends FamiliarActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-		case R.id.image:
-			progDialog.show();
-			asyncTask = new FetchPictureTask();
-			asyncTask.execute((String[]) null);
-			return true;
-		case R.id.price:
-			progDialog.show();
-			asyncTask = new FetchPriceTask();
-			asyncTask.execute((String[]) null);
-			return true;
-		case R.id.changeset:
-			showDialog(CHANGESET);
-			return true;
-		case R.id.legality:
-			progDialog.show();
-			asyncTask = new FetchLegalityTask();
-			asyncTask.execute((String[]) null);
-			return true;
-		case R.id.cardrulings:
-			progDialog.show();
-			asyncTask = new FetchRulingsTask();
-			asyncTask.execute((String[]) null);
-			return true;
-		case R.id.addtowishlist:
-//			progDialog.show();
-//			asyncTask = new WishlistTask();
-//			asyncTask.execute((String[]) null);
-			showDialog(WISHLIST_COUNTS);
-			return true;
-		case R.id.quittosearch:
-			MyApp appState = ((MyApp) getApplicationContext());
-			appState.setState(QUITTOSEARCH);
-			finish();
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
+			case R.id.image:
+				progDialog.show();
+				asyncTask = new FetchPictureTask();
+				asyncTask.execute((String[]) null);
+				return true;
+			case R.id.price:
+				progDialog.show();
+				asyncTask = new FetchPriceTask();
+				asyncTask.execute((String[]) null);
+				return true;
+			case R.id.changeset:
+				showDialog(CHANGESET);
+				return true;
+			case R.id.legality:
+				progDialog.show();
+				asyncTask = new FetchLegalityTask();
+				asyncTask.execute((String[]) null);
+				return true;
+			case R.id.cardrulings:
+				progDialog.show();
+				asyncTask = new FetchRulingsTask();
+				asyncTask.execute((String[]) null);
+				return true;
+			case R.id.addtowishlist:
+				showDialog(WISHLIST_COUNTS);
+				return true;
+			case R.id.quittosearch:
+				MyApp appState = ((MyApp) getApplicationContext());
+				appState.setState(QUITTOSEARCH);
+				finish();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 
 	@Override
 	protected void onPrepareDialog(int id, Dialog dialog) {
 		switch (id) {
-		case GETIMAGE:
-			if (DialogImageView != null) {
-				DialogImageView.setImageDrawable(cardPicture);
-			}
-			break;
+			case GETIMAGE:
+				if (DialogImageView != null) {
+					DialogImageView.setImageDrawable(cardPicture);
+				}
+				break;
 		}
 	}
 

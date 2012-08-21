@@ -96,6 +96,7 @@ public class CardTradingActivity extends FamiliarActivity {
 	public static final String		fetch_failed					= "Fetch Failed";
 	public static final String		number_of_invalid			= "Number of Cards Invalid";
 	public static final String		price_invalid					= "Price Invalid";
+	public static final String		card_corrupted					= "Card Data corrupted, discarding.";
 
 	private static final int			AVG_PRICE							= 1;
 
@@ -139,7 +140,7 @@ public class CardTradingActivity extends FamiliarActivity {
 					int numberOf = Integer.parseInt(numberOfFromField);
 
 					CardData data = mTradeListHelper.new CardData(namefield.getText().toString(), "", "", numberOf, 0, "loading", null);
-
+					
 					lTradeLeft.add(0, data);
 					aaTradeLeft.notifyDataSetChanged();
 					FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(data, aaTradeLeft, priceSetting, (CardTradingActivity) me, null);
@@ -555,22 +556,35 @@ public class CardTradingActivity extends FamiliarActivity {
 			while ((line = br.readLine()) != null) {
 				parts = line.split(CardData.delimiter);
 
-				String cardName = parts[1];
-				String cardSet = parts[2];
-				String tcgName = mDbHelper.getTCGname(cardSet);
-				int side = Integer.parseInt(parts[0]);
-				int numberOf = Integer.parseInt(parts[3]);
-
-				CardData cd = mTradeListHelper.new CardData(cardName, tcgName, cardSet, numberOf, 0, "loading", null);
-				if (side == CardDbAdapter.LEFT) {
-					lTradeLeft.add(0, cd);
-					FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(lTradeLeft.get(0), aaTradeLeft, priceSetting, (CardTradingActivity) me, null);
-					loadPrice.execute();
+				String cardName = "";
+				
+				try {
+					cardName = parts[1];
+					String cardSet = parts[2];
+					String tcgName = mDbHelper.getTCGname(cardSet);
+					int side = Integer.parseInt(parts[0]);
+					int numberOf = Integer.parseInt(parts[3]);
+					
+					CardData cd = mTradeListHelper.new CardData(cardName, tcgName, cardSet, numberOf, 0, "loading", null);
+					if (side == CardDbAdapter.LEFT) {
+						lTradeLeft.add(0, cd);
+						FetchPriceTask loadPrice = 
+								mTradeListHelper.new FetchPriceTask(lTradeLeft.get(0), aaTradeLeft, priceSetting, (CardTradingActivity) me, null);
+						loadPrice.execute();
+					}
+					else if (side == CardDbAdapter.RIGHT) {
+						lTradeRight.add(0, cd);
+						FetchPriceTask loadPrice = 
+								mTradeListHelper.new FetchPriceTask(lTradeRight.get(0), aaTradeRight, priceSetting, (CardTradingActivity) me, null);
+						loadPrice.execute();
+					}
 				}
-				else if (side == CardDbAdapter.RIGHT) {
-					lTradeRight.add(0, cd);
-					FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(lTradeRight.get(0), aaTradeRight, priceSetting, (CardTradingActivity) me, null);
-					loadPrice.execute();
+				catch (Exception e) {
+					if (cardName != null && cardName.length() != 0)
+						Toast.makeText(mCtx, cardName + ": " + card_corrupted, Toast.LENGTH_LONG).show();
+					else
+						Toast.makeText(mCtx, card_corrupted, Toast.LENGTH_SHORT).show();
+					continue;
 				}
 			}
 		}

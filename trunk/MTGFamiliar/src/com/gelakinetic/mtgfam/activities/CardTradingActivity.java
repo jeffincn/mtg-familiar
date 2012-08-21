@@ -139,7 +139,25 @@ public class CardTradingActivity extends FamiliarActivity {
 					}
 					int numberOf = Integer.parseInt(numberOfFromField);
 
-					CardData data = mTradeListHelper.new CardData(namefield.getText().toString(), "", "", numberOf, 0, "loading", null);
+					String cardName = "", 
+							setCode = "", 
+							tcgName = "";
+					try {
+						cardName = namefield.getText().toString();
+						Cursor cards = mDbHelper.fetchCardByName(cardName);
+						setCode = cards.getString(cards.getColumnIndex(CardDbAdapter.KEY_SET));
+						tcgName = mDbHelper.getTCGname(setCode);
+						
+						cards.deactivate();
+						cards.close();
+					}
+					catch (Exception e) {
+						Toast.makeText(mCtx, card_not_found, Toast.LENGTH_SHORT).show();
+						namefield.setText("");
+						numberfield.setText("1");
+						return;
+					}
+					CardData data = mTradeListHelper.new CardData(cardName, tcgName, setCode, numberOf, 0, "loading", null);
 					
 					lTradeLeft.add(0, data);
 					aaTradeLeft.notifyDataSetChanged();
@@ -163,7 +181,25 @@ public class CardTradingActivity extends FamiliarActivity {
 					}
 					int numberOf = Integer.parseInt(numberOfFromField);
 
-					CardData data = mTradeListHelper.new CardData(namefield.getText().toString(), "", "", numberOf, 0, "loading", null);
+					String cardName = "", 
+							setCode = "", 
+							tcgName = "";
+					try {
+						cardName = namefield.getText().toString();
+						Cursor cards = mDbHelper.fetchCardByName(cardName);
+						setCode = cards.getString(cards.getColumnIndex(CardDbAdapter.KEY_SET));
+						tcgName = mDbHelper.getTCGname(setCode);
+						
+						cards.deactivate();
+						cards.close();
+					}
+					catch (Exception e) {
+						Toast.makeText(mCtx, card_not_found, Toast.LENGTH_SHORT).show();
+						namefield.setText("");
+						numberfield.setText("1");
+						return;
+					}
+					CardData data = mTradeListHelper.new CardData(cardName, tcgName, setCode, numberOf, 0, "loading", null);
 
 					lTradeRight.add(0, data);
 					aaTradeRight.notifyDataSetChanged();

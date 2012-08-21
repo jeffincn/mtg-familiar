@@ -535,7 +535,7 @@ public class CardViewActivity extends FamiliarActivity {
 				String picurl;
 				if (setCode.equals("PP2")) {
 					picurl = "http://magiccards.info/extras/plane/planechase-2012-edition/" + cardName + ".jpg";
-					picurl = picurl.replace(" ", "-").replace("ï¿½", "Ae").replace("?", "").replace(",", "").replace("'", "").replace("!", "");
+					picurl = picurl.replace(" ", "-").replace("Æ", "Ae").replace("?", "").replace(",", "").replace("'", "").replace("!", "");
 				}
 				else if (setCode.equals("PCP")) {
 					if (cardName.equalsIgnoreCase("tazeem")) {
@@ -553,11 +553,11 @@ public class CardViewActivity extends FamiliarActivity {
 					else {
 						picurl = "http://magiccards.info/extras/plane/planechase/" + cardName + ".jpg";
 					}
-					picurl = picurl.replace(" ", "-").replace("ï¿½", "Ae").replace("?", "").replace(",", "").replace("'", "").replace("!", "");
+					picurl = picurl.replace(" ", "-").replace("Æ", "Ae").replace("?", "").replace(",", "").replace("'", "").replace("!", "");
 				}
 				else if (setCode.equals("ARS")) {
 					picurl = "http://magiccards.info/extras/scheme/archenemy/" + cardName + ".jpg";
-					picurl = picurl.replace(" ", "-").replace("ï¿½", "Ae").replace("?", "").replace(",", "").replace("'", "").replace("!", "");
+					picurl = picurl.replace(" ", "-").replace("Æ", "Ae").replace("?", "").replace(",", "").replace("'", "").replace("!", "");
 				}
 				else {
 					picurl = "http://magiccards.info/scans/en/" + mtgi_code + "/" + number + ".jpg";
@@ -704,7 +704,7 @@ public class CardViewActivity extends FamiliarActivity {
 					tcgCardName = cardName;
 				}
 				priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p=" + tcgCardName).replace(" ", "%20")
-						.replace("ï¿½", "Ae"));
+						.replace("Æ", "Ae"));
 
 				// Get a SAXParser from the SAXPArserFactory.
 				SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -994,7 +994,7 @@ public class CardViewActivity extends FamiliarActivity {
 					message += (r.toString() + "<br><br>");
 				}
 
-				message = message.replace("{", "<img src=\"").replace("}", "\"/>");
+				message = message.replace("{Tap}", "{T}").replace("{", "<img src=\"").replace("}", "\"/>");
 			}
 			CharSequence messageGlyph = ImageGetterHelper.jellyBeanHack(message, imgGetter, null);
 

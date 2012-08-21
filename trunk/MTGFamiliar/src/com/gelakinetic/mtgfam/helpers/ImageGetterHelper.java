@@ -32,7 +32,10 @@ import com.gelakinetic.mtgfam.R;
 public class ImageGetterHelper {
 
 	public static Spanned jellyBeanHack(String source) {
-		return jellyBeanHack(source, null, null);
+		if (Build.VERSION.SDK_INT == 16) {
+			source = source.replace("<", " <").replace(">", " >").replace("  ", " ");
+		}
+		return Html.fromHtml(source);
 	}
 
 	public static Spanned jellyBeanHack(String source, ImageGetter imageGetter, TagHandler tagHandler) {
@@ -177,6 +180,10 @@ public class ImageGetterHelper {
 					}
 				}
 
+				if(d == null){
+					return null;
+				}
+				
 				d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
 				return d;
 			}

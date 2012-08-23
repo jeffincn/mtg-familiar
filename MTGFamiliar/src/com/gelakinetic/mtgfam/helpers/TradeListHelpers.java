@@ -37,6 +37,43 @@ public class TradeListHelpers {
 //private static final int			AVG_PRICE							= 1;
 	private static final int			HIGH_PRICE						= 2;
 
+	public CardData FetchCardData(Context mCtx, CardData _data){
+		CardData data = _data;
+		try {
+			CardDbAdapter mDbHelper = new CardDbAdapter(mCtx);
+			mDbHelper.openReadable();
+
+			Cursor card;
+			if(data.setCode == null || data.setCode.equals(""))
+				card = mDbHelper.fetchCardByName(data.name);
+			else
+				card = mDbHelper.fetchCardByNameAndSet(data.name, data.setCode);
+
+			if (card.moveToFirst()) {
+				data.name = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NAME));
+				data.setCode = card.getString(card.getColumnIndex(CardDbAdapter.KEY_SET));
+				data.tcgName = mDbHelper.getTCGname(data.setCode);
+				data.type = card.getString(card.getColumnIndex(CardDbAdapter.KEY_TYPE));
+				data.cost = card.getString(card.getColumnIndex(CardDbAdapter.KEY_MANACOST));
+				data.ability = card.getString(card.getColumnIndex(CardDbAdapter.KEY_ABILITY));
+				data.power = card.getString(card.getColumnIndex(CardDbAdapter.KEY_POWER));
+				data.toughness = card.getString(card.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS));
+				data.loyalty = card.getInt(card.getColumnIndex(CardDbAdapter.KEY_LOYALTY));
+				data.rarity = card.getInt(card.getColumnIndex(CardDbAdapter.KEY_RARITY));
+				data.cardNumber = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NUMBER));
+			}
+			card.deactivate();
+			card.close();
+		}
+		catch (SQLiteException e) {
+			data.message = card_not_found;
+		}
+		catch (IllegalStateException e) {
+			data.message = database_busy;
+		}		
+		return data;
+	}
+	
 	public class FetchPriceTask extends AsyncTask<Void, Void, Integer> {
 		CardData					data;
 		Object	toNotify;
@@ -64,72 +101,27 @@ public class TradeListHelpers {
 		@Override
 		protected void onPreExecute()
 		{
-			mDbHelper = new CardDbAdapter(mCtx);
-			mDbHelper.openReadable();
+//			mDbHelper = new CardDbAdapter(mCtx);
+//			mDbHelper.openReadable();
 		}
 		
 		@Override
 		protected Integer doInBackground(Void... params) {
-			String cardName;
-			String cardNumber;
-			String setCode;
-			String tcgName;
-			try {
-				cardName = data.name;
-				cardNumber = data.cardNumber == null ? "" : data.cardNumber;
-				setCode = data.setCode == null ? "" : data.setCode;
-				tcgName = data.tcgName == null ? "" : data.tcgName;
-				if (cardNumber.equals("") || setCode.equals("") || tcgName.equals("")) {
-					Cursor card;
-					if(setCode.equals(""))
-						card = mDbHelper.fetchCardByName(data.name);
-					else
-						card = mDbHelper.fetchCardByNameAndSet(data.name, setCode);
-					if (card.moveToFirst()) {
-						cardName = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NAME));
-//						if (data.setCode.equals("")) {
-						if (data.ability == null) {
-
-							data.setCode = card.getString(card.getColumnIndex(CardDbAdapter.KEY_SET));
-							data.tcgName = mDbHelper.getTCGname(data.setCode);
-							data.type = card.getString(card.getColumnIndex(CardDbAdapter.KEY_TYPE));
-							data.cost = card.getString(card.getColumnIndex(CardDbAdapter.KEY_MANACOST));
-							data.ability = card.getString(card.getColumnIndex(CardDbAdapter.KEY_ABILITY));
-							data.power = card.getString(card.getColumnIndex(CardDbAdapter.KEY_POWER));
-							data.toughness = card.getString(card.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS));
-							data.loyalty = card.getInt(card.getColumnIndex(CardDbAdapter.KEY_LOYALTY));
-							data.rarity = card.getInt(card.getColumnIndex(CardDbAdapter.KEY_RARITY));
-							data.cardNumber = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NUMBER));
-							
-							cardName = data.name;
-							cardNumber = data.cardNumber;
-							setCode = data.setCode;
-							tcgName = data.tcgName;
-						}
-
-						card.deactivate();
-						card.close();
-					}
-					else {
-						price = card_dne;
-						card.deactivate();
-						card.close();
-						return 1;
-					}
-				}
-			}
-			catch (SQLiteException e) {
-				price = card_not_found;
-				return 1;
-			}
-			catch (IllegalStateException e) {
-				price = database_busy;
-				return 1;
-			}
-
 			URL priceurl = null;
 
 			try {
+				String cardName = data.name;
+				String cardNumber = data.cardNumber == null ? "" : data.cardNumber;
+				String setCode = data.setCode == null ? "" : data.setCode;
+				String tcgName = data.tcgName == null ? "" : data.tcgName;
+				if (cardNumber == "" || setCode == "" || tcgName == "") {
+					data = FetchCardData(mCtx,data);
+					if(data.message == card_not_found || data.message == database_busy) {
+						price = data.message;
+						return 1;
+					}
+				}
+
 				if (cardNumber.contains("b") && CardViewActivity.isTransformable(cardNumber, data.setCode)) {
 					priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p="
 							+ mDbHelper.getTransformName(setCode, cardNumber.replace("b", "a"))).replace(" ", "%20").replace("Æ", "Ae"));

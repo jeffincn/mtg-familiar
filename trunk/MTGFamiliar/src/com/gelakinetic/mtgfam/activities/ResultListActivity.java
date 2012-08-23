@@ -43,6 +43,9 @@ import com.gelakinetic.mtgfam.activities.SearchActivity.SearchCriteria;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.MyApp;
 import com.gelakinetic.mtgfam.helpers.ResultListAdapter;
+//import com.gelakinetic.mtgfam.helpers.TradeListHelpers;
+//import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
+//import com.gelakinetic.mtgfam.helpers.WishlistHelpers;
 
 public class ResultListActivity extends FamiliarActivity {
 
@@ -234,6 +237,21 @@ public class ResultListActivity extends FamiliarActivity {
 			to[i] = toList.get(i);
 		}
 
+//		ArrayList<CardData> wishlist = new ArrayList<CardData>();
+//		TradeListHelpers tlh = new TradeListHelpers();
+//		c.moveToFirst();
+//		while (!c.isAfterLast()) {
+//			CardData cd = (tlh).new CardData(
+//					c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME)), 
+//					c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)),
+//					1);
+//			wishlist.add(cd);
+//			c.moveToNext();
+//		}
+//
+//		new WishlistHelpers();
+//		WishlistHelpers.WriteWishlist(mCtx,wishlist);
+		
 		ResultListAdapter rla = new ResultListAdapter(this, R.layout.card_row, c, from, to, this.getResources());
 		lv.setAdapter(rla);
 	}

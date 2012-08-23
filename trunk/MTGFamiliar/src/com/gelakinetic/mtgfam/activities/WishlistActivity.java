@@ -238,8 +238,11 @@ public class WishlistActivity extends FamiliarActivity {
 				setCodes.add(setCode);
 
 				lCardlist.add(new TradeListHelpers().new CardData(card.name, tcgName, setCode, 0,
-						0, "loading", null, null, null, null, null, null,
-						CardDbAdapter.NOONECARES, '-'));
+						0, "loading", c.getString(c.getColumnIndex(CardDbAdapter.KEY_NUMBER)), 
+						c.getString(c.getColumnIndex(CardDbAdapter.KEY_TYPE)), c.getString(c.getColumnIndex(CardDbAdapter.KEY_MANACOST)), 
+						c.getString(c.getColumnIndex(CardDbAdapter.KEY_ABILITY)), c.getString(c.getColumnIndex(CardDbAdapter.KEY_POWER)), 
+						c.getString(c.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS)), c.getInt(c.getColumnIndex(CardDbAdapter.KEY_LOYALTY)), 
+						c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY))));
 				c.moveToNext();
 			}
 			c.deactivate();
@@ -267,11 +270,7 @@ public class WishlistActivity extends FamiliarActivity {
 			lCardlist.set(0,card);
 		}
 		cardSetWishlists.set(position,lCardlist);
-		//we bind to the first card in the card list, so ensure that it has details if we're showing those details
-		if(ensureFirst && position != 0 && verbose){
-			FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(lCardlist.get(0), aaExpWishlist, priceSetting, null, (WishlistActivity) me);
-			loadPrice.execute();
-		}
+
 		FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(card, aaExpWishlist, priceSetting, null, (WishlistActivity) me);
 		loadPrice.execute();
 	}

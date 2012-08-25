@@ -19,6 +19,7 @@ along with MTG Familiar. If not, see <http://www.gnu.org/licenses/>.
 package com.gelakinetic.mtgfam.activities;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -52,6 +53,7 @@ import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.AutocompleteCursorAdapter;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
+import com.gelakinetic.mtgfam.helpers.QueuedAsyncTask;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.FetchPriceTask;
@@ -173,6 +175,7 @@ public class WishlistActivity extends FamiliarActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
+		QueuedAsyncTask.shutdownGracefully();
 		ArrayList<CardData> lWishlist=new ArrayList<CardData>();
 		for(ArrayList<CardData> lCardlist : cardSetWishlists){
 			//add all the non-zeros to the persistence list
@@ -187,6 +190,7 @@ public class WishlistActivity extends FamiliarActivity {
 	protected void onResume() {
 		super.onResume();
 		doneLoading = false;
+		QueuedAsyncTask.THREAD_POOL_EXECUTOR.pause();
 		ArrayList<CardData> lWishlist = new ArrayList<CardData>();
 
 		WishlistHelpers.ReadWishlist(getApplicationContext(), (WishlistActivity) me, mDbHelper, lWishlist);
@@ -209,6 +213,7 @@ public class WishlistActivity extends FamiliarActivity {
 		catch (IllegalArgumentException e) {
 		}
 		doneLoading = true;
+		QueuedAsyncTask.THREAD_POOL_EXECUTOR.resume();
 	}
 	
 	private void AddCardOrUpdateSetCounts(CardData card){
@@ -261,7 +266,11 @@ public class WishlistActivity extends FamiliarActivity {
 		}
 		//now that we have the correct place holder, add the card or update the set count with what as passed in
 		if(card.setCode != null  && card.setCode != ""){
-			lCardlist.set(setCodes.indexOf(card.setCode),card);
+			int location = setCodes.indexOf(card.setCode);
+			int numberOf = card.numberOf;
+			card = lCardlist.get(location);
+			card.numberOf = numberOf; 
+			lCardlist.set(location,card);
 		}
 		else {
 			int i = card.numberOf;
@@ -381,17 +390,19 @@ public class WishlistActivity extends FamiliarActivity {
 	}
 
 	public void UpdateTotalPrices() {
-		int totalPrice = GetPricesFromCardLists(cardSetWishlists);
-		if (showTotalPrice) {
-			Resources resources = mCtx.getResources();
-			int color = PriceListsHaveBadValues(cardSetWishlists) ? resources.getColor(R.color.red) : resources.getColor(R.color.white);
-			String sTotal = "$" + (totalPrice / 100) + "." + String.format("%02d", (totalPrice % 100));
-			tradePrice.setText(sTotal);
-			tradePrice.setTextColor(color);
+		if(doneLoading){
+			int totalPrice = GetPricesFromCardLists(cardSetWishlists);
+			if (showTotalPrice) {
+				Resources resources = mCtx.getResources();
+				int color = PriceListsHaveBadValues(cardSetWishlists) ? resources.getColor(R.color.red) : resources.getColor(R.color.white);
+				String sTotal = "$" + (totalPrice / 100) + "." + String.format("%02d", (totalPrice % 100));
+				tradePrice.setText(sTotal);
+				tradePrice.setTextColor(color);
+			}
+			aaExpWishlist.notifyDataSetChanged();
+			expWishlist.invalidate();
+			expWishlist.postInvalidate();
 		}
-		aaExpWishlist.notifyDataSetChanged();
-		expWishlist.invalidate();
-		expWishlist.postInvalidate();
 	}
 
 	private boolean PriceListsHaveBadValues(ArrayList<ArrayList<CardData>> cardlists) {

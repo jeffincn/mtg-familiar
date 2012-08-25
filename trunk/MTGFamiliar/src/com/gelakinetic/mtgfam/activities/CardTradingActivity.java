@@ -55,6 +55,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.AutocompleteCursorAdapter;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
+import com.gelakinetic.mtgfam.helpers.QueuedAsyncTask;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.FetchPriceTask;
@@ -102,6 +103,7 @@ public class CardTradingActivity extends FamiliarActivity {
 
 	private static final String		autosaveName					= "autosave";
 	private static final String		tradeExtension				= ".trade";
+	private boolean							doneLoading				= false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -278,7 +280,7 @@ public class CardTradingActivity extends FamiliarActivity {
 	@Override
 	public void onPause() {
 		super.onPause();
-
+		QueuedAsyncTask.shutdownGracefully();
 		SaveTrade(autosaveName + tradeExtension);
 	}
 
@@ -582,6 +584,7 @@ public class CardTradingActivity extends FamiliarActivity {
 
 	protected void LoadTrade(String _tradeName) {
 		try {
+			doneLoading = false;
 			BufferedReader br = new BufferedReader(new InputStreamReader(openFileInput(_tradeName)));
 
 			lTradeLeft.clear();
@@ -630,6 +633,7 @@ public class CardTradingActivity extends FamiliarActivity {
 		catch (IOException e) {
 			Toast.makeText(getApplicationContext(), "IOException", Toast.LENGTH_LONG).show();
 		}
+		doneLoading = true;
 	}
 
 	protected void ChangeSet(final String _side, final int _position) {
@@ -681,19 +685,21 @@ public class CardTradingActivity extends FamiliarActivity {
 	}
 
 	private void UpdateTotalPrices(String _side) {
-		if (_side.equals("left") || _side.equals("both")) {
-			int totalPriceLeft = GetPricesFromTradeList(lTradeLeft);
-			int color = PriceListHasBadValues(lTradeLeft) ? mCtx.getResources().getColor(R.color.red) : mCtx.getResources().getColor(R.color.white);
-			String sTotalLeft = "$" + (totalPriceLeft / 100) + "." + String.format("%02d", (totalPriceLeft % 100));
-			tradePriceLeft.setText(sTotalLeft);
-			tradePriceLeft.setTextColor(color);
-		}
-		if (_side.equals("right") || _side.equals("both")) {
-			int totalPriceRight = GetPricesFromTradeList(lTradeRight);
-			int color = PriceListHasBadValues(lTradeRight) ? mCtx.getResources().getColor(R.color.red) : mCtx.getResources().getColor(R.color.white);
-			String sTotalRight = "$" + (totalPriceRight / 100) + "." + String.format("%02d", (totalPriceRight % 100));
-			tradePriceRight.setText(sTotalRight);
-			tradePriceRight.setTextColor(color);
+		if(doneLoading){
+			if (_side.equals("left") || _side.equals("both")) {
+				int totalPriceLeft = GetPricesFromTradeList(lTradeLeft);
+				int color = PriceListHasBadValues(lTradeLeft) ? mCtx.getResources().getColor(R.color.red) : mCtx.getResources().getColor(R.color.white);
+				String sTotalLeft = "$" + (totalPriceLeft / 100) + "." + String.format("%02d", (totalPriceLeft % 100));
+				tradePriceLeft.setText(sTotalLeft);
+				tradePriceLeft.setTextColor(color);
+			}
+			if (_side.equals("right") || _side.equals("both")) {
+				int totalPriceRight = GetPricesFromTradeList(lTradeRight);
+				int color = PriceListHasBadValues(lTradeRight) ? mCtx.getResources().getColor(R.color.red) : mCtx.getResources().getColor(R.color.white);
+				String sTotalRight = "$" + (totalPriceRight / 100) + "." + String.format("%02d", (totalPriceRight % 100));
+				tradePriceRight.setText(sTotalRight);
+				tradePriceRight.setTextColor(color);
+			}
 		}
 	}
 

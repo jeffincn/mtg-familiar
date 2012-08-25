@@ -259,7 +259,7 @@ public class WishlistHelpers {
 
 	public void fillWishlistDialog() {
 		lCardlist.clear();
-		Cursor c = act.mDbHelper.fetchCardByName(cardName);
+		Cursor c = act.mDbHelper.fetchCardByName(cardName, new String[]{CardDbAdapter.KEY_SET});
 		// make a place holder item for each version set of this card
 		while (!c.isAfterLast()) {
 			String setCode = c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET));

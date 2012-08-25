@@ -146,7 +146,7 @@ public class CardTradingActivity extends FamiliarActivity {
 							tcgName = "";
 					try {
 						cardName = namefield.getText().toString();
-						Cursor cards = mDbHelper.fetchCardByName(cardName);
+						Cursor cards = mDbHelper.fetchCardByName(cardName, new String[]{CardDbAdapter.KEY_SET});
 						setCode = cards.getString(cards.getColumnIndex(CardDbAdapter.KEY_SET));
 						tcgName = mDbHelper.getTCGname(setCode);
 						
@@ -188,7 +188,7 @@ public class CardTradingActivity extends FamiliarActivity {
 							tcgName = "";
 					try {
 						cardName = namefield.getText().toString();
-						Cursor cards = mDbHelper.fetchCardByName(cardName);
+						Cursor cards = mDbHelper.fetchCardByName(cardName, new String[]{CardDbAdapter.KEY_SET});
 						setCode = cards.getString(cards.getColumnIndex(CardDbAdapter.KEY_SET));
 						tcgName = mDbHelper.getTCGname(setCode);
 						
@@ -640,7 +640,7 @@ public class CardTradingActivity extends FamiliarActivity {
 		CardData data = (_side.equals("left") ? lTradeLeft.get(_position) : lTradeRight.get(_position));
 		String name = data.name;
 
-		Cursor cards = mDbHelper.fetchCardByName(name);
+		Cursor cards = mDbHelper.fetchCardByName(name, new String[]{CardDbAdapter.KEY_SET});
 		Set<String> sets = new LinkedHashSet<String>();
 		Set<String> setCodes = new LinkedHashSet<String>();
 		while (!cards.isAfterLast()) {

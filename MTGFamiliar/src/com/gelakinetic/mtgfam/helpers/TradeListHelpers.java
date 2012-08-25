@@ -26,27 +26,27 @@ import com.gelakinetic.mtgfam.helpers.QueuedAsyncTask;
 
 public class TradeListHelpers {
 
-	public static final String		card_not_found				= "Card Not Found";
-	public static final String		mangled_url						= "Mangled URL";
-	public static final String		database_busy					= "Database Busy";
-	public static final String		card_dne							= "Card Does Not Exist";
-	public static final String		fetch_failed					= "Fetch Failed";
-	public static final String		number_of_invalid			= "Number of Cards Invalid";
-	public static final String		price_invalid					= "Price Invalid";
+	public static final String	card_not_found		= "Card Not Found";
+	public static final String	mangled_url				= "Mangled URL";
+	public static final String	database_busy			= "Database Busy";
+	public static final String	card_dne					= "Card Does Not Exist";
+	public static final String	fetch_failed			= "Fetch Failed";
+	public static final String	number_of_invalid	= "Number of Cards Invalid";
+	public static final String	price_invalid			= "Price Invalid";
 
-	private static final int			LOW_PRICE							= 0;
-//private static final int			AVG_PRICE							= 1;
-	private static final int			HIGH_PRICE						= 2;
+	private static final int		LOW_PRICE					= 0;
+	// private static final int AVG_PRICE = 1;
+	private static final int		HIGH_PRICE				= 2;
 
-	public CardData FetchCardData(Context mCtx, CardData _data){
+	public CardData FetchCardData(Context mCtx, CardData _data) {
 		CardData data = _data;
 		try {
 			CardDbAdapter mDbHelper = new CardDbAdapter(mCtx);
 			mDbHelper.openReadable();
 
 			Cursor card;
-			if(data.setCode == null || data.setCode.equals(""))
-				card = mDbHelper.fetchCardByName(data.name);
+			if (data.setCode == null || data.setCode.equals(""))
+				card = mDbHelper.fetchCardByName(data.name, CardDbAdapter.allData);
 			else
 				card = mDbHelper.fetchCardByNameAndSet(data.name, data.setCode);
 
@@ -71,28 +71,27 @@ public class TradeListHelpers {
 		}
 		catch (IllegalStateException e) {
 			data.message = database_busy;
-		}		
+		}
 		return data;
 	}
-	
+
 	public class FetchPriceTask extends QueuedAsyncTask<Void, Void, Integer> {
-		CardData					data;
-		Object	toNotify;
-		String						price		= "";
-		CardDbAdapter mDbHelper;
-		Context mCtx;
-		private int priceSetting;
-		private WishlistActivity wa;
-		private CardTradingActivity cta;
-		
+		CardData										data;
+		Object											toNotify;
+		String											price	= "";
+		Context											mCtx;
+		private int									priceSetting;
+		private WishlistActivity		wa;
+		private CardTradingActivity	cta;
+
 		public FetchPriceTask(CardData _data, Object _toNotify, int ps, CardTradingActivity cta, WishlistActivity wa) {
 			data = _data;
 			toNotify = _toNotify;
-			if(wa != null){
-				mCtx = (Context)wa;
+			if (wa != null) {
+				mCtx = (Context) wa;
 			}
-			if(cta != null){
-				mCtx = (Context)cta;
+			if (cta != null) {
+				mCtx = (Context) cta;
 			}
 			priceSetting = ps;
 			this.cta = cta;
@@ -100,12 +99,9 @@ public class TradeListHelpers {
 		}
 
 		@Override
-		protected void onPreExecute()
-		{
-//			mDbHelper = new CardDbAdapter(mCtx);
-//			mDbHelper.openReadable();
+		protected void onPreExecute() {
 		}
-		
+
 		@Override
 		protected Integer doInBackground(Void... params) {
 			URL priceurl = null;
@@ -116,20 +112,23 @@ public class TradeListHelpers {
 				String setCode = data.setCode == null ? "" : data.setCode;
 				String tcgName = data.tcgName == null ? "" : data.tcgName;
 				if (cardNumber == "" || setCode == "" || tcgName == "") {
-					data = FetchCardData(mCtx,data);
-					if(data.message == card_not_found || data.message == database_busy) {
+					data = FetchCardData(mCtx, data);
+					if (data.message == card_not_found || data.message == database_busy) {
 						price = data.message;
 						return 1;
 					}
 				}
 
 				if (cardNumber.contains("b") && CardViewActivity.isTransformable(cardNumber, data.setCode)) {
+					CardDbAdapter mDbHelper = new CardDbAdapter(mCtx);
+					mDbHelper.openReadable();
 					priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p="
 							+ mDbHelper.getTransformName(setCode, cardNumber.replace("b", "a"))).replace(" ", "%20").replace("Æ", "Ae"));
+					mDbHelper.close();
 				}
 				else {
-					priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p="
-							+ cardName).replace(" ", "%20").replace("Æ", "Ae"));
+					priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p=" + cardName).replace(" ", "%20")
+							.replace("Æ", "Ae"));
 				}
 			}
 			catch (MalformedURLException e) {
@@ -163,10 +162,10 @@ public class TradeListHelpers {
 			}
 			data.price = (int) (dPrice * 100);
 
-			if(wa != null){
+			if (wa != null) {
 				wa.UpdateTotalPrices();
 			}
-			else if(cta != null){
+			else if (cta != null) {
 				cta.UpdateTotalPrices();
 			}
 			try {
@@ -174,7 +173,9 @@ public class TradeListHelpers {
 					((ArrayAdapter<CardData>) toNotify).notifyDataSetChanged();
 				else
 					((BaseExpandableListAdapter) toNotify).notifyDataSetChanged();
-			}catch (Exception e){}
+			}
+			catch (Exception e) {
+			}
 		}
 
 		String fetchPrice(URL _priceURL) {
@@ -223,26 +224,26 @@ public class TradeListHelpers {
 			}
 		}
 	}
-	
+
 	public class CardData {
 
-		public String name;
-		public String cardNumber;
-		public String tcgName;
-		public String setCode;
-		public int numberOf;
-		public int price;		// In cents
-		public String message;
-		public String type;
-		public String cost;
-		public String ability;
-		public String power;
-		public String toughness;
-		public int loyalty;
-		public int rarity;
+		public String	name;
+		public String	cardNumber;
+		public String	tcgName;
+		public String	setCode;
+		public int		numberOf;
+		public int		price;			// In cents
+		public String	message;
+		public String	type;
+		public String	cost;
+		public String	ability;
+		public String	power;
+		public String	toughness;
+		public int		loyalty;
+		public int		rarity;
 
-		public CardData(String name, String tcgName, String setCode, int numberOf, int price, String message, String number, 
-				String type, String cost, String ability, String p, String t, int loyalty, int rarity) {
+		public CardData(String name, String tcgName, String setCode, int numberOf, int price, String message, String number, String type, String cost,
+				String ability, String p, String t, int loyalty, int rarity) {
 			this.name = name;
 			this.cardNumber = number;
 			this.setCode = setCode;
@@ -258,7 +259,7 @@ public class TradeListHelpers {
 			this.loyalty = loyalty;
 			this.rarity = rarity;
 		}
-		
+
 		public CardData(String name, String tcgName, String setCode, int numberOf, int price, String message, String number) {
 			this.name = name;
 			this.cardNumber = number;

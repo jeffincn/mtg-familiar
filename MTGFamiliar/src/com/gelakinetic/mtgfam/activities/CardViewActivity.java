@@ -275,18 +275,23 @@ public class CardViewActivity extends FamiliarActivity {
 
 		switch ((char) c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY))) {
 			case 'C':
+			case 'c':
 				set.setTextColor(this.getResources().getColor(R.color.common));
 				break;
 			case 'U':
+			case 'u':
 				set.setTextColor(this.getResources().getColor(R.color.uncommon));
 				break;
 			case 'R':
+			case 'r':
 				set.setTextColor(this.getResources().getColor(R.color.rare));
 				break;
 			case 'M':
+			case 'm':
 				set.setTextColor(this.getResources().getColor(R.color.mythic));
 				break;
 			case 'T':
+			case 't':
 				set.setTextColor(this.getResources().getColor(R.color.timeshifted));
 				break;
 		}

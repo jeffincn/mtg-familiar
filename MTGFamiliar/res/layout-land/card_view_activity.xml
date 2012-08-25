@@ -181,7 +181,7 @@
     </ScrollView>
 
     <LinearLayout
-        android:id="@+id/linearLayout10"
+        android:id="@+id/scrollButtons"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

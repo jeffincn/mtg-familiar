@@ -60,19 +60,17 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -102,7 +100,7 @@ public class CardViewActivity extends FamiliarActivity {
 	private static final int					GETIMAGE				= 2;
 	private static final int					CHANGESET				= 3;
 	private static final int					CARDRULINGS			= 4;
-	private static final int					BROKEN_IMAGE		= 5;
+//private static final int					BROKEN_IMAGE		= 5;
 	private static final int					WISHLIST_COUNTS	= 6;
 
 	// Where the card image is loaded to
@@ -238,11 +236,11 @@ public class CardViewActivity extends FamiliarActivity {
 		}
 		catch (IllegalArgumentException e) {
 		}
-		try {
-			dismissDialog(BROKEN_IMAGE);
-		}
-		catch (IllegalArgumentException e) {
-		}
+//		try {
+//			dismissDialog(BROKEN_IMAGE);
+//		}
+//		catch (IllegalArgumentException e) {
+//		}
 		try {
 			dismissDialog(WISHLIST_COUNTS);
 		}
@@ -566,8 +564,7 @@ public class CardViewActivity extends FamiliarActivity {
 
 				URL u = new URL(picurl);
 				cardPicture = new BitmapDrawable(me.getResources(), u.openStream());
-				Bitmap bmp = cardPicture.getBitmap();
-
+				
 				int height = 0, width = 0;
 				float scale = 0;
 				int border = 16;
@@ -577,7 +574,9 @@ public class CardViewActivity extends FamiliarActivity {
 					Window window = getWindow();
 					window.getDecorView().getWindowVisibleDisplayFrame(rectgle);
 
-					height = (display.getHeight() - rectgle.top - getSupportActionBar().getHeight()) - border;
+					LinearLayout scrollButtons = (LinearLayout)findViewById(R.id.scrollButtons);
+					
+					height = (display.getHeight() - rectgle.top - getSupportActionBar().getHeight() - scrollButtons.getHeight()) - border;
 					width = display.getWidth() - border;
 				}
 				else if (loadTo == DIALOG) {
@@ -597,9 +596,8 @@ public class CardViewActivity extends FamiliarActivity {
 
 				int newWidth = Math.round(cardPicture.getIntrinsicWidth() * scale);
 				int newHeight = Math.round(cardPicture.getIntrinsicHeight() * scale);
-
-				bmp = Bitmap.createScaledBitmap(bmp, newWidth, newHeight, true);
-				cardPicture = new BitmapDrawable(mCtx.getResources(), bmp);
+				
+				cardPicture = resize(cardPicture, newWidth, newHeight);
 			}
 			catch (FileNotFoundException e) {
 				// internet works, image not found
@@ -620,9 +618,15 @@ public class CardViewActivity extends FamiliarActivity {
 				error = "No Internet Connection";
 			}
 			catch (NullPointerException e) {
-				error = "NPE: Image Not Found";
+				error = "Image load failed. Please try again later.";
 			}
 			return null;
+		}
+		
+		private BitmapDrawable resize(BitmapDrawable image, int newWidth, int newHeight) {
+			Bitmap d = ((BitmapDrawable) image).getBitmap();
+			Bitmap bitmapOrig = Bitmap.createScaledBitmap(d, newWidth, newHeight, true);
+			return new BitmapDrawable(me.getResources(), bitmapOrig);
 		}
 
 		@Override
@@ -642,12 +646,12 @@ public class CardViewActivity extends FamiliarActivity {
 				}
 			}
 			else {
-				if (error.equalsIgnoreCase("NPE: Image Not Found")) {
-					showDialog(BROKEN_IMAGE);
-				}
-				else {
+//				if (error.equalsIgnoreCase("NPE: Image Not Found")) {
+//					showDialog(BROKEN_IMAGE);
+//				}
+//				else {
 					Toast.makeText(mCtx, error, Toast.LENGTH_SHORT).show();
-				}
+//				}
 				if (loadTo == MAINPAGE) {
 					cardpic.setVisibility(View.GONE);
 					name.setVisibility(View.VISIBLE);
@@ -880,16 +884,16 @@ public class CardViewActivity extends FamiliarActivity {
 
 			return dialog;
 		}
-		else if (id == BROKEN_IMAGE) {
-			View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
-			TextView text = (TextView) dialogLayout.findViewById(R.id.corruption_message);
-			text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.error_broken_image)));
-			text.setMovementMethod(LinkMovementMethod.getInstance());
-
-			dialog = new AlertDialog.Builder(this).setTitle(R.string.error).setView(dialogLayout).setPositiveButton(android.R.string.ok, null).create();
-
-			return dialog;
-		}
+//		else if (id == BROKEN_IMAGE) {
+//			View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
+//			TextView text = (TextView) dialogLayout.findViewById(R.id.corruption_message);
+//			text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.error_broken_image)));
+//			text.setMovementMethod(LinkMovementMethod.getInstance());
+//
+//			dialog = new AlertDialog.Builder(this).setTitle(R.string.error).setView(dialogLayout).setPositiveButton(android.R.string.ok, null).create();
+//
+//			return dialog;
+//		}
 		else if (id == GETLEGALITY) {
 			if (formats == null) {
 				return null;

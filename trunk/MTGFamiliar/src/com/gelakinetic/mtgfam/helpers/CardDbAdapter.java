@@ -487,6 +487,7 @@ public class CardDbAdapter {
 
 	}
 
+	public static final String[] allData = {CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_SET, CardDbAdapter.KEY_NUMBER, CardDbAdapter.KEY_TYPE, CardDbAdapter.KEY_MANACOST, CardDbAdapter.KEY_ABILITY, CardDbAdapter.KEY_POWER, CardDbAdapter.KEY_TOUGHNESS, CardDbAdapter.KEY_LOYALTY, CardDbAdapter.KEY_RARITY};
 	/**
 	 * Return a Cursor positioned at the Card that matches the given rowId
 	 * 
@@ -496,9 +497,21 @@ public class CardDbAdapter {
 	 * @throws SQLException
 	 *           if Card could not be found/retrieved
 	 */
-	public Cursor fetchCardByName(String name) throws SQLException {
+	public Cursor fetchCardByName(String name, String[] fields) throws SQLException {
 		name = name.replace("'", "''").replace("æ", "Æ");
-		String sql = "SELECT " + DATABASE_TABLE_CARDS + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " + DATABASE_TABLE_CARDS + "." + KEY_SET + ", " + DATABASE_TABLE_CARDS + "." + KEY_NUMBER + ", "+ DATABASE_TABLE_CARDS + "." + KEY_TYPE + ", " + DATABASE_TABLE_CARDS + "." + KEY_MANACOST + ", " + DATABASE_TABLE_CARDS + "." + KEY_ABILITY + ", " + DATABASE_TABLE_CARDS + "." + KEY_POWER + ", " + DATABASE_TABLE_CARDS + "." + KEY_TOUGHNESS + ", " + DATABASE_TABLE_CARDS + "." + KEY_LOYALTY + ", " + DATABASE_TABLE_CARDS + "." + KEY_RARITY +  " FROM "+ DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = "+ DATABASE_TABLE_CARDS + "." + KEY_SET + " WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + name+ "' ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC";
+		String sql = "SELECT ";
+		boolean first = true;
+		for (String field : fields) {
+			if (first) {
+				first = false;
+			}
+			else {
+				sql += ", ";
+			}
+			sql += DATABASE_TABLE_CARDS + "." + field;
+		}
+		sql += " FROM " + DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = " + DATABASE_TABLE_CARDS
+				+ "." + KEY_SET + " WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + name + "' ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC";
 		Cursor mCursor = null;
 
 		try {

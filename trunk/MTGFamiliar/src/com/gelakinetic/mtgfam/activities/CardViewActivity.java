@@ -943,7 +943,7 @@ public class CardViewActivity extends FamiliarActivity {
 		}
 		else if (id == CHANGESET) {
 			try {
-				Cursor c = mDbHelper.fetchCardByName(cardName);
+				Cursor c = mDbHelper.fetchCardByName(cardName, new String[]{CardDbAdapter.KEY_SET, CardDbAdapter.KEY_ID});
 				Set<String> sets = new LinkedHashSet<String>();
 				Set<Long> cardIds = new LinkedHashSet<Long>();
 				while (!c.isAfterLast()) {

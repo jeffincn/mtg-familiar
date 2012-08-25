@@ -248,20 +248,21 @@ public abstract class QueuedAsyncTask<Params, Progress, Result> {
 	}
 
 	public static void shutdownGracefully() {
-		THREAD_POOL_EXECUTOR.shutdown(); // Disable new tasks from being
-											// submitted
-		try {
-			// Wait a while for existing tasks to terminate
-			if (!THREAD_POOL_EXECUTOR.awaitTermination(5, TimeUnit.SECONDS)) {
-				THREAD_POOL_EXECUTOR.shutdownNow(); // Cancel currently
-													// executing tasks
-			}
-		} catch (InterruptedException ie) {
-			// (Re-)Cancel if current thread also interrupted
-			THREAD_POOL_EXECUTOR.shutdownNow();
-			// Preserve interrupt status
-			Thread.currentThread().interrupt();
-		}
+		//we can't use shutdown or we get errors when we re-enter
+//		THREAD_POOL_EXECUTOR.shutdown(); // Disable new tasks from being
+//											// submitted
+//		try {
+//			// Wait a while for existing tasks to terminate
+//			if (!THREAD_POOL_EXECUTOR.awaitTermination(5, TimeUnit.SECONDS)) {
+//				THREAD_POOL_EXECUTOR.shutdownNow(); // Cancel currently
+//													// executing tasks
+//			}
+//		} catch (InterruptedException ie) {
+//			// (Re-)Cancel if current thread also interrupted
+//			THREAD_POOL_EXECUTOR.shutdownNow();
+//			// Preserve interrupt status
+//			Thread.currentThread().interrupt();
+//		}
 	}
 
 	public static class PausableThreadPoolExecutor extends ThreadPoolExecutor {

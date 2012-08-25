@@ -226,7 +226,7 @@ public class WishlistActivity extends FamiliarActivity {
 				c = mDbHelper.fetchCardByName(card.name, CardDbAdapter.allData);
 			}
 			else {
-				c = mDbHelper.fetchCardByName(card.name, new String[] { CardDbAdapter.KEY_SET, CardDbAdapter.KEY_NUMBER });
+				c = mDbHelper.fetchCardByName(card.name, new String[] { CardDbAdapter.KEY_SET, CardDbAdapter.KEY_NUMBER, CardDbAdapter.KEY_RARITY });
 			}
 			if (c.getCount() == 0) {
 				Toast.makeText(this, R.string.wishlist_toast_no_card, Toast.LENGTH_LONG).show();
@@ -250,7 +250,7 @@ public class WishlistActivity extends FamiliarActivity {
 				}
 				else {
 					lCardlist.add(new TradeListHelpers().new CardData(card.name, tcgName, setCode, 0, 0, "loading", c.getString(c
-							.getColumnIndex(CardDbAdapter.KEY_NUMBER)), null, null, null, null, null, 0, 0));
+							.getColumnIndex(CardDbAdapter.KEY_NUMBER)), null, null, null, null, null, 0, c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY))));
 				}
 				c.moveToNext();
 			}
@@ -505,18 +505,23 @@ public class WishlistActivity extends FamiliarActivity {
 				char r = (char) data.rarity;
 				switch (r) {
 					case 'C':
+					case 'c':
 						setField.setTextColor(resources.getColor(R.color.common));
 						break;
 					case 'U':
+					case 'u':
 						setField.setTextColor(resources.getColor(R.color.uncommon));
 						break;
 					case 'R':
+					case 'r':
 						setField.setTextColor(resources.getColor(R.color.rare));
 						break;
 					case 'M':
+					case 'm':
 						setField.setTextColor(resources.getColor(R.color.mythic));
 						break;
 					case 'T':
+					case 't':
 						setField.setTextColor(resources.getColor(R.color.timeshifted));
 						break;
 				}
@@ -580,13 +585,13 @@ public class WishlistActivity extends FamiliarActivity {
 				nameField.setText(data.name);
 				nameField.setOnClickListener(onClick);
 
-				if(!verbose){
+				if (!verbose) {
 					typeField.setVisibility(View.GONE);
 					costField.setVisibility(View.GONE);
 					abilityField.setVisibility(View.GONE);
 					pField.setVisibility(View.GONE);
 					slashField.setVisibility(View.GONE);
-					tField.setVisibility(View.GONE);		
+					tField.setVisibility(View.GONE);
 				}
 				else {
 					String type = data.type;

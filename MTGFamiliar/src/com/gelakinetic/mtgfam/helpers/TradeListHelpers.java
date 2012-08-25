@@ -15,13 +15,14 @@ import org.xml.sax.XMLReader;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
-import android.os.AsyncTask;
+//import android.os.AsyncTask;
 import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 
 import com.gelakinetic.mtgfam.activities.CardTradingActivity;
 import com.gelakinetic.mtgfam.activities.CardViewActivity;
 import com.gelakinetic.mtgfam.activities.WishlistActivity;
+import com.gelakinetic.mtgfam.helpers.QueuedAsyncTask;
 
 public class TradeListHelpers {
 
@@ -74,7 +75,7 @@ public class TradeListHelpers {
 		return data;
 	}
 	
-	public class FetchPriceTask extends AsyncTask<Void, Void, Integer> {
+	public class FetchPriceTask extends QueuedAsyncTask<Void, Void, Integer> {
 		CardData					data;
 		Object	toNotify;
 		String						price		= "";

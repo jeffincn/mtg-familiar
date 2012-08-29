@@ -31,6 +31,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Html.ImageGetter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,9 +52,10 @@ import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.AutocompleteCursorAdapter;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
-import com.gelakinetic.mtgfam.helpers.QueuedAsyncTask;
+//import com.gelakinetic.mtgfam.helpers.QueuedAsyncTask;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
+import com.gelakinetic.mtgfam.helpers.TradeListHelpers.FetchAllPrices;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.FetchPriceTask;
 import com.gelakinetic.mtgfam.helpers.WishlistHelpers;
 
@@ -78,6 +80,7 @@ public class WishlistActivity extends FamiliarActivity {
 	private boolean																showTotalPrice;
 	private boolean																verbose;
 	private TradeListHelpers											mTradeListHelper;
+	private FetchAllPrices												mFetchAllPrices;
 
 	public static final String										card_not_found				= "Card Not Found";
 	public static final String										mangled_url						= "Mangled URL";
@@ -166,12 +169,16 @@ public class WishlistActivity extends FamiliarActivity {
 				return false;
 			}
 		});
+		mFetchAllPrices = mTradeListHelper.new FetchAllPrices(null, cardSetWishlists, aaExpWishlist, priceSetting, null, (WishlistActivity) me);
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		QueuedAsyncTask.shutdownGracefully();
+		//QueuedAsyncTask.shutdownGracefully();
+		try {
+			mFetchAllPrices.cancel(true);
+		} catch (Exception e) {}
 		ArrayList<CardData> lWishlist = new ArrayList<CardData>();
 		for (ArrayList<CardData> lCardlist : cardSetWishlists) {
 			// add all the non-zeros to the persistence list
@@ -186,9 +193,10 @@ public class WishlistActivity extends FamiliarActivity {
 	protected void onResume() {
 		super.onResume();
 		doneLoading = false;
-		QueuedAsyncTask.THREAD_POOL_EXECUTOR.pause();
+		//QueuedAsyncTask.THREAD_POOL_EXECUTOR.pause();
 		ArrayList<CardData> lWishlist = new ArrayList<CardData>();
 
+		Log.d("WishlistActivity", "Loading list.");
 		WishlistHelpers.ReadWishlist(getApplicationContext(), (WishlistActivity) me, mDbHelper, lWishlist);
 
 		// split each card into its own mini-list
@@ -197,6 +205,7 @@ public class WishlistActivity extends FamiliarActivity {
 		}
 		aaExpWishlist.notifyDataSetChanged();
 		lWishlist.clear();
+		Log.d("WishlistActivity", "Done loading list.");
 
 		try {
 			dismissDialog(DIALOG_UPDATE_CARD);
@@ -209,7 +218,9 @@ public class WishlistActivity extends FamiliarActivity {
 		catch (IllegalArgumentException e) {
 		}
 		doneLoading = true;
-		QueuedAsyncTask.THREAD_POOL_EXECUTOR.resume();
+		Log.d("WishlistActivity", "Starting price fetch.");
+		mFetchAllPrices.execute();
+		//QueuedAsyncTask.THREAD_POOL_EXECUTOR.resume();
 	}
 
 	private void AddCardOrUpdateSetCounts(CardData card) {
@@ -282,9 +293,13 @@ public class WishlistActivity extends FamiliarActivity {
 			lCardlist.set(0, card);
 		}
 		cardSetWishlists.set(position, lCardlist);
+		Log.d("WishlistActivity", String.format("Added %s.", card.name));
+//		aaExpWishlist.notifyDataSetChanged();
 
-		FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(card, aaExpWishlist, priceSetting, null, (WishlistActivity) me);
-		loadPrice.execute();
+		if(doneLoading){
+			FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(card, aaExpWishlist, priceSetting, null, (WishlistActivity) me);
+			loadPrice.execute();
+		}
 	}
 
 	protected Dialog onCreateDialog(int id) {

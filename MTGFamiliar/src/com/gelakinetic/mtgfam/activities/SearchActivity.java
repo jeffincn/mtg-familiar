@@ -19,18 +19,10 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam.activities;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -51,7 +43,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -85,7 +76,7 @@ public class SearchActivity extends FamiliarActivity {
 		int Set_Logic;
 	}
 	public static final String CRITERIA = "criteria";
-	private static final String DEFAULT_CRITERIA_FILE = "defaultSearchCriteria.ser";
+//	private static final String DEFAULT_CRITERIA_FILE = "defaultSearchCriteria.ser";
 //	public static final String		NAME				= "name";
 //	public static final String		TEXT				= "text";
 //	public static final String		TYPE				= "type";
@@ -767,7 +758,7 @@ public class SearchActivity extends FamiliarActivity {
 		formatButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
 		rarityButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
 	}
-
+/*
 	private void persistOptions(){
 		try {
 			SearchCriteria searchCriteria = parseForm();
@@ -945,7 +936,7 @@ public class SearchActivity extends FamiliarActivity {
 			Toast.makeText(mCtx, "Could not load search options.", Toast.LENGTH_LONG).show();
 		} 
 	}
-
+*/
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection

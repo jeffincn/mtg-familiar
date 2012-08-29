@@ -55,7 +55,6 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.AutocompleteCursorAdapter;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
-import com.gelakinetic.mtgfam.helpers.QueuedAsyncTask;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.FetchPriceTask;
@@ -164,7 +163,7 @@ public class CardTradingActivity extends FamiliarActivity {
 					lTradeLeft.add(0, data);
 					aaTradeLeft.notifyDataSetChanged();
 					FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(data, aaTradeLeft, priceSetting, (CardTradingActivity) me, null);
-					loadPrice.execute();
+					TradeListHelpers.addTaskAndExecute(loadPrice);
 					namefield.setText("");
 					numberfield.setText("1");
 				}
@@ -206,7 +205,7 @@ public class CardTradingActivity extends FamiliarActivity {
 					lTradeRight.add(0, data);
 					aaTradeRight.notifyDataSetChanged();
 					FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(data, aaTradeRight, priceSetting, (CardTradingActivity) me, null);
-					loadPrice.execute();
+					TradeListHelpers.addTaskAndExecute(loadPrice);
 					namefield.setText("");
 					numberfield.setText("1");
 				}
@@ -280,8 +279,8 @@ public class CardTradingActivity extends FamiliarActivity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		QueuedAsyncTask.shutdownGracefully();
 		SaveTrade(autosaveName + tradeExtension);
+		TradeListHelpers.cancelAllTasks();
 	}
 
 	protected Dialog onCreateDialog(int id) {
@@ -391,14 +390,14 @@ public class CardTradingActivity extends FamiliarActivity {
 						for (CardData data : lTradeLeft) {
 							data.message = "loading";
 							FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaTradeLeft, priceSetting, (CardTradingActivity) me, null);
-							task.execute();
+							TradeListHelpers.addTaskAndExecute(task);
 						}
 						aaTradeLeft.notifyDataSetChanged();
 
 						for (CardData data : lTradeRight) {
 							data.message = "loading";
 							FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaTradeRight, priceSetting, (CardTradingActivity) me, null);
-							task.execute();
+							TradeListHelpers.addTaskAndExecute(task);
 						}
 						aaTradeRight.notifyDataSetChanged();
 
@@ -609,13 +608,13 @@ public class CardTradingActivity extends FamiliarActivity {
 						lTradeLeft.add(0, cd);
 						FetchPriceTask loadPrice = 
 								mTradeListHelper.new FetchPriceTask(lTradeLeft.get(0), aaTradeLeft, priceSetting, (CardTradingActivity) me, null);
-						loadPrice.execute();
+						TradeListHelpers.addTaskAndExecute(loadPrice);
 					}
 					else if (side == CardDbAdapter.RIGHT) {
 						lTradeRight.add(0, cd);
 						FetchPriceTask loadPrice = 
 								mTradeListHelper.new FetchPriceTask(lTradeRight.get(0), aaTradeRight, priceSetting, (CardTradingActivity) me, null);
-						loadPrice.execute();
+						TradeListHelpers.addTaskAndExecute(loadPrice);
 					}
 				}
 				catch (Exception e) {
@@ -664,7 +663,7 @@ public class CardTradingActivity extends FamiliarActivity {
 					lTradeLeft.get(_position).message = ("loading");
 					aaTradeLeft.notifyDataSetChanged();
 					FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(lTradeLeft.get(_position), aaTradeLeft, priceSetting, (CardTradingActivity) me, null);
-					loadPrice.execute();
+					TradeListHelpers.addTaskAndExecute(loadPrice);
 				}
 				else if (_side.equals("right")) {
 					lTradeRight.get(_position).setCode = (aSetCodes[item]);
@@ -672,7 +671,7 @@ public class CardTradingActivity extends FamiliarActivity {
 					lTradeRight.get(_position).message = ("loading");
 					aaTradeRight.notifyDataSetChanged();
 					FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(lTradeRight.get(_position), aaTradeRight, priceSetting, (CardTradingActivity) me, null);
-					loadPrice.execute();
+					TradeListHelpers.addTaskAndExecute(loadPrice);
 				}
 				return;
 			}

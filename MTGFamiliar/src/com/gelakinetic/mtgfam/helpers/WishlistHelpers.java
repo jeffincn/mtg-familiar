@@ -251,7 +251,9 @@ public class WishlistHelpers {
 			lCardlist = new ArrayList<CardData>();
 			fillWishlistDialog();
 		}
-		else lCardlist = (ArrayList<CardData>) list.clone();
+		else{
+			lCardlist = (ArrayList<CardData>) list.clone();
+		}
 		bindWishlistRows();
 
 		return dialog;

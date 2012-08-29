@@ -3,8 +3,8 @@ package com.gelakinetic.mtgfam.helpers;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -77,8 +77,8 @@ public class TradeListHelpers {
 	}
 
 	public static final int MAX_SIMULTANEOUS_THREADS = 9; // could be 10, but leaves space for when one is winding down while the next is starting
-	public static LinkedList<FetchPriceTask> pendingTasks = new LinkedList<FetchPriceTask>();
-	public static ArrayList<FetchPriceTask> currentExecutingTasks = new ArrayList<FetchPriceTask>(MAX_SIMULTANEOUS_THREADS);
+	public static LinkedBlockingQueue<FetchPriceTask> pendingTasks = new LinkedBlockingQueue<FetchPriceTask>();
+	public static ArrayBlockingQueue<FetchPriceTask> currentExecutingTasks = new ArrayBlockingQueue<FetchPriceTask>(MAX_SIMULTANEOUS_THREADS);
 	
 	public static void addTaskAndExecute(FetchPriceTask fpt){
 		pendingTasks.add(fpt);

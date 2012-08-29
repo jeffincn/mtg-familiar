@@ -1059,10 +1059,6 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 				this.poisonAdapter = new HistoryAdapter(context, poison);
 			}
 		}
-		
-		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context) {
-			this(n, l, p, lhist, phist, context, INITIAL_LIFE);
-		}
 
 		public void setLayoutSize(int listSizeWidth, int listSizeHeight) {
 			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(listSizeWidth, listSizeHeight);

@@ -26,9 +26,8 @@ public abstract class QueuedAsyncTask<Params, Progress, Result> {
 	private static final int CORE_POOL_SIZE = 5;// start up to 5 synchronous
 												// threads by default (since
 												// 1.6)
-	private static final int MAXIMUM_POOL_SIZE = 6;// if our queue fills (and it
-													// never will), start up to
-													// 6 threads
+	private static final int MAXIMUM_POOL_SIZE = 15;// if our queue fills, start up to
+													// 10 threads
 	private static final int KEEP_ALIVE = 1;// default since 2.1 - it was 10
 											// before, and this just makes them
 											// more responsive
@@ -41,7 +40,7 @@ public abstract class QueuedAsyncTask<Params, Progress, Result> {
 		}
 	};
 
-	private static final BlockingQueue<Runnable> sPoolWorkQueue = new LinkedBlockingQueue<Runnable>();
+	private static final BlockingQueue<Runnable> sPoolWorkQueue = new LinkedBlockingQueue<Runnable>(10);
 	// there was a queue size of 10 by default to prevent starvation;
 	// we remove that limit because we'll be queuing a bunch of small tasks
 

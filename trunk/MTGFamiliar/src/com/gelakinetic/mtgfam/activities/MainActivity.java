@@ -317,10 +317,7 @@ public class MainActivity extends FamiliarActivity {
 				SharedPreferences.Editor editor = preferences.edit();
 				editor.putInt("lastLegalityUpdate", 0);
 				editor.commit();
-
-                startService(new Intent(this, DbUpdaterService.class));
-				//asyncTask = new OTATask();
-				//asyncTask.execute((Void[]) null);
+				startService(new Intent(this, DbUpdaterService.class));
 				return true;
 			case R.id.preferences:
 				startActivity(new Intent().setClass(this, PreferencesActivity.class));

@@ -1,59 +1,44 @@
 package com.gelakinetic.mtgfam.activities;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.zip.GZIPInputStream;
 
 import android.app.Instrumentation;
-import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
-import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
-import android.os.AsyncTask;
+import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.helpers.BuildDate;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.DbUpdaterService;
-import com.gelakinetic.mtgfam.helpers.JsonParser;
 import com.gelakinetic.mtgfam.helpers.MyApp;
-import com.gelakinetic.mtgfam.helpers.RulesParser;
+import com.gelakinetic.mtgfam.helpers.RoundTimerService;
 
 public abstract class FamiliarActivity extends SherlockActivity {
 
-	private ProgressDialog									progDialogSpinner;
-	private ProgressDialog									progDialogHorizontal;
-	private ProgressDialog									progDialog;
-	protected AsyncTask<Void, String, Long>	asyncTask;
-
-	protected FamiliarActivity							me;
-	protected static SharedPreferences			preferences;
-	public CardDbAdapter										mDbHelper;
-	protected Context												mCtx;
+	protected FamiliarActivity					me;
+	protected static SharedPreferences	preferences;
+	public CardDbAdapter								mDbHelper;
+	protected Context										mCtx;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		me = this;
 		mCtx = this;
-		
+
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -66,33 +51,50 @@ public abstract class FamiliarActivity extends SherlockActivity {
 			int lastLegalityUpdate = preferences.getInt("lastLegalityUpdate", 0);
 			// days to ms
 			if (((curTime / 1000) - lastLegalityUpdate) > (updatefrequency * 24 * 60 * 60)) {
-				//If we should be updating, check to see if we already are
-				MyApp appState = (MyApp)getApplicationContext();
+				// If we should be updating, check to see if we already are
+				MyApp appState = (MyApp) getApplicationContext();
 				boolean update;
-				synchronized(this) {
-					if(!appState.isUpdating()) {
+				synchronized (this) {
+					if (!appState.isUpdating()) {
 						appState.setUpdating(true);
 						appState.setUpdatingActivity(this);
 						update = true;
 					}
 					else {
 						update = false;
-						if(appState.getUpdatingActivity() != this) {
-							//finish();
+						if (appState.getUpdatingActivity() != this) {
+							// finish();
 						}
 					}
 				}
-				
-				if(update) {
-                    startService(new Intent(this, DbUpdaterService.class));
-					//asyncTask = new OTATask();
-					//asyncTask.execute((Void[]) null);
+
+				if (update) {
+					startService(new Intent(this, DbUpdaterService.class));
 				}
 			}
 		}
 
 		mDbHelper = new CardDbAdapter(this);
-		mDbHelper.openWritable();
+		try {
+			mDbHelper.openWritable();
+			// throw new android.database.sqlite.SQLiteDatabaseLockedException();
+		}
+		catch (SQLiteException e) {
+			String name = e.getClass().getName();
+			String parts[] = name.split("\\.");
+			String msg = parts[parts.length - 1] + getString(R.string.error_couldnt_open_db_toast);
+			Toast.makeText(mCtx, msg, Toast.LENGTH_LONG).show();
+			this.finish();
+			return;
+		}
+
+		updatingDisplay = false;
+		timeShowing = false;
+
+		timerHandler = new Handler();
+		registerReceiver(endTimeReceiver, new IntentFilter(RoundTimerActivity.RESULT_FILTER));
+		registerReceiver(startTimeReceiver, new IntentFilter(RoundTimerService.START_FILTER));
+		registerReceiver(cancelTimeReceiver, new IntentFilter(RoundTimerService.CANCEL_FILTER));
 	}
 
 	@Override
@@ -101,28 +103,9 @@ public abstract class FamiliarActivity extends SherlockActivity {
 		if (mDbHelper != null) {
 			mDbHelper.close();
 		}
-	}
-
-	/*
-	 * Always add a virtual search key to the menu on the actionbar
-	 * super.onCreateOptionsMenu should always be called from FamiliarActivities
-	 */
-	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(R.string.name_search_hint).setIcon(R.drawable.menu_search)
-		.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-			@Override
-			public boolean onMenuItemClick(MenuItem item) {
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						new Instrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_SEARCH);
-					}
-				}).start();
-				return true;
-			}
-		}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-		return true;
+		unregisterReceiver(endTimeReceiver);
+		unregisterReceiver(startTimeReceiver);
+		unregisterReceiver(cancelTimeReceiver);
 	}
 
 	// clear this in every activity. except not cardview
@@ -140,201 +123,143 @@ public abstract class FamiliarActivity extends SherlockActivity {
 		else {
 			appState.setState(0);
 		}
+
+		Intent i = new Intent(RoundTimerService.REQUEST_FILTER);
+		sendBroadcast(i);
+
+		if (!updatingDisplay) {
+			startUpdatingDisplay();
+		}
 	}
 
-	public class OTATask extends AsyncTask<Void, String, Long>
-            implements JsonParser.CardProgressReporter, RulesParser.ProgressReporter {
-		
-		@Override
-		protected void onPreExecute() {
+	@Override
+	protected void onPause() {
+		super.onPause();
+		updatingDisplay = false;
+		timerHandler.removeCallbacks(timerUpdate);
+	}
 
-			progDialogSpinner = new ProgressDialog(me);
-			progDialogSpinner.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			progDialogSpinner.setIndeterminate(true);
-			progDialogSpinner.setCancelable(false);
-			progDialogSpinner.setOnCancelListener(new OnCancelListener() {
-				public void onCancel(DialogInterface pd) {
-					asyncTask.cancel(true);
-				}
-			});
-			progDialogSpinner.setOnKeyListener(new OnKeyListener() {
-				@Override
-				public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-					if (keyCode == KeyEvent.KEYCODE_SEARCH) {
-						return true;
+	/*
+	 * Always add a virtual search key to the menu on the actionbar super.onCreateOptionsMenu should always be called from FamiliarActivities
+	 */
+	public boolean onCreateOptionsMenu(Menu menu) {
+		menu.add(R.string.name_search_hint).setIcon(R.drawable.menu_search).setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						new Instrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_SEARCH);
 					}
-					return false;
-				}
-			});
-
-			progDialogHorizontal = new ProgressDialog(me);
-			progDialogHorizontal.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-			progDialogHorizontal.setIndeterminate(false);
-			progDialogHorizontal.setCancelable(false);
-			progDialogHorizontal.setOnCancelListener(new OnCancelListener() {
-				public void onCancel(DialogInterface pd) {
-					asyncTask.cancel(true);
-				}
-			});
-			progDialogHorizontal.setOnKeyListener(new OnKeyListener() {
-				@Override
-				public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-					if (keyCode == KeyEvent.KEYCODE_SEARCH) {
-						return true;
-					}
-					return false;
-				}
-			});
-			progDialog = progDialogSpinner;
-
-			// lock the rotation
-			int currentOrientation = me.getResources().getConfiguration().orientation;
-			if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-				me.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+				}).start();
+				return true;
 			}
-			else if (currentOrientation == Configuration.ORIENTATION_PORTRAIT) {
-				me.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+		return true;
+	}
+
+	// Displays the timer in the actionbar
+
+	private boolean						updatingDisplay;
+	private long							endTime;
+	private Handler						timerHandler;
+	private boolean						timeShowing;
+	
+	private Runnable					timerUpdate					= new Runnable() {
+		@Override
+		public void run() {
+			displayTimeLeft();
+			
+			if (endTime > SystemClock.elapsedRealtime()) {
+				getSupportActionBar().setDisplayShowTitleEnabled(true);
+				timeShowing = true;
+				timerHandler.postDelayed(timerUpdate, 200);
 			}
 			else {
-				me.setRequestedOrientation(me.getRequestedOrientation());
-			}
-
-			progDialog.setMessage(mCtx.getString(R.string.update_updates));
-			progDialog.show();
-		}
-
-		@Override
-		protected Long doInBackground(Void... params) {
-			
-			this.publishProgress(new String[] { "indeterminate", mCtx.getString(R.string.update_legality) });
-
-			try {				
-				ArrayList<String[]> patchInfo = JsonParser.readUpdateJsonStream(preferences);
-
-				URL legal = new URL("https://sites.google.com/site/mtgfamiliar/manifests/legality.json");
-				InputStream in = new BufferedInputStream(legal.openStream());
-				JsonParser.readLegalityJsonStream(in, mDbHelper, preferences);
-
-				this.publishProgress(new String[] { "indeterminate", mCtx.getString(R.string.update_cards) });
-
-				if (patchInfo != null) {
-					
-					for (int i = 0; i < patchInfo.size(); i++) {
-						String[] set = patchInfo.get(i);
-						if (!mDbHelper.doesSetExist(set[2])) {
-							try {
-								GZIPInputStream gis = new GZIPInputStream(new URL(set[1]).openStream());
-								JsonParser.readCardJsonStream(gis, this, set[0], mDbHelper, mCtx);
-							}
-							catch (MalformedURLException e) {
-								// Log.e("JSON error", e.toString());
-							}
-							catch (IOException e) {
-								// Log.e("JSON error", e.toString());
-							}
-						}
-					}
-					JsonParser.readTCGNameJsonStream(preferences, mDbHelper);
-				}
-			}
-			catch (MalformedURLException e1) {
-				// eat it
-			}
-			catch (IOException e) {
-				// eat it
-			}
-
-			this.publishProgress(new String[] { "indeterminate", mCtx.getString(R.string.update_rules) });
-
-			long lastRulesUpdate = preferences.getLong("lastRulesUpdate", BuildDate.get(mCtx).getTime());
-			RulesParser rp = new RulesParser(new Date(lastRulesUpdate), mDbHelper, mCtx, this);
-			boolean newRulesParsed = false;
-			if (rp.needsToUpdate()) {
-				if (rp.parseRules()) {
-					int code = rp.loadRulesAndGlossary();
-					
-					//Only save the timestamp of this if the update was 100% successful; if
-					//something went screwy, we should let them know and try again next update.
-					if(code == RulesParser.SUCCESS) {
-						newRulesParsed = true;	
-					}
-					else {
-						//TODO - We should indicate failure here somehow (toasts don't work in the async task)
-					}
-				}
-			}
-
-			long curTime = new Date().getTime();
-			SharedPreferences.Editor editor = preferences.edit();
-			editor.putInt("lastLegalityUpdate", (int)(curTime / 1000));
-			if(newRulesParsed) {
-				editor.putLong("lastRulesUpdate", curTime);
-			}
-			editor.commit();
-
-			return null;
-		}
-
-        public void reportRulesProgress(String... values) {
-			this.publishProgress(values);
-        }
-        public void reportJsonCardProgress(String... values) {
-			this.publishProgress(values);
-        }
-
-		@Override
-		protected void onProgressUpdate(String... values) {
-			if (values.length == 2) {
-				progDialog.dismiss();
-				if (values[0].equalsIgnoreCase("indeterminate")) {
-					progDialog = progDialogSpinner;
-				}
-				else {
-					progDialog = progDialogHorizontal;
-				}
-				progDialog.setMessage(values[1]);
-				progDialog.show();
-			}
-			else if (values.length == 3) {
-				if (values[0] != null) {
-					progDialog.setTitle(values[0]);
-				}
-				if (values[1] != null) {
-					progDialog.setMessage(values[1]);
-				}
-				if (values[2] != null) {
-					try {
-						int i = Integer.parseInt(values[2]);
-						progDialog.setProgress(i);
-					}
-					catch (NumberFormatException e) {
-					}
-				}
-			}
-			else {
-				progDialog.setMessage("PROBLEM");
+				timeShowing = false;
+				getSupportActionBar().setDisplayShowTitleEnabled(false);
+				timerHandler.removeCallbacks(timerUpdate);
 			}
 		}
-
+	};
+	
+	private BroadcastReceiver	endTimeReceiver			= new BroadcastReceiver() {
 		@Override
-		protected void onPostExecute(Long result) {
-			me.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
-			try {
-				progDialog.dismiss();
+		public void onReceive(Context context, Intent intent) {
+			endTime = intent.getLongExtra(RoundTimerService.EXTRA_END_TIME, SystemClock.elapsedRealtime());
+			startUpdatingDisplay();
+			timerHandler.postDelayed(timerUpdate, 200);
+		}
+	};
+	
+	private BroadcastReceiver	cancelTimeReceiver	= new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			endTime = 0;
+			stopUpdatingDisplay();
+		}
+	};
+	
+	private BroadcastReceiver startTimeReceiver	= new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Intent i = new Intent(RoundTimerService.REQUEST_FILTER);
+			sendBroadcast(i);
+		}
+	};
+	
+	private void startUpdatingDisplay() {
+		updatingDisplay = true;
+		displayTimeLeft();
+		timerHandler.removeCallbacks(timerUpdate);
+		timerHandler.postDelayed(timerUpdate, 200);
+	}
+	
+	private void stopUpdatingDisplay() {
+		updatingDisplay = false;
+		timeShowing = false;
+		displayTimeLeft();
+		timerHandler.removeCallbacks(timerUpdate);
+		getSupportActionBar().setDisplayShowTitleEnabled(false);
+	}
+
+	private void displayTimeLeft() {
+		long timeLeftMillis = endTime - SystemClock.elapsedRealtime();
+		String timeLeftStr = "";
+
+		if (timeLeftMillis <= 0) {
+			timeLeftStr = "00:00:00";
+		}
+		else {
+			long timeLeftInSecs = (timeLeftMillis / 1000);
+
+			// This is a slight hack to handle the fact that it always rounds down. It
+			// makes the clock look much nicer this way.
+			timeLeftInSecs++;
+
+			String hours = String.valueOf(timeLeftInSecs / (3600));
+			String minutes = String.valueOf((timeLeftInSecs % 3600) / 60);
+			String seconds = String.valueOf(timeLeftInSecs % 60);
+
+			if (hours.length() == 1) {
+				timeLeftStr += "0";
 			}
-			catch (IllegalArgumentException e) {
+			timeLeftStr += hours + ":";
+
+			if (minutes.length() == 1) {
+				timeLeftStr += "0";
 			}
-			
-			MyApp appState = (MyApp)getApplicationContext();
-			appState.setUpdating(false);
-			appState.setUpdatingActivity(null);
+			timeLeftStr += minutes + ":";
+
+			if (seconds.length() == 1) {
+				timeLeftStr += "0";
+			}
+			timeLeftStr += seconds;
 		}
 
-		@Override
-		protected void onCancelled() {			
-			MyApp appState = (MyApp)getApplicationContext();
-			appState.setUpdating(false);
-			appState.setUpdatingActivity(null);
+		if (timeShowing) {
+			getSupportActionBar().setTitle(timeLeftStr);
 		}
 	}
 }

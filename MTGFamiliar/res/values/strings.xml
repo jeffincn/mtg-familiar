@@ -41,11 +41,8 @@
         &lt;a href="mailto:mtg.familiar@gmail.com">mtg.familiar@gmail.com&lt;/a> so we can track this bug and fix it.
         In the meantime, if it doesn\'t manage to fix itself, please try clearing the app data in your device\'s settings,
         and if that doesn\'t work reinstall the app from the Play Store.</string>
-    <string name="error_broken_image">Congratulations, you found a NullPointerException! This should never happen, and we\'re not sure how, or why,
-		you found it. Please send us an email at &lt;a href="mailto:mtg.familiar@gmail.com">mtg.familiar@gmail.com&lt;/a> so we can track this bug
-		and fix it. Thanks!</string>
-	<string name="error_rules_parsing">Errors occurred while parsing the comprehensive rules. To try again, please perform a force update.</string>
-    
+    <string name="error_rules_parsing">Errors occurred while parsing the comprehensive rules. To try again, please perform a force update.</string>
+    <string name="error_couldnt_open_db_toast">: Please try again</string>
     
     <!-- Placeholder text -->
     <string name="ph_type">Type</string>
@@ -217,6 +214,7 @@
     
     <!-- Round timer activity -->
     <string name="timer_how_long">How long is the round?\n(HH:MM)</string>
+    <string name="timer_how_long_landscape">How long is the round? (HH:MM)</string>
     <string name="timer_start">Start Timer</string>
     <string name="timer_cancel">Cancel Timer</string>
     <string name="timer_round_end">The round will end in:</string>

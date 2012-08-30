@@ -100,7 +100,6 @@ public class CardViewActivity extends FamiliarActivity {
 	private static final int					GETIMAGE				= 2;
 	private static final int					CHANGESET				= 3;
 	private static final int					CARDRULINGS			= 4;
-//private static final int					BROKEN_IMAGE		= 5;
 	private static final int					WISHLIST_COUNTS	= 6;
 
 	// Where the card image is loaded to
@@ -236,11 +235,6 @@ public class CardViewActivity extends FamiliarActivity {
 		}
 		catch (IllegalArgumentException e) {
 		}
-//		try {
-//			dismissDialog(BROKEN_IMAGE);
-//		}
-//		catch (IllegalArgumentException e) {
-//		}
 		try {
 			dismissDialog(WISHLIST_COUNTS);
 		}
@@ -651,12 +645,6 @@ public class CardViewActivity extends FamiliarActivity {
 				}
 			}
 			else {
-//				if (error.equalsIgnoreCase("NPE: Image Not Found")) {
-//					showDialog(BROKEN_IMAGE);
-//				}
-//				else {
-					Toast.makeText(mCtx, error, Toast.LENGTH_SHORT).show();
-//				}
 				if (loadTo == MAINPAGE) {
 					cardpic.setVisibility(View.GONE);
 					name.setVisibility(View.VISIBLE);
@@ -889,16 +877,6 @@ public class CardViewActivity extends FamiliarActivity {
 
 			return dialog;
 		}
-//		else if (id == BROKEN_IMAGE) {
-//			View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
-//			TextView text = (TextView) dialogLayout.findViewById(R.id.corruption_message);
-//			text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.error_broken_image)));
-//			text.setMovementMethod(LinkMovementMethod.getInstance());
-//
-//			dialog = new AlertDialog.Builder(this).setTitle(R.string.error).setView(dialogLayout).setPositiveButton(android.R.string.ok, null).create();
-//
-//			return dialog;
-//		}
 		else if (id == GETLEGALITY) {
 			if (formats == null) {
 				return null;

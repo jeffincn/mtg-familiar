@@ -132,37 +132,6 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	private boolean													ttsInitialized				= false;
 
 	private GatheringsIO										gIO;
-	
-	private boolean updatingDisplay;
-	private long endTime;
-	private Handler timerHandler;
-	private boolean	timeShowing;
-	private Runnable timerUpdate = new Runnable() {
-		@Override
-		public void run() {
-			displayTimeLeft();
-			//Log.i("LifeCounter", "Updating time");
-
-			if (endTime > SystemClock.elapsedRealtime()) {
-				getSupportActionBar().setDisplayShowTitleEnabled(true);
-				timeShowing = true;
-				timerHandler.postDelayed(timerUpdate, 200);
-			}
-			else {
-				timeShowing = false;
-				getSupportActionBar().setDisplayShowTitleEnabled(false);
-				timerHandler.removeCallbacks(timerUpdate);
-			}
-		}
-	};
-	private BroadcastReceiver endTimeReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			endTime = intent.getLongExtra(RoundTimerService.EXTRA_END_TIME,
-					SystemClock.elapsedRealtime());
-			startUpdatingDisplay();
-		}
-	};
 
 	/** Called when the activity is first created. */
 	@Override
@@ -170,13 +139,6 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.n_player_life_activity);
 		
-		timeShowing = false;
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
-		
-		timerHandler = new Handler();
-		
-		registerReceiver(endTimeReceiver, new IntentFilter(RoundTimerActivity.RESULT_FILTER));
-
 		gIO = new GatheringsIO(getApplicationContext());
 
 		players = new ArrayList<Player>(2);
@@ -202,10 +164,6 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		resetButton = (ImageView) findViewById(R.id.reset_button);
 		
 		anchor = this;
-		
-//		ActionBar ab = getSupportActionBar();
-//		ab.setDisplayShowTitleEnabled(true);
-//		ab.setTitle("title");
 
 		poisonButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
@@ -281,10 +239,6 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		if (preferences.getBoolean("hasTts", false)) {
 			tts = new TextToSpeech(this, this);
 		}
-		
-		Intent i = new Intent(RoundTimerService.REQUEST_FILTER);
-		sendBroadcast(i);
-		updatingDisplay = true;
 	}
 
 	@Override
@@ -294,15 +248,11 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		if (tts != null) {
 			tts.shutdown();
 		}
-		unregisterReceiver(endTimeReceiver);
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		
-		updatingDisplay = false;
-		timerHandler.removeCallbacks(timerUpdate);
 		
 		if (canGetLock) {
 			wl.release();
@@ -324,10 +274,6 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	public void onResume() {
 		super.onResume();
 		
-		if (!updatingDisplay) {
-			startUpdatingDisplay();
-		}
-
 		try {
 			dismissDialog(DIALOG_RESET_CONFIRM);
 		}
@@ -1407,51 +1353,5 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 		MenuInflater inflater = new MenuInflater(this);
 		inflater.inflate(R.menu.life_counter_menu, menu);
 		return true;
-	}
-	
-	private void startUpdatingDisplay() {
-		updatingDisplay = true;
-		displayTimeLeft();
-		timerHandler.removeCallbacks(timerUpdate);
-		timerHandler.postDelayed(timerUpdate, 200);
-	}
-	
-	private void displayTimeLeft() {
-		long timeLeftMillis = endTime - SystemClock.elapsedRealtime();
-		String timeLeftStr = "";
-
-		if (timeLeftMillis <= 0) {
-			timeLeftStr = "00:00:00";
-		}
-		else {
-			long timeLeftInSecs = (timeLeftMillis / 1000);
-
-			// This is a slight hack to handle the fact that it always rounds down. It
-			// makes the clock look much nicer this way.
-			timeLeftInSecs++;
-
-			String hours = String.valueOf(timeLeftInSecs / (3600));
-			String minutes = String.valueOf((timeLeftInSecs % 3600) / 60);
-			String seconds = String.valueOf(timeLeftInSecs % 60);
-
-			if (hours.length() == 1) {
-				timeLeftStr += "0";
-			}
-			timeLeftStr += hours + ":";
-
-			if (minutes.length() == 1) {
-				timeLeftStr += "0";
-			}
-			timeLeftStr += minutes + ":";
-
-			if (seconds.length() == 1) {
-				timeLeftStr += "0";
-			}
-			timeLeftStr += seconds;
-		}
-
-		if(timeShowing){
-			getSupportActionBar().setTitle(timeLeftStr);
-		}
 	}
 }

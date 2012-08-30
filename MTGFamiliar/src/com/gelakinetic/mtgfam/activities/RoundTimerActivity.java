@@ -33,14 +33,12 @@ import android.media.AudioManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.Settings.System;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.actionbarsherlock.view.Menu;
@@ -59,29 +57,10 @@ public class RoundTimerActivity extends FamiliarActivity {
 
 	private static int DIALOG_SET_WARNINGS = 0;
 
-	private Handler timerHandler = new Handler();
-	private Runnable updateTimeViewTask = new Runnable() {
-		public void run() {
-			displayTimeLeft();
-			//Log.i("RoundTimer", "Updating time");
-
-			if (endTime > SystemClock.elapsedRealtime()) {
-				actionButton.setText(R.string.timer_cancel);
-				timerHandler.postDelayed(updateTimeViewTask, 100);
-			}
-			else {
-				actionButton.setText(R.string.timer_start);
-				timerHandler.removeCallbacks(updateTimeViewTask);
-			}
-		}
-	};
-
 	private TimePicker picker;
 	private Button actionButton;
-	private TextView timeView;
 
 	private long endTime;
-	private boolean updatingDisplay;
 	private boolean ttsInitialized = false;
 
 	private BroadcastReceiver resultReceiver = new BroadcastReceiver() {
@@ -89,7 +68,6 @@ public class RoundTimerActivity extends FamiliarActivity {
 		public void onReceive(Context context, Intent intent) {
 			endTime = intent.getLongExtra(RoundTimerService.EXTRA_END_TIME,
 					SystemClock.elapsedRealtime());
-			startUpdatingDisplay();
 		}
 	};
 
@@ -135,12 +113,8 @@ public class RoundTimerActivity extends FamiliarActivity {
 			}
 		});
 
-		this.timeView = (TextView) findViewById(R.id.rt_time_display);
-
 		Intent i = new Intent(RoundTimerService.REQUEST_FILTER);
 		sendBroadcast(i);
-		updatingDisplay = true; // So onResume() doesn't start the updates before we
-														// get the response broadcast
 
 		if (preferences.getBoolean("hasTts", false)) {
 			i = new Intent(RoundTimerService.TTS_INITIALIZED_FILTER); // Find out if
@@ -148,22 +122,6 @@ public class RoundTimerActivity extends FamiliarActivity {
 																																// initialized
 			sendBroadcast(i);
 		}
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		if (!updatingDisplay) {
-			startUpdatingDisplay();
-		}
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-		timerHandler.removeCallbacks(updateTimeViewTask);
-		updatingDisplay = false; // So we resume the updates when we resume the
-															// activity
 	}
 
 	@Override
@@ -285,53 +243,8 @@ public class RoundTimerActivity extends FamiliarActivity {
 			i.putExtra(EXTRA_END_TIME, endTime);
 			sendBroadcast(i);
 
-			startUpdatingDisplay();
 			actionButton.setText(R.string.timer_cancel);
 		}
-	}
-
-	private void startUpdatingDisplay() {
-		updatingDisplay = true;
-		displayTimeLeft();
-		timerHandler.removeCallbacks(updateTimeViewTask);
-		timerHandler.postDelayed(updateTimeViewTask, 100);
-	}
-
-	private void displayTimeLeft() {
-		long timeLeftMillis = endTime - SystemClock.elapsedRealtime();
-		String timeLeftStr = "";
-
-		if (timeLeftMillis <= 0) {
-			timeLeftStr = "00:00:00";
-		}
-		else {
-			long timeLeftInSecs = (timeLeftMillis / 1000);
-
-			// This is a slight hack to handle the fact that it always rounds down. It
-			// makes the clock look much nicer this way.
-			timeLeftInSecs++;
-
-			String hours = String.valueOf(timeLeftInSecs / (3600));
-			String minutes = String.valueOf((timeLeftInSecs % 3600) / 60);
-			String seconds = String.valueOf(timeLeftInSecs % 60);
-
-			if (hours.length() == 1) {
-				timeLeftStr += "0";
-			}
-			timeLeftStr += hours + ":";
-
-			if (minutes.length() == 1) {
-				timeLeftStr += "0";
-			}
-			timeLeftStr += minutes + ":";
-
-			if (seconds.length() == 1) {
-				timeLeftStr += "0";
-			}
-			timeLeftStr += seconds;
-		}
-
-		timeView.setText(timeLeftStr);
 	}
 
 	@Override
@@ -341,4 +254,5 @@ public class RoundTimerActivity extends FamiliarActivity {
 		inflater.inflate(R.menu.timer_menu, menu);
 		return true;
 	}
+	
 }

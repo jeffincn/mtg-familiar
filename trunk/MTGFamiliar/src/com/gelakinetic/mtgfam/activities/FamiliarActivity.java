@@ -106,6 +106,7 @@ public abstract class FamiliarActivity extends SherlockActivity {
 		unregisterReceiver(endTimeReceiver);
 		unregisterReceiver(startTimeReceiver);
 		unregisterReceiver(cancelTimeReceiver);
+		timerHandler.removeCallbacks(timerUpdate);
 	}
 
 	// clear this in every activity. except not cardview
@@ -163,7 +164,7 @@ public abstract class FamiliarActivity extends SherlockActivity {
 
 	private boolean						updatingDisplay;
 	private long							endTime;
-	private Handler						timerHandler;
+	protected Handler					timerHandler;
 	private boolean						timeShowing;
 	
 	private Runnable					timerUpdate					= new Runnable() {

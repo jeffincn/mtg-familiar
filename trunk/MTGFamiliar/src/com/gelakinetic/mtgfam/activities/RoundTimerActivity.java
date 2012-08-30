@@ -76,6 +76,21 @@ public class RoundTimerActivity extends FamiliarActivity {
 		public void onReceive(Context context, Intent intent) {
 			ttsInitialized = intent.getBooleanExtra(
 					RoundTimerService.EXTRA_TTS_INITIALIZED, false);
+			if(timerWarning != null){
+				timerWarning.setVisible(ttsInitialized);
+			}
+		}
+	};
+
+	private Runnable updateButtonTextTask = new Runnable() {
+		public void run() {
+			if (endTime > SystemClock.elapsedRealtime()) {
+				actionButton.setText(R.string.timer_cancel);
+			}
+			else {
+				actionButton.setText(R.string.timer_start);
+			}
+			timerHandler.postDelayed(updateButtonTextTask, 200);
 		}
 	};
 
@@ -83,7 +98,6 @@ public class RoundTimerActivity extends FamiliarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.round_timer_activity);
-		// this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		registerReceiver(resultReceiver, new IntentFilter(RESULT_FILTER));
 		registerReceiver(ttsReceiver, new IntentFilter(TTS_FILTER));
@@ -99,8 +113,7 @@ public class RoundTimerActivity extends FamiliarActivity {
 		}
 		catch (Exception ex) {
 			// Eat the exception; this should never happen in practice, and if it does
-			// we just want to
-			// default to 50 and pretend nothing broke
+			// we just want to default to 50 and pretend nothing broke
 			length = 50;
 		}
 		picker.setCurrentHour(length / 60);
@@ -117,11 +130,12 @@ public class RoundTimerActivity extends FamiliarActivity {
 		sendBroadcast(i);
 
 		if (preferences.getBoolean("hasTts", false)) {
-			i = new Intent(RoundTimerService.TTS_INITIALIZED_FILTER); // Find out if
-																																// TTS is
-																																// initialized
+			// Find out if TTS is initialized
+			i = new Intent(RoundTimerService.TTS_INITIALIZED_FILTER);
 			sendBroadcast(i);
 		}
+
+		timerHandler.postDelayed(updateButtonTextTask, 200);
 	}
 
 	@Override
@@ -129,11 +143,15 @@ public class RoundTimerActivity extends FamiliarActivity {
 		super.onDestroy();
 		unregisterReceiver(resultReceiver);
 		unregisterReceiver(ttsReceiver);
+		timerHandler.removeCallbacks(updateButtonTextTask);
 	}
 
+	MenuItem timerWarning = null;
+	
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		menu.findItem(R.id.set_timer_warnings).setVisible(ttsInitialized);
+		timerWarning = menu.findItem(R.id.set_timer_warnings);
+		timerWarning.setVisible(ttsInitialized);
 		return true;
 	}
 
@@ -228,7 +246,7 @@ public class RoundTimerActivity extends FamiliarActivity {
 		else {
 			// We're not running, so this command is start
 			picker.clearFocus(); // This forces the inner value to update, in case the
-														// user typed it in manually
+			// user typed it in manually
 			int hours = picker.getCurrentHour();
 			int minutes = picker.getCurrentMinute();
 
@@ -254,5 +272,5 @@ public class RoundTimerActivity extends FamiliarActivity {
 		inflater.inflate(R.menu.timer_menu, menu);
 		return true;
 	}
-	
+
 }

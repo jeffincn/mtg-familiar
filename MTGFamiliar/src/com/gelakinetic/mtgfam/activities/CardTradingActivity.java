@@ -149,7 +149,6 @@ public class CardTradingActivity extends FamiliarActivity {
 						setCode = cards.getString(cards.getColumnIndex(CardDbAdapter.KEY_SET));
 						tcgName = mDbHelper.getTCGname(setCode);
 						
-						cards.deactivate();
 						cards.close();
 					}
 					catch (Exception e) {
@@ -191,7 +190,6 @@ public class CardTradingActivity extends FamiliarActivity {
 						setCode = cards.getString(cards.getColumnIndex(CardDbAdapter.KEY_SET));
 						tcgName = mDbHelper.getTCGname(setCode);
 						
-						cards.deactivate();
 						cards.close();
 					}
 					catch (Exception e) {
@@ -648,7 +646,6 @@ public class CardTradingActivity extends FamiliarActivity {
 			}
 			cards.moveToNext();
 		}
-		cards.deactivate();
 		cards.close();
 
 		final String[] aSets = sets.toArray(new String[sets.size()]);

@@ -359,7 +359,6 @@ public class SearchActivity extends FamiliarActivity {
 			setCursor.moveToNext();
 		}
 
-		setCursor.deactivate();
 		setCursor.close();
 
 		Cursor c = mDbHelper.fetchAllFormats();
@@ -370,7 +369,6 @@ public class SearchActivity extends FamiliarActivity {
 				formatNames[i] = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
 				c.moveToNext();
 			}
-			c.deactivate();
 			c.close();
 		}
 		else {

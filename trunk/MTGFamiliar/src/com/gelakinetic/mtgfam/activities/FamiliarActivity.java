@@ -76,7 +76,7 @@ public abstract class FamiliarActivity extends SherlockActivity {
 
 		mDbHelper = new CardDbAdapter(this);
 		try {
-			mDbHelper.openWritable();
+			mDbHelper.openReadable();
 			// throw new android.database.sqlite.SQLiteDatabaseLockedException();
 		}
 		catch (SQLiteException e) {
@@ -106,7 +106,6 @@ public abstract class FamiliarActivity extends SherlockActivity {
 		unregisterReceiver(endTimeReceiver);
 		unregisterReceiver(startTimeReceiver);
 		unregisterReceiver(cancelTimeReceiver);
-		timerHandler.removeCallbacks(timerUpdate);
 	}
 
 	// clear this in every activity. except not cardview

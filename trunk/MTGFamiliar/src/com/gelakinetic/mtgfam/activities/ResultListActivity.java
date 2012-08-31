@@ -191,7 +191,6 @@ public class ResultListActivity extends FamiliarActivity {
 	public void onDestroy() {
 		super.onDestroy();
 		if (c != null) {
-			c.deactivate();
 			c.close();
 		}
 	}

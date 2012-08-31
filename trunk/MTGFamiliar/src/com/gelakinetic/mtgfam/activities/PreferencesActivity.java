@@ -33,6 +33,7 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.preferences);
+		getSupportActionBar().setDisplayShowTitleEnabled(false);
 	}
 	
 	/*

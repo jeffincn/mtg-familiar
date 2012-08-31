@@ -270,7 +270,6 @@ public class WishlistHelpers {
 			lCardlist.add(new TradeListHelpers().new CardData(cardName, tcgName, setCode, 0, 0, "loading", null));
 			c.moveToNext();
 		}
-		c.deactivate();
 		c.close();
 
 		// Read the wishlist

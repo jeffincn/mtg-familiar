@@ -496,7 +496,6 @@ public class CardViewActivity extends FamiliarActivity {
 				cFormats.moveToNext();
 			}
 
-			cFormats.deactivate();
 			cFormats.close();
 
 			return null;
@@ -939,7 +938,6 @@ public class CardViewActivity extends FamiliarActivity {
 					}
 					c.moveToNext();
 				}
-				c.deactivate();
 				c.close();
 
 				final String[] aSets = sets.toArray(new String[sets.size()]);

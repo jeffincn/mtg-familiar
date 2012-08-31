@@ -227,7 +227,6 @@ public class WishlistActivity extends FamiliarActivity {
 			}
 			if (c.getCount() == 0) {
 				Toast.makeText(this, R.string.wishlist_toast_no_card, Toast.LENGTH_LONG).show();
-				c.deactivate();
 				c.close();
 				return;
 			}
@@ -251,7 +250,6 @@ public class WishlistActivity extends FamiliarActivity {
 				}
 				c.moveToNext();
 			}
-			c.deactivate();
 			c.close();
 			cardNames.add(card.name);
 			cardSetNames.add(setCodes);

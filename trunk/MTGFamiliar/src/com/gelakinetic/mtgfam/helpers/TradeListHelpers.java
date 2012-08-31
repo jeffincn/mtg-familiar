@@ -64,7 +64,6 @@ public class TradeListHelpers {
 				data.rarity = card.getInt(card.getColumnIndex(CardDbAdapter.KEY_RARITY));
 				data.cardNumber = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NUMBER));
 			}
-			card.deactivate();
 			card.close();
 		}
 		catch (SQLiteException e) {

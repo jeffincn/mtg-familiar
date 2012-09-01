@@ -127,8 +127,8 @@ public class GatheringCreateActivity extends FamiliarActivity {
 				break;
 			case DIALOG_GATHERING_EXIST:
 				LayoutInflater factory2 = LayoutInflater.from(this);
-				final View textEntryView2 = factory2.inflate(R.layout.corruption_layout, null);
-				final TextView text = (TextView) textEntryView2.findViewById(R.id.corruption_message);
+				final View textEntryView2 = factory2.inflate(R.layout.simple_message_layout, null);
+				final TextView text = (TextView) textEntryView2.findViewById(R.id.message);
 				text.setText("This Gathering already exists, overwrite existing file?");
 				dialog = new AlertDialog.Builder(this).setTitle("Overwrite Existing Gathering?").setView(textEntryView2)
 						.setPositiveButton("Yes", new DialogInterface.OnClickListener() {

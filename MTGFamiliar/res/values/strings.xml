@@ -43,6 +43,7 @@
         and if that doesn\'t work reinstall the app from the Play Store.</string>
     <string name="error_rules_parsing">Errors occurred while parsing the comprehensive rules. To try again, please perform a force update.</string>
     <string name="error_couldnt_open_db_toast">: Please try again</string>
+    <string name="confirmation">Are You Sure?</string>
     
     <!-- Placeholder text -->
     <string name="ph_type">Type</string>
@@ -210,6 +211,7 @@
     <string name="wishlist_set_pricing">Set Pricing Option</string>
     <string name="wishlist_toast_select_card">Please enter a card first.</string>
     <string name="wishlist_toast_no_card">No card found with that name.</string>
+    <string name="wishlist_clear_confirmation">Empty your wishlist?</string>
     
     
     <!-- Round timer activity -->

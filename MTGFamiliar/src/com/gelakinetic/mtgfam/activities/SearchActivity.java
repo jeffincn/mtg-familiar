@@ -623,8 +623,8 @@ public class SearchActivity extends FamiliarActivity {
 			return rarityDialog;
 		}
 		else if (id == CORRUPTION) {
-			View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
-			TextView text = (TextView) dialogLayout.findViewById(R.id.corruption_message);
+			View dialogLayout = getLayoutInflater().inflate(R.layout.simple_message_layout, null);
+			TextView text = (TextView) dialogLayout.findViewById(R.id.message);
 			text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.error_corruption)));
 			text.setMovementMethod(LinkMovementMethod.getInstance());
 

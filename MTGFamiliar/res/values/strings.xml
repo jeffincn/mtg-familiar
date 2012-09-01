@@ -86,6 +86,7 @@
  	- Actionbar for everybody! Ice Cream Sandwitch UI goodness&lt;br />&lt;br /> 
  	- Brand new updater: faster and out of the way&lt;br />&lt;br /> 
  	- Database stability improvements and bugfixes&lt;br />&lt;br /> 
+ 	- 1.8.1: Round timer now always visible in the ActionBar&lt;br />&lt;br /> 
  	- 1.8.1: More bugfixes!
     </string>
     <string name="main_about_title">About App</string>
@@ -203,6 +204,7 @@
     <string name="trader_edit_dialog_x">x</string>
     <string name="trader_edit_dialog_change_set">Change Set</string>
     <string name="trader_edit_dialog_remove">Remove</string>
+    <string name="trader_clear_confirmation">Clear the current trade?</string>
     
     
     <!-- Wishlist activity -->

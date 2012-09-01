@@ -524,7 +524,13 @@ public class WishlistActivity extends FamiliarActivity {
 		Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto","", null));
 		emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "MTG Familiar Wishlist");
 		emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, WishlistHelpers.GetReadableWishlist(cardSetWishlists, includeTcgName));
-		startActivity(Intent.createChooser(emailIntent, "Send email..."));
+        try { 
+        	startActivity(Intent.createChooser(emailIntent, "Send email..."));
+        } catch (android.content.ActivityNotFoundException ex) { 
+			Toast.makeText(getApplicationContext(),
+					getString(R.string.error_no_email_client),
+					Toast.LENGTH_SHORT).show();
+        } 
 //		Intent sharingIntent = new Intent(Intent.ACTION_SEND);
 //		sharingIntent.setType("text/html");
 //		sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT,WishlistHelpers.GetReadableWishlist(cardSetWishlists, includeTcgName));

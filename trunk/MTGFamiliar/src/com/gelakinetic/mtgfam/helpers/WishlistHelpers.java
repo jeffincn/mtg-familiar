@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,6 +19,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,11 +51,11 @@ public class WishlistHelpers {
 		}
 	}
 
-	public static String GetReadableWishlist(ArrayList<ArrayList<CardData>> cardSetWishlists, boolean includeTcgName){
+	public static String GetReadableWishlist(ArrayList<ArrayList<CardData>> cardSetWishlists, boolean includeTcgName) {
 		StringBuilder readableWishlist = new StringBuilder();
 		for (ArrayList<CardData> cardlist : cardSetWishlists)
 			for (CardData card : cardlist)
-				if(card.numberOf>0)
+				if (card.numberOf > 0)
 					readableWishlist.append(card.toReadableString(includeTcgName));
 		return readableWishlist.toString();
 	}
@@ -180,25 +182,47 @@ public class WishlistHelpers {
 
 	// Variables for the dialog. Like the highlander, there should only be one
 	public int									dismissReason	= 0;
-	Dialog							dialog;
-	Context							mCtx;
+	LinearLayout								lvSets;
+	Context											mCtx;
 	public ArrayList<CardData>	lCardlist;
-	String							cardName;
-	FamiliarActivity		act;
+	String											cardName;
+	FamiliarActivity						act;
 
 	public Dialog getDialog(String cn, final FamiliarActivity fa) {
 		return getDialog(cn, fa, null);
 	}
+
 	public Dialog getDialog(String cn, final FamiliarActivity fa, ArrayList<CardData> list) {
-		
+
 		act = fa;
 		cardName = cn;
 		mCtx = act;
-		dialog = new Dialog(act);
+		AlertDialog.Builder b = new AlertDialog.Builder((Context) fa);
+		// dialog = new Dialog(act);
 
-		dialog.setTitle(cardName + " in the Wishlist");
+		b.setTitle(cardName + " in the Wishlist");
 
-		dialog.setContentView(R.layout.card_setwishlist_dialog);
+		View view = fa.getLayoutInflater().inflate(R.layout.card_setwishlist_dialog, null);
+		lvSets = (LinearLayout)view.findViewById(R.id.setList);
+		b.setView(view);
+
+		b.setPositiveButton(R.string.dialog_done, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dismissReason = DONE;
+				dialog.dismiss();
+			}
+		});
+
+		b.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dismissReason = CANCEL;
+				dialog.dismiss();
+			}
+		});
+
+		AlertDialog dialog = b.create();
 
 		dialog.setOnDismissListener(new OnDismissListener() {
 			@Override
@@ -213,16 +237,15 @@ public class WishlistHelpers {
 						break;
 					case DONE:
 					default:
-						LinearLayout lvSets = (LinearLayout) dialog.findViewById(R.id.setList);
 						ArrayList<CardData> newCards = new ArrayList<CardData>();
 
 						for (int i = 0; i < lvSets.getChildCount(); i++) {
 							View v = lvSets.getChildAt(i);
 							int numberField;
-							try{
+							try {
 								numberField = Integer.valueOf(((EditText) v.findViewById(R.id.numberInput)).getText().toString());
 							}
-							catch(NumberFormatException e){
+							catch (NumberFormatException e) {
 								numberField = 0;
 							}
 							if (numberField != 0) {
@@ -239,28 +262,11 @@ public class WishlistHelpers {
 			}
 		});
 
-		Button done = (Button) dialog.findViewById(R.id.done);
-		done.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				dismissReason = DONE;
-				dialog.dismiss();
-			}
-		});
-		Button cancel = (Button) dialog.findViewById(R.id.cancel);
-		cancel.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				dismissReason = CANCEL;
-				dialog.dismiss();
-			}
-		});
-
-		if(list == null){
+		if (list == null) {
 			lCardlist = new ArrayList<CardData>();
 			fillWishlistDialog();
 		}
-		else{
+		else {
 			lCardlist = (ArrayList<CardData>) list.clone();
 		}
 		bindWishlistRows();
@@ -270,7 +276,7 @@ public class WishlistHelpers {
 
 	public void fillWishlistDialog() {
 		lCardlist.clear();
-		Cursor c = act.mDbHelper.fetchCardByName(cardName, new String[]{CardDbAdapter.KEY_SET});
+		Cursor c = act.mDbHelper.fetchCardByName(cardName, new String[] { CardDbAdapter.KEY_SET });
 		// make a place holder item for each version set of this card
 		while (!c.isAfterLast()) {
 			String setCode = c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET));
@@ -299,8 +305,8 @@ public class WishlistHelpers {
 			}
 		}
 	}
-	public void bindWishlistRows(){
-		LinearLayout lvSets = (LinearLayout) dialog.findViewById(R.id.setList);
+
+	public void bindWishlistRows() {
 		lvSets.removeAllViews();
 
 		for (CardData cd : lCardlist) {
@@ -314,6 +320,6 @@ public class WishlistHelpers {
 			setField.setText(cd.tcgName);
 
 			lvSets.addView(v);
-		}		
+		}
 	}
 }

@@ -36,6 +36,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -55,6 +56,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.AutocompleteCursorAdapter;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
+import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.FetchPriceTask;
@@ -65,6 +67,7 @@ public class CardTradingActivity extends FamiliarActivity {
 	private final static int			DIALOG_SAVE_TRADE			= 3;
 	private final static int			DIALOG_LOAD_TRADE			= 4;
 	private final static int			DIALOG_DELETE_TRADE		= 5;
+	private final static int			DIALOG_CONFIRMATION		= 6;
 	private String								sideForDialog;
 	private int										positionForDialog;
 
@@ -544,6 +547,30 @@ public class CardTradingActivity extends FamiliarActivity {
 				});
 				break;
 			}
+			case DIALOG_CONFIRMATION: {
+				View dialogLayout = getLayoutInflater().inflate(R.layout.simple_message_layout, null);
+				TextView text = (TextView) dialogLayout.findViewById(R.id.message);
+				text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.trader_clear_confirmation)));
+				text.setMovementMethod(LinkMovementMethod.getInstance());
+
+				dialog = new AlertDialog.Builder(this).setTitle(R.string.confirmation).setView(dialogLayout)
+						.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								lTradeRight.clear();
+								aaTradeRight.notifyDataSetChanged();
+								lTradeLeft.clear();
+								aaTradeLeft.notifyDataSetChanged();
+								UpdateTotalPrices("both");
+								removeDialog(DIALOG_CONFIRMATION);
+							}
+						}).setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								removeDialog(DIALOG_CONFIRMATION);
+							}
+						}).setCancelable(true).create();
+				dialog.show();
+				break;
+			}
 			default: {
 				dialog = null;
 			}
@@ -807,11 +834,7 @@ public class CardTradingActivity extends FamiliarActivity {
 		// Handle item selection
 		switch (item.getItemId()) {
 			case R.id.trader_menu_clear:
-				lTradeRight.clear();
-				aaTradeRight.notifyDataSetChanged();
-				lTradeLeft.clear();
-				aaTradeLeft.notifyDataSetChanged();
-				UpdateTotalPrices("both");
+				showDialog(DIALOG_CONFIRMATION);
 				return true;
 			case R.id.trader_menu_settings:
 				showDialog(DIALOG_PRICE_SETTING);

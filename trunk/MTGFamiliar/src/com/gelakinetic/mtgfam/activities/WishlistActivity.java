@@ -61,39 +61,39 @@ import com.gelakinetic.mtgfam.helpers.TradeListHelpers.FetchPriceTask;
 import com.gelakinetic.mtgfam.helpers.WishlistHelpers;
 
 public class WishlistActivity extends FamiliarActivity {
-	private final static int DIALOG_UPDATE_CARD = 1;
-	private final static int DIALOG_PRICE_SETTING = 2;
-	private final static int DIALOG_CONFIRMATION = 3;
-	private final static int DIALOG_SHARE = 4;
-	private int positionForDialog;
+	private final static int											DIALOG_UPDATE_CARD		= 1;
+	private final static int											DIALOG_PRICE_SETTING	= 2;
+	private final static int											DIALOG_CONFIRMATION		= 3;
+	private final static int											DIALOG_SHARE					= 4;
+	private int																		positionForDialog;
 
-	private AutoCompleteTextView namefield;
+	private AutoCompleteTextView									namefield;
 
-	private Button bAdd;
-	private TextView tradePrice;
-	private ExpandableListView expWishlist;
-	private WishlistAdapter aaExpWishlist;
-	private ArrayList<String> cardNames;
-	private ArrayList<ArrayList<String>> cardSetNames;
-	private static ArrayList<ArrayList<CardData>> cardSetWishlists;
+	private Button																bAdd;
+	private TextView															tradePrice;
+	private ExpandableListView										expWishlist;
+	private WishlistAdapter												aaExpWishlist;
+	private ArrayList<String>											cardNames;
+	private ArrayList<ArrayList<String>>					cardSetNames;
+	private static ArrayList<ArrayList<CardData>>	cardSetWishlists;
 
-	private EditText numberfield;
+	private EditText															numberfield;
 
-	public int priceSetting;
-	private boolean showTotalPrice;
-	private boolean verbose;
-	private TradeListHelpers mTradeListHelper;
+	public int																		priceSetting;
+	private boolean																showTotalPrice;
+	private boolean																verbose;
+	private TradeListHelpers											mTradeListHelper;
 
-	public static final String card_not_found = "Card Not Found";
-	public static final String mangled_url = "Mangled URL";
-	public static final String database_busy = "Database Busy";
-	public static final String card_dne = "Card Does Not Exist";
-	public static final String fetch_failed = "Fetch Failed";
-	public static final String number_of_invalid = "Number of Cards Invalid";
-	public static final String price_invalid = "Price Invalid";
+	public static final String										card_not_found				= "Card Not Found";
+	public static final String										mangled_url						= "Mangled URL";
+	public static final String										database_busy					= "Database Busy";
+	public static final String										card_dne							= "Card Does Not Exist";
+	public static final String										fetch_failed					= "Fetch Failed";
+	public static final String										number_of_invalid			= "Number of Cards Invalid";
+	public static final String										price_invalid					= "Price Invalid";
 
-	private static final int AVG_PRICE = 1;
-	private boolean doneLoading = false;
+	private static final int											AVG_PRICE							= 1;
+	private boolean																doneLoading						= false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -102,8 +102,7 @@ public class WishlistActivity extends FamiliarActivity {
 
 		mTradeListHelper = new TradeListHelpers();
 
-		showTotalPrice = preferences.getBoolean("showTotalPriceWishlistPref",
-				false);
+		showTotalPrice = preferences.getBoolean("showTotalPriceWishlistPref", false);
 		verbose = preferences.getBoolean("verboseWishlistPref", false);
 
 		namefield = (AutoCompleteTextView) findViewById(R.id.namesearch);
@@ -120,7 +119,8 @@ public class WishlistActivity extends FamiliarActivity {
 
 		if (!showTotalPrice) {
 			tradePrice.setVisibility(View.GONE);
-		} else {
+		}
+		else {
 			tradePrice.setVisibility(View.VISIBLE);
 		}
 
@@ -133,26 +133,23 @@ public class WishlistActivity extends FamiliarActivity {
 					}
 					int numberOf = Integer.parseInt(numberOfFromField);
 
-					CardData data = mTradeListHelper.new CardData(namefield
-							.getText().toString(), "", "", numberOf, 0,
-							"loading", null, null, null, null, null, null,
-							CardDbAdapter.NOONECARES, '-');
+					CardData data = mTradeListHelper.new CardData(namefield.getText().toString(), "", "", numberOf, 0, "loading",
+							null, null, null, null, null, null, CardDbAdapter.NOONECARES, '-');
 
 					AddCardOrUpdateSetCounts(data);
 					aaExpWishlist.notifyDataSetChanged();
 
 					namefield.setText("");
 					numberfield.setText("1");
-				} else {
-					Toast.makeText(getApplicationContext(),
-							getString(R.string.wishlist_toast_select_card),
-							Toast.LENGTH_SHORT).show();
+				}
+				else {
+					Toast.makeText(getApplicationContext(), getString(R.string.wishlist_toast_select_card), Toast.LENGTH_SHORT)
+							.show();
 				}
 			}
 		});
 
-		priceSetting = Integer.parseInt(preferences.getString("tradePrice",
-				String.valueOf(AVG_PRICE)));
+		priceSetting = Integer.parseInt(preferences.getString("tradePrice", String.valueOf(AVG_PRICE)));
 
 		expWishlist = (ExpandableListView) this.findViewById(R.id.wishlist);
 
@@ -164,11 +161,11 @@ public class WishlistActivity extends FamiliarActivity {
 		expWishlist.setAdapter(aaExpWishlist);
 
 		expWishlist.setOnChildClickListener(new OnChildClickListener() {
-			public boolean onChildClick(ExpandableListView parent, View v,
-					int groupPosition, int childPosition, long id) {
+			public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 				try {
 					removeDialog(DIALOG_UPDATE_CARD);
-				} catch (IllegalArgumentException e) {
+				}
+				catch (IllegalArgumentException e) {
 				}
 				positionForDialog = groupPosition;
 				showDialog(DIALOG_UPDATE_CARD);
@@ -197,8 +194,7 @@ public class WishlistActivity extends FamiliarActivity {
 		doneLoading = false;
 		ArrayList<CardData> lWishlist = new ArrayList<CardData>();
 
-		WishlistHelpers.ReadWishlist(getApplicationContext(),
-				(WishlistActivity) me, mDbHelper, lWishlist);
+		WishlistHelpers.ReadWishlist(getApplicationContext(), (WishlistActivity) me, mDbHelper, lWishlist);
 
 		// split each card into its own mini-list
 		for (CardData card : (ArrayList<CardData>) lWishlist) {
@@ -209,11 +205,13 @@ public class WishlistActivity extends FamiliarActivity {
 
 		try {
 			dismissDialog(DIALOG_UPDATE_CARD);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 		}
 		try {
 			dismissDialog(DIALOG_PRICE_SETTING);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 		}
 		doneLoading = true;
 	}
@@ -231,69 +229,35 @@ public class WishlistActivity extends FamiliarActivity {
 			Cursor c;
 			if (verbose) {
 				c = mDbHelper.fetchCardByName(card.name, CardDbAdapter.allData);
-			} else {
-				c = mDbHelper.fetchCardByName(card.name, new String[] {
-						CardDbAdapter.KEY_SET, CardDbAdapter.KEY_NUMBER,
+			}
+			else {
+				c = mDbHelper.fetchCardByName(card.name, new String[] { CardDbAdapter.KEY_SET, CardDbAdapter.KEY_NUMBER,
 						CardDbAdapter.KEY_RARITY });
 			}
 			if (c.getCount() == 0) {
-				Toast.makeText(this, R.string.wishlist_toast_no_card,
-						Toast.LENGTH_LONG).show();
+				Toast.makeText(this, R.string.wishlist_toast_no_card, Toast.LENGTH_LONG).show();
 				c.close();
 				return;
 			}
 
 			// make a place holder item for each version set of this card
 			while (!c.isAfterLast()) {
-				String setCode = c.getString(c
-						.getColumnIndex(CardDbAdapter.KEY_SET));
+				String setCode = c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET));
 				String tcgName = mDbHelper.getTCGname(setCode);
 				setCodes.add(setCode);
 
 				if (verbose) {
-					lCardlist
-							.add(new TradeListHelpers().new CardData(
-									card.name,
-									tcgName,
-									setCode,
-									0,
-									0,
-									"loading",
-									c.getString(c
-											.getColumnIndex(CardDbAdapter.KEY_NUMBER)),
-									c.getString(c
-											.getColumnIndex(CardDbAdapter.KEY_TYPE)),
-									c.getString(c
-											.getColumnIndex(CardDbAdapter.KEY_MANACOST)),
-									c.getString(c
-											.getColumnIndex(CardDbAdapter.KEY_ABILITY)),
-									c.getString(c
-											.getColumnIndex(CardDbAdapter.KEY_POWER)),
-									c.getString(c
-											.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS)),
-									c.getInt(c
-											.getColumnIndex(CardDbAdapter.KEY_LOYALTY)),
-									c.getInt(c
-											.getColumnIndex(CardDbAdapter.KEY_RARITY))));
-				} else {
-					lCardlist
-							.add(new TradeListHelpers().new CardData(
-									card.name,
-									tcgName,
-									setCode,
-									0,
-									0,
-									"loading",
-									c.getString(c
-											.getColumnIndex(CardDbAdapter.KEY_NUMBER)),
-									null,
-									null,
-									null,
-									null,
-									null,
-									0,
-									c.getInt(c
-											.getColumnIndex(CardDbAdapter.KEY_RARITY))));
+					lCardlist.add(new TradeListHelpers().new CardData(card.name, tcgName, setCode, 0, 0, "loading", c.getString(c
+							.getColumnIndex(CardDbAdapter.KEY_NUMBER)), c.getString(c.getColumnIndex(CardDbAdapter.KEY_TYPE)), c
+							.getString(c.getColumnIndex(CardDbAdapter.KEY_MANACOST)), c.getString(c
+							.getColumnIndex(CardDbAdapter.KEY_ABILITY)), c.getString(c.getColumnIndex(CardDbAdapter.KEY_POWER)), c
+							.getString(c.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS)), c.getInt(c
+							.getColumnIndex(CardDbAdapter.KEY_LOYALTY)), c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY))));
+				}
+				else {
+					lCardlist.add(new TradeListHelpers().new CardData(card.name, tcgName, setCode, 0, 0, "loading", c.getString(c
+							.getColumnIndex(CardDbAdapter.KEY_NUMBER)), null, null, null, null, null, 0, c.getInt(c
+							.getColumnIndex(CardDbAdapter.KEY_RARITY))));
 				}
 				c.moveToNext();
 			}
@@ -303,7 +267,8 @@ public class WishlistActivity extends FamiliarActivity {
 			cardSetWishlists.add(lCardlist);
 
 			position = cardNames.indexOf(card.name);
-		} else {
+		}
+		else {
 			// otherwise, we've already made a place holder - just find it
 			setCodes = cardSetNames.get(position);
 			lCardlist = cardSetWishlists.get(position);
@@ -316,7 +281,8 @@ public class WishlistActivity extends FamiliarActivity {
 			card = lCardlist.get(location);
 			card.numberOf = numberOf;
 			lCardlist.set(location, card);
-		} else {
+		}
+		else {
 			int i = card.numberOf;
 			card = lCardlist.get(0);
 			card.numberOf += i;
@@ -324,8 +290,8 @@ public class WishlistActivity extends FamiliarActivity {
 		}
 		cardSetWishlists.set(position, lCardlist);
 
-		FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(card,
-				aaExpWishlist, priceSetting, null, (WishlistActivity) me);
+		FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(card, aaExpWishlist, priceSetting, null,
+				(WishlistActivity) me);
 		TradeListHelpers.addTaskAndExecute(loadPrice);
 	}
 
@@ -334,207 +300,172 @@ public class WishlistActivity extends FamiliarActivity {
 		if (doneLoading) {
 			AlertDialog.Builder builder;
 			switch (id) {
-			case DIALOG_UPDATE_CARD: {
-				final WishlistHelpers wh = new WishlistHelpers();
-				dialog = (wh).getDialog(cardNames.get(positionForDialog), this,
-						cardSetWishlists.get(positionForDialog));
-				dialog.show();
+				case DIALOG_UPDATE_CARD: {
+					final WishlistHelpers wh = new WishlistHelpers();
+					dialog = (wh).getDialog(cardNames.get(positionForDialog), this, cardSetWishlists.get(positionForDialog));
+					dialog.show();
 
-				final Dialog dlg = dialog;
-				dialog.setOnDismissListener(new OnDismissListener() {
-					@Override
-					public void onDismiss(DialogInterface di) {
-						switch (wh.dismissReason) {
-						case 2:
-							break;
-						case 1:
-						default:
-							LinearLayout lvSets = (LinearLayout) dlg
-									.findViewById(R.id.setList);
+					final Dialog dlg = dialog;
+					dialog.setOnDismissListener(new OnDismissListener() {
+						@Override
+						public void onDismiss(DialogInterface di) {
+							switch (wh.dismissReason) {
+								case 2:
+									break;
+								case 1:
+								default:
+									LinearLayout lvSets = (LinearLayout) dlg.findViewById(R.id.setList);
 
-							ArrayList<CardData> cardlist = cardSetWishlists
-									.get(positionForDialog);
-							int totalCards = 0;
-							for (int i = 0; i < lvSets.getChildCount(); i++) {
-								View v = lvSets.getChildAt(i);
-								int numberField;
-								try {
-									numberField = Integer.valueOf(((EditText) v
-											.findViewById(R.id.numberInput))
-											.getText().toString());
-								} catch (NumberFormatException e) {
-									numberField = 0;
-								}
-								CardData cd = cardlist.get(i);
-								int prior = cd.numberOf;
-								cd.numberOf = numberField;
-								totalCards += numberField;
-								if (prior != numberField && numberField != 0) {
-									cd.message = ("loading");
-									FetchPriceTask task = mTradeListHelper.new FetchPriceTask(
-											cd, aaExpWishlist, priceSetting,
-											null, (WishlistActivity) me);
-									TradeListHelpers.addTaskAndExecute(task);
-								}
-								cardlist.set(i, cd);
-							}
-							if (totalCards == 0) {
-								cardSetNames.remove(positionForDialog);
-								cardSetWishlists.remove(positionForDialog);
-								cardNames.remove(positionForDialog);
-							}
-							aaExpWishlist.notifyDataSetChanged();
-							break;
-						}
-					}
-				});
-
-				break;
-			}
-			case DIALOG_PRICE_SETTING: {
-				builder = new AlertDialog.Builder(this);
-
-				builder.setTitle("Price Options");
-				builder.setSingleChoiceItems(new String[] { "Low", "Average",
-						"High" }, priceSetting,
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog,
-									int which) {
-								priceSetting = which;
-								dialog.dismiss();
-
-								// Update ALL the prices (for non-zero counts)!
-								for (int i = 0; i < cardNames.size(); i++) {
-									for (CardData data : cardSetWishlists
-											.get(i)) {
-										if (data.numberOf > 0) {
-											data.message = ("loading");
-											FetchPriceTask task = mTradeListHelper.new FetchPriceTask(
-													data, aaExpWishlist,
-													priceSetting, null,
+									ArrayList<CardData> cardlist = cardSetWishlists.get(positionForDialog);
+									int totalCards = 0;
+									for (int i = 0; i < lvSets.getChildCount(); i++) {
+										View v = lvSets.getChildAt(i);
+										int numberField;
+										try {
+											numberField = Integer.valueOf(((EditText) v.findViewById(R.id.numberInput)).getText().toString());
+										}
+										catch (NumberFormatException e) {
+											numberField = 0;
+										}
+										CardData cd = cardlist.get(i);
+										int prior = cd.numberOf;
+										cd.numberOf = numberField;
+										totalCards += numberField;
+										if (prior != numberField && numberField != 0) {
+											cd.message = ("loading");
+											FetchPriceTask task = mTradeListHelper.new FetchPriceTask(cd, aaExpWishlist, priceSetting, null,
 													(WishlistActivity) me);
-											TradeListHelpers
-													.addTaskAndExecute(task);
+											TradeListHelpers.addTaskAndExecute(task);
+										}
+										cardlist.set(i, cd);
+									}
+									if (totalCards == 0) {
+										cardSetNames.remove(positionForDialog);
+										cardSetWishlists.remove(positionForDialog);
+										cardNames.remove(positionForDialog);
+									}
+									aaExpWishlist.notifyDataSetChanged();
+									break;
+							}
+						}
+					});
+
+					break;
+				}
+				case DIALOG_PRICE_SETTING: {
+					builder = new AlertDialog.Builder(this);
+
+					builder.setTitle("Price Options");
+					builder.setSingleChoiceItems(new String[] { "Low", "Average", "High" }, priceSetting,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+									priceSetting = which;
+									dialog.dismiss();
+
+									// Update ALL the prices (for non-zero counts)!
+									for (int i = 0; i < cardNames.size(); i++) {
+										for (CardData data : cardSetWishlists.get(i)) {
+											if (data.numberOf > 0) {
+												data.message = ("loading");
+												FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaExpWishlist, priceSetting,
+														null, (WishlistActivity) me);
+												TradeListHelpers.addTaskAndExecute(task);
+											}
 										}
 									}
+									aaExpWishlist.notifyDataSetChanged();
+
+									// And also update the preference
+									SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(WishlistActivity.this)
+											.edit();
+									edit.putString("tradePrice", String.valueOf(priceSetting));
+									edit.commit();
+
+									removeDialog(DIALOG_PRICE_SETTING);
 								}
-								aaExpWishlist.notifyDataSetChanged();
+							});
 
-								// And also update the preference
-								SharedPreferences.Editor edit = PreferenceManager
-										.getDefaultSharedPreferences(
-												WishlistActivity.this).edit();
-								edit.putString("tradePrice",
-										String.valueOf(priceSetting));
-								edit.commit();
+					dialog = builder.create();
 
-								removeDialog(DIALOG_PRICE_SETTING);
-							}
-						});
+					dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+						public void onDismiss(DialogInterface dialog) {
+							removeDialog(DIALOG_PRICE_SETTING);
+						}
+					});
 
-				dialog = builder.create();
+					dialog.show();
+					break;
+				}
+				case DIALOG_CONFIRMATION: {
+					View dialogLayout = getLayoutInflater().inflate(R.layout.simple_message_layout, null);
+					TextView text = (TextView) dialogLayout.findViewById(R.id.message);
+					text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.wishlist_clear_confirmation)));
+					text.setMovementMethod(LinkMovementMethod.getInstance());
 
-				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-					public void onDismiss(DialogInterface dialog) {
-						removeDialog(DIALOG_PRICE_SETTING);
-					}
-				});
+					dialog = new AlertDialog.Builder(this).setTitle(R.string.confirmation).setView(dialogLayout)
+							.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+									cardNames.clear();
+									cardSetNames.clear();
+									cardSetWishlists.clear();
+									aaExpWishlist.notifyDataSetChanged();
+									UpdateTotalPrices();
+									removeDialog(DIALOG_CONFIRMATION);
+								}
+							}).setNegativeButton(R.string.dialog_cancel, new OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+									removeDialog(DIALOG_CONFIRMATION);
+								}
+							}).setCancelable(true).create();
+					dialog.show();
+					break;
+				}
+				case DIALOG_SHARE: {
+					View dialogLayout = getLayoutInflater().inflate(R.layout.simple_message_layout, null);
+					TextView text = (TextView) dialogLayout.findViewById(R.id.message);
+					text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.wishlist_share_include_set)));
+					text.setMovementMethod(LinkMovementMethod.getInstance());
 
-				dialog.show();
-				break;
-			}
-			case DIALOG_CONFIRMATION: {
-				View dialogLayout = getLayoutInflater().inflate(
-						R.layout.simple_message_layout, null);
-				TextView text = (TextView) dialogLayout
-						.findViewById(R.id.message);
-				text.setText(ImageGetterHelper
-						.jellyBeanHack(getString(R.string.wishlist_clear_confirmation)));
-				text.setMovementMethod(LinkMovementMethod.getInstance());
-
-				dialog = new AlertDialog.Builder(this)
-						.setTitle(R.string.confirmation)
-						.setView(dialogLayout)
-						.setPositiveButton(R.string.dialog_ok,
-								new OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										cardNames.clear();
-										cardSetNames.clear();
-										cardSetWishlists.clear();
-										aaExpWishlist.notifyDataSetChanged();
-										UpdateTotalPrices();
-										removeDialog(DIALOG_CONFIRMATION);
-									}
-								})
-						.setNegativeButton(R.string.dialog_cancel,
-								new OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										removeDialog(DIALOG_CONFIRMATION);
-									}
-								})
-						.setCancelable(true).create();
-				dialog.show();
-				break;
-			}
-			case DIALOG_SHARE: {
-				View dialogLayout = getLayoutInflater().inflate(
-						R.layout.simple_message_layout, null);
-				TextView text = (TextView) dialogLayout
-						.findViewById(R.id.message);
-				text.setText(ImageGetterHelper
-						.jellyBeanHack(getString(R.string.wishlist_share_include_set)));
-				text.setMovementMethod(LinkMovementMethod.getInstance());
-
-				dialog = new AlertDialog.Builder(this)
-						.setTitle(R.string.wishlist_share)
-						.setView(dialogLayout)
-						.setPositiveButton(R.string.dialog_yes,
-								new OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										mailWishlist(true);
-										removeDialog(DIALOG_SHARE);
-									}
-								})
-						.setNegativeButton(R.string.dialog_no,
-								new OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										mailWishlist(false);
-										removeDialog(DIALOG_SHARE);
-									}
-								})
-						.setCancelable(true).create();
-				dialog.show();
-				break;
-			}
-			default: {
-				dialog = null;
-			}
+					dialog = new AlertDialog.Builder(this).setTitle(R.string.wishlist_share).setView(dialogLayout)
+							.setPositiveButton(R.string.dialog_yes, new OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+									mailWishlist(true);
+									removeDialog(DIALOG_SHARE);
+								}
+							}).setNegativeButton(R.string.dialog_no, new OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+									mailWishlist(false);
+									removeDialog(DIALOG_SHARE);
+								}
+							}).setCancelable(true).create();
+					dialog.show();
+					break;
+				}
+				default: {
+					dialog = null;
+				}
 			}
 		}
 		return dialog;
 	}
-	
-	private void mailWishlist(boolean includeTcgName){
-		///TODO: check to make sure that this works on an actual phone
+
+	private void mailWishlist(boolean includeTcgName) {
+		// /TODO: check to make sure that this works on an actual phone
 		// blank mailId - user will have to fill in To: field
-		Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto","", null));
+		Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "", null));
 		emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "MTG Familiar Wishlist");
-		emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, WishlistHelpers.GetReadableWishlist(cardSetWishlists, includeTcgName));
-        try { 
-        	startActivity(Intent.createChooser(emailIntent, "Send email..."));
-        } catch (android.content.ActivityNotFoundException ex) { 
-			Toast.makeText(getApplicationContext(),
-					getString(R.string.error_no_email_client),
-					Toast.LENGTH_SHORT).show();
-        } 
-//		Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-//		sharingIntent.setType("text/html");
-//		sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT,WishlistHelpers.GetReadableWishlist(cardSetWishlists, includeTcgName));
-//		startActivity(Intent.createChooser(sharingIntent,"Share using"));
+		emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
+				WishlistHelpers.GetReadableWishlist(cardSetWishlists, includeTcgName));
+		try {
+			startActivity(Intent.createChooser(emailIntent, "Send email..."));
+		}
+		catch (android.content.ActivityNotFoundException ex) {
+			Toast.makeText(getApplicationContext(), getString(R.string.error_no_email_client), Toast.LENGTH_SHORT).show();
+		}
+		// Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+		// sharingIntent.setType("text/html");
+		// sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT,WishlistHelpers.GetReadableWishlist(cardSetWishlists, includeTcgName));
+		// startActivity(Intent.createChooser(sharingIntent,"Share using"));
 	}
 
 	public void UpdateTotalPrices() {
@@ -542,11 +473,9 @@ public class WishlistActivity extends FamiliarActivity {
 			int totalPrice = GetPricesFromCardLists(cardSetWishlists);
 			if (showTotalPrice) {
 				Resources resources = mCtx.getResources();
-				int color = PriceListsHaveBadValues(cardSetWishlists) ? resources
-						.getColor(R.color.red) : resources
+				int color = PriceListsHaveBadValues(cardSetWishlists) ? resources.getColor(R.color.red) : resources
 						.getColor(R.color.white);
-				String sTotal = "$" + (totalPrice / 100) + "."
-						+ String.format("%02d", (totalPrice % 100));
+				String sTotal = "$" + (totalPrice / 100) + "." + String.format("%02d", (totalPrice % 100));
 				tradePrice.setText(sTotal);
 				tradePrice.setTextColor(color);
 			}
@@ -556,8 +485,7 @@ public class WishlistActivity extends FamiliarActivity {
 		}
 	}
 
-	private boolean PriceListsHaveBadValues(
-			ArrayList<ArrayList<CardData>> cardlists) {
+	private boolean PriceListsHaveBadValues(ArrayList<ArrayList<CardData>> cardlists) {
 
 		for (int i = 0; i < cardlists.size(); i++) {
 			for (CardData data : cardlists.get(i)) {
@@ -578,7 +506,8 @@ public class WishlistActivity extends FamiliarActivity {
 				CardData data = cardlist.get(i);
 				if (data.hasPrice()) {
 					totalPrice += data.numberOf * data.price;
-				} else {
+				}
+				else {
 					String message = data.message;
 
 					// Remove the card from the list, unless it was just a fetch
@@ -590,31 +519,27 @@ public class WishlistActivity extends FamiliarActivity {
 						cardlist.remove(data);
 						i--;
 						aaExpWishlist.notifyDataSetChanged();
-						Toast.makeText(getApplicationContext(),
-								data.name + ": " + card_not_found,
-								Toast.LENGTH_LONG).show();
-					} else if (message.compareTo(mangled_url) == 0) {
+						Toast.makeText(getApplicationContext(), data.name + ": " + card_not_found, Toast.LENGTH_LONG).show();
+					}
+					else if (message.compareTo(mangled_url) == 0) {
 						cardlist.remove(data);
 						i--;
 						aaExpWishlist.notifyDataSetChanged();
-						Toast.makeText(getApplicationContext(),
-								data.name + ": " + mangled_url,
-								Toast.LENGTH_LONG).show();
-					} else if (message.compareTo(database_busy) == 0) {
+						Toast.makeText(getApplicationContext(), data.name + ": " + mangled_url, Toast.LENGTH_LONG).show();
+					}
+					else if (message.compareTo(database_busy) == 0) {
 						cardlist.remove(data);
 						i--;
 						aaExpWishlist.notifyDataSetChanged();
-						Toast.makeText(getApplicationContext(),
-								data.name + ": " + database_busy,
-								Toast.LENGTH_LONG).show();
-					} else if (message.compareTo(card_dne) == 0) {
+						Toast.makeText(getApplicationContext(), data.name + ": " + database_busy, Toast.LENGTH_LONG).show();
+					}
+					else if (message.compareTo(card_dne) == 0) {
 						cardlist.remove(data);
 						i--;
 						aaExpWishlist.notifyDataSetChanged();
-						Toast.makeText(getApplicationContext(),
-								data.name + ": " + card_dne, Toast.LENGTH_LONG)
-								.show();
-					} else if (message.compareTo(fetch_failed) == 0) {
+						Toast.makeText(getApplicationContext(), data.name + ": " + card_dne, Toast.LENGTH_LONG).show();
+					}
+					else if (message.compareTo(fetch_failed) == 0) {
 
 					}
 				}
@@ -625,9 +550,9 @@ public class WishlistActivity extends FamiliarActivity {
 
 	class WishlistAdapter extends BaseExpandableListAdapter {
 
-		private Resources resources;
-		ExpandableListView _list;
-		private ImageGetter imgGetter;
+		private Resources		resources;
+		ExpandableListView	_list;
+		private ImageGetter	imgGetter;
 
 		public WishlistAdapter(Context context, ExpandableListView list) {
 			_list = list;
@@ -643,55 +568,48 @@ public class WishlistActivity extends FamiliarActivity {
 			return 0;
 		}
 
-		public View getChildView(int groupPosition, int childPosition,
-				boolean isLastChild, View convertView, ViewGroup parent) {
+		public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView,
+				ViewGroup parent) {
 			View v = convertView;
-			CardData data = WishlistActivity.cardSetWishlists
-					.get(groupPosition).get(childPosition);
+			CardData data = WishlistActivity.cardSetWishlists.get(groupPosition).get(childPosition);
 			// empty view for 0-count rows
 			if (data == null || data.numberOf == 0)
 				v = new View(mCtx);
 			else {
 				LayoutInflater inf = getLayoutInflater();
 				v = inf.inflate(R.layout.wishlist_cardset_row, null);
-				TextView setField = (TextView) v
-						.findViewById(R.id.wishlistRowSet);
-				TextView priceField = (TextView) v
-						.findViewById(R.id.wishlistRowPrice);
+				TextView setField = (TextView) v.findViewById(R.id.wishlistRowSet);
+				TextView priceField = (TextView) v.findViewById(R.id.wishlistRowPrice);
 
 				setField.setText(data.tcgName);
 				char r = (char) data.rarity;
 				switch (r) {
-				case 'C':
-				case 'c':
-					setField.setTextColor(resources.getColor(R.color.common));
-					break;
-				case 'U':
-				case 'u':
-					setField.setTextColor(resources.getColor(R.color.uncommon));
-					break;
-				case 'R':
-				case 'r':
-					setField.setTextColor(resources.getColor(R.color.rare));
-					break;
-				case 'M':
-				case 'm':
-					setField.setTextColor(resources.getColor(R.color.mythic));
-					break;
-				case 'T':
-				case 't':
-					setField.setTextColor(resources
-							.getColor(R.color.timeshifted));
-					break;
+					case 'C':
+					case 'c':
+						setField.setTextColor(resources.getColor(R.color.common));
+						break;
+					case 'U':
+					case 'u':
+						setField.setTextColor(resources.getColor(R.color.uncommon));
+						break;
+					case 'R':
+					case 'r':
+						setField.setTextColor(resources.getColor(R.color.rare));
+						break;
+					case 'M':
+					case 'm':
+						setField.setTextColor(resources.getColor(R.color.mythic));
+						break;
+					case 'T':
+					case 't':
+						setField.setTextColor(resources.getColor(R.color.timeshifted));
+						break;
 				}
-				priceField.setText(data.numberOf
-						+ "x"
-						+ (data.hasPrice() ? data.getPriceString()
-								: data.message));
+				priceField.setText(data.numberOf + "x" + (data.hasPrice() ? data.getPriceString() : data.message));
 				if (data.hasPrice()) {
-					priceField.setTextColor(resources
-							.getColor(R.color.light_gray));
-				} else {
+					priceField.setTextColor(resources.getColor(R.color.light_gray));
+				}
+				else {
 					priceField.setTextColor(resources.getColor(R.color.red));
 				}
 			}
@@ -715,34 +633,31 @@ public class WishlistActivity extends FamiliarActivity {
 		}
 
 		@Override
-		public View getGroupView(int groupPosition, boolean isExpanded,
-				View convertView, ViewGroup parent) {
+		public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 			View v = convertView;
 			if (v == null) {
 				LayoutInflater inf = getLayoutInflater();
 				v = inf.inflate(R.layout.wishlist_row, null);
 			}
-			CardData data = WishlistActivity.cardSetWishlists
-					.get(groupPosition).get(0);
+			CardData data = WishlistActivity.cardSetWishlists.get(groupPosition).get(0);
 			if (data != null) {
 				final int pos = groupPosition;
 				View.OnClickListener onClick = new View.OnClickListener() {
 					public void onClick(View v) {
 						try {
 							removeDialog(DIALOG_UPDATE_CARD);
-						} catch (IllegalArgumentException e) {
+						}
+						catch (IllegalArgumentException e) {
 						}
 						positionForDialog = pos;
 						showDialog(DIALOG_UPDATE_CARD);
 					}
 				};
 
-				TextView nameField = (TextView) v
-						.findViewById(R.id.wishlistRowName);
+				TextView nameField = (TextView) v.findViewById(R.id.wishlistRowName);
 				TextView typeField = (TextView) v.findViewById(R.id.cardtype);
 				TextView costField = (TextView) v.findViewById(R.id.cardcost);
-				TextView abilityField = (TextView) v
-						.findViewById(R.id.cardability);
+				TextView abilityField = (TextView) v.findViewById(R.id.cardability);
 				TextView pField = (TextView) v.findViewById(R.id.cardp);
 				TextView slashField = (TextView) v.findViewById(R.id.cardslash);
 				TextView tField = (TextView) v.findViewById(R.id.cardt);
@@ -761,7 +676,8 @@ public class WishlistActivity extends FamiliarActivity {
 					pField.setVisibility(View.GONE);
 					slashField.setVisibility(View.GONE);
 					tField.setVisibility(View.GONE);
-				} else {
+				}
+				else {
 					String type = data.type;
 					// we check the actual values for visibility here (instead
 					// of just the verbose flag)
@@ -769,7 +685,8 @@ public class WishlistActivity extends FamiliarActivity {
 					// tokens don't have cost, etc.
 					if (!verbose || type == null || type == "") {
 						typeField.setVisibility(View.GONE);
-					} else {
+					}
+					else {
 						typeField.setVisibility(View.VISIBLE);
 						typeField.setText(type);
 						typeField.setOnClickListener(onClick);
@@ -777,23 +694,21 @@ public class WishlistActivity extends FamiliarActivity {
 					String manaCost = data.cost;
 					if (!verbose || manaCost == null || manaCost == "") {
 						costField.setVisibility(View.GONE);
-					} else {
+					}
+					else {
 						costField.setVisibility(View.VISIBLE);
-						manaCost = manaCost.replace("{", "<img src=\"")
-								.replace("}", "\"/>");
-						costField.setText(ImageGetterHelper.jellyBeanHack(
-								manaCost, imgGetter, null));
+						manaCost = manaCost.replace("{", "<img src=\"").replace("}", "\"/>");
+						costField.setText(ImageGetterHelper.jellyBeanHack(manaCost, imgGetter, null));
 						costField.setOnClickListener(onClick);
 					}
 					String ability = data.ability;
 					if (!verbose || ability == null || ability == "") {
 						abilityField.setVisibility(View.GONE);
-					} else {
+					}
+					else {
 						abilityField.setVisibility(View.VISIBLE);
-						ability = ability.replace("{", "<img src=\"").replace(
-								"}", "\"/>");
-						abilityField.setText(ImageGetterHelper.jellyBeanHack(
-								ability, imgGetter, null));
+						ability = ability.replace("{", "<img src=\"").replace("}", "\"/>");
+						abilityField.setText(ImageGetterHelper.jellyBeanHack(ability, imgGetter, null));
 						abilityField.setOnClickListener(onClick);
 					}
 					boolean hidePT = true;
@@ -815,13 +730,15 @@ public class WishlistActivity extends FamiliarActivity {
 							else {
 								if (p == (int) p) {
 									pow = Integer.valueOf((int) p).toString();
-								} else {
+								}
+								else {
 									pow = Float.valueOf(p).toString();
 								}
 							}
 							pField.setText(pow);
 						}
-					} catch (NumberFormatException e) {
+					}
+					catch (NumberFormatException e) {
 
 					}
 					try {
@@ -842,13 +759,15 @@ public class WishlistActivity extends FamiliarActivity {
 							else {
 								if (t == (int) t) {
 									tou = Integer.valueOf((int) t).toString();
-								} else {
+								}
+								else {
 									tou = Float.valueOf(t).toString();
 								}
 							}
 							tField.setText(tou);
 						}
-					} catch (NumberFormatException e) {
+					}
+					catch (NumberFormatException e) {
 					}
 					boolean hideLoyalty = true;
 					float l = data.loyalty;
@@ -856,7 +775,8 @@ public class WishlistActivity extends FamiliarActivity {
 						hideLoyalty = false;
 						if (l == (int) l) {
 							tField.setText(Integer.toString((int) l));
-						} else {
+						}
+						else {
 							tField.setText(Float.toString(l));
 						}
 					}
@@ -870,7 +790,8 @@ public class WishlistActivity extends FamiliarActivity {
 					if (!hideLoyalty) {
 						pField.setVisibility(View.GONE);
 						slashField.setVisibility(View.GONE);
-					} else if (hidePT) {
+					}
+					else if (hidePT) {
 						pField.setVisibility(View.GONE);
 						slashField.setVisibility(View.GONE);
 						tField.setVisibility(View.GONE);
@@ -883,14 +804,14 @@ public class WishlistActivity extends FamiliarActivity {
 				}
 			}
 			_list.expandGroup(groupPosition); // used to Expand the child list
-												// automatically at the time of
-												// displaying
+			// automatically at the time of
+			// displaying
 			_list.collapseGroup(groupPosition); // used to Expand the child list
-												// automatically at the time of
-												// displaying
+			// automatically at the time of
+			// displaying
 			_list.expandGroup(groupPosition); // used to Expand the child list
-												// automatically at the time of
-												// displaying
+			// automatically at the time of
+			// displaying
 			return v;
 		}
 
@@ -907,18 +828,18 @@ public class WishlistActivity extends FamiliarActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-		case R.id.wishlist_menu_clear:
-			showDialog(DIALOG_CONFIRMATION);
-			return true;
-		case R.id.wishlist_menu_settings:
-			showDialog(DIALOG_PRICE_SETTING);
-			return true;
-//TODO: un-comment for 1.9
-//		case R.id.wishlist_menu_share:
-//			showDialog(DIALOG_SHARE);
-//			return true;
-		default:
-			return super.onOptionsItemSelected(item);
+			case R.id.wishlist_menu_clear:
+				showDialog(DIALOG_CONFIRMATION);
+				return true;
+			case R.id.wishlist_menu_settings:
+				showDialog(DIALOG_PRICE_SETTING);
+				return true;
+				// TODO: un-comment for 1.9
+				// case R.id.wishlist_menu_share:
+				// showDialog(DIALOG_SHARE);
+				// return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 

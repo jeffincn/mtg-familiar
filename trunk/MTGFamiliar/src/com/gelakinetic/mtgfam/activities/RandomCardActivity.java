@@ -314,8 +314,8 @@ public class RandomCardActivity extends FamiliarActivity {
 			image.setImageResource(R.drawable.jhoira_full);
 		}
 		else if (id == CORRUPTION) {
-			View dialogLayout = getLayoutInflater().inflate(R.layout.corruption_layout, null);
-			TextView text = (TextView) dialogLayout.findViewById(R.id.corruption_message);
+			View dialogLayout = getLayoutInflater().inflate(R.layout.simple_message_layout, null);
+			TextView text = (TextView) dialogLayout.findViewById(R.id.message);
 			text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.error_corruption)));
 			text.setMovementMethod(LinkMovementMethod.getInstance());
 

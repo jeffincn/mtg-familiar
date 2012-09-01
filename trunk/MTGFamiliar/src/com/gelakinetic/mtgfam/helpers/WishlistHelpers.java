@@ -49,6 +49,15 @@ public class WishlistHelpers {
 		}
 	}
 
+	public static String GetReadableWishlist(ArrayList<ArrayList<CardData>> cardSetWishlists, boolean includeTcgName){
+		StringBuilder readableWishlist = new StringBuilder();
+		for (ArrayList<CardData> cardlist : cardSetWishlists)
+			for (CardData card : cardlist)
+				if(card.numberOf>0)
+					readableWishlist.append(card.toReadableString(includeTcgName));
+		return readableWishlist.toString();
+	}
+
 	public static void AppendCard(Context mCtx, CardData card) {
 		try {
 			FileOutputStream fos = mCtx.openFileOutput(wishlistName, Context.MODE_APPEND);

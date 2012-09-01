@@ -26,9 +26,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnDismissListener;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Html.ImageGetter;
@@ -62,6 +64,7 @@ public class WishlistActivity extends FamiliarActivity {
 	private final static int DIALOG_UPDATE_CARD = 1;
 	private final static int DIALOG_PRICE_SETTING = 2;
 	private final static int DIALOG_CONFIRMATION = 3;
+	private final static int DIALOG_SHARE = 4;
 	private int positionForDialog;
 
 	private AutoCompleteTextView namefield;
@@ -475,12 +478,57 @@ public class WishlistActivity extends FamiliarActivity {
 				dialog.show();
 				break;
 			}
+			case DIALOG_SHARE: {
+				View dialogLayout = getLayoutInflater().inflate(
+						R.layout.simple_message_layout, null);
+				TextView text = (TextView) dialogLayout
+						.findViewById(R.id.message);
+				text.setText(ImageGetterHelper
+						.jellyBeanHack(getString(R.string.wishlist_share_include_set)));
+				text.setMovementMethod(LinkMovementMethod.getInstance());
+
+				dialog = new AlertDialog.Builder(this)
+						.setTitle(R.string.wishlist_share)
+						.setView(dialogLayout)
+						.setPositiveButton(R.string.dialog_yes,
+								new OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int which) {
+										mailWishlist(true);
+										removeDialog(DIALOG_SHARE);
+									}
+								})
+						.setNegativeButton(R.string.dialog_no,
+								new OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int which) {
+										mailWishlist(false);
+										removeDialog(DIALOG_SHARE);
+									}
+								})
+						.setCancelable(true).create();
+				dialog.show();
+				break;
+			}
 			default: {
 				dialog = null;
 			}
 			}
 		}
 		return dialog;
+	}
+	
+	private void mailWishlist(boolean includeTcgName){
+		///TODO: check to make sure that this works on an actual phone
+		// blank mailId - user will have to fill in To: field
+		Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto","", null));
+		emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "MTG Familiar Wishlist");
+		emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, WishlistHelpers.GetReadableWishlist(cardSetWishlists, includeTcgName));
+		startActivity(Intent.createChooser(emailIntent, "Send email..."));
+//		Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+//		sharingIntent.setType("text/html");
+//		sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT,WishlistHelpers.GetReadableWishlist(cardSetWishlists, includeTcgName));
+//		startActivity(Intent.createChooser(sharingIntent,"Share using"));
 	}
 
 	public void UpdateTotalPrices() {
@@ -859,6 +907,10 @@ public class WishlistActivity extends FamiliarActivity {
 		case R.id.wishlist_menu_settings:
 			showDialog(DIALOG_PRICE_SETTING);
 			return true;
+//TODO: un-comment for 1.9
+//		case R.id.wishlist_menu_share:
+//			showDialog(DIALOG_SHARE);
+//			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}

@@ -327,5 +327,9 @@ public class TradeListHelpers {
 		public String toString(int side) {
 			return side + delimiter + this.name + delimiter + this.setCode + delimiter + this.numberOf + '\n';
 		}
+
+		public String toReadableString(boolean includeTcgName) {
+			return this.numberOf + ' ' + this.name + (includeTcgName?'(' + this.tcgName + ')':"") + '\n';
+		}
 	}
 }

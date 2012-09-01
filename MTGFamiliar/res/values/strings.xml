@@ -18,6 +18,8 @@
     <string name="slash">/</string>
     <string name="dialog_ok">OK</string>
     <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_yes">Yes</string>
+    <string name="dialog_no">No</string>
     <string name="dialog_done">Done</string>
     <string name="dialog_both">Both</string>
     <string name="dialog_life">Life</string>
@@ -212,6 +214,8 @@
     <string name="wishlist_toast_select_card">Please enter a card first.</string>
     <string name="wishlist_toast_no_card">No card found with that name.</string>
     <string name="wishlist_clear_confirmation">Empty your wishlist?</string>
+    <string name="wishlist_share">Share Wishlist</string>
+    <string name="wishlist_share_include_set">Include Set Names?</string>
     
     
     <!-- Round timer activity -->

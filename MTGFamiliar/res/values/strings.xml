@@ -45,6 +45,7 @@
         and if that doesn\'t work reinstall the app from the Play Store.</string>
     <string name="error_rules_parsing">Errors occurred while parsing the comprehensive rules. To try again, please perform a force update.</string>
     <string name="error_couldnt_open_db_toast">: Please try again</string>
+    <string name="error_no_email_client">It does not appear that you have an active email client installed. Please configure an email application.</string>
     <string name="confirmation">Are You Sure?</string>
     
     <!-- Placeholder text -->

@@ -49,16 +49,23 @@ import com.gelakinetic.mtgfam.helpers.RoundTimerService;
 
 public class RoundTimerActivity extends FamiliarActivity {
 
-	public static String RESULT_FILTER = "com.gelakinetic.mtgfam.RESULT_FILTER";
-	public static String TTS_FILTER = "com.gelakinetic.mtgfam.TTS_FILTER";
-	public static String EXTRA_END_TIME = "EndTime";
+	public static final String RESULT_FILTER = "com.gelakinetic.mtgfam.RESULT_FILTER";
+	public static final String TTS_FILTER = "com.gelakinetic.mtgfam.TTS_FILTER";
+	public static final String EXTRA_END_TIME = "EndTime";
+	
+	private static final String SAVED_HOURS = "SavedHours";
+	private static final String SAVED_MINUTES = "SavedMinutes";
 
-	private static int RINGTONE_REQUEST_CODE = 17;
+	private static final int RINGTONE_REQUEST_CODE = 17;
 
-	private static int DIALOG_SET_WARNINGS = 0;
+	private static final int DIALOG_SET_WARNINGS = 0;
 
 	private TimePicker picker;
 	private Button actionButton;
+	
+	private int hours;
+	private int minutes;
+	private boolean firstLoad;
 
 	private long endTime;
 	private boolean ttsInitialized = false;
@@ -105,19 +112,16 @@ public class RoundTimerActivity extends FamiliarActivity {
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
 		this.picker = (TimePicker) findViewById(R.id.rt_time_picker);
-		picker.setIs24HourView(true);
-
-		int length;
-		try {
-			length = Integer.parseInt(preferences.getString("roundLength", "50"));
+		this.picker.setIs24HourView(true);
+		
+		if(savedInstanceState != null) {
+			this.firstLoad = false;
+			this.hours = savedInstanceState.getInt(SAVED_HOURS);
+			this.minutes = savedInstanceState.getInt(SAVED_MINUTES);
 		}
-		catch (Exception ex) {
-			// Eat the exception; this should never happen in practice, and if it does
-			// we just want to default to 50 and pretend nothing broke
-			length = 50;
+		else {
+			this.firstLoad = true;
 		}
-		picker.setCurrentHour(length / 60);
-		picker.setCurrentMinute(length % 60);
 
 		this.actionButton = (Button) findViewById(R.id.rt_action_button);
 		actionButton.setOnClickListener(new View.OnClickListener() {
@@ -137,13 +141,49 @@ public class RoundTimerActivity extends FamiliarActivity {
 
 		timerHandler.postDelayed(updateButtonTextTask, 200);
 	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		if(firstLoad) {
+			try {
+				int length = Integer.parseInt(preferences.getString("roundLength", "50"));
+				this.hours = length / 60;
+				this.minutes = length % 60;
+			}
+			catch (Exception ex) {
+				// Eat the exception; this should never happen in practice, and if it does
+				// we just want to default to 50 and pretend nothing broke
+				this.hours = 0;
+				this.minutes = 50;
+			}
+			this.firstLoad = false;
+		}
+		
+		this.picker.setCurrentHour(this.hours);
+		this.picker.setCurrentMinute(this.minutes);
+	}
 
+	@Override
+	protected void onPause() {
+		super.onPause();
+	}
+	
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		unregisterReceiver(resultReceiver);
 		unregisterReceiver(ttsReceiver);
 		timerHandler.removeCallbacks(updateButtonTextTask);
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		
+		outState.putInt(SAVED_HOURS, this.picker.getCurrentHour());
+		outState.putInt(SAVED_MINUTES, this.picker.getCurrentMinute());
 	}
 
 	MenuItem timerWarning = null;

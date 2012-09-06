@@ -519,7 +519,6 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 					}
 				});
 
-				dialog.show();
 				break;
 			default:
 				dialog = null;

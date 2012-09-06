@@ -297,13 +297,14 @@ public class WishlistActivity extends FamiliarActivity {
 
 	protected Dialog onCreateDialog(int id) {
 		Dialog dialog = null;
+		View dialogLayout;
+		TextView text;
 		if (doneLoading) {
 			AlertDialog.Builder builder;
 			switch (id) {
-				case DIALOG_UPDATE_CARD: {
+				case DIALOG_UPDATE_CARD:
 					final WishlistHelpers wh = new WishlistHelpers();
 					dialog = (wh).getDialog(cardNames.get(positionForDialog), this, cardSetWishlists.get(positionForDialog));
-					dialog.show();
 
 					final Dialog dlg = dialog;
 					dialog.setOnDismissListener(new OnDismissListener() {
@@ -351,8 +352,7 @@ public class WishlistActivity extends FamiliarActivity {
 					});
 
 					break;
-				}
-				case DIALOG_PRICE_SETTING: {
+				case DIALOG_PRICE_SETTING:
 					builder = new AlertDialog.Builder(this);
 
 					builder.setTitle("Price Options");
@@ -393,57 +393,61 @@ public class WishlistActivity extends FamiliarActivity {
 						}
 					});
 
-					dialog.show();
 					break;
-				}
-				case DIALOG_CONFIRMATION: {
-					View dialogLayout = getLayoutInflater().inflate(R.layout.simple_message_layout, null);
-					TextView text = (TextView) dialogLayout.findViewById(R.id.message);
-					text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.wishlist_clear_confirmation)));
+				case DIALOG_CONFIRMATION:
+					dialogLayout = getLayoutInflater().inflate(R.layout.simple_message_layout, null);
+					text = (TextView) dialogLayout.findViewById(R.id.message);
+					text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.wishlist_empty_dialog_text)));
 					text.setMovementMethod(LinkMovementMethod.getInstance());
-
-					dialog = new AlertDialog.Builder(this).setTitle(R.string.confirmation).setView(dialogLayout)
-							.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
-								public void onClick(DialogInterface dialog, int which) {
-									cardNames.clear();
-									cardSetNames.clear();
-									cardSetWishlists.clear();
-									aaExpWishlist.notifyDataSetChanged();
-									UpdateTotalPrices();
-									removeDialog(DIALOG_CONFIRMATION);
-								}
-							}).setNegativeButton(R.string.dialog_cancel, new OnClickListener() {
-								public void onClick(DialogInterface dialog, int which) {
-									removeDialog(DIALOG_CONFIRMATION);
-								}
-							}).setCancelable(true).create();
-					dialog.show();
+					
+					dialog = new AlertDialog.Builder(this)
+						.setTitle(R.string.wishlist_empty_dialog_title)
+						.setView(dialogLayout)
+						.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								cardNames.clear();
+								cardSetNames.clear();
+								cardSetWishlists.clear();
+								aaExpWishlist.notifyDataSetChanged();
+								UpdateTotalPrices();
+								removeDialog(DIALOG_CONFIRMATION);
+							}
+						})
+						.setNegativeButton(R.string.dialog_cancel, new OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								removeDialog(DIALOG_CONFIRMATION);
+							}
+						})
+						.setCancelable(true)
+						.create();
 					break;
-				}
-				case DIALOG_SHARE: {
-					View dialogLayout = getLayoutInflater().inflate(R.layout.simple_message_layout, null);
-					TextView text = (TextView) dialogLayout.findViewById(R.id.message);
+				case DIALOG_SHARE:
+					dialogLayout = getLayoutInflater().inflate(R.layout.simple_message_layout, null);
+					text = (TextView) dialogLayout.findViewById(R.id.message);
 					text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.wishlist_share_include_set)));
 					text.setMovementMethod(LinkMovementMethod.getInstance());
 
-					dialog = new AlertDialog.Builder(this).setTitle(R.string.wishlist_share).setView(dialogLayout)
-							.setPositiveButton(R.string.dialog_yes, new OnClickListener() {
-								public void onClick(DialogInterface dialog, int which) {
-									mailWishlist(true);
-									removeDialog(DIALOG_SHARE);
-								}
-							}).setNegativeButton(R.string.dialog_no, new OnClickListener() {
-								public void onClick(DialogInterface dialog, int which) {
-									mailWishlist(false);
-									removeDialog(DIALOG_SHARE);
-								}
-							}).setCancelable(true).create();
-					dialog.show();
+					dialog = new AlertDialog.Builder(this)
+						.setTitle(R.string.wishlist_share)
+						.setView(dialogLayout)
+						.setPositiveButton(R.string.dialog_yes, new OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								mailWishlist(true);
+								removeDialog(DIALOG_SHARE);
+							}
+						})
+						.setNegativeButton(R.string.dialog_no, new OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								mailWishlist(false);
+								removeDialog(DIALOG_SHARE);
+							}
+						})
+						.setCancelable(true)
+						.create();
 					break;
-				}
-				default: {
+				default:
 					dialog = null;
-				}
+					break;
 			}
 		}
 		return dialog;

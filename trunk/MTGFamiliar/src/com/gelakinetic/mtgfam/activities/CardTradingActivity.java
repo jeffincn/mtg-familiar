@@ -287,8 +287,10 @@ public class CardTradingActivity extends FamiliarActivity {
 	protected Dialog onCreateDialog(int id) {
 		Dialog dialog;
 		AlertDialog.Builder builder;
+		String[] files;
+		ArrayList<String> validFiles;
 		switch (id) {
-			case DIALOG_UPDATE_CARD: {
+			case DIALOG_UPDATE_CARD:
 				final int position = positionForDialog;
 				final String side = (sideForDialog.equals("left") ? "left" : "right");
 				final ArrayList<CardData> lSide = (sideForDialog.equals("left") ? lTradeLeft : lTradeRight);
@@ -374,11 +376,8 @@ public class CardTradingActivity extends FamiliarActivity {
 						removeDialog(DIALOG_UPDATE_CARD);
 					}
 				});
-
-				dialog.show();
 				break;
-			}
-			case DIALOG_PRICE_SETTING: {
+			case DIALOG_PRICE_SETTING:
 				builder = new AlertDialog.Builder(this);
 
 				builder.setTitle("Price Options");
@@ -418,11 +417,8 @@ public class CardTradingActivity extends FamiliarActivity {
 						removeDialog(DIALOG_PRICE_SETTING);
 					}
 				});
-
-				dialog.show();
 				break;
-			}
-			case DIALOG_SAVE_TRADE: {
+			case DIALOG_SAVE_TRADE:
 				builder = new AlertDialog.Builder(this);
 
 				builder.setTitle("Save Trade");
@@ -459,10 +455,9 @@ public class CardTradingActivity extends FamiliarActivity {
 					}
 				});
 				break;
-			}
-			case DIALOG_LOAD_TRADE: {
-				String[] files = fileList();
-				ArrayList<String> validFiles = new ArrayList<String>();
+			case DIALOG_LOAD_TRADE:
+				files = fileList();
+				validFiles = new ArrayList<String>();
 				for (String fileName : files) {
 					if (fileName.endsWith(tradeExtension)) {
 						validFiles.add(fileName.substring(0, fileName.indexOf(tradeExtension)));
@@ -505,10 +500,9 @@ public class CardTradingActivity extends FamiliarActivity {
 					}
 				});
 				break;
-			}
-			case DIALOG_DELETE_TRADE: {
-				String[] files = fileList();
-				ArrayList<String> validFiles = new ArrayList<String>();
+			case DIALOG_DELETE_TRADE:
+				files = fileList();
+				validFiles = new ArrayList<String>();
 				for (String fileName : files) {
 					if (fileName.endsWith(tradeExtension)) {
 						validFiles.add(fileName.substring(0, fileName.indexOf(tradeExtension)));
@@ -546,34 +540,36 @@ public class CardTradingActivity extends FamiliarActivity {
 					}
 				});
 				break;
-			}
-			case DIALOG_CONFIRMATION: {
+			case DIALOG_CONFIRMATION:
 				View dialogLayout = getLayoutInflater().inflate(R.layout.simple_message_layout, null);
 				TextView text = (TextView) dialogLayout.findViewById(R.id.message);
-				text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.trader_clear_confirmation)));
+				text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.trader_clear_dialog_text)));
 				text.setMovementMethod(LinkMovementMethod.getInstance());
-
-				dialog = new AlertDialog.Builder(this).setTitle(R.string.confirmation).setView(dialogLayout)
-						.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int which) {
-								lTradeRight.clear();
-								aaTradeRight.notifyDataSetChanged();
-								lTradeLeft.clear();
-								aaTradeLeft.notifyDataSetChanged();
-								UpdateTotalPrices("both");
-								removeDialog(DIALOG_CONFIRMATION);
-							}
-						}).setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int which) {
-								removeDialog(DIALOG_CONFIRMATION);
-							}
-						}).setCancelable(true).create();
-				dialog.show();
+				
+				dialog = new AlertDialog.Builder(this)
+					.setTitle(R.string.trader_clear_dialog_title)
+					.setView(dialogLayout)
+					.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							lTradeRight.clear();
+							aaTradeRight.notifyDataSetChanged();
+							lTradeLeft.clear();
+							aaTradeLeft.notifyDataSetChanged();
+							UpdateTotalPrices("both");
+							removeDialog(DIALOG_CONFIRMATION);
+						}
+					})
+					.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							removeDialog(DIALOG_CONFIRMATION);
+						}
+					})
+					.setCancelable(true)
+					.create();
 				break;
-			}
-			default: {
+			default:
 				dialog = null;
-			}
+				break;
 		}
 		return dialog;
 	}

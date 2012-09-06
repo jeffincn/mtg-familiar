@@ -30,11 +30,7 @@
     <string name="update_updating_rules">Updating comprehensive rules…</string>
     <string name="update_added">Added</string>
     <string name="update_added_rules">new comprehensive rules</string>
-    <string name="update_updates">Checking for updates…</string>
-    <string name="update_legality">Checking legality…</string>
-    <string name="update_cards">Checking for new cards…</string>
     <string name="update_parse_cards">Parsing %s</string>
-    <string name="update_rules">Checking for new comprehensive rules…</string>
     <string name="update_parse_rules">Parsing comprehensive rules</string>
     <string name="error">Error</string>
     <string name="error_database">A database error occurred. If it persists, try clearing the app data from the Android settings menu.</string>
@@ -43,10 +39,8 @@
         &lt;a href="mailto:mtg.familiar@gmail.com">mtg.familiar@gmail.com&lt;/a> so we can track this bug and fix it.
         In the meantime, if it doesn\'t manage to fix itself, please try clearing the app data in your device\'s settings,
         and if that doesn\'t work reinstall the app from the Play Store.</string>
-    <string name="error_rules_parsing">Errors occurred while parsing the comprehensive rules. To try again, please perform a force update.</string>
-    <string name="error_couldnt_open_db_toast">: Please try again</string>
+    <string name="error_couldnt_open_db_toast">: Please try again.</string>
     <string name="error_no_email_client">It does not appear that you have an active email client installed. Please configure an email application.</string>
-    <string name="confirmation">Are You Sure?</string>
     
     <!-- Placeholder text -->
     <string name="ph_type">Type</string>
@@ -161,7 +155,6 @@
     <string name="life_counter_plus_five">+5</string>
     <string name="life_counter_minus_one">-1</string>
     <string name="life_counter_minus_five">-5</string>
-    <string name="life_counter_round_end">Round ends in:</string>
     <string name="life_counter_announce_life">Announce Life Totals</string>
     <string name="life_counter_change_default_gathering">Edit Gatherings</string>
     <string name="life_counter_set_gathering">Set Current Gathering</string>
@@ -172,15 +165,21 @@
     
     
     <!-- Default gathering activity -->
-    <string name="gathering_name_hint">Gathering\'s Name</string>
     <string name="gathering_custom_name">Name</string>
-    <string name="gathering_starting_life">Starting Life</string>
+    <string name="gathering_player">Player</string>
+    <string name="gathering_starting_life">Starting life:</string>
     <string name="gathering_starting_life_default">20</string>
     <string name="gathering_save">Save Gathering</string>
+    <string name="gathering_enter_name">Enter Gathering\'s Name</string>
+    <string name="gathering_dialog_overwrite_title">Confirm Overwrite</string>
+    <string name="gathering_dialog_overwrite_text">This Gathering already exists. Do you want to overwrite the existing file?</string>
     <string name="gathering_load">Load Gathering</string>
     <string name="gathering_delete">Delete Gathering</string>
     <string name="gathering_remove_player">Remove a Player</string>
     <string name="gathering_add_player">Add a Player</string>
+    <string name="gathering_toast_no_gatherings">No Gatherings exist.</string>
+    <string name="gathering_toast_no_name">Please include a name for the Gathering.</string>
+    
     
     
     <!-- Mana pool activity -->
@@ -191,7 +190,6 @@
     
     
     <!-- Card trading activity -->
-    <string name="trader_name">Name</string>
     <string name="trader_add_card">Add Card</string>
    	<string name="trader_default_price">$0.00</string>
     <string name="trader_default_number_of">1x</string>
@@ -204,21 +202,22 @@
     <string name="trader_edit_dialog_x">x</string>
     <string name="trader_edit_dialog_change_set">Change Set</string>
     <string name="trader_edit_dialog_remove">Remove</string>
-    <string name="trader_clear_confirmation">Clear the current trade?</string>
+    <string name="trader_clear_dialog_title">Clear Trade</string>
+    <string name="trader_clear_dialog_text">Are you sure you want to clear the current trade?</string>
     
     
     <!-- Wishlist activity -->
     <string name="wishlist_name">Name</string>
     <string name="wishlist_add_card">Add</string>
    	<string name="wishlist_default_price">$0.00</string>
-    <string name="wishlist_default_number_of">1x</string>
     <string name="wishlist_clear_fields">Clear Fields</string>
     <string name="wishlist_set_pricing">Set Pricing Option</string>
     <string name="wishlist_toast_select_card">Please enter a card first.</string>
     <string name="wishlist_toast_no_card">No card found with that name.</string>
-    <string name="wishlist_clear_confirmation">Empty your wishlist?</string>
     <string name="wishlist_share">Share Wishlist</string>
     <string name="wishlist_share_include_set">Include Set Names?</string>
+    <string name="wishlist_empty_dialog_title">Empty Wishlist</string>
+    <string name="wishlist_empty_dialog_text">Are you sure you want to empty your wishlist?</string>
     
     
     <!-- Round timer activity -->
@@ -226,15 +225,12 @@
     <string name="timer_how_long_landscape">How long is the round? (HH:MM)</string>
     <string name="timer_start">Start Timer</string>
     <string name="timer_cancel">Cancel Timer</string>
-    <string name="timer_round_end">The round will end in:</string>
-    <string name="timer_default_time">00:00:00</string>
     <string name="timer_set_ringtone">Set Timer Ringtone</string>
     <string name="timer_set_warnings">Set Warnings</string>
     <string name="timer_warning_dialog_title">Spoken Warnings</string>
     
     
     <!-- Rules activity -->
-    <string name="rules_search">Keyword Search</string>
     <string name="rules_exit">Exit Rules</string>
     <string name="rules_search_title">Keyword Search</string>
     <string name="rules_search_all">Search all rules for:</string>
@@ -429,9 +425,9 @@
         <item>16</item>
     </string-array>
     <string-array name="color_spinner">
-        <item>May Include Any Color(s)</item>
-        <item>Must Include All Colors</item>
-        <item>No Other Colors</item>
+        <item>May include any color(s)</item>
+        <item>Must include all colors</item>
+        <item>No other colors</item>
         <item>Exact (all selected and no others)</item>
     </string-array>
     <string-array name="trade_option_entries">
@@ -445,10 +441,10 @@
         <item>2</item>
     </string-array>
     <string-array name="set_spinner">
-        <item >Most Recent Printing</item>
-        <item >Original Printing</item>
-        <item >All Printings</item>
-        <item >Reprints Only</item>
+        <item >Most recent printing</item>
+        <item >Original printing</item>
+        <item >All printings</item>
+        <item >Reprints only</item>
     </string-array>
     <string-array name="rt_defaulttimes">
     	<item>30 minutes</item>

@@ -42,8 +42,6 @@ import com.gelakinetic.mtgfam.helpers.GatheringsPlayerData;
 public class GatheringCreateActivity extends FamiliarActivity {
 	private static final int								DIALOG_SET_NAME				= 0;
 	private static final int								DIALOG_GATHERING_EXIST		= 1;
-	private static final String								NO_GATHERINGS_EXIST			= "No Gatherings exist.";
-	private static final String								TOAST_NO_NAME				= "Please include a name for the Gathering.";
 															
 
 	private String							proposedGathering;
@@ -62,8 +60,8 @@ public class GatheringCreateActivity extends FamiliarActivity {
 		mCtx = this;
 		gIO = new GatheringsIO(mCtx);
 		
-		AddPlayerRowFromData(new GatheringsPlayerData("Player 1", 20));
-		AddPlayerRowFromData(new GatheringsPlayerData("Player 2", 20));
+		AddPlayerRowFromData(new GatheringsPlayerData(getString(R.string.gathering_player) + " 1", 20));
+		AddPlayerRowFromData(new GatheringsPlayerData(getString(R.string.gathering_player) + " 2", 20));
 	}
 
 	@Override
@@ -90,56 +88,64 @@ public class GatheringCreateActivity extends FamiliarActivity {
 				final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
 				final EditText nameInput = (EditText) textEntryView.findViewById(R.id.player_name);
 				nameInput.setText(proposedGathering);
-				dialog = new AlertDialog.Builder(this).setTitle("Enter Gathering's Name").setView(textEntryView)
-						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int whichButton) {
-								String gatheringName = nameInput.getText().toString().trim();
-								if (gatheringName.length() <= 0){
-									Toast.makeText(mCtx, TOAST_NO_NAME, Toast.LENGTH_LONG).show();
-									return;
-								}
+				dialog = new AlertDialog.Builder(this)
+					.setTitle(R.string.gathering_enter_name)
+					.setView(textEntryView)
+					.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							String gatheringName = nameInput.getText().toString().trim();
+							if (gatheringName.length() <= 0){
+								Toast.makeText(mCtx, R.string.gathering_toast_no_name, Toast.LENGTH_LONG).show();
+								return;
+							}
+							
+							
+							ArrayList<String> existingGatheringsFiles = gIO.getGatheringFileList();
+							
+							boolean existing = false;
+							for (String existingGatheringFile : existingGatheringsFiles){
+								String givenName = gIO.ReadGatheringNameFromXML(existingGatheringFile);
 								
-								
-								ArrayList<String> existingGatheringsFiles = gIO.getGatheringFileList();
-								
-								boolean existing = false;
-								for (String existingGatheringFile : existingGatheringsFiles){
-									String givenName = gIO.ReadGatheringNameFromXML(existingGatheringFile);
-									
-									if (gatheringName.equals(givenName)){
-										//throw existing dialog
-										existing = true;
-										proposedGathering = gatheringName;
-										showDialog(DIALOG_GATHERING_EXIST);
-										break;
-									}
-								}
-								
-								if (existingGatheringsFiles.size() <= 0 || existing == false){
-									SaveGathering(gatheringName);
+								if (gatheringName.equals(givenName)){
+									//throw existing dialog
+									existing = true;
+									proposedGathering = gatheringName;
+									showDialog(DIALOG_GATHERING_EXIST);
+									break;
 								}
 							}
-						}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int whichButton) {
+							
+							if (existingGatheringsFiles.size() <= 0 || existing == false){
+								SaveGathering(gatheringName);
 							}
-						}).create();
+						}
+					})
+					.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+						}
+					})
+					.create();
 
 				break;
 			case DIALOG_GATHERING_EXIST:
 				LayoutInflater factory2 = LayoutInflater.from(this);
 				final View textEntryView2 = factory2.inflate(R.layout.simple_message_layout, null);
 				final TextView text = (TextView) textEntryView2.findViewById(R.id.message);
-				text.setText("This Gathering already exists, overwrite existing file?");
-				dialog = new AlertDialog.Builder(this).setTitle("Overwrite Existing Gathering?").setView(textEntryView2)
-						.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int whichButton) {
-								gIO.DeleteGatheringByName(proposedGathering);
-								SaveGathering(proposedGathering);
-							}
-						}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int whichButton) {
-							}
-						}).create();
+				text.setText(R.string.gathering_dialog_overwrite_text);
+				
+				dialog = new AlertDialog.Builder(this)
+					.setTitle(R.string.gathering_dialog_overwrite_title).setView(textEntryView2)
+					.setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							gIO.DeleteGatheringByName(proposedGathering);
+							SaveGathering(proposedGathering);
+						}
+					})
+					.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+						}
+					})
+					.create();
 
 				break;
 			default:
@@ -150,7 +156,7 @@ public class GatheringCreateActivity extends FamiliarActivity {
 
 	private void SaveGathering(String _gatheringName){
 		if (_gatheringName.length() <= 0){
-			Toast.makeText(mCtx, TOAST_NO_NAME, Toast.LENGTH_LONG).show();
+			Toast.makeText(mCtx, R.string.gathering_toast_no_name, Toast.LENGTH_LONG).show();
 			return;
 		}
 		
@@ -195,7 +201,7 @@ public class GatheringCreateActivity extends FamiliarActivity {
 		switch (item.getItemId()) {
 			case R.id.gdelete_gathering:
 				if (gIO.getNumberOfGatherings() <= 0){
-					Toast.makeText(this, NO_GATHERINGS_EXIST, Toast.LENGTH_LONG).show();
+					Toast.makeText(this, R.string.gathering_toast_no_gatherings, Toast.LENGTH_LONG).show();
 					return true;
 				}
 				
@@ -207,7 +213,7 @@ public class GatheringCreateActivity extends FamiliarActivity {
 				}
 
 				AlertDialog.Builder dbuilder = new AlertDialog.Builder(mCtx);
-				dbuilder.setTitle("Delete a Gathering");
+				dbuilder.setTitle(R.string.gathering_delete);
 				dbuilder.setItems(dProperNames, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialogInterface, int item) {
 						gIO.DeleteGathering(dfGatherings[item]);
@@ -227,7 +233,7 @@ public class GatheringCreateActivity extends FamiliarActivity {
 				final String[] aNames = names.toArray(new String[names.size()]);
 				
 				AlertDialog.Builder builderRemove = new AlertDialog.Builder(mCtx);
-				builderRemove.setTitle("Load a Gathering");
+				builderRemove.setTitle(R.string.gathering_load);
 				builderRemove.setItems(aNames, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialogInterface, int item) {
 						mainLayout.removeViewAt(item);
@@ -238,11 +244,11 @@ public class GatheringCreateActivity extends FamiliarActivity {
 				return true;
 			case R.id.gadd_player:
 				int playersCount = mainLayout.getChildCount();
-				AddPlayerRowFromData(new GatheringsPlayerData("Player " + String.valueOf(playersCount + 1), 20));
+				AddPlayerRowFromData(new GatheringsPlayerData(getString(R.string.gathering_player) + " " + String.valueOf(playersCount + 1), 20));
 				return true;
 			case R.id.gload_gathering:
 				if (gIO.getNumberOfGatherings() <= 0){
-					Toast.makeText(this, NO_GATHERINGS_EXIST, Toast.LENGTH_LONG).show();
+					Toast.makeText(this, R.string.gathering_toast_no_gatherings, Toast.LENGTH_LONG).show();
 					return true;
 				}
 				
@@ -254,7 +260,7 @@ public class GatheringCreateActivity extends FamiliarActivity {
 				}
 
 				AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
-				builder.setTitle("Load a Gathering");
+				builder.setTitle(R.string.gathering_load);
 				builder.setItems(properNames, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialogInterface, int item) {
 						RemoveAllPlayerRows();

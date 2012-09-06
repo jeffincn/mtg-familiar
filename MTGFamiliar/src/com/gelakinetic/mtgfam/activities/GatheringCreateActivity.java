@@ -81,77 +81,77 @@ public class GatheringCreateActivity extends FamiliarActivity {
 	
 	@Override
 	protected Dialog onCreateDialog(int id) {
-		Dialog dialog;
 		switch (id) {
-			case DIALOG_SET_NAME:
+			case DIALOG_SET_NAME: {
 				LayoutInflater factory = LayoutInflater.from(this);
 				final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
 				final EditText nameInput = (EditText) textEntryView.findViewById(R.id.player_name);
 				nameInput.setText(proposedGathering);
-				dialog = new AlertDialog.Builder(this)
+				Dialog dialog = new AlertDialog.Builder(this)
 					.setTitle(R.string.gathering_enter_name)
 					.setView(textEntryView)
 					.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int whichButton) {
-							String gatheringName = nameInput.getText().toString().trim();
-							if (gatheringName.length() <= 0){
+							public void onClick(DialogInterface dialog, int whichButton) {
+								String gatheringName = nameInput.getText().toString().trim();
+								if (gatheringName.length() <= 0) {
 								Toast.makeText(mCtx, R.string.gathering_toast_no_name, Toast.LENGTH_LONG).show();
-								return;
-							}
+									return;
+								}
 							
-							
-							ArrayList<String> existingGatheringsFiles = gIO.getGatheringFileList();
-							
-							boolean existing = false;
-							for (String existingGatheringFile : existingGatheringsFiles){
-								String givenName = gIO.ReadGatheringNameFromXML(existingGatheringFile);
-								
-								if (gatheringName.equals(givenName)){
-									//throw existing dialog
-									existing = true;
-									proposedGathering = gatheringName;
-									showDialog(DIALOG_GATHERING_EXIST);
-									break;
+								ArrayList<String> existingGatheringsFiles = gIO.getGatheringFileList();
+
+								boolean existing = false;
+								for (String existingGatheringFile : existingGatheringsFiles) {
+									String givenName = gIO.ReadGatheringNameFromXML(existingGatheringFile);
+
+									if (gatheringName.equals(givenName)) {
+										// throw existing dialog
+										existing = true;
+										proposedGathering = gatheringName;
+										showDialog(DIALOG_GATHERING_EXIST);
+										break;
+									}
+								}
+
+								if (existingGatheringsFiles.size() <= 0 || existing == false) {
+									SaveGathering(gatheringName);
 								}
 							}
-							
-							if (existingGatheringsFiles.size() <= 0 || existing == false){
-								SaveGathering(gatheringName);
-							}
-						}
 					})
 					.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int whichButton) {
-						}
+							public void onClick(DialogInterface dialog, int whichButton) {
+							}
 					})
 					.create();
 
-				break;
-			case DIALOG_GATHERING_EXIST:
+				return dialog;
+			}
+			case DIALOG_GATHERING_EXIST: {
 				LayoutInflater factory2 = LayoutInflater.from(this);
 				final View textEntryView2 = factory2.inflate(R.layout.simple_message_layout, null);
 				final TextView text = (TextView) textEntryView2.findViewById(R.id.message);
 				text.setText(R.string.gathering_dialog_overwrite_text);
 				
-				dialog = new AlertDialog.Builder(this)
+				Dialog dialog = new AlertDialog.Builder(this)
 					.setTitle(R.string.gathering_dialog_overwrite_title).setView(textEntryView2)
 					.setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int whichButton) {
-							gIO.DeleteGatheringByName(proposedGathering);
-							SaveGathering(proposedGathering);
-						}
+							public void onClick(DialogInterface dialog, int whichButton) {
+								gIO.DeleteGatheringByName(proposedGathering);
+								SaveGathering(proposedGathering);
+							}
 					})
 					.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int whichButton) {
-						}
+							public void onClick(DialogInterface dialog, int whichButton) {
+							}
 					})
 					.create();
 
-				break;
-			default:
-				dialog = null;
+				return dialog;
+			}
+			default: {
+				return super.onCreateDialog(id);
+			}
 		}
-		return dialog;
 	}
 
 	private void SaveGathering(String _gatheringName){

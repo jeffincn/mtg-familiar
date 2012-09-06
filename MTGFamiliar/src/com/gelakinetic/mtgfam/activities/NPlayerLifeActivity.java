@@ -422,21 +422,18 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
-		final Context context = (Context) this;
-		Dialog dialog;
-		String[] names;
 		switch (id) {
-			case DIALOG_RESET_CONFIRM:
+			case DIALOG_RESET_CONFIRM: {
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setMessage(getString(R.string.life_counter_clear_dialog_text)).setCancelable(true)
 						.setPositiveButton(getString(R.string.dialog_both), new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								ManaPoolActivity.reset(context);
+								ManaPoolActivity.reset(mCtx);
 								reset(EVERYTHING);
 							}
 						}).setNeutralButton(getString(R.string.dialog_life), new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								ManaPoolActivity.reset(context);
+								ManaPoolActivity.reset(mCtx);
 								reset(JUST_TOTALS);
 							}
 						}).setNegativeButton(getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
@@ -445,15 +442,15 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 							}
 						});
 
-				dialog = builder.create();
-				break;
-			case DIALOG_REMOVE_PLAYER:
-				names = new String[players.size()];
+				return builder.create();
+			}
+			case DIALOG_REMOVE_PLAYER: {
+				String[] names = new String[players.size()];
 				for (int i = 0; i < players.size(); i++) {
 					names[i] = players.get(i).name;
 				}
 
-				builder = new AlertDialog.Builder(this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle(getString(R.string.life_counter_remove_player));
 
 				builder.setItems(names, new DialogInterface.OnClickListener() {
@@ -465,53 +462,56 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 					}
 				});
 
-				dialog = builder.create();
-				break;
-			case DIALOG_SET_NAME:
+				return builder.create();
+			}
+			case DIALOG_SET_NAME: {
 				LayoutInflater factory = LayoutInflater.from(this);
 				final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
 				nameInput = (EditText) textEntryView.findViewById(R.id.player_name);
-				dialog = new AlertDialog.Builder(this).setTitle("Enter Name").setView(textEntryView).setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						if (playerToHaveNameChanged == null) {
-							return;
-						}
-						if (nameInput == null) {
-							return;
-						}
-						String newName = nameInput.getText().toString();
-						if (newName.equals("")) {
-							return;
-						}
-						playerToHaveNameChanged.setName(newName);
-					}
-				}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-					}
-				}).create();
+				Dialog dialog = new AlertDialog.Builder(this).setTitle("Enter Name").setView(textEntryView)
+						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) {
+								if (playerToHaveNameChanged == null) {
+									return;
+								}
+								if (nameInput == null) {
+									return;
+								}
+								String newName = nameInput.getText().toString();
+								if (newName.equals("")) {
+									return;
+								}
+								playerToHaveNameChanged.setName(newName);
+							}
+						}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) {
+							}
+						}).create();
 
-				break;
-			case DIALOG_CHANGE_DISPLAY:
-				builder = new AlertDialog.Builder(this);
+				return dialog;
+			}
+			case DIALOG_CHANGE_DISPLAY: {
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
 				builder.setTitle(R.string.pref_display_mode_title);
-				builder.setSingleChoiceItems(getResources().getStringArray(R.array.display_array_entries), displayMode, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						displayMode = which;
+				builder.setSingleChoiceItems(getResources().getStringArray(R.array.display_array_entries), displayMode,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								displayMode = which;
 
-						Intent i = new Intent(NPlayerLifeActivity.this, NPlayerLifeActivity.class);
-						finish();
-						startActivity(i);
+								Intent i = new Intent(NPlayerLifeActivity.this, NPlayerLifeActivity.class);
+								finish();
+								startActivity(i);
 
-						// And also update the preference
-						editor.putString("displayMode", String.valueOf(displayMode));
-						editor.commit();
+								// And also update the preference
+								editor.putString("displayMode", String.valueOf(displayMode));
+								editor.commit();
 
-						removeDialog(DIALOG_CHANGE_DISPLAY);
-					}
-				});
+								removeDialog(DIALOG_CHANGE_DISPLAY);
+							}
+						});
 
-				dialog = builder.create();
+				Dialog dialog = builder.create();
 
 				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 					public void onDismiss(DialogInterface dialog) {
@@ -519,11 +519,12 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 					}
 				});
 
-				break;
-			default:
-				dialog = null;
+				return dialog;
+			}
+			default: {
+				return super.onCreateDialog(id);
+			}
 		}
-		return dialog;
 	}
 
 	private void update() {

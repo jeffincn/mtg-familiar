@@ -238,60 +238,62 @@ public class RulesActivity extends FamiliarActivity {
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
-		Dialog result = null;
-
-		if (id == SEARCH) {
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle(R.string.rules_search_title);
-			String header;
-			if (this.category == -1) {
-				header = getString(R.string.rules_search_all);
-			}
-			else {
-				header = String.format(getString(R.string.rules_search_cat), mDbHelper.getCategoryName(category, subcategory));
-			}
-			View v = getLayoutInflater().inflate(R.layout.rules_search_dialog, null);
-			((TextView) v.findViewById(R.id.keyword_search_desc)).setText(header);
-			final EditText input = (EditText) v.findViewById(R.id.keyword_search_field);
-			builder.setView(v);
-			builder.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					String keyword = input.getText().toString().trim();
-					if (keyword.length() < 3) {
-						Toast.makeText(RulesActivity.this, "Your search term must be at least 3 characters long.",
-								Toast.LENGTH_LONG).show();
-					}
-					else {
-						Intent i = new Intent(RulesActivity.this, RulesActivity.class);
-						i.putExtra(KEYWORD_KEY, keyword);
-						i.putExtra(CATEGORY_KEY, category);
-						i.putExtra(SUBCATEGORY_KEY, subcategory);
-						startActivityForResult(i, ARBITRARY_REQUEST_CODE);
-					}
+		switch (id) {
+			case SEARCH: {
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle(R.string.rules_search_title);
+				String header;
+				if (this.category == -1) {
+					header = getString(R.string.rules_search_all);
 				}
-			});
-			builder.setNegativeButton(R.string.dialog_cancel, new OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					// Do nothing
+				else {
+					header = String
+							.format(getString(R.string.rules_search_cat), mDbHelper.getCategoryName(category, subcategory));
 				}
-			});
-			result = builder.create();
-		}
-		else if (id == CORRUPTION) {
-			View dialogLayout = getLayoutInflater().inflate(R.layout.simple_message_layout, null);
-			TextView text = (TextView) dialogLayout.findViewById(R.id.message);
-			text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.error_corruption)));
-			text.setMovementMethod(LinkMovementMethod.getInstance());
-
-			result = new AlertDialog.Builder(this).setTitle(R.string.error).setView(dialogLayout)
-					.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							finish();
+				View v = getLayoutInflater().inflate(R.layout.rules_search_dialog, null);
+				((TextView) v.findViewById(R.id.keyword_search_desc)).setText(header);
+				final EditText input = (EditText) v.findViewById(R.id.keyword_search_field);
+				builder.setView(v);
+				builder.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						String keyword = input.getText().toString().trim();
+						if (keyword.length() < 3) {
+							Toast.makeText(RulesActivity.this, "Your search term must be at least 3 characters long.",
+									Toast.LENGTH_LONG).show();
 						}
-					}).setCancelable(false).create();
-		}
+						else {
+							Intent i = new Intent(RulesActivity.this, RulesActivity.class);
+							i.putExtra(KEYWORD_KEY, keyword);
+							i.putExtra(CATEGORY_KEY, category);
+							i.putExtra(SUBCATEGORY_KEY, subcategory);
+							startActivityForResult(i, ARBITRARY_REQUEST_CODE);
+						}
+					}
+				});
+				builder.setNegativeButton(R.string.dialog_cancel, new OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						// Do nothing
+					}
+				});
+				return builder.create();
+			}
+			case CORRUPTION: {
+				View dialogLayout = getLayoutInflater().inflate(R.layout.simple_message_layout, null);
+				TextView text = (TextView) dialogLayout.findViewById(R.id.message);
+				text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.error_corruption)));
+				text.setMovementMethod(LinkMovementMethod.getInstance());
 
-		return result;
+				return new AlertDialog.Builder(this).setTitle(R.string.error).setView(dialogLayout)
+						.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								finish();
+							}
+						}).setCancelable(false).create();
+			}
+			default: {
+				return super.onCreateDialog(id);
+			}
+		}
 	}
 
 	@Override

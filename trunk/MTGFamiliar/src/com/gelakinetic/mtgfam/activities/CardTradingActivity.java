@@ -285,12 +285,8 @@ public class CardTradingActivity extends FamiliarActivity {
 	}
 
 	protected Dialog onCreateDialog(int id) {
-		Dialog dialog;
-		AlertDialog.Builder builder;
-		String[] files;
-		ArrayList<String> validFiles;
 		switch (id) {
-			case DIALOG_UPDATE_CARD:
+			case DIALOG_UPDATE_CARD: {
 				final int position = positionForDialog;
 				final String side = (sideForDialog.equals("left") ? "left" : "right");
 				final ArrayList<CardData> lSide = (sideForDialog.equals("left") ? lTradeLeft : lTradeRight);
@@ -306,10 +302,10 @@ public class CardTradingActivity extends FamiliarActivity {
 				final EditText numberOf = (EditText) view.findViewById(R.id.traderDialogNumber);
 				final EditText priceText = (EditText) view.findViewById(R.id.traderDialogPrice);
 
-				builder = new AlertDialog.Builder(CardTradingActivity.this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(CardTradingActivity.this);
 				builder.setTitle(lSide.get(position).name).setView(view);
 
-				dialog = builder.create();
+				Dialog dialog = builder.create();
 
 				String numberOfStr = String.valueOf(numberOfCards);
 				numberOf.setText(numberOfStr);
@@ -376,50 +372,57 @@ public class CardTradingActivity extends FamiliarActivity {
 						removeDialog(DIALOG_UPDATE_CARD);
 					}
 				});
-				break;
-			case DIALOG_PRICE_SETTING:
-				builder = new AlertDialog.Builder(this);
+				return dialog;
+			}
+			case DIALOG_PRICE_SETTING: {
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
 				builder.setTitle("Price Options");
-				builder.setSingleChoiceItems(new String[] { "Low", "Average", "High" }, priceSetting, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						priceSetting = which;
-						dialog.dismiss();
+				builder.setSingleChoiceItems(new String[] { "Low", "Average", "High" }, priceSetting,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								priceSetting = which;
+								dialog.dismiss();
 
-						// Update ALL the prices!
-						for (CardData data : lTradeLeft) {
-							data.message = "loading";
-							FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaTradeLeft, priceSetting, (CardTradingActivity) me, null);
-							TradeListHelpers.addTaskAndExecute(task);
-						}
-						aaTradeLeft.notifyDataSetChanged();
+								// Update ALL the prices!
+								for (CardData data : lTradeLeft) {
+									data.message = "loading";
+									FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaTradeLeft, priceSetting,
+											(CardTradingActivity) me, null);
+									TradeListHelpers.addTaskAndExecute(task);
+								}
+								aaTradeLeft.notifyDataSetChanged();
 
-						for (CardData data : lTradeRight) {
-							data.message = "loading";
-							FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaTradeRight, priceSetting, (CardTradingActivity) me, null);
-							TradeListHelpers.addTaskAndExecute(task);
-						}
-						aaTradeRight.notifyDataSetChanged();
+								for (CardData data : lTradeRight) {
+									data.message = "loading";
+									FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaTradeRight, priceSetting,
+											(CardTradingActivity) me, null);
+									TradeListHelpers.addTaskAndExecute(task);
+								}
+								aaTradeRight.notifyDataSetChanged();
 
-						// And also update the preference
-						SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(CardTradingActivity.this).edit();
-						edit.putString("tradePrice", String.valueOf(priceSetting));
-						edit.commit();
+								// And also update the preference
+								SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(CardTradingActivity.this)
+										.edit();
+								edit.putString("tradePrice", String.valueOf(priceSetting));
+								edit.commit();
 
-						removeDialog(DIALOG_PRICE_SETTING);
-					}
-				});
+								removeDialog(DIALOG_PRICE_SETTING);
+							}
+						});
 
-				dialog = builder.create();
+				Dialog dialog = builder.create();
 
 				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 					public void onDismiss(DialogInterface dialog) {
 						removeDialog(DIALOG_PRICE_SETTING);
 					}
 				});
-				break;
-			case DIALOG_SAVE_TRADE:
-				builder = new AlertDialog.Builder(this);
+
+				return dialog;
+			}
+			case DIALOG_SAVE_TRADE: {
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
 				builder.setTitle("Save Trade");
 				builder.setMessage("Enter the trade's name");
@@ -447,33 +450,34 @@ public class CardTradingActivity extends FamiliarActivity {
 					}
 				});
 
-				dialog = builder.create();
+				Dialog dialog = builder.create();
 
 				dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 					public void onDismiss(DialogInterface dialog) {
 						removeDialog(DIALOG_SAVE_TRADE);
 					}
 				});
-				break;
-			case DIALOG_LOAD_TRADE:
-				files = fileList();
-				validFiles = new ArrayList<String>();
+				return dialog;
+			}
+			case DIALOG_LOAD_TRADE: {
+				String[] files = fileList();
+				ArrayList<String> validFiles = new ArrayList<String>();
 				for (String fileName : files) {
 					if (fileName.endsWith(tradeExtension)) {
 						validFiles.add(fileName.substring(0, fileName.indexOf(tradeExtension)));
 					}
 				}
 
+				Dialog dialog;
 				if (validFiles.size() == 0) {
-					dialog = null;
 					Toast.makeText(getApplicationContext(), "No Saved Trades", Toast.LENGTH_LONG).show();
-					break;
+					return null;
 				}
 
 				final String[] tradeNames = new String[validFiles.size()];
 				validFiles.toArray(tradeNames);
 
-				builder = new AlertDialog.Builder(this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle("Select A Trade");
 				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
@@ -499,26 +503,27 @@ public class CardTradingActivity extends FamiliarActivity {
 						removeDialog(DIALOG_LOAD_TRADE);
 					}
 				});
-				break;
-			case DIALOG_DELETE_TRADE:
-				files = fileList();
-				validFiles = new ArrayList<String>();
+				return dialog;
+			}
+			case DIALOG_DELETE_TRADE: {
+				String[] files = fileList();
+				ArrayList<String> validFiles = new ArrayList<String>();
 				for (String fileName : files) {
 					if (fileName.endsWith(tradeExtension)) {
 						validFiles.add(fileName.substring(0, fileName.indexOf(tradeExtension)));
 					}
 				}
 
+				Dialog dialog;
 				if (validFiles.size() == 0) {
-					dialog = null;
 					Toast.makeText(getApplicationContext(), "No Saved Trades", Toast.LENGTH_LONG).show();
-					break;
+					return null;
 				}
 
 				final String[] tradeNamesD = new String[validFiles.size()];
 				validFiles.toArray(tradeNamesD);
 
-				builder = new AlertDialog.Builder(this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle("Delete A Trade");
 				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
@@ -539,39 +544,37 @@ public class CardTradingActivity extends FamiliarActivity {
 						removeDialog(DIALOG_DELETE_TRADE);
 					}
 				});
-				break;
-			case DIALOG_CONFIRMATION:
+				return dialog;
+			}
+			case DIALOG_CONFIRMATION: {
 				View dialogLayout = getLayoutInflater().inflate(R.layout.simple_message_layout, null);
 				TextView text = (TextView) dialogLayout.findViewById(R.id.message);
 				text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.trader_clear_dialog_text)));
 				text.setMovementMethod(LinkMovementMethod.getInstance());
-				
-				dialog = new AlertDialog.Builder(this)
+
+				Dialog dialog = new AlertDialog.Builder(this)
 					.setTitle(R.string.trader_clear_dialog_title)
 					.setView(dialogLayout)
-					.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							lTradeRight.clear();
-							aaTradeRight.notifyDataSetChanged();
-							lTradeLeft.clear();
-							aaTradeLeft.notifyDataSetChanged();
-							UpdateTotalPrices("both");
-							removeDialog(DIALOG_CONFIRMATION);
-						}
-					})
-					.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							removeDialog(DIALOG_CONFIRMATION);
-						}
-					})
-					.setCancelable(true)
-					.create();
-				break;
-			default:
-				dialog = null;
-				break;
+						.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								lTradeRight.clear();
+								aaTradeRight.notifyDataSetChanged();
+								lTradeLeft.clear();
+								aaTradeLeft.notifyDataSetChanged();
+								UpdateTotalPrices("both");
+								removeDialog(DIALOG_CONFIRMATION);
+							}
+						}).setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								removeDialog(DIALOG_CONFIRMATION);
+							}
+						}).setCancelable(true).create();
+				return dialog;
+			}
+			default: {
+				return super.onCreateDialog(id);
+			}
 		}
-		return dialog;
 	}
 
 	protected void SaveTrade(String _tradeName) {

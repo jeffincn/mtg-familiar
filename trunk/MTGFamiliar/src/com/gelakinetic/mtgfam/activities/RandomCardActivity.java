@@ -273,60 +273,65 @@ public class RandomCardActivity extends FamiliarActivity {
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
+		switch (id) {
+			case RULESDIALOG: {
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setNeutralButton(R.string.dialog_play, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+					}
+				});
+				builder.setMessage(ImageGetterHelper.jellyBeanHack(getString(R.string.mojhosto_rules_text)));
+				builder.setTitle(R.string.mojhosto_rules_title);
+				return builder.create();
+			}
+			case MOMIR_IMAGE: {
+				Dialog d = new Dialog(this);
+				d.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-		Dialog d = null;
-		if (id == RULESDIALOG) {
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setNeutralButton(R.string.dialog_play, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					dialog.cancel();
-				}
-			});
-			builder.setMessage(ImageGetterHelper.jellyBeanHack(getString(R.string.mojhosto_rules_text)));
-			builder.setTitle(R.string.mojhosto_rules_title);
-			d = builder.create();
+				d.setContentView(R.layout.image_dialog);
+
+				ImageView image = (ImageView) d.findViewById(R.id.cardimage);
+				image.setImageResource(R.drawable.momir_full);
+				return d;
+			}
+			case STONEHEWER_IMAGE: {
+				Dialog d = new Dialog(this);
+				d.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+				d.setContentView(R.layout.image_dialog);
+
+				ImageView image = (ImageView) d.findViewById(R.id.cardimage);
+				image.setImageResource(R.drawable.stonehewer_full);
+				return d;
+			}
+			case JHOIRA_IMAGE: {
+				Dialog d = new Dialog(this);
+				d.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+				d.setContentView(R.layout.image_dialog);
+
+				ImageView image = (ImageView) d.findViewById(R.id.cardimage);
+				image.setImageResource(R.drawable.jhoira_full);
+				return d;
+			}
+			case CORRUPTION: {
+				View dialogLayout = getLayoutInflater().inflate(R.layout.simple_message_layout, null);
+				TextView text = (TextView) dialogLayout.findViewById(R.id.message);
+				text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.error_corruption)));
+				text.setMovementMethod(LinkMovementMethod.getInstance());
+
+				return new AlertDialog.Builder(this).setTitle(R.string.error).setView(dialogLayout)
+						.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								finish();
+							}
+						}).setCancelable(false).create();
+			}
+			default: {
+				return super.onCreateDialog(id);
+			}
 		}
-		else if (id == MOMIR_IMAGE) {
-			d = new Dialog(this);
-			d.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-			d.setContentView(R.layout.image_dialog);
-
-			ImageView image = (ImageView) d.findViewById(R.id.cardimage);
-			image.setImageResource(R.drawable.momir_full);
-		}
-		else if (id == STONEHEWER_IMAGE) {
-			d = new Dialog(this);
-			d.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-			d.setContentView(R.layout.image_dialog);
-
-			ImageView image = (ImageView) d.findViewById(R.id.cardimage);
-			image.setImageResource(R.drawable.stonehewer_full);
-		}
-		else if (id == JHOIRA_IMAGE) {
-			d = new Dialog(this);
-			d.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-			d.setContentView(R.layout.image_dialog);
-
-			ImageView image = (ImageView) d.findViewById(R.id.cardimage);
-			image.setImageResource(R.drawable.jhoira_full);
-		}
-		else if (id == CORRUPTION) {
-			View dialogLayout = getLayoutInflater().inflate(R.layout.simple_message_layout, null);
-			TextView text = (TextView) dialogLayout.findViewById(R.id.message);
-			text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.error_corruption)));
-			text.setMovementMethod(LinkMovementMethod.getInstance());
-
-			d = new AlertDialog.Builder(this).setTitle(R.string.error).setView(dialogLayout)
-					.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							finish();
-						}
-					}).setCancelable(false).create();
-		}
-		return d;
 	}
 
 	@Override

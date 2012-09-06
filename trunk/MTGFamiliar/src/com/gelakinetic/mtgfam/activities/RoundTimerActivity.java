@@ -222,26 +222,29 @@ public class RoundTimerActivity extends FamiliarActivity {
 
 	@Override
 	public Dialog onCreateDialog(int id) {
-		Dialog dialog = null;
-		if (id == DIALOG_SET_WARNINGS) {
-			final View v = View.inflate(this, R.layout.timer_warning_dialog, null);
-			final CheckBox chkFifteen = (CheckBox) v.findViewById(R.id.timer_pref_fifteen);
-			final CheckBox chkTen = (CheckBox) v.findViewById(R.id.timer_pref_ten);
-			final CheckBox chkFive = (CheckBox) v.findViewById(R.id.timer_pref_five);
+		switch (id) {
+			case DIALOG_SET_WARNINGS: {
+				final View v = View.inflate(this, R.layout.timer_warning_dialog, null);
+				final CheckBox chkFifteen = (CheckBox) v.findViewById(R.id.timer_pref_fifteen);
+				final CheckBox chkTen = (CheckBox) v.findViewById(R.id.timer_pref_ten);
+				final CheckBox chkFive = (CheckBox) v.findViewById(R.id.timer_pref_five);
 
-			dialog = new AlertDialog.Builder(this).setView(v).setTitle(R.string.timer_warning_dialog_title)
-					.setPositiveButton("OK", new OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(RoundTimerActivity.this)
-									.edit();
-							edit.putBoolean("fifteenMinutePref", chkFifteen.isChecked());
-							edit.putBoolean("tenMinutePref", chkTen.isChecked());
-							edit.putBoolean("fiveMinutePref", chkFive.isChecked());
-							edit.commit();
-						}
-					}).create();
+				return new AlertDialog.Builder(this).setView(v).setTitle(R.string.timer_warning_dialog_title)
+						.setPositiveButton("OK", new OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(RoundTimerActivity.this)
+										.edit();
+								edit.putBoolean("fifteenMinutePref", chkFifteen.isChecked());
+								edit.putBoolean("tenMinutePref", chkTen.isChecked());
+								edit.putBoolean("fiveMinutePref", chkFive.isChecked());
+								edit.commit();
+							}
+						}).create();
+			}
+			default: {
+				return super.onCreateDialog(id);
+			}
 		}
-		return dialog;
 	}
 
 	@Override

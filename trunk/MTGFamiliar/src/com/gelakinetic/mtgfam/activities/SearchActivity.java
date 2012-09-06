@@ -613,30 +613,34 @@ public class SearchActivity extends FamiliarActivity {
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
-		if (id == SETLIST) {
-			return setDialog;
-		}
-		else if (id == FORMATLIST) {
-			return formatDialog;
-		}
-		else if (id == RARITYLIST) {
-			return rarityDialog;
-		}
-		else if (id == CORRUPTION) {
-			View dialogLayout = getLayoutInflater().inflate(R.layout.simple_message_layout, null);
-			TextView text = (TextView) dialogLayout.findViewById(R.id.message);
-			text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.error_corruption)));
-			text.setMovementMethod(LinkMovementMethod.getInstance());
+		switch (id) {
+			case SETLIST: {
+				return setDialog;
+			}
+			case FORMATLIST: {
+				return formatDialog;
+			}
+			case RARITYLIST: {
+				return rarityDialog;
+			}
+			case CORRUPTION: {
+				View dialogLayout = getLayoutInflater().inflate(R.layout.simple_message_layout, null);
+				TextView text = (TextView) dialogLayout.findViewById(R.id.message);
+				text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.error_corruption)));
+				text.setMovementMethod(LinkMovementMethod.getInstance());
 
-			AlertDialog dialog = new AlertDialog.Builder(this).setTitle(R.string.error)
-					.setView(dialogLayout).setPositiveButton(R.string.dialog_ok, new OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							finish();
-						}
-					}).setCancelable(false).create();
-			return dialog;
+				AlertDialog dialog = new AlertDialog.Builder(this).setTitle(R.string.error).setView(dialogLayout)
+						.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								finish();
+							}
+						}).setCancelable(false).create();
+				return dialog;
+			}
+			default: {
+				return super.onCreateDialog(id);
+			}
 		}
-		return null;
 	}
 
 	public class DialogSelectionClickHandler implements DialogInterface.OnMultiChoiceClickListener {

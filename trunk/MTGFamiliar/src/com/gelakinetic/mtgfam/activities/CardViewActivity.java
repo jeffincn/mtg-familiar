@@ -562,7 +562,7 @@ public class CardViewActivity extends FamiliarActivity {
 
 				URL u = new URL(picurl);
 				cardPicture = new BitmapDrawable(me.getResources(), u.openStream());
-				
+
 				int height = 0, width = 0;
 				float scale = 0;
 				int border = 16;
@@ -573,7 +573,7 @@ public class CardViewActivity extends FamiliarActivity {
 					window.getDecorView().getWindowVisibleDisplayFrame(rectgle);
 
 					LinearLayout scrollButtons = (LinearLayout)findViewById(R.id.scrollButtons);
-					
+
 					height = (display.getHeight() - rectgle.top - getSupportActionBar().getHeight() - scrollButtons.getHeight()) - border;
 					width = display.getWidth() - border;
 				}
@@ -594,7 +594,7 @@ public class CardViewActivity extends FamiliarActivity {
 
 				int newWidth = Math.round(cardPicture.getIntrinsicWidth() * scale);
 				int newHeight = Math.round(cardPicture.getIntrinsicHeight() * scale);
-				
+
 				cardPicture = resize(cardPicture, newWidth, newHeight);
 			}
 			catch (FileNotFoundException e) {
@@ -620,7 +620,7 @@ public class CardViewActivity extends FamiliarActivity {
 			}
 			return null;
 		}
-		
+
 		private BitmapDrawable resize(BitmapDrawable image, int newWidth, int newHeight) {
 			Bitmap d = ((BitmapDrawable) image).getBitmap();
 			Bitmap bitmapOrig = Bitmap.createScaledBitmap(d, newWidth, newHeight, true);
@@ -859,141 +859,145 @@ public class CardViewActivity extends FamiliarActivity {
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
-		Dialog dialog;
-		if (id == GETIMAGE) {
+		switch (id) {
+			case GETIMAGE: {
 
-			if (cardPicture == null) {
-				return new Dialog(this);
-			}
-
-			dialog = new Dialog(this);
-			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-			dialog.setContentView(R.layout.image_dialog);
-
-			DialogImageView = (ImageView) dialog.findViewById(R.id.cardimage);
-			DialogImageView.setImageDrawable(cardPicture);
-
-			return dialog;
-		}
-		else if (id == GETLEGALITY) {
-			if (formats == null) {
-				return null;
-			}
-
-			dialog = new Dialog(this);
-			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-			dialog.setContentView(R.layout.legality_dialog);
-
-			// create the grid item mapping
-			String[] from = new String[] { "format", "status" };
-			int[] to = new int[] { R.id.format, R.id.status };
-
-			// prepare the list of all records
-			List<HashMap<String, String>> fillMaps = new ArrayList<HashMap<String, String>>();
-			for (int i = 0; i < formats.length; i++) {
-				HashMap<String, String> map = new HashMap<String, String>();
-				map.put(from[0], formats[i]);
-				map.put(from[1], legalities[i]);
-				fillMaps.add(map);
-			}
-
-			SimpleAdapter adapter = new SimpleAdapter(this, fillMaps, R.layout.legal_row, from, to);
-			ListView lv = (ListView) dialog.findViewById(R.id.legallist);
-			lv.setAdapter(adapter);
-			return dialog;
-		}
-		else if (id == GETPRICE) { // price
-
-			if (XMLhandler == null) {
-				return null;
-			}
-
-			dialog = new Dialog(this);
-			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-			dialog.setContentView(R.layout.price_dialog);
-
-			TextView l = (TextView) dialog.findViewById(R.id.low);
-			TextView m = (TextView) dialog.findViewById(R.id.med);
-			TextView h = (TextView) dialog.findViewById(R.id.high);
-			TextView pricelink = (TextView) dialog.findViewById(R.id.pricelink);
-
-			l.setText("$" + XMLhandler.lowprice);
-			m.setText("$" + XMLhandler.avgprice);
-			h.setText("$" + XMLhandler.hiprice);
-			pricelink.setMovementMethod(LinkMovementMethod.getInstance());
-			pricelink.setText(ImageGetterHelper.jellyBeanHack("<a href=\"" + XMLhandler.link + "\">" + getString(R.string.card_view_price_dialog_link) + "</a>"));
-			return dialog;
-		}
-		else if (id == CHANGESET) {
-			try {
-				Cursor c = mDbHelper.fetchCardByName(cardName, new String[]{CardDbAdapter.KEY_SET, CardDbAdapter.KEY_ID});
-				Set<String> sets = new LinkedHashSet<String>();
-				Set<Long> cardIds = new LinkedHashSet<Long>();
-				while (!c.isAfterLast()) {
-					if (sets.add(mDbHelper.getTCGname(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET))))) {
-						cardIds.add(c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID)));
-					}
-					c.moveToNext();
+				if (cardPicture == null) {
+					return new Dialog(this);
 				}
-				c.close();
 
-				final String[] aSets = sets.toArray(new String[sets.size()]);
-				final Long[] aIds = cardIds.toArray(new Long[cardIds.size()]);
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle("Pick a Set");
-				builder.setItems(aSets, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialogInterface, int item) {
-						setInfoFromID(aIds[item]);
-					}
-				});
-				dialog = builder.create();
+				Dialog dialog = new Dialog(this);
+				dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+				dialog.setContentView(R.layout.image_dialog);
+
+				DialogImageView = (ImageView) dialog.findViewById(R.id.cardimage);
+				DialogImageView.setImageDrawable(cardPicture);
+
 				return dialog;
 			}
-			catch (SQLException e) {
-				// Should we do something here?
-			}
-		}
-		else if (id == CARDRULINGS) {
-
-			if (rulingsArrayList == null) {
-				return null;
-			}
-
-			dialog = new Dialog(this);
-			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-			dialog.setContentView(R.layout.rulings_dialog);
-
-			TextView textViewRules = (TextView) dialog.findViewById(R.id.rules);
-			TextView textViewUrl = (TextView) dialog.findViewById(R.id.url);
-
-			String message = "";
-			if (rulingsArrayList.size() == 0) {
-				message = "No rulings for this card";
-			}
-			else {
-				for (Ruling r : rulingsArrayList) {
-					message += (r.toString() + "<br><br>");
+			case GETLEGALITY: {
+				if (formats == null) {
+					return null;
 				}
 
-				message = message.replace("{Tap}", "{T}").replace("{", "<img src=\"").replace("}", "\"/>");
+				Dialog dialog = new Dialog(this);
+				dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+				dialog.setContentView(R.layout.legality_dialog);
+
+				// create the grid item mapping
+				String[] from = new String[] { "format", "status" };
+				int[] to = new int[] { R.id.format, R.id.status };
+
+				// prepare the list of all records
+				List<HashMap<String, String>> fillMaps = new ArrayList<HashMap<String, String>>();
+				for (int i = 0; i < formats.length; i++) {
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put(from[0], formats[i]);
+					map.put(from[1], legalities[i]);
+					fillMaps.add(map);
+				}
+
+				SimpleAdapter adapter = new SimpleAdapter(this, fillMaps, R.layout.legal_row, from, to);
+				ListView lv = (ListView) dialog.findViewById(R.id.legallist);
+				lv.setAdapter(adapter);
+				return dialog;
 			}
-			CharSequence messageGlyph = ImageGetterHelper.jellyBeanHack(message, imgGetter, null);
+			case GETPRICE: { // price
 
-			textViewRules.setText(messageGlyph);
+				if (XMLhandler == null) {
+					return null;
+				}
 
-			textViewUrl.setMovementMethod(LinkMovementMethod.getInstance());
-			textViewUrl.setText(Html.fromHtml("<a href=http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multiverseId + ">Gatherer Page</a>"));
+				Dialog dialog = new Dialog(this);
+				dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-			return dialog;
+				dialog.setContentView(R.layout.price_dialog);
+
+				TextView l = (TextView) dialog.findViewById(R.id.low);
+				TextView m = (TextView) dialog.findViewById(R.id.med);
+				TextView h = (TextView) dialog.findViewById(R.id.high);
+				TextView pricelink = (TextView) dialog.findViewById(R.id.pricelink);
+
+				l.setText("$" + XMLhandler.lowprice);
+				m.setText("$" + XMLhandler.avgprice);
+				h.setText("$" + XMLhandler.hiprice);
+				pricelink.setMovementMethod(LinkMovementMethod.getInstance());
+				pricelink.setText(ImageGetterHelper.jellyBeanHack("<a href=\"" + XMLhandler.link + "\">"
+						+ getString(R.string.card_view_price_dialog_link) + "</a>"));
+				return dialog;
+			}
+			case CHANGESET: {
+				try {
+					Cursor c = mDbHelper.fetchCardByName(cardName, new String[] { CardDbAdapter.KEY_SET, CardDbAdapter.KEY_ID });
+					Set<String> sets = new LinkedHashSet<String>();
+					Set<Long> cardIds = new LinkedHashSet<Long>();
+					while (!c.isAfterLast()) {
+						if (sets.add(mDbHelper.getTCGname(c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET))))) {
+							cardIds.add(c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID)));
+						}
+						c.moveToNext();
+					}
+					c.close();
+
+					final String[] aSets = sets.toArray(new String[sets.size()]);
+					final Long[] aIds = cardIds.toArray(new Long[cardIds.size()]);
+					AlertDialog.Builder builder = new AlertDialog.Builder(this);
+					builder.setTitle("Pick a Set");
+					builder.setItems(aSets, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialogInterface, int item) {
+							setInfoFromID(aIds[item]);
+						}
+					});
+					return builder.create();
+				}
+				catch (SQLException e) {
+					// Should we do something here?
+				}
+			}
+			case CARDRULINGS: {
+
+				if (rulingsArrayList == null) {
+					return null;
+				}
+
+				Dialog dialog = new Dialog(this);
+				dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+				dialog.setContentView(R.layout.rulings_dialog);
+
+				TextView textViewRules = (TextView) dialog.findViewById(R.id.rules);
+				TextView textViewUrl = (TextView) dialog.findViewById(R.id.url);
+
+				String message = "";
+				if (rulingsArrayList.size() == 0) {
+					message = "No rulings for this card";
+				}
+				else {
+					for (Ruling r : rulingsArrayList) {
+						message += (r.toString() + "<br><br>");
+					}
+
+					message = message.replace("{Tap}", "{T}").replace("{", "<img src=\"").replace("}", "\"/>");
+				}
+				CharSequence messageGlyph = ImageGetterHelper.jellyBeanHack(message, imgGetter, null);
+
+				textViewRules.setText(messageGlyph);
+
+				textViewUrl.setMovementMethod(LinkMovementMethod.getInstance());
+				textViewUrl.setText(Html.fromHtml("<a href=http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid="
+						+ multiverseId + ">Gatherer Page</a>"));
+
+				return dialog;
+			}
+			case WISHLIST_COUNTS: {
+				return (new WishlistHelpers()).getDialog(cardName, this);
+			}
+			default: {
+				return super.onCreateDialog(id);
+			}
 		}
-		else if (id == WISHLIST_COUNTS) {
-			return (new WishlistHelpers()).getDialog(cardName, this);
-		}
-		return null;
 	}
 
 	@Override
@@ -1026,7 +1030,7 @@ public class CardViewActivity extends FamiliarActivity {
 				break;
 			case R.id.copyall:
 				copyText = name.getText().toString() + '\n' + cost.getText().toString() + '\n' + type.getText().toString() + '\n' + set.getText().toString() + '\n'
-						+ ability.getText().toString() + '\n' + flavor.getText().toString() + '\n' + pt.getText().toString() + '\n' + artist.getText().toString();
+				+ ability.getText().toString() + '\n' + flavor.getText().toString() + '\n' + pt.getText().toString() + '\n' + artist.getText().toString();
 				break;
 			default:
 				return super.onContextItemSelected(item);

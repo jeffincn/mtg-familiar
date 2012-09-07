@@ -95,12 +95,12 @@ public class CardViewActivity extends FamiliarActivity {
 	protected static final int				SWIPERIGHT			= 6;
 
 	// Dialogs
-	private static final int					GETLEGALITY			= 0;
 	private static final int					GETPRICE				= 1;
 	private static final int					GETIMAGE				= 2;
 	private static final int					CHANGESET				= 3;
 	private static final int					CARDRULINGS			= 4;
 	private static final int					WISHLIST_COUNTS	= 6;
+	private static final int					GETLEGALITY			= 7;
 
 	// Where the card image is loaded to
 	private static final int					MAINPAGE				= 0;

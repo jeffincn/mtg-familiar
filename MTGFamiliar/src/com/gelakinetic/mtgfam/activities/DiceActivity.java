@@ -38,9 +38,9 @@ public class DiceActivity extends FamiliarActivity {
 	private Random													r;
 	private ImageView												d2, d4, d6, d8, d10, d12, d20, d100;
 	private TextView												dieOutput;
-	private boolean													d2AsCoin;
 	private final ScheduledExecutorService	scheduler		= Executors.newScheduledThreadPool(1);
 	private Handler													handler;
+	private final DiceActivity							anchor			= this;
 
 	public static final int									updateDelay	= 150;
 
@@ -49,9 +49,6 @@ public class DiceActivity extends FamiliarActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.dice_activity);
 
-		d2AsCoin = preferences.getBoolean("d2AsCoin", true);
-
-		final DiceActivity anchor = this;
 		r = new Random();
 		handler = new Handler();
 
@@ -66,28 +63,6 @@ public class DiceActivity extends FamiliarActivity {
 		d20 = (ImageView) findViewById(R.id.d20);
 		d100 = (ImageView) findViewById(R.id.d100);
 
-		if (d2 != null) {
-			if (d2AsCoin) {
-				d2.setImageResource(R.drawable.dcoin);
-			}
-			else {
-				d2.setImageResource(R.drawable.d2);
-			}
-			if (d2AsCoin) {
-				d2.setOnClickListener(new View.OnClickListener() {
-					public void onClick(View view) {
-						anchor.flipCoin();
-					}
-				});
-			}
-			else {
-				d2.setOnClickListener(new View.OnClickListener() {
-					public void onClick(View view) {
-						anchor.rollDie(2);
-					}
-				});
-			}
-		}
 		if (d4 != null) {
 			d4.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
@@ -136,6 +111,35 @@ public class DiceActivity extends FamiliarActivity {
 					anchor.rollDie(100);
 				}
 			});
+		}
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		boolean d2AsCoin = preferences.getBoolean("d2AsCoin", true);
+
+		if (d2 != null) {
+			if (d2AsCoin) {
+				d2.setImageResource(R.drawable.dcoin);
+			}
+			else {
+				d2.setImageResource(R.drawable.d2);
+			}
+			if (d2AsCoin) {
+				d2.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View view) {
+						anchor.flipCoin();
+					}
+				});
+			}
+			else {
+				d2.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View view) {
+						anchor.rollDie(2);
+					}
+				});
+			}
 		}
 	}
 

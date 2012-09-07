@@ -28,6 +28,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,6 +44,8 @@ import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 import com.gelakinetic.mtgfam.helpers.MyApp;
 import com.gelakinetic.mtgfam.helpers.RoundTimerService;
 import com.slidingmenu.lib.SlidingMenu;
+import com.slidingmenu.lib.SlidingMenu.OnClosedListener;
+import com.slidingmenu.lib.SlidingMenu.OnOpenedListener;
 import com.slidingmenu.lib.app.SlidingActivity;
 
 public abstract class FamiliarActivity extends SlidingActivity {
@@ -58,6 +61,9 @@ public abstract class FamiliarActivity extends SlidingActivity {
 
 	private static final int        TTS_CHECK_CODE  = 23;
 
+	private Class<?>	pendingClass = null;
+	private int	pendingDialog = -1;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -154,112 +160,121 @@ public abstract class FamiliarActivity extends SlidingActivity {
 		TextView whatsnew = (TextView) findViewById(R.id.whatsnew);
 		TextView aboutapp = (TextView) findViewById(R.id.aboutapp);
 
+		getSlidingMenu().setOnClosedListener(new OnClosedListener(){
+			@Override
+			public void onClosed() {
+				if(pendingClass != null){
+					Intent i = new Intent(mCtx, pendingClass);
+					startActivity(i);
+					pendingClass = null;
+				}
+				else if(pendingDialog != -1){
+					showDialog(pendingDialog);
+					pendingDialog = -1;
+				}
+			}});
+
+		getSlidingMenu().setOnOpenedListener(new OnOpenedListener(){
+			@Override
+			public void onOpened() {
+				// Close the keyboard if the slidingMenu is opened
+				try{
+					InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+	        imm.hideSoftInputFromWindow(getCurrentFocus().getApplicationWindowToken(), 0);
+				}
+				catch(NullPointerException e){
+					// eat it
+				}
+			}});
+		
+		/*
+		 * Activity Launchers
+		 */
 		nbplayerbutton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				toggle();
-				Intent i = new Intent(mCtx, NPlayerLifeActivity.class);
-				startActivity(i);
+				slidingActivityLauncher(NPlayerLifeActivity.class);
 			}
 		});
 
 		search.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				toggle();
-				Intent i = new Intent(mCtx, SearchActivity.class);
-				startActivity(i);
+				slidingActivityLauncher(SearchActivity.class);
 			}
 		});
 
 		rules.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				toggle();
-				Intent i = new Intent(mCtx, RulesActivity.class);
-				startActivity(i);
+				slidingActivityLauncher(RulesActivity.class);
 			}
 		});
 
 		rng.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				toggle();
-				Intent i = new Intent(mCtx, DiceActivity.class);
-				startActivity(i);
+				slidingActivityLauncher(DiceActivity.class);
 			}
 		});
 
 		manapool.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				toggle();
-				Intent i = new Intent(mCtx, ManaPoolActivity.class);
-				startActivity(i);
+				slidingActivityLauncher(ManaPoolActivity.class);
 			}
 		});
 
 		randomCard.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				toggle();
-				Intent i = new Intent(mCtx, RandomCardActivity.class);
-				startActivity(i);
+				slidingActivityLauncher(RandomCardActivity.class);
 			}
 		});
 
 		roundTimer.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				toggle();
-				Intent i = new Intent(mCtx, RoundTimerActivity.class);
-				startActivity(i);
+				slidingActivityLauncher(RoundTimerActivity.class);
 			}
 		});
 
 		trader.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				toggle();
-				Intent i = new Intent(mCtx, CardTradingActivity.class);
-				startActivity(i);
+				slidingActivityLauncher(CardTradingActivity.class);
 			}
 		});
 
 		wishlist.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				toggle();
-				Intent i = new Intent(mCtx, WishlistActivity.class);
-				startActivity(i);
+				slidingActivityLauncher(WishlistActivity.class);
 			}
 		});
 
+		/*
+		 * Old Main Page Menu Buttons
+		 */
 		checkUpdate.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Set the last legality update time back to zero on a forced update
 				SharedPreferences.Editor editor = preferences.edit();
 				editor.putLong("lastLegalityUpdate", 0);
 				editor.commit();
-
 				startService(new Intent(me, DbUpdaterService.class));
-
-				toggle();
+				showAbove();
 			}
 		});
 		preferencesButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				startActivity(new Intent().setClass(mCtx, PreferencesActivity.class));
-				toggle();
+				slidingActivityLauncher(PreferencesActivity.class);
 			}
 		});
 		donate.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				showDialog(DONATEDIALOG);
-				toggle();
+				slidingDialogLauncher(DONATEDIALOG);
 			}
 		});
 		whatsnew.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				showDialog(CHANGELOGDIALOG);
-				toggle();
+				slidingDialogLauncher(CHANGELOGDIALOG);
 			}
 		});
 		aboutapp.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				showDialog(ABOUTDIALOG);
-				toggle();
+				slidingDialogLauncher(ABOUTDIALOG);
 			}
 		});
 
@@ -271,6 +286,16 @@ public abstract class FamiliarActivity extends SlidingActivity {
 		catch (ActivityNotFoundException anf) {
 			showTtsWarningIfShould();
 		}
+	}
+
+	protected void slidingActivityLauncher(final Class<?> class1) {
+		pendingClass = class1;
+		showAbove();
+	}
+	
+	protected void slidingDialogLauncher(final int id) {
+		pendingDialog = id;
+		showAbove();
 	}
 
 	@Override
@@ -288,6 +313,7 @@ public abstract class FamiliarActivity extends SlidingActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		showAbove(); // always close the sliding menu when returning to this activity
 		MyApp appState = ((MyApp) getApplicationContext());
 		String classname = this.getClass().getCanonicalName();
 		if (classname.equalsIgnoreCase("com.gelakinetic.mtgfam.activities.CardViewActivity")) {

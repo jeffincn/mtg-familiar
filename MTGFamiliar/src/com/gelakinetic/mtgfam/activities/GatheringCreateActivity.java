@@ -40,9 +40,8 @@ import com.gelakinetic.mtgfam.helpers.GatheringsIO;
 import com.gelakinetic.mtgfam.helpers.GatheringsPlayerData;
 
 public class GatheringCreateActivity extends FamiliarActivity {
-	private static final int								DIALOG_SET_NAME				= 0;
-	private static final int								DIALOG_GATHERING_EXIST		= 1;
-															
+	private static final int								DIALOG_SET_NAME				= 1;
+	private static final int								DIALOG_GATHERING_EXIST		= 2;
 
 	private String							proposedGathering;
 

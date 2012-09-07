@@ -100,10 +100,10 @@ public class SearchActivity extends FamiliarActivity {
 //	// End addition
 //	public static final String		SETLOGIC		= "setlogic";
 
-	protected static final int		SETLIST			= 0;
-	protected static final int		FORMATLIST	= 1;
-	protected static final int		RARITYLIST	= 2;
-	protected static final int		CORRUPTION	= 3;
+	protected static final int		SETLIST			= 1;
+	protected static final int		FORMATLIST	= 2;
+	protected static final int		RARITYLIST	= 3;
+	protected static final int		CORRUPTION	= 4;
 
 	private Button								searchbutton;
 	private AutoCompleteTextView	namefield;

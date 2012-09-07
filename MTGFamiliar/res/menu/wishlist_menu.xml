@@ -29,11 +29,10 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:icon="@drawable/menu_hi_med_low"
         android:showAsAction="ifRoom"
         android:title="@string/wishlist_set_pricing" />
-<!-- Commented for the 1.8 release; we'll return these for 1.9
     <item
         android:id="@+id/wishlist_menu_share"
         android:icon="@drawable/menu_share"
         android:showAsAction="ifRoom"
         android:title="@string/wishlist_share" />
-     -->
+
 </menu>

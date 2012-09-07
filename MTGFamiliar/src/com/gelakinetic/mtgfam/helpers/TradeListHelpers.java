@@ -329,7 +329,7 @@ public class TradeListHelpers {
 		}
 
 		public String toReadableString(boolean includeTcgName) {
-			return this.numberOf + ' ' + this.name + (includeTcgName?'(' + this.tcgName + ')':"") + '\n';
+			return String.valueOf(this.numberOf) + ' ' + this.name + (includeTcgName?" (" + this.tcgName + ')':"") + '\n';
 		}
 	}
 }

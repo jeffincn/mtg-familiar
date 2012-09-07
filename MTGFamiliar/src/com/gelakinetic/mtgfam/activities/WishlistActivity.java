@@ -102,9 +102,6 @@ public class WishlistActivity extends FamiliarActivity {
 
 		mTradeListHelper = new TradeListHelpers();
 
-		showTotalPrice = preferences.getBoolean("showTotalPriceWishlistPref", false);
-		verbose = preferences.getBoolean("verboseWishlistPref", false);
-
 		namefield = (AutoCompleteTextView) findViewById(R.id.namesearch);
 		namefield.setAdapter(new AutocompleteCursorAdapter(this, null));
 
@@ -116,13 +113,6 @@ public class WishlistActivity extends FamiliarActivity {
 		cardSetWishlists = new ArrayList<ArrayList<CardData>>();
 		bAdd = (Button) findViewById(R.id.addCard);
 		tradePrice = (TextView) findViewById(R.id.priceText);
-
-		if (!showTotalPrice) {
-			tradePrice.setVisibility(View.GONE);
-		}
-		else {
-			tradePrice.setVisibility(View.VISIBLE);
-		}
 
 		bAdd.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -148,8 +138,6 @@ public class WishlistActivity extends FamiliarActivity {
 				}
 			}
 		});
-
-		priceSetting = Integer.parseInt(preferences.getString("tradePrice", String.valueOf(AVG_PRICE)));
 
 		expWishlist = (ExpandableListView) this.findViewById(R.id.wishlist);
 
@@ -192,6 +180,17 @@ public class WishlistActivity extends FamiliarActivity {
 	protected void onResume() {
 		super.onResume();
 		doneLoading = false;
+		showTotalPrice = preferences.getBoolean("showTotalPriceWishlistPref", false);
+		verbose = preferences.getBoolean("verboseWishlistPref", false);
+		priceSetting = Integer.parseInt(preferences.getString("tradePrice", String.valueOf(AVG_PRICE)));
+
+		if (!showTotalPrice) {
+			tradePrice.setVisibility(View.GONE);
+		}
+		else {
+			tradePrice.setVisibility(View.VISIBLE);
+		}
+
 		ArrayList<CardData> lWishlist = new ArrayList<CardData>();
 
 		WishlistHelpers.ReadWishlist(getApplicationContext(), (WishlistActivity) me, mDbHelper, lWishlist);
@@ -460,7 +459,6 @@ public class WishlistActivity extends FamiliarActivity {
 	}
 
 	private void mailWishlist(boolean includeTcgName) {
-		// /TODO: check to make sure that this works on an actual phone
 		// blank mailId - user will have to fill in To: field
 		Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "", null));
 		emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "MTG Familiar Wishlist");
@@ -472,10 +470,6 @@ public class WishlistActivity extends FamiliarActivity {
 		catch (android.content.ActivityNotFoundException ex) {
 			Toast.makeText(getApplicationContext(), getString(R.string.error_no_email_client), Toast.LENGTH_SHORT).show();
 		}
-		// Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-		// sharingIntent.setType("text/html");
-		// sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT,WishlistHelpers.GetReadableWishlist(cardSetWishlists, includeTcgName));
-		// startActivity(Intent.createChooser(sharingIntent,"Share using"));
 	}
 
 	public void UpdateTotalPrices() {
@@ -688,12 +682,14 @@ public class WishlistActivity extends FamiliarActivity {
 					tField.setVisibility(View.GONE);
 				}
 				else {
+					if(data.ability == null || data.ability == "")
+						data = new TradeListHelpers().FetchCardData(mCtx, data);
 					String type = data.type;
 					// we check the actual values for visibility here (instead
 					// of just the verbose flag)
 					// because some card types won't have some of these - i.e.
 					// tokens don't have cost, etc.
-					if (!verbose || type == null || type == "") {
+					if (type == null || type == "") {
 						typeField.setVisibility(View.GONE);
 					}
 					else {
@@ -702,7 +698,7 @@ public class WishlistActivity extends FamiliarActivity {
 						typeField.setOnClickListener(onClick);
 					}
 					String manaCost = data.cost;
-					if (!verbose || manaCost == null || manaCost == "") {
+					if (manaCost == null || manaCost == "") {
 						costField.setVisibility(View.GONE);
 					}
 					else {
@@ -712,7 +708,7 @@ public class WishlistActivity extends FamiliarActivity {
 						costField.setOnClickListener(onClick);
 					}
 					String ability = data.ability;
-					if (!verbose || ability == null || ability == "") {
+					if (ability == null || ability == "") {
 						abilityField.setVisibility(View.GONE);
 					}
 					else {
@@ -806,11 +802,6 @@ public class WishlistActivity extends FamiliarActivity {
 						slashField.setVisibility(View.GONE);
 						tField.setVisibility(View.GONE);
 					}
-					if (!verbose) {
-						pField.setVisibility(View.GONE);
-						slashField.setVisibility(View.GONE);
-						tField.setVisibility(View.GONE);
-					}
 				}
 			}
 			_list.expandGroup(groupPosition); // used to Expand the child list
@@ -844,10 +835,9 @@ public class WishlistActivity extends FamiliarActivity {
 			case R.id.wishlist_menu_settings:
 				showDialog(DIALOG_PRICE_SETTING);
 				return true;
-				// TODO: un-comment for 1.9
-				// case R.id.wishlist_menu_share:
-				// showDialog(DIALOG_SHARE);
-				// return true;
+			case R.id.wishlist_menu_share:
+				showDialog(DIALOG_SHARE);
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}

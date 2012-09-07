@@ -47,11 +47,12 @@ import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 
 public class RandomCardActivity extends FamiliarActivity {
-	private static final int		RULESDIALOG				= 0;
-	protected static final int	MOMIR_IMAGE				= 1;
-	protected static final int	STONEHEWER_IMAGE	= 2;
-	protected static final int	JHOIRA_IMAGE			= 3;
-	protected static final int	CORRUPTION				= 4;
+	private static final int		RULESDIALOG				= 1;
+	protected static final int	MOMIR_IMAGE				= 2;
+	protected static final int	STONEHEWER_IMAGE	= 3;
+	protected static final int	JHOIRA_IMAGE			= 4;
+	protected static final int	CORRUPTION				= 5;
+	
 	private Random							rand;
 	private String							name;
 	private Spinner							momirCmcChoice;

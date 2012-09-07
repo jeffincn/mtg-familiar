@@ -58,7 +58,7 @@ public class RoundTimerActivity extends FamiliarActivity {
 
 	private static final int RINGTONE_REQUEST_CODE = 17;
 
-	private static final int DIALOG_SET_WARNINGS = 0;
+	private static final int DIALOG_SET_WARNINGS = 1;
 
 	private TimePicker picker;
 	private Button actionButton;

@@ -23,16 +23,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.gelakinetic.mtgfam.R;
-
 public class MainActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main_activity);
-		
-		Intent i = new Intent(this, SearchActivity.class);
-		startActivity(i);
+		super.onCreate(savedInstanceState);		
+		startActivity(new Intent(this, SearchActivity.class));
 		this.finish();
 	}
 }

@@ -67,10 +67,10 @@ public class RulesActivity extends FamiliarActivity {
 	public static String						KEYWORD_KEY							= "keyword";
 	public static String						GLOSSARY_KEY						= "glossary";
 
-	private static final int				SEARCH									= 0;
-	private static final int				RESULT_NORMAL						= 1;
-	private static final int				RESULT_QUIT_TO_MAIN			= 2;
-	private static final int				CORRUPTION							= 3;
+	private static final int				SEARCH									= 1;
+	private static final int				RESULT_NORMAL						= 2;
+	private static final int				RESULT_QUIT_TO_MAIN			= 3;
+	private static final int				CORRUPTION							= 4;
 	private static final int				ARBITRARY_REQUEST_CODE	= 23;
 
 	private ImageGetter							imgGetter;

@@ -66,10 +66,11 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 	private static final String							NO_GATHERINGS_EXIST				= "No Gatherings exist.";
 	private static final String							DISPLAY_MODE_UNSUPPORTED	= "Current display mode is not supported in this orientation. Switching to normal display mode.";
 
-	private static final int								DIALOG_RESET_CONFIRM			= 0;
-	private static final int								DIALOG_REMOVE_PLAYER			= 1;
-	private static final int								DIALOG_SET_NAME						= 2;
-	private static final int								DIALOG_CHANGE_DISPLAY			= 3;
+	private static final int								DIALOG_RESET_CONFIRM			= 1;
+	private static final int								DIALOG_REMOVE_PLAYER			= 2;
+	private static final int								DIALOG_SET_NAME						= 3;
+	private static final int								DIALOG_CHANGE_DISPLAY			= 4;
+	
 	private static final int								LIFE											= 0;
 	private static final int								POISON										= 1;
 	public static final int									INITIAL_LIFE							= 20;

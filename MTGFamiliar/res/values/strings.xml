@@ -318,6 +318,8 @@
     <string name="pref_wishlist_details_summary">Display full card details in the wishlist</string>
     <string name="pref_wishlist_totals_title">Show Total Price</string>
     <string name="pref_wishlist_totals_summary">Display total price summary in the wishlist</string>
+    <string name="pref_wishlist_prices_title">Show Card Prices</string>
+    <string name="pref_wishlist_prices_summary">Display each card price in the wishlist</string>
     
     
     <!-- Debug -->

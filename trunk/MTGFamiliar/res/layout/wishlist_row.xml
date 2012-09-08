@@ -25,9 +25,7 @@
             android:id="@+id/cardcost"
             style="@style/text"
             android:layout_width="wrap_content"
-            android:layout_marginBottom="-3sp"
             android:gravity="right|center_vertical"
-            android:paddingTop="4.5sp"
             android:text="@string/ph_cost" />
     </LinearLayout>
 
@@ -35,7 +33,6 @@
         android:id="@+id/cardtype"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="-5sp"
         android:text="@string/ph_type"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -44,7 +41,6 @@
         style="@style/text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="3sp"
         android:text="@string/ph_ability"
         android:textSize="18sp" >
     </TextView>

@@ -81,6 +81,7 @@ public class WishlistActivity extends FamiliarActivity {
 
 	public int																		priceSetting;
 	private boolean																showTotalPrice;
+	private boolean																showIndividualPrices;
 	private boolean																verbose;
 	private TradeListHelpers											mTradeListHelper;
 
@@ -181,6 +182,7 @@ public class WishlistActivity extends FamiliarActivity {
 		super.onResume();
 		doneLoading = false;
 		showTotalPrice = preferences.getBoolean("showTotalPriceWishlistPref", false);
+		showIndividualPrices = preferences.getBoolean("showIndividualPricesWishlistPref", true);
 		verbose = preferences.getBoolean("verboseWishlistPref", false);
 		priceSetting = Integer.parseInt(preferences.getString("tradePrice", String.valueOf(AVG_PRICE)));
 
@@ -289,9 +291,11 @@ public class WishlistActivity extends FamiliarActivity {
 		}
 		cardSetWishlists.set(position, lCardlist);
 
-		FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(card, aaExpWishlist, priceSetting, null,
-				(WishlistActivity) me);
-		TradeListHelpers.addTaskAndExecute(loadPrice);
+		if(showTotalPrice || showIndividualPrices) {
+			FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(card, aaExpWishlist, priceSetting, null,
+					(WishlistActivity) me);
+			TradeListHelpers.addTaskAndExecute(loadPrice);
+		}
 	}
 
 	protected Dialog onCreateDialog(int id) {
@@ -329,10 +333,14 @@ public class WishlistActivity extends FamiliarActivity {
 										cd.numberOf = numberField;
 										totalCards += numberField;
 										if (prior != numberField && numberField != 0) {
-											cd.message = ("loading");
-											FetchPriceTask task = mTradeListHelper.new FetchPriceTask(cd, aaExpWishlist, priceSetting, null,
-													(WishlistActivity) me);
-											TradeListHelpers.addTaskAndExecute(task);
+											if (showTotalPrice || showIndividualPrices){
+												cd.message = ("loading");
+												FetchPriceTask task = mTradeListHelper.new FetchPriceTask(cd, aaExpWishlist, priceSetting, null,
+														(WishlistActivity) me);
+												TradeListHelpers.addTaskAndExecute(task);
+											}
+											else
+												cd = mTradeListHelper.FetchCardData(mCtx, cd);
 										}
 										cardlist.set(i, cd);
 									}
@@ -364,18 +372,20 @@ public class WishlistActivity extends FamiliarActivity {
 									priceSetting = which;
 									dialog.dismiss();
 
-									// Update ALL the prices (for non-zero counts)!
-									for (int i = 0; i < cardNames.size(); i++) {
-										for (CardData data : cardSetWishlists.get(i)) {
-											if (data.numberOf > 0) {
-												data.message = ("loading");
-												FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaExpWishlist, priceSetting,
-														null, (WishlistActivity) me);
-												TradeListHelpers.addTaskAndExecute(task);
+									if(showTotalPrice || showIndividualPrices){
+										// Update ALL the prices (for non-zero counts)!
+										for (int i = 0; i < cardNames.size(); i++) {
+											for (CardData data : cardSetWishlists.get(i)) {
+												if (data.numberOf > 0) {
+													data.message = ("loading");
+													FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaExpWishlist, priceSetting,
+															null, (WishlistActivity) me);
+													TradeListHelpers.addTaskAndExecute(task);
+												}
 											}
 										}
+										aaExpWishlist.notifyDataSetChanged();
 									}
-									aaExpWishlist.notifyDataSetChanged();
 
 									// And also update the preference
 									SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(WishlistActivity.this)
@@ -415,7 +425,8 @@ public class WishlistActivity extends FamiliarActivity {
 									cardSetNames.clear();
 									cardSetWishlists.clear();
 									aaExpWishlist.notifyDataSetChanged();
-									UpdateTotalPrices();
+									if(showTotalPrice || showIndividualPrices)
+										UpdateTotalPrices();
 									removeDialog(DIALOG_CONFIRMATION);
 								}
 							}).setNegativeButton(R.string.dialog_cancel, new OnClickListener() {
@@ -609,7 +620,7 @@ public class WishlistActivity extends FamiliarActivity {
 						setField.setTextColor(resources.getColor(R.color.timeshifted));
 						break;
 				}
-				priceField.setText(data.numberOf + "x" + (data.hasPrice() ? data.getPriceString() : data.message));
+				priceField.setText((showIndividualPrices?"":"x") + data.numberOf + (showIndividualPrices? ("x" + (data.hasPrice() ? data.getPriceString() : data.message)):""));
 				if (data.hasPrice()) {
 					priceField.setTextColor(resources.getColor(R.color.light_gray));
 				}

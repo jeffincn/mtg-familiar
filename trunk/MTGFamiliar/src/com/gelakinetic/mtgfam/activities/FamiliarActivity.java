@@ -122,6 +122,11 @@ public abstract class FamiliarActivity extends SlidingActivity {
 			}
 		}
 
+		timerHandler = new Handler();
+		registerReceiver(endTimeReceiver, new IntentFilter(RoundTimerActivity.RESULT_FILTER));
+		registerReceiver(startTimeReceiver, new IntentFilter(RoundTimerService.START_FILTER));
+		registerReceiver(cancelTimeReceiver, new IntentFilter(RoundTimerService.CANCEL_FILTER));
+		
 		mDbHelper = new CardDbAdapter(this);
 		try {
 			mDbHelper.openReadable();
@@ -138,11 +143,6 @@ public abstract class FamiliarActivity extends SlidingActivity {
 
 		updatingDisplay = false;
 		timeShowing = false;
-
-		timerHandler = new Handler();
-		registerReceiver(endTimeReceiver, new IntentFilter(RoundTimerActivity.RESULT_FILTER));
-		registerReceiver(startTimeReceiver, new IntentFilter(RoundTimerService.START_FILTER));
-		registerReceiver(cancelTimeReceiver, new IntentFilter(RoundTimerService.CANCEL_FILTER));
 
 		TextView search = (TextView) findViewById(R.id.cardsearch);
 		TextView rules = (TextView) findViewById(R.id.rules);
@@ -304,9 +304,14 @@ public abstract class FamiliarActivity extends SlidingActivity {
 		if (mDbHelper != null) {
 			mDbHelper.close();
 		}
-		unregisterReceiver(endTimeReceiver);
-		unregisterReceiver(startTimeReceiver);
-		unregisterReceiver(cancelTimeReceiver);
+		try {
+			unregisterReceiver(endTimeReceiver);
+			unregisterReceiver(startTimeReceiver);
+			unregisterReceiver(cancelTimeReceiver);
+		}
+		catch (IllegalArgumentException e) {
+			// EAT IT
+		}
 	}
 
 	// clear this in every activity. except not cardview

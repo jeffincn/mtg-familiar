@@ -52,6 +52,21 @@
             </TextView>
 
             <TextView
+                android:id="@+id/cardcounters"
+                style="@style/text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/life_counter_icon"
+                android:drawablePadding="15dp"
+                android:gravity="center_vertical"
+                android:text="@string/main_card_counters"
+                android:textSize="30dip" >
+            </TextView>
+            
+            <TextView
                 android:id="@+id/manapool"
                 style="@style/text"
                 android:layout_width="match_parent"

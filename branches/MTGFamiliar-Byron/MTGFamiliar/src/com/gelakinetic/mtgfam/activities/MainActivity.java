@@ -54,6 +54,7 @@ public class MainActivity extends FamiliarActivity {
 	private static final int	TTS_CHECK_CODE	= 23;
 	private PackageInfo				pInfo;
 	private TextView					search;
+	private TextView                    cardCounters;
 	private TextView					rules;
 	private TextView					rng;
 	private TextView					manapool;
@@ -70,6 +71,7 @@ public class MainActivity extends FamiliarActivity {
 
 		mCtx = this;
 		search = (TextView) findViewById(R.id.cardsearch);
+		cardCounters = (TextView) findViewById(R.id.cardcounters);
 		rules = (TextView) findViewById(R.id.rules);
 		rng = (TextView) findViewById(R.id.rng);
 		manapool = (TextView) findViewById(R.id.manapool);
@@ -84,6 +86,13 @@ public class MainActivity extends FamiliarActivity {
 				Intent i = new Intent(mCtx, NPlayerLifeActivity.class);
 				startActivity(i);
 			}
+		});
+
+		cardCounters.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent i = new Intent(mCtx, CardCountersActivity.class);
+                startActivity(i);
+            }
 		});
 
 		search.setOnClickListener(new View.OnClickListener() {

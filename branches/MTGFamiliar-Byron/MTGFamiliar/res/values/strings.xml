@@ -13,7 +13,7 @@
 <resources>
 
     <!-- General-purpose strings -->
-	<string name="app_name">MTG Familiar</string>
+	<string name="app_name">Byron\'s MTG Familiar</string>
     <string name="name_search_hint">Search Names</string>
     <string name="slash">/</string>
     <string name="dialog_ok">OK</string>
@@ -59,6 +59,7 @@
     <!-- Main menu activity -->
     <string name="main_card_search">Card Search</string>
     <string name="main_life_counter">Life Counter</string>
+    <string name="main_card_counters">Card Counters</string>
     <string name="main_mana_pool">Mana Pool</string>
     <string name="main_dice">Dice</string>
     <string name="main_trade">Trade Cards</string>

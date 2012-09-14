@@ -23,8 +23,8 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
-import com.gelakinetic.fragments.MoJhoStoFragment;
 import com.gelakinetic.mtgfam.R;
+import com.gelakinetic.mtgfam.fragments.MoJhoStoFragment;
 
 public class RandomCardActivity extends FamiliarActivity {
 

@@ -1,4 +1,4 @@
-package com.gelakinetic.fragments;
+package com.gelakinetic.mtgfam.fragments;
 
 import android.app.Dialog;
 import android.os.Bundle;

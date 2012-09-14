@@ -46,9 +46,9 @@ import com.gelakinetic.mtgfam.helpers.RoundTimerService;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.SlidingMenu.OnClosedListener;
 import com.slidingmenu.lib.SlidingMenu.OnOpenedListener;
-import com.slidingmenu.lib.app.SlidingActivity;
+import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
-public abstract class FamiliarActivity extends SlidingActivity {
+public abstract class FamiliarActivity extends SlidingFragmentActivity {
 
 	protected FamiliarActivity					me;
 	protected static SharedPreferences	preferences;

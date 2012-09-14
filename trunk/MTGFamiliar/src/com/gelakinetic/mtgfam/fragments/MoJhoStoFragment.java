@@ -1,4 +1,4 @@
-package com.gelakinetic.fragments;
+package com.gelakinetic.mtgfam.fragments;
 
 import java.util.Random;
 

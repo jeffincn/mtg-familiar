@@ -23,6 +23,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
+import android.support.v4.app.FragmentManager;
 import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -51,7 +52,7 @@ import com.slidingmenu.lib.app.SlidingFragmentActivity;
 public abstract class FamiliarActivity extends SlidingFragmentActivity {
 
 	protected FamiliarActivity					me;
-	protected static SharedPreferences	preferences;
+	public static SharedPreferences	preferences;
 	public CardDbAdapter								mDbHelper;
 	protected Context										mCtx;
 	private PackageInfo	pInfo;
@@ -63,11 +64,15 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 
 	private Class<?>	pendingClass = null;
 	private int	pendingDialog = -1;
-	
+	public FragmentManager	mFragmentManager;
+	private Bundle mFragResults;
+
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		mFragmentManager = getSupportFragmentManager();
+		
 		try {
 			pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
 		}
@@ -251,7 +256,7 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 			public void onClick(View v) {
 				// Set the last legality update time back to zero on a forced update
 				SharedPreferences.Editor editor = preferences.edit();
-				editor.putLong("lastLegalityUpdate", 0);
+				editor.putInt("lastLegalityUpdate", 0);
 				editor.commit();
 				startService(new Intent(me, DbUpdaterService.class));
 				showAbove();
@@ -576,16 +581,21 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == TTS_CHECK_CODE) {
-			if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
-				// We have TTS, so flag it as such
-				SharedPreferences.Editor edit = preferences.edit();
-				edit.putBoolean("hasTts", true);
-				edit.commit();
-			}
-			else {
-				showTtsWarningIfShould();
-			}
+		switch (requestCode) {
+			case TTS_CHECK_CODE:
+				if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+					// We have TTS, so flag it as such
+					SharedPreferences.Editor edit = preferences.edit();
+					edit.putBoolean("hasTts", true);
+					edit.commit();
+				}
+				else {
+					showTtsWarningIfShould();
+				}
+				break;
+			default:
+				super.onActivityResult(requestCode, resultCode, data);
+				break;
 		}
 	}
 
@@ -616,5 +626,18 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 		// that we don't have TTS
 		edit.putBoolean("has_tts", false);
 		edit.commit();
+	}
+	
+	public void setFragmentResult(Bundle result) {
+		mFragResults = result;
+	}
+	
+	public Bundle getFragmentResults() {
+		if(mFragResults != null){
+			Bundle res = mFragResults;
+			mFragResults = null;
+			return res;
+		}
+		return null;
 	}
 }

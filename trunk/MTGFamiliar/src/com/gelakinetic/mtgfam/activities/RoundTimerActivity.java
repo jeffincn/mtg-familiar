@@ -102,7 +102,7 @@ public class RoundTimerActivity extends FamiliarActivity {
 	};
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.round_timer_activity);
 

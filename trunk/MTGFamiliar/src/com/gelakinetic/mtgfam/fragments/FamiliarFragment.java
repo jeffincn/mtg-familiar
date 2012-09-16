@@ -2,8 +2,10 @@ package com.gelakinetic.mtgfam.fragments;
 
 import android.app.Instrumentation;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
@@ -11,19 +13,28 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.gelakinetic.mtgfam.R;
+import com.gelakinetic.mtgfam.activities.FamiliarActivity;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 
 public class FamiliarFragment extends SherlockFragment {
 
-	FragmentActivity	mActivity;
-	CardDbAdapter			mDbHelper;
+	CardDbAdapter mDbHelper;
+	protected FamiliarFragment anchor;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mActivity = getActivity();
-		mDbHelper = new CardDbAdapter(mActivity);
+
+		anchor = this;
+		mDbHelper = new CardDbAdapter(this.getFamiliarActivity());
 		mDbHelper.openReadable();
+		this.setHasOptionsMenu(true);
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		anchor = this;
+		return super.onCreateView(inflater, container, savedInstanceState);
 	}
 
 	@Override
@@ -52,5 +63,9 @@ public class FamiliarFragment extends SherlockFragment {
 						return true;
 					}
 				}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+	}
+
+	public FamiliarActivity getFamiliarActivity() {
+		return (FamiliarActivity) this.getActivity();
 	}
 }

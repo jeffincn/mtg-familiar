@@ -5,7 +5,6 @@ import java.util.Random;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
@@ -29,43 +28,42 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.activities.ResultListActivity;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 
 public class MoJhoStoFragment extends FamiliarFragment {
 
-	private Random							rand;
-	private String							name;
-	private Spinner							momirCmcChoice;
-	private String[]						cmcChoices;
-	private Button							momirButton;
-	private Button							stonehewerButton;
-	private Spinner							stonehewerCmcChoice;
-	private Button							jhoiraInstantButton;
-	private Button							jhoiraSorceryButton;
-	private ImageView						stonehewerImage;
-	private ImageView						momirImage;
-	private ImageView						jhoiraImage;
-	private OnClickListener			jhoiraSorceryListener;
-	private OnClickListener			jhoiraInstantListener;
-	private OnClickListener			stonehewerListener;
-	private OnClickListener			momirListener;
+	private Random rand;
+	private String name;
+	private Spinner momirCmcChoice;
+	private String[] cmcChoices;
+	private Button momirButton;
+	private Button stonehewerButton;
+	private Spinner stonehewerCmcChoice;
+	private Button jhoiraInstantButton;
+	private Button jhoiraSorceryButton;
+	private ImageView stonehewerImage;
+	private ImageView momirImage;
+	private ImageView jhoiraImage;
+	private OnClickListener jhoiraSorceryListener;
+	private OnClickListener jhoiraInstantListener;
+	private OnClickListener stonehewerListener;
+	private OnClickListener momirListener;
 
-	private static final int		RULESDIALOG				= 1;
-	protected static final int	MOMIR_IMAGE				= 2;
-	protected static final int	STONEHEWER_IMAGE	= 3;
-	protected static final int	JHOIRA_IMAGE			= 4;
-	protected static final int	CORRUPTION				= 5;
+	private static final int RULESDIALOG = 1;
+	protected static final int MOMIR_IMAGE = 2;
+	protected static final int STONEHEWER_IMAGE = 3;
+	protected static final int JHOIRA_IMAGE = 4;
+	protected static final int CORRUPTION = 5;
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see com.gelakinetic.fragments.FamiliarFragment#onCreate(android.os.Bundle)
 	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		this.setHasOptionsMenu(true);
 
 		momirListener = new View.OnClickListener() {
 
@@ -90,9 +88,17 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					name = doods.getString(doods.getColumnIndex(CardDbAdapter.KEY_NAME));
 					doods.close();
 
-					Intent i = new Intent(mActivity, ResultListActivity.class);
-					i.putExtra("id", mDbHelper.fetchIdByName(name));
-					startActivityForResult(i, 0);
+					// add a fragment
+					Bundle args = new Bundle();
+					args.putLong("id", mDbHelper.fetchIdByName(name));
+					ResultListFragment rlFrag = new ResultListFragment();
+					rlFrag.setArguments(args);
+
+					FragmentTransaction fragmentTransaction = anchor.getFamiliarActivity().mFragmentManager.beginTransaction();
+					fragmentTransaction.addToBackStack(null);
+
+					fragmentTransaction.replace(R.id.frag_view, rlFrag);
+					fragmentTransaction.commit();
 				}
 				catch (SQLiteDatabaseCorruptException e) {
 					showDialog(CORRUPTION);
@@ -123,9 +129,18 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					name = equipment.getString(equipment.getColumnIndex(CardDbAdapter.KEY_NAME));
 					equipment.close();
 
-					Intent i = new Intent(mActivity, ResultListActivity.class);
-					i.putExtra("id", mDbHelper.fetchIdByName(name));
-					startActivityForResult(i, 0);
+					// add a fragment
+					Bundle args = new Bundle();
+					args.putLong("id", mDbHelper.fetchIdByName(name));
+					ResultListFragment rlFrag = new ResultListFragment();
+					rlFrag.setArguments(args);
+
+					FragmentTransaction fragmentTransaction = anchor.getFamiliarActivity().mFragmentManager.beginTransaction();
+					fragmentTransaction.addToBackStack(null);
+
+					fragmentTransaction.replace(R.id.frag_view, rlFrag);
+					fragmentTransaction.commit();
+
 				}
 				catch (SQLiteDatabaseCorruptException e) {
 					showDialog(CORRUPTION);
@@ -155,16 +170,24 @@ public class MoJhoStoFragment extends FamiliarFragment {
 						pos[2] = rand.nextInt(instants.getCount());
 					}
 
-					String names[] = new String[3];
-					Intent intent = new Intent(mActivity, ResultListActivity.class);
+					Bundle args = new Bundle();
 					for (int i = 0; i < 3; i++) {
 						instants.moveToPosition(pos[i]);
-						names[i] = instants.getString(instants.getColumnIndex(CardDbAdapter.KEY_NAME));
-						intent.putExtra("id" + i, mDbHelper.fetchIdByName(names[i]));
+						args.putLong("id" + i,
+								mDbHelper.fetchIdByName(instants.getString(instants.getColumnIndex(CardDbAdapter.KEY_NAME))));
 					}
 					instants.close();
 
-					startActivityForResult(intent, 0);
+					// add a fragment
+					ResultListFragment rlFrag = new ResultListFragment();
+					rlFrag.setArguments(args);
+
+					FragmentTransaction fragmentTransaction = anchor.getFamiliarActivity().mFragmentManager.beginTransaction();
+					fragmentTransaction.addToBackStack(null);
+
+					fragmentTransaction.replace(R.id.frag_view, rlFrag);
+					fragmentTransaction.commit();
+
 				}
 				catch (SQLiteDatabaseCorruptException e) {
 					showDialog(CORRUPTION);
@@ -195,15 +218,23 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					}
 
 					String names[] = new String[3];
-					Intent intent = new Intent(mActivity, ResultListActivity.class);
+					Bundle args = new Bundle();
 					for (int i = 0; i < 3; i++) {
 						sorceries.moveToPosition(pos[i]);
 						names[i] = sorceries.getString(sorceries.getColumnIndex(CardDbAdapter.KEY_NAME));
-						intent.putExtra("id" + i, mDbHelper.fetchIdByName(names[i]));
+						args.putLong("id" + i, mDbHelper.fetchIdByName(names[i]));
 					}
 					sorceries.close();
 
-					startActivityForResult(intent, 0);
+					// add a fragment
+					ResultListFragment rlFrag = new ResultListFragment();
+					rlFrag.setArguments(args);
+
+					FragmentTransaction fragmentTransaction = anchor.getFamiliarActivity().mFragmentManager.beginTransaction();
+					fragmentTransaction.addToBackStack(null);
+
+					fragmentTransaction.replace(R.id.frag_view, rlFrag);
+					fragmentTransaction.commit();
 				}
 				catch (SQLiteDatabaseCorruptException e) {
 					showDialog(CORRUPTION);
@@ -226,10 +257,14 @@ public class MoJhoStoFragment extends FamiliarFragment {
 
 	/*
 	 * (non-Javadoc)
-	 * @see android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
+	 * 
+	 * @see
+	 * android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater,
+	 * android.view.ViewGroup, android.os.Bundle)
 	 */
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		super.onCreateView(inflater, container, savedInstanceState);
 		View myFragmentView = inflater.inflate(R.layout.mojhosto_frag, container, false);
 
 		momirImage = (ImageView) myFragmentView.findViewById(R.id.imageViewMo);
@@ -278,7 +313,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 
 		return myFragmentView;
 	}
-	
+
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
@@ -315,7 +350,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 			public Dialog onCreateDialog(Bundle savedInstanceState) {
 				switch (id) {
 					case RULESDIALOG: {
-						AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+						AlertDialog.Builder builder = new AlertDialog.Builder(this.getFamiliarActivity());
 						builder.setNeutralButton(R.string.dialog_play, new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								dialog.cancel();
@@ -326,7 +361,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 						return builder.create();
 					}
 					case MOMIR_IMAGE: {
-						Dialog d = new Dialog(mActivity);
+						Dialog d = new Dialog(this.getFamiliarActivity());
 						d.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 						d.setContentView(R.layout.image_dialog);
@@ -336,7 +371,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 						return d;
 					}
 					case STONEHEWER_IMAGE: {
-						Dialog d = new Dialog(mActivity);
+						Dialog d = new Dialog(this.getFamiliarActivity());
 						d.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 						d.setContentView(R.layout.image_dialog);
@@ -346,7 +381,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 						return d;
 					}
 					case JHOIRA_IMAGE: {
-						Dialog d = new Dialog(mActivity);
+						Dialog d = new Dialog(this.getFamiliarActivity());
 						d.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 						d.setContentView(R.layout.image_dialog);
@@ -356,15 +391,16 @@ public class MoJhoStoFragment extends FamiliarFragment {
 						return d;
 					}
 					case CORRUPTION: {
-						View dialogLayout = mActivity.getLayoutInflater().inflate(R.layout.simple_message_layout, null);
+						View dialogLayout = this.getFamiliarActivity().getLayoutInflater()
+								.inflate(R.layout.simple_message_layout, null);
 						TextView text = (TextView) dialogLayout.findViewById(R.id.message);
 						text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.error_corruption)));
 						text.setMovementMethod(LinkMovementMethod.getInstance());
 
-						return new AlertDialog.Builder(mActivity).setTitle(R.string.error).setView(dialogLayout)
+						return new AlertDialog.Builder(this.getFamiliarActivity()).setTitle(R.string.error).setView(dialogLayout)
 								.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int which) {
-										mActivity.finish();
+										anchor.getFamiliarActivity().finish();
 									}
 								}).setCancelable(false).create();
 					}

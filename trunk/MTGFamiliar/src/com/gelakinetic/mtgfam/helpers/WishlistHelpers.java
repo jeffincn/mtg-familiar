@@ -11,15 +11,11 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnDismissListener;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -210,6 +206,25 @@ public class WishlistHelpers {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				dismissReason = DONE;
+				ArrayList<CardData> newCards = new ArrayList<CardData>();
+
+				for (int i = 0; i < lvSets.getChildCount(); i++) {
+					View v = lvSets.getChildAt(i);
+					int numberField;
+					try {
+						numberField = Integer.valueOf(((EditText) v.findViewById(R.id.numberInput)).getText().toString());
+					}
+					catch (NumberFormatException e) {
+						numberField = 0;
+					}
+					if (numberField != 0) {
+						// returns the CardData at that position
+						CardData cd = (CardData) lCardlist.get(i);
+						cd.numberOf = numberField;
+						newCards.add(cd);
+					}
+				}
+				WishlistHelpers.ResetCards(mCtx, cardName, newCards);
 				dialog.dismiss();
 			}
 		});
@@ -218,49 +233,31 @@ public class WishlistHelpers {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				dismissReason = CANCEL;
+			// this will refill the dialog with the values in the wishlist
+				// otherwise the changed values will persist in the dialog even if
+				// they arent saved
+				fillWishlistDialog();
+				bindWishlistRows();
 				dialog.dismiss();
 			}
 		});
 
 		AlertDialog dialog = b.create();
 
-		dialog.setOnDismissListener(new OnDismissListener() {
-			@Override
-			public void onDismiss(DialogInterface di) {
-				switch (dismissReason) {
-					case CANCEL:
-						// this will refill the dialog with the values in the wishlist
-						// otherwise the changed values will persist in the dialog even if
-						// they arent saved
-						fillWishlistDialog();
-						bindWishlistRows();
-						break;
-					case DONE:
-					default:
-						ArrayList<CardData> newCards = new ArrayList<CardData>();
-
-						for (int i = 0; i < lvSets.getChildCount(); i++) {
-							View v = lvSets.getChildAt(i);
-							int numberField;
-							try {
-								numberField = Integer.valueOf(((EditText) v.findViewById(R.id.numberInput)).getText().toString());
-							}
-							catch (NumberFormatException e) {
-								numberField = 0;
-							}
-							if (numberField != 0) {
-								CardData cd = (CardData) lCardlist.get(i); // returns the
-																														// CardData at that
-																														// position
-								cd.numberOf = numberField;
-								newCards.add(cd);
-							}
-						}
-						WishlistHelpers.ResetCards(mCtx, cardName, newCards);
-						break;
-				}
-			}
-		});
+//		dialog.setOnDismissListener(new OnDismissListener() {
+//			@Override
+//			public void onDismiss(DialogInterface di) {
+//				switch (dismissReason) {
+//					case CANCEL:
+//						
+//						break;
+//					case DONE:
+//					default:
+//						
+//						break;
+//				}
+//			}
+//		});
 
 		if (list == null) {
 			lCardlist = new ArrayList<CardData>();

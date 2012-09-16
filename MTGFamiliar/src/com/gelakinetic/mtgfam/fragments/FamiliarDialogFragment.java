@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
+import com.gelakinetic.mtgfam.activities.FamiliarActivity;
 
 public class FamiliarDialogFragment extends SherlockDialogFragment {
 
@@ -19,11 +20,15 @@ public class FamiliarDialogFragment extends SherlockDialogFragment {
 			getDialog().setOnDismissListener(null);
 		super.onDestroyView();
 	}
-	
+
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		//int id = savedInstanceState.getInt("id");
+		// int id = savedInstanceState.getInt("id");
+		// fixes some bug. try rotating a dialog w/o this
 		return null;
 	}
 
+	protected FamiliarActivity getFamiliarActivity() {
+		return (FamiliarActivity) this.getActivity();
+	}
 }

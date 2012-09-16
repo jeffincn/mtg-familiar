@@ -20,7 +20,6 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 package com.gelakinetic.mtgfam.activities;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
 import com.gelakinetic.mtgfam.R;
@@ -33,13 +32,14 @@ public class RandomCardActivity extends FamiliarActivity {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.fragment_activity);
       
-   // get an instance of FragmentTransaction from your Activity 
-      FragmentManager fragmentManager = getSupportFragmentManager();
-      FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+  		if(savedInstanceState == null) 
+  		{
+  		    mFragmentManager = getSupportFragmentManager();
+  		    FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
 
-      //add a fragment 
-      MoJhoStoFragment mjsFrag = new MoJhoStoFragment();
-      fragmentTransaction.add(R.id.frag_view, mjsFrag);
-      fragmentTransaction.commit();
+  	      MoJhoStoFragment mjsFrag = new MoJhoStoFragment();
+  	      fragmentTransaction.add(R.id.frag_view, mjsFrag);
+  		    fragmentTransaction.commit();
+  		}
   }
 }

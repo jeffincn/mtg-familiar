@@ -44,12 +44,4 @@ public class MyApp extends Application {
 	public void setUpdating(boolean updating) {
 		this.updating = updating;
 	}
-	
-	public FamiliarActivity getUpdatingActivity() {
-		return this.updatingActivity;
-	}
-	
-	public void setUpdatingActivity(FamiliarActivity updatingActivity) {
-		this.updatingActivity = updatingActivity;
-	}
 }

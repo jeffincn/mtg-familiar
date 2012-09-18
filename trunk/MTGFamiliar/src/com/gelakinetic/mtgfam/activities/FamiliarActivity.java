@@ -39,6 +39,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.gelakinetic.mtgfam.R;
+import com.gelakinetic.mtgfam.fragments.CardViewFragment;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.DbUpdaterService;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
@@ -110,14 +111,10 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 				synchronized (this) {
 					if (!appState.isUpdating()) {
 						appState.setUpdating(true);
-						appState.setUpdatingActivity(this);
 						update = true;
 					}
 					else {
 						update = false;
-						if (appState.getUpdatingActivity() != this) {
-							// finish();
-						}
 					}
 				}
 
@@ -183,13 +180,7 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 			@Override
 			public void onOpened() {
 				// Close the keyboard if the slidingMenu is opened
-				try{
-					InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-	        imm.hideSoftInputFromWindow(getCurrentFocus().getApplicationWindowToken(), 0);
-				}
-				catch(NullPointerException e){
-					// eat it
-				}
+				hideKeyboard();
 			}});
 		
 		/*
@@ -293,6 +284,17 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 		}
 	}
 
+	public void hideKeyboard() {
+		try{
+			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+      imm.hideSoftInputFromWindow(getCurrentFocus().getApplicationWindowToken(), 0);
+		}
+		catch(NullPointerException e){
+			// eat it
+		}
+
+	}
+
 	protected void slidingActivityLauncher(final Class<?> class1) {
 		pendingClass = class1;
 		showAbove();
@@ -324,17 +326,17 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 	protected void onResume() {
 		super.onResume();
 		showAbove(); // always close the sliding menu when returning to this activity
-		MyApp appState = ((MyApp) getApplicationContext());
-		String classname = this.getClass().getCanonicalName();
-		if (classname.equalsIgnoreCase("com.gelakinetic.mtgfam.activities.CardViewActivity")) {
-			if (appState.getState() == CardViewActivity.QUITTOSEARCH) {
-				this.finish();
-				return;
-			}
-		}
-		else {
-			appState.setState(0);
-		}
+//		MyApp appState = ((MyApp) getApplicationContext());
+//		String classname = this.getClass().getCanonicalName();
+//		if (classname.equalsIgnoreCase("com.gelakinetic.mtgfam.activities.CardViewActivity")) {
+//			if (appState.getState() == CardViewFragment.QUITTOSEARCH) {
+//				this.finish();
+//				return;
+//			}
+//		}
+//		else {
+//			appState.setState(0);
+//		}
 
 		Intent i = new Intent(this, RoundTimerService.class);
 		startService(i);

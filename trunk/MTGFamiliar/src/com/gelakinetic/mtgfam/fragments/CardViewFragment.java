@@ -61,6 +61,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
@@ -83,7 +84,6 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.activities.FamiliarActivity;
-import com.gelakinetic.mtgfam.activities.SearchActivity;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 import com.gelakinetic.mtgfam.helpers.MyApp;
@@ -93,66 +93,66 @@ import com.gelakinetic.mtgfam.helpers.WishlistHelpers;
 public class CardViewFragment extends FamiliarFragment {
 
 	// Dont use 0, thats the default when the back key is pressed
-	public static final int RANDOMLEFT = 2;
-	public static final int RANDOMRIGHT = 3;
-	public static final int QUITTOSEARCH = 4;
-	public static final int SWIPELEFT = 5;
-	public static final int SWIPERIGHT = 6;
+	public static final int						RANDOMLEFT			= 2;
+	public static final int						RANDOMRIGHT			= 3;
+	public static final int						QUITTOSEARCH		= 4;
+	public static final int						SWIPELEFT				= 5;
+	public static final int						SWIPERIGHT			= 6;
 
 	// Dialogs
-	private static final int GETPRICE = 1;
-	private static final int GETIMAGE = 2;
-	private static final int CHANGESET = 3;
-	private static final int CARDRULINGS = 4;
-	private static final int WISHLIST_COUNTS = 6;
-	private static final int GETLEGALITY = 7;
+	private static final int					GETPRICE				= 1;
+	private static final int					GETIMAGE				= 2;
+	private static final int					CHANGESET				= 3;
+	private static final int					CARDRULINGS			= 4;
+	private static final int					WISHLIST_COUNTS	= 6;
+	private static final int					GETLEGALITY			= 7;
 
 	// Where the card image is loaded to
-	private static final int MAINPAGE = 0;
-	private static final int DIALOG = 1;
+	private static final int					MAINPAGE				= 0;
+	private static final int					DIALOG					= 1;
 
 	// Random useful things
-	private ImageGetter imgGetter;
-	private TextView copyView;
+	private ImageGetter								imgGetter;
+	private TextView									copyView;
 
 	// UI elements
-	private TextView name;
-	private TextView cost;
-	private TextView type;
-	private TextView set;
-	private TextView ability;
-	private TextView pt;
-	private TextView flavor;
-	private TextView artist;
-	private Button transform;
-	private Button leftRandom;
-	private Button rightRandom;
-	private ImageView cardpic;
-	private ImageView DialogImageView;
+	private TextView									name;
+	private TextView									cost;
+	private TextView									type;
+	private TextView									set;
+	private TextView									ability;
+	private TextView									pt;
+	private TextView									flavor;
+	private TextView									artist;
+	private Button										transform;
+	private Button										leftRandom;
+	private Button										rightRandom;
+	private ImageView									cardpic;
+	private ImageView									DialogImageView;
 
 	// Stuff for AsyncTasks
-	private BitmapDrawable cardPicture;
-	private String[] legalities;
-	private String[] formats;
-	private TCGPlayerXMLHandler XMLhandler;
-	public ArrayList<Ruling> rulingsArrayList;
-	private ProgressDialog progDialog;
-	AsyncTask<String, Integer, Long> asyncTask;
+	private BitmapDrawable						cardPicture;
+	private String[]									legalities;
+	private String[]									formats;
+	private TCGPlayerXMLHandler				XMLhandler;
+	public ArrayList<Ruling>					rulingsArrayList;
+	private ProgressDialog						progDialog;
+	AsyncTask<String, Integer, Long>	asyncTask;
 
 	// Card info
-	private long cardID;
-	private String number;
-	private String setCode;
-	private String cardName;
-	private String mtgi_code;
-	private int multiverseId;
+	private long											cardID;
+	private String										number;
+	private String										setCode;
+	private String										cardName;
+	private String										mtgi_code;
+	private int												multiverseId;
 
 	// Preferences
-	private int loadTo;
-	private boolean isRandom;
-	private boolean isSingle;
-	private boolean scroll_results;
-	private View myFragmentView;
+	private int												loadTo;
+	private boolean										isRandom;
+	private boolean										isSingle;
+	private boolean										scroll_results;
+	private View											myFragmentView;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -184,7 +184,7 @@ public class CardViewFragment extends FamiliarFragment {
 
 		Bundle extras = this.getArguments();
 		cardID = extras.getLong("id");
-		isRandom = extras.getBoolean(SearchActivity.RANDOM);
+		isRandom = extras.getBoolean(SearchViewFragment.RANDOM);
 		isSingle = extras.getBoolean("isSingle", false);
 		if (FamiliarActivity.preferences.getBoolean("picFirst", false)) {
 			loadTo = MAINPAGE;
@@ -209,41 +209,6 @@ public class CardViewFragment extends FamiliarFragment {
 		setInfoFromID(cardID);
 
 		return myFragmentView;
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		// try {
-		// this.getFamiliarActivity().dismissDialog(GETLEGALITY);
-		// }
-		// catch (IllegalArgumentException e) {
-		// }
-		// try {
-		// this.getFamiliarActivity().dismissDialog(GETPRICE);
-		// }
-		// catch (IllegalArgumentException e) {
-		// }
-		// try {
-		// this.getFamiliarActivity().dismissDialog(GETIMAGE);
-		// }
-		// catch (IllegalArgumentException e) {
-		// }
-		// try {
-		// this.getFamiliarActivity().dismissDialog(CHANGESET);
-		// }
-		// catch (IllegalArgumentException e) {
-		// }
-		// try {
-		// this.getFamiliarActivity().dismissDialog(CARDRULINGS);
-		// }
-		// catch (IllegalArgumentException e) {
-		// }
-		// try {
-		// this.getFamiliarActivity().dismissDialog(WISHLIST_COUNTS);
-		// }
-		// catch (IllegalArgumentException e) {
-		// }
 	}
 
 	@Override
@@ -537,7 +502,7 @@ public class CardViewFragment extends FamiliarFragment {
 
 	private class FetchPictureTask extends AsyncTask<String, Integer, Long> {
 
-		private String error;
+		private String	error;
 
 		@Override
 		protected Long doInBackground(String... params) {
@@ -700,7 +665,7 @@ public class CardViewFragment extends FamiliarFragment {
 
 	private class FetchPriceTask extends AsyncTask<String, Integer, Long> {
 
-		private String error;
+		private String	error;
 
 		@Override
 		protected Long doInBackground(String... params) {
@@ -793,7 +758,7 @@ public class CardViewFragment extends FamiliarFragment {
 
 	private class FetchRulingsTask extends AsyncTask<String, Integer, Long> {
 
-		private boolean error = false;
+		private boolean	error	= false;
 
 		@Override
 		protected Long doInBackground(String... params) {
@@ -866,7 +831,7 @@ public class CardViewFragment extends FamiliarFragment {
 	}
 
 	private static class Ruling {
-		public String date, ruling;
+		public String	date, ruling;
 
 		public Ruling(String d, String r) {
 			date = d;
@@ -1061,7 +1026,7 @@ public class CardViewFragment extends FamiliarFragment {
 		inflater.inflate(R.menu.copy_menu, menu);
 	}
 
-	private static final boolean useOldClipboard = (android.os.Build.VERSION.SDK_INT < 11);
+	private static final boolean	useOldClipboard	= (android.os.Build.VERSION.SDK_INT < 11);
 
 	@SuppressLint("NewApi")
 	@Override
@@ -1134,7 +1099,13 @@ public class CardViewFragment extends FamiliarFragment {
 			case R.id.quittosearch:
 				MyApp appState = ((MyApp) this.getFamiliarActivity().getApplicationContext());
 				appState.setState(QUITTOSEARCH);
-				this.getFamiliarActivity().mFragmentManager.popBackStack();
+				Log.v("backstack", anchor.getFamiliarActivity().mFragmentManager.getBackStackEntryCount()+"");
+				if(anchor.getFamiliarActivity().mFragmentManager.getBackStackEntryCount() == 0) {
+					anchor.getFamiliarActivity().finish();
+				}
+				else {
+					anchor.getFamiliarActivity().mFragmentManager.popBackStack();
+				}
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

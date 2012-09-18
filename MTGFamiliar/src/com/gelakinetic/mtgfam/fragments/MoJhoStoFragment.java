@@ -33,28 +33,28 @@ import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 
 public class MoJhoStoFragment extends FamiliarFragment {
 
-	private Random rand;
-	private String name;
-	private Spinner momirCmcChoice;
-	private String[] cmcChoices;
-	private Button momirButton;
-	private Button stonehewerButton;
-	private Spinner stonehewerCmcChoice;
-	private Button jhoiraInstantButton;
-	private Button jhoiraSorceryButton;
-	private ImageView stonehewerImage;
-	private ImageView momirImage;
-	private ImageView jhoiraImage;
-	private OnClickListener jhoiraSorceryListener;
-	private OnClickListener jhoiraInstantListener;
-	private OnClickListener stonehewerListener;
-	private OnClickListener momirListener;
+	private Random							rand;
+	private String							name;
+	private Spinner							momirCmcChoice;
+	private String[]						cmcChoices;
+	private Button							momirButton;
+	private Button							stonehewerButton;
+	private Spinner							stonehewerCmcChoice;
+	private Button							jhoiraInstantButton;
+	private Button							jhoiraSorceryButton;
+	private ImageView						stonehewerImage;
+	private ImageView						momirImage;
+	private ImageView						jhoiraImage;
+	private OnClickListener			jhoiraSorceryListener;
+	private OnClickListener			jhoiraInstantListener;
+	private OnClickListener			stonehewerListener;
+	private OnClickListener			momirListener;
 
-	private static final int RULESDIALOG = 1;
-	protected static final int MOMIR_IMAGE = 2;
-	protected static final int STONEHEWER_IMAGE = 3;
-	protected static final int JHOIRA_IMAGE = 4;
-	protected static final int CORRUPTION = 5;
+	private static final int		RULESDIALOG				= 1;
+	protected static final int	MOMIR_IMAGE				= 2;
+	protected static final int	STONEHEWER_IMAGE	= 3;
+	protected static final int	JHOIRA_IMAGE			= 4;
+	protected static final int	CORRUPTION				= 5;
 
 	/*
 	 * (non-Javadoc)
@@ -99,6 +99,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 
 					fragmentTransaction.replace(R.id.frag_view, rlFrag);
 					fragmentTransaction.commit();
+					anchor.getFamiliarActivity().hideKeyboard();
 				}
 				catch (SQLiteDatabaseCorruptException e) {
 					showDialog(CORRUPTION);
@@ -140,7 +141,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 
 					fragmentTransaction.replace(R.id.frag_view, rlFrag);
 					fragmentTransaction.commit();
-
+					anchor.getFamiliarActivity().hideKeyboard();
 				}
 				catch (SQLiteDatabaseCorruptException e) {
 					showDialog(CORRUPTION);
@@ -187,7 +188,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 
 					fragmentTransaction.replace(R.id.frag_view, rlFrag);
 					fragmentTransaction.commit();
-
+					anchor.getFamiliarActivity().hideKeyboard();
 				}
 				catch (SQLiteDatabaseCorruptException e) {
 					showDialog(CORRUPTION);
@@ -235,6 +236,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 
 					fragmentTransaction.replace(R.id.frag_view, rlFrag);
 					fragmentTransaction.commit();
+					anchor.getFamiliarActivity().hideKeyboard();
 				}
 				catch (SQLiteDatabaseCorruptException e) {
 					showDialog(CORRUPTION);

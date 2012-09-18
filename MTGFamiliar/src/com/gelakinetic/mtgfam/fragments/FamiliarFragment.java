@@ -15,11 +15,12 @@ import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.activities.FamiliarActivity;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
+import com.gelakinetic.mtgfam.helpers.MyApp;
 
 public class FamiliarFragment extends SherlockFragment {
 
-	CardDbAdapter mDbHelper;
-	protected FamiliarFragment anchor;
+	CardDbAdapter								mDbHelper;
+	protected FamiliarFragment	anchor;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -37,6 +38,27 @@ public class FamiliarFragment extends SherlockFragment {
 		return super.onCreateView(inflater, container, savedInstanceState);
 	}
 
+	@Override
+	public void onResume(){
+		super.onResume();
+		MyApp appState = ((MyApp) getActivity().getApplicationContext());
+		String classname = this.getClass().getCanonicalName();
+		if (classname.equalsIgnoreCase("com.gelakinetic.mtgfam.fragments.CardViewFragment")) {
+			if (appState.getState() == CardViewFragment.QUITTOSEARCH) {
+				if(this.getFamiliarActivity().mFragmentManager.getBackStackEntryCount() == 0) {
+					getActivity().finish();
+				}
+				else {
+					getFamiliarActivity().mFragmentManager.popBackStack();
+				}
+				return;
+			}
+		}
+		else {
+			appState.setState(0);
+		}
+	}
+	
 	@Override
 	public void onDestroy() {
 		super.onDestroy();

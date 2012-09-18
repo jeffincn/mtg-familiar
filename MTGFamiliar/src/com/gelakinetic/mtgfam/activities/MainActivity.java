@@ -19,15 +19,73 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam.activities;
 
-import android.app.Activity;
+import android.app.SearchManager;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 
-public class MainActivity extends Activity {
+import com.gelakinetic.mtgfam.R;
+import com.gelakinetic.mtgfam.fragments.CardViewFragment;
+import com.gelakinetic.mtgfam.fragments.ResultListFragment;
+import com.gelakinetic.mtgfam.fragments.SearchViewFragment;
+import com.gelakinetic.mtgfam.fragments.SearchViewFragment.SearchCriteria;
+import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
+
+public class MainActivity extends FamiliarActivity {
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);		
-		startActivity(new Intent(this, SearchActivity.class));
-		this.finish();
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.fragment_activity);
+
+		Intent intent = getIntent();
+
+		if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+			// handles a click on a search suggestion; launches activity to show word
+			Uri u = intent.getData();
+			long id = Long.parseLong(u.getLastPathSegment());
+
+			// add a fragment
+			Bundle args = new Bundle();
+			args.putBoolean("isSingle", true);
+			args.putLong("id", id);
+			CardViewFragment rlFrag = new CardViewFragment();
+			rlFrag.setArguments(args);
+
+			FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+			fragmentTransaction.add(R.id.frag_view, rlFrag);
+			fragmentTransaction.commit();
+			hideKeyboard();
+		}
+		else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+			boolean consolidate = preferences.getBoolean("consolidateSearch", true);
+			String query = intent.getStringExtra(SearchManager.QUERY);
+			SearchCriteria sc = new SearchCriteria();
+			sc.Name = query;
+			sc.Set_Logic = (consolidate ? CardDbAdapter.FIRSTPRINTING : CardDbAdapter.ALLPRINTINGS);
+
+			// add a fragment
+			Bundle args = new Bundle();
+			args.putBoolean(SearchViewFragment.RANDOM, false);
+			args.putSerializable(SearchViewFragment.CRITERIA, sc);
+			ResultListFragment rlFrag = new ResultListFragment();
+			rlFrag.setArguments(args);
+
+			FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+			fragmentTransaction.add(R.id.frag_view, rlFrag);
+			fragmentTransaction.commit();
+			hideKeyboard();
+		}
+		else {
+			if (savedInstanceState == null) {
+				mFragmentManager = getSupportFragmentManager();
+				FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+
+				SearchViewFragment svFrag = new SearchViewFragment();
+				fragmentTransaction.add(R.id.frag_view, svFrag);
+				fragmentTransaction.commit();
+			}
+		}
 	}
 }

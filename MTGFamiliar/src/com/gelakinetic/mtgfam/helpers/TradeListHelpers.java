@@ -22,8 +22,8 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 
 import com.gelakinetic.mtgfam.activities.CardTradingActivity;
-import com.gelakinetic.mtgfam.activities.CardViewActivity;
 import com.gelakinetic.mtgfam.activities.WishlistActivity;
+import com.gelakinetic.mtgfam.fragments.CardViewFragment;
 
 public class TradeListHelpers {
 
@@ -147,7 +147,7 @@ public class TradeListHelpers {
 					}
 				}
 
-				if (cardNumber.contains("b") && CardViewActivity.isTransformable(cardNumber, data.setCode)) {
+				if (cardNumber.contains("b") && CardViewFragment.isTransformable(cardNumber, data.setCode)) {
 					CardDbAdapter mDbHelper = new CardDbAdapter(mCtx);
 					mDbHelper.openReadable();
 					priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p="

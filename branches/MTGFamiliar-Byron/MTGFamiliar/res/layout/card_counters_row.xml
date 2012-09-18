@@ -1,21 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TableRow xmlns:android="http://schemas.android.com/apk/res/android">
-    <TextView
+	<TextView
     	android:id="@+id/cardname"
     	android:layout_width="match_parent"
     	android:layout_height="wrap_content" />
     <TextView
-    	android:id="@+id/cardpower"
+        android:id="@+id/cardpowertougness"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-    	android:layout_weight="1.0"
-    	android:layout_gravity="right"
-    	android:gravity="right" />
-    <TextView
-    	android:id="@+id/cardtoughness"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-    	android:layout_weight="1.0"
-    	android:layout_gravity="right"
-    	android:gravity="right" />
+        android:layout_weight="1.0"
+        android:layout_gravity="right"
+        android:gravity="right" />
 </TableRow>

@@ -120,6 +120,66 @@ public class SearchViewFragment extends FamiliarFragment {
 	private int										selectedFormat;
 
 	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		Cursor setCursor = mDbHelper.fetchAllSets();
+		try {
+			setCursor.moveToFirst();
+		}
+		catch (SQLiteDatabaseCorruptException e) {
+			showDialog(CORRUPTION);
+			return;
+		}
+
+		setNames = new String[setCursor.getCount()];
+		setSymbols = new String[setCursor.getCount()];
+		setChecked = new boolean[setCursor.getCount()];
+
+		for (int i = 0; i < setCursor.getCount(); i++) {
+			setSymbols[i] = setCursor.getString(setCursor.getColumnIndex(CardDbAdapter.KEY_CODE));
+			setNames[i] = setCursor.getString(setCursor.getColumnIndex(CardDbAdapter.KEY_NAME));
+			setChecked[i] = false;
+			setCursor.moveToNext();
+		}
+
+		setCursor.close();
+
+		Cursor c = mDbHelper.fetchAllFormats();
+		if (c != null) {
+			formatNames = new String[c.getCount()];
+			c.moveToFirst();
+			for (int i = 0; i < c.getCount(); i++) {
+				formatNames[i] = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
+				c.moveToNext();
+			}
+			c.close();
+		}
+		else {
+			formatNames = new String[0];
+		}
+		Resources res = getResources();
+		rarityNames = res.getStringArray(R.array.rarities);
+		rarityChecked = new boolean[rarityNames.length];
+
+		selectedFormat = -1;
+
+		setDialog = new AlertDialog.Builder(this.getActivity()).setTitle("Sets")
+				.setMultiChoiceItems(setNames, setChecked, new DialogSelectionClickHandler())
+				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
+		formatDialog = new AlertDialog.Builder(this.getActivity()).setTitle("Formats")
+				.setSingleChoiceItems(formatNames, selectedFormat, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						selectedFormat = which;
+					}
+				}).setPositiveButton("OK", new DialogButtonClickHandler()).create();
+		rarityDialog = new AlertDialog.Builder(this.getActivity()).setTitle("Rarities")
+				.setMultiChoiceItems(rarityNames, rarityChecked, new DialogSelectionClickHandler())
+				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
+
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 		View myFragmentView = inflater.inflate(R.layout.search_frag, container, false);
@@ -226,64 +286,59 @@ public class SearchViewFragment extends FamiliarFragment {
 		cmcLogic = (Spinner) myFragmentView.findViewById(R.id.cmcLogic);
 		cmcChoice = (Spinner) myFragmentView.findViewById(R.id.cmcChoice);
 
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.logic_spinner,
+		ArrayAdapter<CharSequence> powerLogicAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.logic_spinner,
 				android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		powLogic.setAdapter(adapter);
+		powerLogicAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		powLogic.setAdapter(powerLogicAdapter);
 
-		ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(this.getActivity(), R.array.pt_spinner,
+		ArrayAdapter<CharSequence> powChoiceAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.pt_spinner,
 				android.R.layout.simple_spinner_item);
-		adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		powChoice.setAdapter(adapter1);
+		powChoiceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		powChoice.setAdapter(powChoiceAdapter);
 
-		ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this.getActivity(), R.array.logic_spinner,
+		ArrayAdapter<CharSequence> touLogicAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.logic_spinner,
 				android.R.layout.simple_spinner_item);
-		adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		touLogic.setAdapter(adapter2);
+		touLogicAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		touLogic.setAdapter(touLogicAdapter);
 
-		ArrayAdapter<CharSequence> adapter3 = ArrayAdapter.createFromResource(this.getActivity(), R.array.pt_spinner,
+		ArrayAdapter<CharSequence> touChoiceAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.pt_spinner,
 				android.R.layout.simple_spinner_item);
-		adapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		touChoice.setAdapter(adapter3);
+		touChoiceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		touChoice.setAdapter(touChoiceAdapter);
 
-		ArrayAdapter<CharSequence> adapter4 = ArrayAdapter.createFromResource(this.getActivity(), R.array.logic_spinner,
+		ArrayAdapter<CharSequence> CMCLogicAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.logic_spinner,
 				android.R.layout.simple_spinner_item);
-		adapter4.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		cmcLogic.setAdapter(adapter4);
+		CMCLogicAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		cmcLogic.setAdapter(CMCLogicAdapter);
 		cmcLogic.setSelection(1); // CMC should default to <
 
-		ArrayAdapter<CharSequence> adapter5 = ArrayAdapter.createFromResource(this.getActivity(), R.array.cmc_spinner,
+		ArrayAdapter<CharSequence> CMCChoiceAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.cmc_spinner,
 				android.R.layout.simple_spinner_item);
-		adapter5.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		cmcChoice.setAdapter(adapter5);
+		CMCChoiceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		cmcChoice.setAdapter(CMCChoiceAdapter);
 
-		ArrayAdapter<CharSequence> adapter6 = ArrayAdapter.createFromResource(this.getActivity(), R.array.color_spinner,
+		ArrayAdapter<CharSequence> colorSpinnerAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.color_spinner,
 				android.R.layout.simple_spinner_item);
-		adapter6.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		colorspinner.setAdapter(adapter6);
+		colorSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		colorspinner.setAdapter(colorSpinnerAdapter);
 		colorspinner.setSelection(2);
 
 		// Lines Below added by Reuben Kriegel
-		ArrayAdapter<CharSequence> adapter7 = ArrayAdapter.createFromResource(this.getActivity(), R.array.text_spinner,
+		ArrayAdapter<CharSequence> rulesTextAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.text_spinner,
 				android.R.layout.simple_spinner_item);
-		adapter7.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		textspinner.setAdapter(adapter7);
+		rulesTextAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		textspinner.setAdapter(rulesTextAdapter);
 
-		ArrayAdapter<CharSequence> adapter8 = ArrayAdapter.createFromResource(this.getActivity(), R.array.type_spinner,
+		ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.type_spinner,
 				android.R.layout.simple_spinner_item);
-		adapter8.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		typespinner.setAdapter(adapter8);
+		typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		typespinner.setAdapter(typeAdapter);
 		// End addition
 
-		ArrayAdapter<CharSequence> adapter9 = ArrayAdapter.createFromResource(this.getActivity(), R.array.text_spinner,
+		ArrayAdapter<CharSequence> printingsAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.set_spinner,
 				android.R.layout.simple_spinner_item);
-		adapter9.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		textspinner.setAdapter(adapter9);
-
-		ArrayAdapter<CharSequence> adapter10 = ArrayAdapter.createFromResource(this.getActivity(), R.array.set_spinner,
-				android.R.layout.simple_spinner_item);
-		adapter10.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		setspinner.setAdapter(adapter10);
+		printingsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		setspinner.setAdapter(printingsAdapter);
 
 		boolean consolidate = true;
 		consolidate = FamiliarActivity.preferences.getBoolean("consolidateSearch", true);
@@ -313,60 +368,8 @@ public class SearchViewFragment extends FamiliarFragment {
 			}
 		});
 
-		Cursor setCursor = mDbHelper.fetchAllSets();
-		try {
-			setCursor.moveToFirst();
-		}
-		catch (SQLiteDatabaseCorruptException e) {
-			showDialog(CORRUPTION);
-			return null;
-		}
-
-		setNames = new String[setCursor.getCount()];
-		setSymbols = new String[setCursor.getCount()];
-		setChecked = new boolean[setCursor.getCount()];
-
-		for (int i = 0; i < setCursor.getCount(); i++) {
-			setSymbols[i] = setCursor.getString(setCursor.getColumnIndex(CardDbAdapter.KEY_CODE));
-			setNames[i] = setCursor.getString(setCursor.getColumnIndex(CardDbAdapter.KEY_NAME));
-			setChecked[i] = false;
-			setCursor.moveToNext();
-		}
-
-		setCursor.close();
-
-		Cursor c = mDbHelper.fetchAllFormats();
-		if (c != null) {
-			formatNames = new String[c.getCount()];
-			c.moveToFirst();
-			for (int i = 0; i < c.getCount(); i++) {
-				formatNames[i] = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
-				c.moveToNext();
-			}
-			c.close();
-		}
-		else {
-			formatNames = new String[0];
-		}
-		Resources res = getResources();
-		rarityNames = res.getStringArray(R.array.rarities);
-		rarityChecked = new boolean[rarityNames.length];
-
-		selectedFormat = -1;
-
-		setDialog = new AlertDialog.Builder(this.getActivity()).setTitle("Sets")
-				.setMultiChoiceItems(setNames, setChecked, new DialogSelectionClickHandler())
-				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
-		formatDialog = new AlertDialog.Builder(this.getActivity()).setTitle("Formats")
-				.setSingleChoiceItems(formatNames, selectedFormat, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						selectedFormat = which;
-					}
-				}).setPositiveButton("OK", new DialogButtonClickHandler()).create();
-		rarityDialog = new AlertDialog.Builder(this.getActivity()).setTitle("Rarities")
-				.setMultiChoiceItems(rarityNames, rarityChecked, new DialogSelectionClickHandler())
-				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
-
+		checkDialogButtonColors();
+		
 		return myFragmentView;
 	}
 
@@ -813,13 +816,13 @@ public class SearchViewFragment extends FamiliarFragment {
 
 		// Create and show the dialog.
 		FamiliarDialogFragment newFragment = new FamiliarDialogFragment() {
-			
+
 			@Override
 			public void onDismiss(DialogInterface dialog) {
 				super.onDismiss(dialog);
 				checkDialogButtonColors();
 			}
-			
+
 			@Override
 			public Dialog onCreateDialog(Bundle savedInstanceState) {
 				switch (id) {
@@ -877,7 +880,7 @@ public class SearchViewFragment extends FamiliarFragment {
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean onInterceptSearchKey() {
 		doSearch(false);

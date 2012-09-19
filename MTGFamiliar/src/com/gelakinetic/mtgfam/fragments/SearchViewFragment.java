@@ -367,37 +367,6 @@ public class SearchViewFragment extends FamiliarFragment {
 				.setMultiChoiceItems(rarityNames, rarityChecked, new DialogSelectionClickHandler())
 				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
 
-		setDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			public void onDismiss(DialogInterface arg0) {
-				setButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
-				for (int i = 0; i < setChecked.length; i++) {
-					if (setChecked[i]) {
-						setButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
-					}
-				}
-			}
-		});
-
-		formatDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			public void onDismiss(DialogInterface arg0) {
-				formatButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
-				if (selectedFormat != -1) {
-					formatButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
-				}
-			}
-		});
-
-		rarityDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			public void onDismiss(DialogInterface arg0) {
-				rarityButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
-				for (int i = 0; i < rarityChecked.length; i++) {
-					if (rarityChecked[i]) {
-						rarityButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
-					}
-				}
-			}
-		});
-
 		return myFragmentView;
 	}
 
@@ -640,37 +609,6 @@ public class SearchViewFragment extends FamiliarFragment {
 				.setMultiChoiceItems(rarityNames, rarityChecked, new DialogSelectionClickHandler())
 				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
 
-		setDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			public void onDismiss(DialogInterface arg0) {
-				setButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
-				for (int i = 0; i < setChecked.length; i++) {
-					if (setChecked[i]) {
-						setButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
-					}
-				}
-			}
-		});
-
-		formatDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			public void onDismiss(DialogInterface arg0) {
-				formatButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
-				if (selectedFormat != -1) {
-					formatButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
-				}
-			}
-		});
-
-		rarityDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			public void onDismiss(DialogInterface arg0) {
-				rarityButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
-				for (int i = 0; i < rarityChecked.length; i++) {
-					if (rarityChecked[i]) {
-						rarityButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
-					}
-				}
-			}
-		});
-
 		setButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
 		formatButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
 		rarityButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
@@ -805,53 +743,7 @@ public class SearchViewFragment extends FamiliarFragment {
 					.setMultiChoiceItems(rarityNames, rarityChecked, new DialogSelectionClickHandler())
 					.setPositiveButton("OK", new DialogButtonClickHandler()).create();
 
-			setDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-				public void onDismiss(DialogInterface arg0) {
-					setButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
-					for (int i = 0; i < setChecked.length; i++) {
-						if (setChecked[i]) {
-							setButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
-						}
-					}
-				}
-			});
-
-			formatDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-				public void onDismiss(DialogInterface arg0) {
-					formatButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
-					if (selectedFormat != -1) {
-						formatButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
-					}
-				}
-			});
-
-			rarityDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-				public void onDismiss(DialogInterface arg0) {
-					rarityButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
-					for (int i = 0; i < rarityChecked.length; i++) {
-						if (rarityChecked[i]) {
-							rarityButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
-						}
-					}
-				}
-			});
-
-			setButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
-			for (int i = 0; i < setChecked.length; i++) {
-				if (setChecked[i]) {
-					setButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
-				}
-			}
-			formatButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
-			if (selectedFormat != -1) {
-				formatButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
-			}
-			rarityButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
-			for (int i = 0; i < rarityChecked.length; i++) {
-				if (rarityChecked[i]) {
-					rarityButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
-				}
-			}
+			checkDialogButtonColors();
 
 		}
 		catch (IOException e) {
@@ -862,14 +754,24 @@ public class SearchViewFragment extends FamiliarFragment {
 		}
 	}
 
-	// @Override
-	// public boolean onKeyDown(int keyCode, KeyEvent event) {
-	// if (keyCode == KeyEvent.KEYCODE_SEARCH) {
-	// doSearch(false);
-	// return true;
-	// }
-	// return super.onKeyDown(keyCode, event);
-	// }
+	private void checkDialogButtonColors() {
+		setButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
+		for (int i = 0; i < setChecked.length; i++) {
+			if (setChecked[i]) {
+				setButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
+			}
+		}
+		formatButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
+		if (selectedFormat != -1) {
+			formatButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
+		}
+		rarityButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
+		for (int i = 0; i < rarityChecked.length; i++) {
+			if (rarityChecked[i]) {
+				rarityButton.getBackground().setColorFilter(0xFFFFB942, Mode.MULTIPLY);
+			}
+		}
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -911,7 +813,13 @@ public class SearchViewFragment extends FamiliarFragment {
 
 		// Create and show the dialog.
 		FamiliarDialogFragment newFragment = new FamiliarDialogFragment() {
-
+			
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				super.onDismiss(dialog);
+				checkDialogButtonColors();
+			}
+			
 			@Override
 			public Dialog onCreateDialog(Bundle savedInstanceState) {
 				switch (id) {
@@ -968,5 +876,11 @@ public class SearchViewFragment extends FamiliarFragment {
 					break;
 			}
 		}
+	}
+	
+	@Override
+	public boolean onInterceptSearchKey() {
+		doSearch(false);
+		return true;
 	}
 }

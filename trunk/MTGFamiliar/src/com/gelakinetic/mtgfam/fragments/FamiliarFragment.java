@@ -90,4 +90,13 @@ public class FamiliarFragment extends SherlockFragment {
 	public FamiliarActivity getFamiliarActivity() {
 		return (FamiliarActivity) this.getActivity();
 	}
+
+	/*
+	 * When the search key is pressed, it will tell the fragment
+	 * If the fragment doesn't care what happens, return false
+	 * Otherwise override this, do whatever, and return true
+	 */
+	public boolean onInterceptSearchKey() {
+		return false;
+	}
 }

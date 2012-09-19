@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -75,6 +76,7 @@ public class ResultListFragment extends FamiliarFragment {
 
 		if (this.isAdded()) {
 			if (c == null || c.getCount() == 0) {
+				Toast.makeText(this.getActivity(), getString(R.string.search_toast_no_results), Toast.LENGTH_SHORT).show();
 				anchor.getFamiliarActivity().mFragmentManager.popBackStack();
 				return;
 			}

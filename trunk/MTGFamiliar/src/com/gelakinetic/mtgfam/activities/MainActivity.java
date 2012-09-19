@@ -23,10 +23,13 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.view.KeyEvent;
 
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.fragments.CardViewFragment;
+import com.gelakinetic.mtgfam.fragments.FamiliarFragment;
 import com.gelakinetic.mtgfam.fragments.ResultListFragment;
 import com.gelakinetic.mtgfam.fragments.SearchViewFragment;
 import com.gelakinetic.mtgfam.fragments.SearchViewFragment.SearchCriteria;
@@ -82,10 +85,25 @@ public class MainActivity extends FamiliarActivity {
 				mFragmentManager = getSupportFragmentManager();
 				FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
 
+				// TODO a preference should toggle what fragment is loaded
 				SearchViewFragment svFrag = new SearchViewFragment();
 				fragmentTransaction.add(R.id.frag_view, svFrag);
 				fragmentTransaction.commit();
 			}
 		}
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_SEARCH) {
+			Fragment f = mFragmentManager.findFragmentById(R.id.frag_view);
+			if(((FamiliarFragment)f).onInterceptSearchKey() == false) {
+				return super.onKeyDown(keyCode, event);
+			}
+			else {
+				return true;				
+			}
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 }

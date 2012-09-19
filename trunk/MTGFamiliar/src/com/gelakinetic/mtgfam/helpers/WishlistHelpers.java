@@ -244,21 +244,6 @@ public class WishlistHelpers {
 
 		AlertDialog dialog = b.create();
 
-//		dialog.setOnDismissListener(new OnDismissListener() {
-//			@Override
-//			public void onDismiss(DialogInterface di) {
-//				switch (dismissReason) {
-//					case CANCEL:
-//						
-//						break;
-//					case DONE:
-//					default:
-//						
-//						break;
-//				}
-//			}
-//		});
-
 		if (list == null) {
 			lCardlist = new ArrayList<CardData>();
 			fillWishlistDialog();

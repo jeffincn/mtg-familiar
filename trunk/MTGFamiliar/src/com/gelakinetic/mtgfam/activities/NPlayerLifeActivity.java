@@ -59,6 +59,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
+import com.gelakinetic.mtgfam.fragments.ManaPoolFragment;
 import com.gelakinetic.mtgfam.helpers.GatheringsIO;
 import com.gelakinetic.mtgfam.helpers.GatheringsPlayerData;
 
@@ -429,12 +430,12 @@ public class NPlayerLifeActivity extends FamiliarActivity implements OnInitListe
 				builder.setMessage(getString(R.string.life_counter_clear_dialog_text)).setCancelable(true)
 						.setPositiveButton(getString(R.string.dialog_both), new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								ManaPoolActivity.reset(mCtx);
+								ManaPoolFragment.reset(me);
 								reset(EVERYTHING);
 							}
 						}).setNeutralButton(getString(R.string.dialog_life), new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								ManaPoolActivity.reset(mCtx);
+								ManaPoolFragment.reset(me);
 								reset(JUST_TOTALS);
 							}
 						}).setNegativeButton(getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {

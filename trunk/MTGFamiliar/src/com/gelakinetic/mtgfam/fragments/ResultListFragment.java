@@ -19,7 +19,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.activities.FamiliarActivity;
 import com.gelakinetic.mtgfam.fragments.SearchViewFragment.SearchCriteria;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.ResultListAdapter;
@@ -151,23 +150,23 @@ public class ResultListFragment extends FamiliarFragment {
 			ArrayList<Integer> toList = new ArrayList<Integer>();
 			fromList.add(CardDbAdapter.KEY_NAME);
 			toList.add(R.id.cardname);
-			if (FamiliarActivity.preferences.getBoolean("setPref", true)) {
+			if (getFamiliarActivity().preferences.getBoolean("setPref", true)) {
 				fromList.add(CardDbAdapter.KEY_SET);
 				toList.add(R.id.cardset);
 			}
-			if (FamiliarActivity.preferences.getBoolean("manacostPref", true)) {
+			if (getFamiliarActivity().preferences.getBoolean("manacostPref", true)) {
 				fromList.add(CardDbAdapter.KEY_MANACOST);
 				toList.add(R.id.cardcost);
 			}
-			if (FamiliarActivity.preferences.getBoolean("typePref", true)) {
+			if (getFamiliarActivity().preferences.getBoolean("typePref", true)) {
 				fromList.add(CardDbAdapter.KEY_TYPE);
 				toList.add(R.id.cardtype);
 			}
-			if (FamiliarActivity.preferences.getBoolean("abilityPref", true)) {
+			if (getFamiliarActivity().preferences.getBoolean("abilityPref", true)) {
 				fromList.add(CardDbAdapter.KEY_ABILITY);
 				toList.add(R.id.cardability);
 			}
-			if (FamiliarActivity.preferences.getBoolean("ptPref", true)) {
+			if (getFamiliarActivity().preferences.getBoolean("ptPref", true)) {
 				fromList.add(CardDbAdapter.KEY_POWER);
 				toList.add(R.id.cardp);
 				fromList.add(CardDbAdapter.KEY_TOUGHNESS);

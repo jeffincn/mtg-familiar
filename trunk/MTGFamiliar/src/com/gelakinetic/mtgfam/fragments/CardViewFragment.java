@@ -186,13 +186,13 @@ public class CardViewFragment extends FamiliarFragment {
 		cardID = extras.getLong("id");
 		isRandom = extras.getBoolean(SearchViewFragment.RANDOM);
 		isSingle = extras.getBoolean("isSingle", false);
-		if (FamiliarActivity.preferences.getBoolean("picFirst", false)) {
+		if (getFamiliarActivity().preferences.getBoolean("picFirst", false)) {
 			loadTo = MAINPAGE;
 		}
 		else {
 			loadTo = DIALOG;
 		}
-		scroll_results = FamiliarActivity.preferences.getBoolean("scrollresults", false);
+		scroll_results = getFamiliarActivity().preferences.getBoolean("scrollresults", false);
 
 		progDialog = new ProgressDialog(this.getFamiliarActivity());
 		progDialog.setTitle("");

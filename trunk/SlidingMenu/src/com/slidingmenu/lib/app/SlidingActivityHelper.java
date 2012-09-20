@@ -1,6 +1,7 @@
 package com.slidingmenu.lib.app;
 
 import android.app.Activity;
+import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -45,7 +46,6 @@ public class SlidingActivityHelper {
 		int background = a.getResourceId(0, 0);
 
 		if (mEnableSlide) {
-			mSlidingMenu.setFitsSysWindows(true);
 			// move everything into the SlidingMenu
 			ViewGroup decor = (ViewGroup) mActivity.getWindow().getDecorView();
 			ViewGroup decorChild = (ViewGroup) decor.getChildAt(0);

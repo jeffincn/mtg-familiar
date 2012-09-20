@@ -40,7 +40,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.activities.FamiliarActivity;
 import com.gelakinetic.mtgfam.helpers.AutocompleteCursorAdapter;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
@@ -341,7 +340,7 @@ public class SearchViewFragment extends FamiliarFragment {
 		setspinner.setAdapter(printingsAdapter);
 
 		boolean consolidate = true;
-		consolidate = FamiliarActivity.preferences.getBoolean("consolidateSearch", true);
+		consolidate = getFamiliarActivity().preferences.getBoolean("consolidateSearch", true);
 		setspinner.setSelection(consolidate ? CardDbAdapter.MOSTRECENTPRINTING : CardDbAdapter.ALLPRINTINGS);
 
 		setButton.setOnClickListener(new View.OnClickListener() {

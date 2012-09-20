@@ -39,7 +39,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.fragments.CardViewFragment;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.DbUpdaterService;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
@@ -52,28 +51,28 @@ import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
 public abstract class FamiliarActivity extends SlidingFragmentActivity {
 
-	protected FamiliarActivity					me;
-	public static SharedPreferences	preferences;
-	public CardDbAdapter								mDbHelper;
-	protected Context										mCtx;
-	private PackageInfo	pInfo;
-	private static final int	ABOUTDIALOG			= 100;
-	private static final int	CHANGELOGDIALOG	= 101;
-	private static final int	DONATEDIALOG		= 102;
+	protected FamiliarActivity	me;
+	public SharedPreferences		preferences;
+	public CardDbAdapter				mDbHelper;
+	protected Context						mCtx;
+	private PackageInfo					pInfo;
+	private static final int		ABOUTDIALOG			= 100;
+	private static final int		CHANGELOGDIALOG	= 101;
+	private static final int		DONATEDIALOG		= 102;
 
-	private static final int        TTS_CHECK_CODE  = 23;
+	private static final int		TTS_CHECK_CODE	= 23;
 
-	private Class<?>	pendingClass = null;
-	private int	pendingDialog = -1;
-	public FragmentManager	mFragmentManager;
-	private Bundle mFragResults;
+	private Class<?>						pendingClass		= null;
+	private int									pendingDialog		= -1;
+	public FragmentManager			mFragmentManager;
+	private Bundle							mFragResults;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		mFragmentManager = getSupportFragmentManager();
-		
+
 		try {
 			pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
 		}
@@ -128,7 +127,7 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 		registerReceiver(endTimeReceiver, new IntentFilter(RoundTimerActivity.RESULT_FILTER));
 		registerReceiver(startTimeReceiver, new IntentFilter(RoundTimerService.START_FILTER));
 		registerReceiver(cancelTimeReceiver, new IntentFilter(RoundTimerService.CANCEL_FILTER));
-		
+
 		mDbHelper = new CardDbAdapter(this);
 		try {
 			mDbHelper.openReadable();
@@ -162,27 +161,29 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 		TextView whatsnew = (TextView) findViewById(R.id.whatsnew);
 		TextView aboutapp = (TextView) findViewById(R.id.aboutapp);
 
-		getSlidingMenu().setOnClosedListener(new OnClosedListener(){
+		getSlidingMenu().setOnClosedListener(new OnClosedListener() {
 			@Override
 			public void onClosed() {
-				if(pendingClass != null){
+				if (pendingClass != null) {
 					Intent i = new Intent(mCtx, pendingClass);
 					startActivity(i);
 					pendingClass = null;
 				}
-				else if(pendingDialog != -1){
+				else if (pendingDialog != -1) {
 					showDialog(pendingDialog);
 					pendingDialog = -1;
 				}
-			}});
+			}
+		});
 
-		getSlidingMenu().setOnOpenedListener(new OnOpenedListener(){
+		getSlidingMenu().setOnOpenedListener(new OnOpenedListener() {
 			@Override
 			public void onOpened() {
 				// Close the keyboard if the slidingMenu is opened
 				hideKeyboard();
-			}});
-		
+			}
+		});
+
 		/*
 		 * Activity Launchers
 		 */
@@ -285,11 +286,11 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 	}
 
 	public void hideKeyboard() {
-		try{
+		try {
 			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-      imm.hideSoftInputFromWindow(getCurrentFocus().getApplicationWindowToken(), 0);
+			imm.hideSoftInputFromWindow(getCurrentFocus().getApplicationWindowToken(), 0);
 		}
-		catch(NullPointerException e){
+		catch (NullPointerException e) {
 			// eat it
 		}
 
@@ -299,7 +300,7 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 		pendingClass = class1;
 		showAbove();
 	}
-	
+
 	protected void slidingDialogLauncher(final int id) {
 		pendingDialog = id;
 		showAbove();
@@ -325,18 +326,21 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		showAbove(); // always close the sliding menu when returning to this activity
-//		MyApp appState = ((MyApp) getApplicationContext());
-//		String classname = this.getClass().getCanonicalName();
-//		if (classname.equalsIgnoreCase("com.gelakinetic.mtgfam.activities.CardViewActivity")) {
-//			if (appState.getState() == CardViewFragment.QUITTOSEARCH) {
-//				this.finish();
-//				return;
-//			}
-//		}
-//		else {
-//			appState.setState(0);
-//		}
+		showAbove(); // always close the sliding menu when returning to this
+									// activity
+		// MyApp appState = ((MyApp) getApplicationContext());
+		// String classname = this.getClass().getCanonicalName();
+		// if
+		// (classname.equalsIgnoreCase("com.gelakinetic.mtgfam.activities.CardViewActivity"))
+		// {
+		// if (appState.getState() == CardViewFragment.QUITTOSEARCH) {
+		// this.finish();
+		// return;
+		// }
+		// }
+		// else {
+		// appState.setState(0);
+		// }
 
 		Intent i = new Intent(this, RoundTimerService.class);
 		startService(i);
@@ -364,7 +368,6 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 		updatingDisplay = false;
 		timerHandler.removeCallbacks(timerUpdate);
 	}
-
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
@@ -457,21 +460,23 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 	}
 
 	/*
-	 * Always add a virtual search key to the menu on the actionbar super.onCreateOptionsMenu should always be called from FamiliarActivities
+	 * Always add a virtual search key to the menu on the actionbar
+	 * super.onCreateOptionsMenu should always be called from FamiliarActivities
 	 */
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(R.string.name_search_hint).setIcon(R.drawable.menu_search).setOnMenuItemClickListener(new OnMenuItemClickListener() {
-			@Override
-			public boolean onMenuItemClick(MenuItem item) {
-				new Thread(new Runnable() {
+		menu.add(R.string.name_search_hint).setIcon(R.drawable.menu_search)
+				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 					@Override
-					public void run() {
-						new Instrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_SEARCH);
+					public boolean onMenuItemClick(MenuItem item) {
+						new Thread(new Runnable() {
+							@Override
+							public void run() {
+								new Instrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_SEARCH);
+							}
+						}).start();
+						return true;
 					}
-				}).start();
-				return true;
-			}
-		}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 		return true;
 	}
@@ -484,47 +489,48 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 	private boolean						timeShowing;
 
 	private Runnable					timerUpdate					= new Runnable() {
-		@Override
-		public void run() {
-			displayTimeLeft();
+																									@Override
+																									public void run() {
+																										displayTimeLeft();
 
-			if (endTime > SystemClock.elapsedRealtime()) {
-				getSupportActionBar().setDisplayShowTitleEnabled(true);
-				timeShowing = true;
-				timerHandler.postDelayed(timerUpdate, 200);
-			}
-			else {
-				timeShowing = false;
-				getSupportActionBar().setDisplayShowTitleEnabled(false);
-				timerHandler.removeCallbacks(timerUpdate);
-			}
-		}
-	};
+																										if (endTime > SystemClock.elapsedRealtime()) {
+																											getSupportActionBar().setDisplayShowTitleEnabled(true);
+																											timeShowing = true;
+																											timerHandler.postDelayed(timerUpdate, 200);
+																										}
+																										else {
+																											timeShowing = false;
+																											getSupportActionBar().setDisplayShowTitleEnabled(false);
+																											timerHandler.removeCallbacks(timerUpdate);
+																										}
+																									}
+																								};
 
 	private BroadcastReceiver	endTimeReceiver			= new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			endTime = intent.getLongExtra(RoundTimerService.EXTRA_END_TIME, SystemClock.elapsedRealtime());
-			startUpdatingDisplay();
-			timerHandler.postDelayed(timerUpdate, 200);
-		}
-	};
+																									@Override
+																									public void onReceive(Context context, Intent intent) {
+																										endTime = intent.getLongExtra(RoundTimerService.EXTRA_END_TIME,
+																												SystemClock.elapsedRealtime());
+																										startUpdatingDisplay();
+																										timerHandler.postDelayed(timerUpdate, 200);
+																									}
+																								};
 
 	private BroadcastReceiver	cancelTimeReceiver	= new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			endTime = 0;
-			stopUpdatingDisplay();
-		}
-	};
+																									@Override
+																									public void onReceive(Context context, Intent intent) {
+																										endTime = 0;
+																										stopUpdatingDisplay();
+																									}
+																								};
 
-	private BroadcastReceiver startTimeReceiver	= new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			Intent i = new Intent(RoundTimerService.REQUEST_FILTER);
-			sendBroadcast(i);
-		}
-	};
+	private BroadcastReceiver	startTimeReceiver		= new BroadcastReceiver() {
+																									@Override
+																									public void onReceive(Context context, Intent intent) {
+																										Intent i = new Intent(RoundTimerService.REQUEST_FILTER);
+																										sendBroadcast(i);
+																									}
+																								};
 
 	private void startUpdatingDisplay() {
 		updatingDisplay = true;
@@ -580,7 +586,6 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 		}
 	}
 
-
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
@@ -611,15 +616,15 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 
 			// Then display a dialog informing them of TTS
 			AlertDialog dialog = new Builder(this)
-			.setTitle("Text-to-Speech")
-			.setMessage(
-					"This application has text-to-speech capability for some of its features, but you don't "
-							+ "seem to have it installed. If you want to install it, use the \"Install Text-to-Speech\" link "
-							+ "in the settings menu.").setPositiveButton("OK", new OnClickListener() {
-								public void onClick(DialogInterface dialog, int which) {
-									// Do nothing, just dismiss
-								}
-							}).create();
+					.setTitle("Text-to-Speech")
+					.setMessage(
+							"This application has text-to-speech capability for some of its features, but you don't "
+									+ "seem to have it installed. If you want to install it, use the \"Install Text-to-Speech\" link "
+									+ "in the settings menu.").setPositiveButton("OK", new OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							// Do nothing, just dismiss
+						}
+					}).create();
 
 			dialog.show();
 		}
@@ -629,13 +634,13 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 		edit.putBoolean("has_tts", false);
 		edit.commit();
 	}
-	
+
 	public void setFragmentResult(Bundle result) {
 		mFragResults = result;
 	}
-	
+
 	public Bundle getFragmentResults() {
-		if(mFragResults != null){
+		if (mFragResults != null) {
 			Bundle res = mFragResults;
 			mFragResults = null;
 			return res;

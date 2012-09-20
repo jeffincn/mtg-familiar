@@ -24,6 +24,7 @@ import android.speech.tts.TextToSpeech.OnInitListener;
 
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.activities.RoundTimerActivity;
+import com.gelakinetic.mtgfam.fragments.RoundTimerFragment;
 
 public class RoundTimerService extends Service implements OnInitListener {
 
@@ -161,7 +162,7 @@ public class RoundTimerService extends Service implements OnInitListener {
 	private BroadcastReceiver		requestReceiver					= new BroadcastReceiver() {
 																												@Override
 																												public void onReceive(Context context, Intent intent) {
-																													Intent i = new Intent(RoundTimerActivity.RESULT_FILTER);
+																													Intent i = new Intent(RoundTimerFragment.RESULT_FILTER);
 																													i.putExtra(EXTRA_END_TIME, endTime);
 																													sendBroadcast(i);
 																												}
@@ -171,7 +172,7 @@ public class RoundTimerService extends Service implements OnInitListener {
 																												@Override
 																												public void onReceive(Context context, Intent intent) {
 																													endTime = intent.getLongExtra(
-																															RoundTimerActivity.EXTRA_END_TIME,
+																															RoundTimerFragment.EXTRA_END_TIME,
 																															SystemClock.elapsedRealtime());
 
 																													Intent i;
@@ -268,7 +269,7 @@ public class RoundTimerService extends Service implements OnInitListener {
 	private BroadcastReceiver		hasTtsReceiver					= new BroadcastReceiver() {
 																												@Override
 																												public void onReceive(Context context, Intent intent) {
-																													Intent i = new Intent(RoundTimerActivity.TTS_FILTER);
+																													Intent i = new Intent(RoundTimerFragment.TTS_FILTER);
 																													i.putExtra(EXTRA_TTS_INITIALIZED, ttsInitialized);
 																													sendBroadcast(i);
 																												}

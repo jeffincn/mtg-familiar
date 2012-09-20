@@ -39,6 +39,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.gelakinetic.mtgfam.R;
+import com.gelakinetic.mtgfam.fragments.RoundTimerFragment;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.DbUpdaterService;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
@@ -124,7 +125,7 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 		}
 
 		timerHandler = new Handler();
-		registerReceiver(endTimeReceiver, new IntentFilter(RoundTimerActivity.RESULT_FILTER));
+		registerReceiver(endTimeReceiver, new IntentFilter(RoundTimerFragment.RESULT_FILTER));
 		registerReceiver(startTimeReceiver, new IntentFilter(RoundTimerService.START_FILTER));
 		registerReceiver(cancelTimeReceiver, new IntentFilter(RoundTimerService.CANCEL_FILTER));
 
@@ -483,12 +484,12 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 
 	// Displays the timer in the actionbar
 
-	private boolean						updatingDisplay;
-	private long							endTime;
-	protected Handler					timerHandler;
-	private boolean						timeShowing;
+	public boolean						updatingDisplay;
+	public long								endTime;
+	public Handler						timerHandler;
+	public boolean						timeShowing;
 
-	private Runnable					timerUpdate					= new Runnable() {
+	public Runnable						timerUpdate					= new Runnable() {
 																									@Override
 																									public void run() {
 																										displayTimeLeft();
@@ -506,7 +507,7 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 																									}
 																								};
 
-	private BroadcastReceiver	endTimeReceiver			= new BroadcastReceiver() {
+	public BroadcastReceiver	endTimeReceiver			= new BroadcastReceiver() {
 																									@Override
 																									public void onReceive(Context context, Intent intent) {
 																										endTime = intent.getLongExtra(RoundTimerService.EXTRA_END_TIME,
@@ -516,7 +517,7 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 																									}
 																								};
 
-	private BroadcastReceiver	cancelTimeReceiver	= new BroadcastReceiver() {
+	public BroadcastReceiver	cancelTimeReceiver	= new BroadcastReceiver() {
 																									@Override
 																									public void onReceive(Context context, Intent intent) {
 																										endTime = 0;
@@ -524,7 +525,7 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 																									}
 																								};
 
-	private BroadcastReceiver	startTimeReceiver		= new BroadcastReceiver() {
+	public BroadcastReceiver	startTimeReceiver		= new BroadcastReceiver() {
 																									@Override
 																									public void onReceive(Context context, Intent intent) {
 																										Intent i = new Intent(RoundTimerService.REQUEST_FILTER);
@@ -532,14 +533,14 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 																									}
 																								};
 
-	private void startUpdatingDisplay() {
+	public void startUpdatingDisplay() {
 		updatingDisplay = true;
 		displayTimeLeft();
 		timerHandler.removeCallbacks(timerUpdate);
 		timerHandler.postDelayed(timerUpdate, 200);
 	}
 
-	private void stopUpdatingDisplay() {
+	public void stopUpdatingDisplay() {
 		updatingDisplay = false;
 		timeShowing = false;
 		displayTimeLeft();
@@ -547,7 +548,7 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 	}
 
-	private void displayTimeLeft() {
+	public void displayTimeLeft() {
 		long timeLeftMillis = endTime - SystemClock.elapsedRealtime();
 		String timeLeftStr = "";
 

@@ -61,7 +61,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
@@ -83,7 +82,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.activities.FamiliarActivity;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 import com.gelakinetic.mtgfam.helpers.MyApp;
@@ -1099,7 +1097,6 @@ public class CardViewFragment extends FamiliarFragment {
 			case R.id.quittosearch:
 				MyApp appState = ((MyApp) this.getFamiliarActivity().getApplicationContext());
 				appState.setState(QUITTOSEARCH);
-				Log.v("backstack", anchor.getFamiliarActivity().mFragmentManager.getBackStackEntryCount()+"");
 				if(anchor.getFamiliarActivity().mFragmentManager.getBackStackEntryCount() == 0) {
 					anchor.getFamiliarActivity().finish();
 				}

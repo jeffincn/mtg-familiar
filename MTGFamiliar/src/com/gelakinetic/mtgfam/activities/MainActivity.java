@@ -31,6 +31,7 @@ import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.fragments.CardViewFragment;
 import com.gelakinetic.mtgfam.fragments.FamiliarFragment;
 import com.gelakinetic.mtgfam.fragments.ResultListFragment;
+import com.gelakinetic.mtgfam.fragments.RulesFragment;
 import com.gelakinetic.mtgfam.fragments.SearchViewFragment;
 import com.gelakinetic.mtgfam.fragments.SearchViewFragment.SearchCriteria;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
@@ -86,24 +87,11 @@ public class MainActivity extends FamiliarActivity {
 				FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
 
 				// TODO a preference should toggle what fragment is loaded
-				SearchViewFragment svFrag = new SearchViewFragment();
+				//SearchViewFragment svFrag = new SearchViewFragment();
+				RulesFragment svFrag = new RulesFragment();
 				fragmentTransaction.add(R.id.frag_view, svFrag);
 				fragmentTransaction.commit();
 			}
 		}
-	}
-
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_SEARCH) {
-			Fragment f = mFragmentManager.findFragmentById(R.id.frag_view);
-			if(((FamiliarFragment)f).onInterceptSearchKey() == false) {
-				return super.onKeyDown(keyCode, event);
-			}
-			else {
-				return true;				
-			}
-		}
-		return super.onKeyDown(keyCode, event);
 	}
 }

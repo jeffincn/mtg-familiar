@@ -23,6 +23,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
@@ -39,6 +40,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.gelakinetic.mtgfam.R;
+import com.gelakinetic.mtgfam.fragments.FamiliarFragment;
 import com.gelakinetic.mtgfam.fragments.RoundTimerFragment;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.DbUpdaterService;
@@ -647,5 +649,19 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 			return res;
 		}
 		return null;
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_SEARCH) {
+			Fragment f = mFragmentManager.findFragmentById(R.id.frag_view);
+			if(((FamiliarFragment)f).onInterceptSearchKey() == false) {
+				return super.onKeyDown(keyCode, event);
+			}
+			else {
+				return true;				
+			}
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 }

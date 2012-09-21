@@ -14,7 +14,6 @@ public class WidgetSearchActivity extends FamiliarActivity {
 
 		if (savedInstanceState == null) {
 			mFragmentManager = getSupportFragmentManager();
-			//mFragmentManager.getBackStackEntryCount();
 			FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
 
 			SearchWidgetFragment swFrag = new SearchWidgetFragment();

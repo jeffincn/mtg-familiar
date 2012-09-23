@@ -6,7 +6,6 @@ import java.util.Random;
 import android.database.Cursor;
 import android.database.MergeCursor;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -270,14 +269,7 @@ public class ResultListFragment extends FamiliarFragment {
 		args.putBoolean(SearchViewFragment.RANDOM, isRandom);
 		args.putBoolean("isSingle", isSingle);
 		CardViewFragment cvFrag = new CardViewFragment();
-		cvFrag.setArguments(args);
-
-		FragmentTransaction fragmentTransaction = anchor.getFamiliarActivity().mFragmentManager.beginTransaction();
-		fragmentTransaction.addToBackStack(null);
-
-		fragmentTransaction.replace(R.id.frag_view, cvFrag);
-		fragmentTransaction.commit();
-		anchor.getFamiliarActivity().hideKeyboard();
+		anchor.startNewFragment(cvFrag, args);
 	}
 
 	private void startRandom() {

@@ -285,46 +285,46 @@ public class SearchViewFragment extends FamiliarFragment {
 		cmcLogic = (Spinner) myFragmentView.findViewById(R.id.cmcLogic);
 		cmcChoice = (Spinner) myFragmentView.findViewById(R.id.cmcChoice);
 
-		ArrayAdapter<CharSequence> powerLogicAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.logic_spinner,
-				android.R.layout.simple_spinner_item);
+		ArrayAdapter<CharSequence> powerLogicAdapter = ArrayAdapter.createFromResource(this.getActivity(),
+				R.array.logic_spinner, android.R.layout.simple_spinner_item);
 		powerLogicAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		powLogic.setAdapter(powerLogicAdapter);
 
-		ArrayAdapter<CharSequence> powChoiceAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.pt_spinner,
-				android.R.layout.simple_spinner_item);
+		ArrayAdapter<CharSequence> powChoiceAdapter = ArrayAdapter.createFromResource(this.getActivity(),
+				R.array.pt_spinner, android.R.layout.simple_spinner_item);
 		powChoiceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		powChoice.setAdapter(powChoiceAdapter);
 
-		ArrayAdapter<CharSequence> touLogicAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.logic_spinner,
-				android.R.layout.simple_spinner_item);
+		ArrayAdapter<CharSequence> touLogicAdapter = ArrayAdapter.createFromResource(this.getActivity(),
+				R.array.logic_spinner, android.R.layout.simple_spinner_item);
 		touLogicAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		touLogic.setAdapter(touLogicAdapter);
 
-		ArrayAdapter<CharSequence> touChoiceAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.pt_spinner,
-				android.R.layout.simple_spinner_item);
+		ArrayAdapter<CharSequence> touChoiceAdapter = ArrayAdapter.createFromResource(this.getActivity(),
+				R.array.pt_spinner, android.R.layout.simple_spinner_item);
 		touChoiceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		touChoice.setAdapter(touChoiceAdapter);
 
-		ArrayAdapter<CharSequence> CMCLogicAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.logic_spinner,
-				android.R.layout.simple_spinner_item);
+		ArrayAdapter<CharSequence> CMCLogicAdapter = ArrayAdapter.createFromResource(this.getActivity(),
+				R.array.logic_spinner, android.R.layout.simple_spinner_item);
 		CMCLogicAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		cmcLogic.setAdapter(CMCLogicAdapter);
 		cmcLogic.setSelection(1); // CMC should default to <
 
-		ArrayAdapter<CharSequence> CMCChoiceAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.cmc_spinner,
-				android.R.layout.simple_spinner_item);
+		ArrayAdapter<CharSequence> CMCChoiceAdapter = ArrayAdapter.createFromResource(this.getActivity(),
+				R.array.cmc_spinner, android.R.layout.simple_spinner_item);
 		CMCChoiceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		cmcChoice.setAdapter(CMCChoiceAdapter);
 
-		ArrayAdapter<CharSequence> colorSpinnerAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.color_spinner,
-				android.R.layout.simple_spinner_item);
+		ArrayAdapter<CharSequence> colorSpinnerAdapter = ArrayAdapter.createFromResource(this.getActivity(),
+				R.array.color_spinner, android.R.layout.simple_spinner_item);
 		colorSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		colorspinner.setAdapter(colorSpinnerAdapter);
 		colorspinner.setSelection(2);
 
 		// Lines Below added by Reuben Kriegel
-		ArrayAdapter<CharSequence> rulesTextAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.text_spinner,
-				android.R.layout.simple_spinner_item);
+		ArrayAdapter<CharSequence> rulesTextAdapter = ArrayAdapter.createFromResource(this.getActivity(),
+				R.array.text_spinner, android.R.layout.simple_spinner_item);
 		rulesTextAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		textspinner.setAdapter(rulesTextAdapter);
 
@@ -334,8 +334,8 @@ public class SearchViewFragment extends FamiliarFragment {
 		typespinner.setAdapter(typeAdapter);
 		// End addition
 
-		ArrayAdapter<CharSequence> printingsAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.set_spinner,
-				android.R.layout.simple_spinner_item);
+		ArrayAdapter<CharSequence> printingsAdapter = ArrayAdapter.createFromResource(this.getActivity(),
+				R.array.set_spinner, android.R.layout.simple_spinner_item);
 		printingsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		setspinner.setAdapter(printingsAdapter);
 
@@ -368,7 +368,7 @@ public class SearchViewFragment extends FamiliarFragment {
 		});
 
 		checkDialogButtonColors();
-		
+
 		return myFragmentView;
 	}
 
@@ -549,14 +549,7 @@ public class SearchViewFragment extends FamiliarFragment {
 		args.putBoolean(RANDOM, isRandom);
 		args.putSerializable(CRITERIA, searchCriteria);
 		ResultListFragment rlFrag = new ResultListFragment();
-		rlFrag.setArguments(args);
-
-		FragmentTransaction fragmentTransaction = anchor.getFamiliarActivity().mFragmentManager.beginTransaction();
-		fragmentTransaction.addToBackStack(null);
-
-		fragmentTransaction.replace(R.id.frag_view, rlFrag);
-		fragmentTransaction.commit();
-		anchor.getFamiliarActivity().hideKeyboard();
+		anchor.startNewFragment(rlFrag, args);
 	}
 
 	public void clear() {
@@ -594,9 +587,7 @@ public class SearchViewFragment extends FamiliarFragment {
 		for (int i = 0; i < rarityChecked.length; i++) {
 			rarityChecked[i] = false;
 		}
-		this.removeDialog(SETLIST);
-		this.removeDialog(FORMATLIST);
-		this.removeDialog(RARITYLIST);
+		this.removeDialog();
 
 		setDialog = new AlertDialog.Builder(this.getActivity()).setTitle("Sets")
 				.setMultiChoiceItems(setNames, setChecked, new DialogSelectionClickHandler())
@@ -728,9 +719,7 @@ public class SearchViewFragment extends FamiliarFragment {
 				rarityChecked[i] = (criteria.Rarity != null && criteria.Rarity.contains(rarityNames[i].charAt(0) + ""));
 			}
 
-			this.removeDialog(SETLIST);
-			this.removeDialog(FORMATLIST);
-			this.removeDialog(RARITYLIST);
+			this.removeDialog();
 
 			setDialog = new AlertDialog.Builder(this.getActivity()).setTitle("Sets")
 					.setMultiChoiceItems(setNames, setChecked, new DialogSelectionClickHandler())
@@ -807,7 +796,7 @@ public class SearchViewFragment extends FamiliarFragment {
 		// in a transaction. We also want to remove any currently showing
 		// dialog, so make our own transaction and take care of that here.
 		FragmentTransaction ft = getFragmentManager().beginTransaction();
-		Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+		Fragment prev = getFragmentManager().findFragmentByTag(DIALOG_TAG);
 		if (prev != null) {
 			ft.remove(prev);
 		}
@@ -856,12 +845,7 @@ public class SearchViewFragment extends FamiliarFragment {
 				}
 			}
 		};
-		newFragment.show(ft, "dialog");
-	}
-
-	private void removeDialog(int id) {
-		// TODO Auto-generated method stub
-
+		newFragment.show(ft, DIALOG_TAG);
 	}
 
 	public class DialogSelectionClickHandler implements DialogInterface.OnMultiChoiceClickListener {

@@ -37,7 +37,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.activities.FamiliarActivity;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 
@@ -172,7 +171,8 @@ public class RulesFragment extends FamiliarFragment {
 								else if (GlossaryItem.class.isInstance(item)) {
 									args.putBoolean(GLOSSARY_KEY, true);
 								}
-								startRulesFragment(anchor.getFamiliarActivity(), args);
+								RulesFragment frag = new RulesFragment();
+								anchor.startNewFragment(frag, args);
 							}
 						});
 					}
@@ -226,24 +226,12 @@ public class RulesFragment extends FamiliarFragment {
 		return myFragmentView;
 	}
 
-	protected static void startRulesFragment(FamiliarActivity fa, Bundle args) {
-		RulesFragment frag = new RulesFragment();
-		frag.setArguments(args);
-
-		FragmentTransaction fragmentTransaction = fa.mFragmentManager.beginTransaction();
-		fragmentTransaction.addToBackStack(null);
-
-		fragmentTransaction.replace(R.id.frag_view, frag);
-		fragmentTransaction.commit();
-		fa.hideKeyboard();
-	}
-
 	private void showDialog(final int id) {
 		// DialogFragment.show() will take care of adding the fragment
 		// in a transaction. We also want to remove any currently showing
 		// dialog, so make our own transaction and take care of that here.
 		FragmentTransaction ft = getFragmentManager().beginTransaction();
-		Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+		Fragment prev = getFragmentManager().findFragmentByTag(DIALOG_TAG);
 		if (prev != null) {
 			ft.remove(prev);
 		}
@@ -251,17 +239,18 @@ public class RulesFragment extends FamiliarFragment {
 
 		// Create and show the dialog.
 		FamiliarDialogFragment newFragment = new FamiliarDialogFragment() {
-			
-			private Bundle	searchArgs = null;
+
+			private Bundle	searchArgs	= null;
 
 			@Override
 			public void onDestroy() {
 				super.onDestroy();
-				if(searchArgs != null){
-					startRulesFragment(anchor.getFamiliarActivity(), searchArgs);
+				if (searchArgs != null) {
+					RulesFragment frag = new RulesFragment();
+					anchor.startNewFragment(frag, searchArgs);
 				}
 			}
-			
+
 			@Override
 			public Dialog onCreateDialog(Bundle savedInstanceState) {
 				searchArgs = null;
@@ -324,7 +313,7 @@ public class RulesFragment extends FamiliarFragment {
 				}
 			}
 		};
-		newFragment.show(ft, "dialog");
+		newFragment.show(ft, DIALOG_TAG);
 	}
 
 	@Override
@@ -387,7 +376,8 @@ public class RulesFragment extends FamiliarFragment {
 							args.putInt(CATEGORY_KEY, linkCat);
 							args.putInt(SUBCATEGORY_KEY, linkSub);
 							args.putInt(POSITION_KEY, linkPosition);
-							startRulesFragment(anchor.getFamiliarActivity(), args);
+							RulesFragment frag = new RulesFragment();
+							anchor.startNewFragment(frag, args);
 						}
 					}, m.start(), m.end(), 0);
 				}

@@ -34,57 +34,58 @@ import com.gelakinetic.mtgfam.helpers.RoundTimerService;
 
 public class RoundTimerFragment extends FamiliarFragment {
 
-	public static final String RESULT_FILTER = "com.gelakinetic.mtgfam.RESULT_FILTER";
-	public static final String TTS_FILTER = "com.gelakinetic.mtgfam.TTS_FILTER";
-	public static final String EXTRA_END_TIME = "EndTime";
-	
-	private static final String SAVED_HOURS = "SavedHours";
-	private static final String SAVED_MINUTES = "SavedMinutes";
+	public static final String	RESULT_FILTER					= "com.gelakinetic.mtgfam.RESULT_FILTER";
+	public static final String	TTS_FILTER						= "com.gelakinetic.mtgfam.TTS_FILTER";
+	public static final String	EXTRA_END_TIME				= "EndTime";
 
-	private static final int RINGTONE_REQUEST_CODE = 17;
+	private static final String	SAVED_HOURS						= "SavedHours";
+	private static final String	SAVED_MINUTES					= "SavedMinutes";
 
-	private static final int DIALOG_SET_WARNINGS = 1;
+	private static final int		RINGTONE_REQUEST_CODE	= 17;
 
-	private TimePicker picker;
-	private Button actionButton;
-	
-	private int hours;
-	private int minutes;
-	private boolean firstLoad;
+	private static final int		DIALOG_SET_WARNINGS		= 1;
 
-	private long endTime;
-	private boolean ttsInitialized = false;
+	private TimePicker					picker;
+	private Button							actionButton;
 
-	private BroadcastReceiver resultReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			endTime = intent.getLongExtra(RoundTimerService.EXTRA_END_TIME,
-					SystemClock.elapsedRealtime());
-		}
-	};
+	private int									hours;
+	private int									minutes;
+	private boolean							firstLoad;
 
-	private BroadcastReceiver ttsReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			ttsInitialized = intent.getBooleanExtra(
-					RoundTimerService.EXTRA_TTS_INITIALIZED, false);
-			if(timerWarning != null){
-				timerWarning.setVisible(ttsInitialized);
-			}
-		}
-	};
+	private long								endTime;
+	private boolean							ttsInitialized				= false;
 
-	private Runnable updateButtonTextTask = new Runnable() {
-		public void run() {
-			if (endTime > SystemClock.elapsedRealtime()) {
-				actionButton.setText(R.string.timer_cancel);
-			}
-			else {
-				actionButton.setText(R.string.timer_start);
-			}
-			getFamiliarActivity().timerHandler.postDelayed(updateButtonTextTask, 200);
-		}
-	};
+	private BroadcastReceiver		resultReceiver				= new BroadcastReceiver() {
+																											@Override
+																											public void onReceive(Context context, Intent intent) {
+																												endTime = intent.getLongExtra(RoundTimerService.EXTRA_END_TIME,
+																														SystemClock.elapsedRealtime());
+																											}
+																										};
+
+	private BroadcastReceiver		ttsReceiver						= new BroadcastReceiver() {
+																											@Override
+																											public void onReceive(Context context, Intent intent) {
+																												ttsInitialized = intent.getBooleanExtra(
+																														RoundTimerService.EXTRA_TTS_INITIALIZED, false);
+																												if (timerWarning != null) {
+																													timerWarning.setVisible(ttsInitialized);
+																												}
+																											}
+																										};
+
+	private Runnable						updateButtonTextTask	= new Runnable() {
+																											public void run() {
+																												if (endTime > SystemClock.elapsedRealtime()) {
+																													actionButton.setText(R.string.timer_cancel);
+																												}
+																												else {
+																													actionButton.setText(R.string.timer_start);
+																												}
+																												getFamiliarActivity().timerHandler.postDelayed(
+																														updateButtonTextTask, 200);
+																											}
+																										};
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -98,8 +99,8 @@ public class RoundTimerFragment extends FamiliarFragment {
 
 		this.picker = (TimePicker) myFragmentView.findViewById(R.id.rt_time_picker);
 		this.picker.setIs24HourView(true);
-		
-		if(savedInstanceState != null) {
+
+		if (savedInstanceState != null) {
 			this.firstLoad = false;
 			this.hours = savedInstanceState.getInt(SAVED_HOURS);
 			this.minutes = savedInstanceState.getInt(SAVED_MINUTES);
@@ -127,26 +128,27 @@ public class RoundTimerFragment extends FamiliarFragment {
 		getFamiliarActivity().timerHandler.postDelayed(updateButtonTextTask, 200);
 		return myFragmentView;
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
-		
-		if(firstLoad) {
+
+		if (firstLoad) {
 			try {
 				int length = Integer.parseInt(getFamiliarActivity().preferences.getString("roundLength", "50"));
 				this.hours = length / 60;
 				this.minutes = length % 60;
 			}
 			catch (Exception ex) {
-				// Eat the exception; this should never happen in practice, and if it does
+				// Eat the exception; this should never happen in practice, and if it
+				// does
 				// we just want to default to 50 and pretend nothing broke
 				this.hours = 0;
 				this.minutes = 50;
 			}
 			this.firstLoad = false;
 		}
-		
+
 		this.picker.setCurrentHour(this.hours);
 		this.picker.setCurrentMinute(this.minutes);
 	}
@@ -155,7 +157,7 @@ public class RoundTimerFragment extends FamiliarFragment {
 	public void onPause() {
 		super.onPause();
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -163,19 +165,19 @@ public class RoundTimerFragment extends FamiliarFragment {
 		getActivity().unregisterReceiver(ttsReceiver);
 		getFamiliarActivity().timerHandler.removeCallbacks(updateButtonTextTask);
 	}
-	
+
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		
+
 		this.hours = this.picker.getCurrentHour();
 		this.minutes = this.picker.getCurrentMinute();
 		outState.putInt(SAVED_HOURS, this.picker.getCurrentHour());
 		outState.putInt(SAVED_MINUTES, this.picker.getCurrentMinute());
 	}
 
-	MenuItem timerWarning = null;
-	
+	MenuItem	timerWarning	= null;
+
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
 		timerWarning = menu.findItem(R.id.set_timer_warnings);
@@ -187,8 +189,8 @@ public class RoundTimerFragment extends FamiliarFragment {
 		// Handle item selection
 		switch (item.getItemId()) {
 			case R.id.set_timer_ringtone:
-				Uri soundFile = Uri.parse(getFamiliarActivity().preferences.getString("timerSound",
-						RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION).toString()));
+				Uri soundFile = Uri.parse(getFamiliarActivity().preferences.getString("timerSound", RingtoneManager
+						.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION).toString()));
 
 				Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
 				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
@@ -212,7 +214,7 @@ public class RoundTimerFragment extends FamiliarFragment {
 		// in a transaction. We also want to remove any currently showing
 		// dialog, so make our own transaction and take care of that here.
 		FragmentTransaction ft = getFragmentManager().beginTransaction();
-		Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+		Fragment prev = getFragmentManager().findFragmentByTag(DIALOG_TAG);
 		if (prev != null) {
 			ft.remove(prev);
 		}
@@ -225,23 +227,22 @@ public class RoundTimerFragment extends FamiliarFragment {
 			public Dialog onCreateDialog(Bundle savedInstanceState) {
 				switch (id) {
 					case DIALOG_SET_WARNINGS: {
-					final View v = View.inflate(this.getActivity(), R.layout.timer_warning_dialog, null);
-					final CheckBox chkFifteen = (CheckBox) v.findViewById(R.id.timer_pref_fifteen);
-					final CheckBox chkTen = (CheckBox) v.findViewById(R.id.timer_pref_ten);
-					final CheckBox chkFive = (CheckBox) v.findViewById(R.id.timer_pref_five);
-	
-					return new AlertDialog.Builder(getActivity()).setView(v).setTitle(R.string.timer_warning_dialog_title)
-							.setPositiveButton("OK", new OnClickListener() {
-								public void onClick(DialogInterface dialog, int which) {
-									SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(getActivity())
-											.edit();
-									edit.putBoolean("fifteenMinutePref", chkFifteen.isChecked());
-									edit.putBoolean("tenMinutePref", chkTen.isChecked());
-									edit.putBoolean("fiveMinutePref", chkFive.isChecked());
-									edit.commit();
-								}
-							}).create();
-				}
+						final View v = View.inflate(this.getActivity(), R.layout.timer_warning_dialog, null);
+						final CheckBox chkFifteen = (CheckBox) v.findViewById(R.id.timer_pref_fifteen);
+						final CheckBox chkTen = (CheckBox) v.findViewById(R.id.timer_pref_ten);
+						final CheckBox chkFive = (CheckBox) v.findViewById(R.id.timer_pref_five);
+
+						return new AlertDialog.Builder(getActivity()).setView(v).setTitle(R.string.timer_warning_dialog_title)
+								.setPositiveButton("OK", new OnClickListener() {
+									public void onClick(DialogInterface dialog, int which) {
+										SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+										edit.putBoolean("fifteenMinutePref", chkFifteen.isChecked());
+										edit.putBoolean("tenMinutePref", chkTen.isChecked());
+										edit.putBoolean("fiveMinutePref", chkFive.isChecked());
+										edit.commit();
+									}
+								}).create();
+					}
 					default: {
 						savedInstanceState.putInt("id", id);
 						return super.onCreateDialog(savedInstanceState);
@@ -249,47 +250,54 @@ public class RoundTimerFragment extends FamiliarFragment {
 				}
 			}
 		};
-		newFragment.show(ft, "dialog");
+		newFragment.show(ft, DIALOG_TAG);
 	}
-//	@Override
-//	public Dialog onCreateDialog(int id) {
-//		switch (id) {
-//			case DIALOG_SET_WARNINGS: {
-//				final View v = View.inflate(this, R.layout.timer_warning_dialog, null);
-//				final CheckBox chkFifteen = (CheckBox) v.myFragmentView.findViewById(R.id.timer_pref_fifteen);
-//				final CheckBox chkTen = (CheckBox) v.myFragmentView.findViewById(R.id.timer_pref_ten);
-//				final CheckBox chkFive = (CheckBox) v.myFragmentView.findViewById(R.id.timer_pref_five);
-//
-//				return new AlertDialog.Builder(this).setView(v).setTitle(R.string.timer_warning_dialog_title)
-//						.setPositiveButton("OK", new OnClickListener() {
-//							public void onClick(DialogInterface dialog, int which) {
-//								SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(RoundTimerActivity.this)
-//										.edit();
-//								edit.putBoolean("fifteenMinutePref", chkFifteen.isChecked());
-//								edit.putBoolean("tenMinutePref", chkTen.isChecked());
-//								edit.putBoolean("fiveMinutePref", chkFive.isChecked());
-//								edit.commit();
-//							}
-//						}).create();
-//			}
-//			default: {
-//				return super.onCreateDialog(id);
-//			}
-//		}
-//	}
-//
-//	@Override
-//	protected void onPrepareDialog(int id, Dialog dialog) {
-//		if (id == DIALOG_SET_WARNINGS) {
-//			boolean fifteen = preferences.getBoolean("fifteenMinutePref", false);
-//			boolean ten = preferences.getBoolean("tenMinutePref", false);
-//			boolean five = preferences.getBoolean("fiveMinutePref", false);
-//
-//			((CheckBox) dialog.findViewById(R.id.timer_pref_fifteen)).setChecked(fifteen);
-//			((CheckBox) dialog.findViewById(R.id.timer_pref_ten)).setChecked(ten);
-//			((CheckBox) dialog.findViewById(R.id.timer_pref_five)).setChecked(five);
-//		}
-//	}
+
+	// @Override
+	// public Dialog onCreateDialog(int id) {
+	// switch (id) {
+	// case DIALOG_SET_WARNINGS: {
+	// final View v = View.inflate(this, R.layout.timer_warning_dialog, null);
+	// final CheckBox chkFifteen = (CheckBox)
+	// v.myFragmentView.findViewById(R.id.timer_pref_fifteen);
+	// final CheckBox chkTen = (CheckBox)
+	// v.myFragmentView.findViewById(R.id.timer_pref_ten);
+	// final CheckBox chkFive = (CheckBox)
+	// v.myFragmentView.findViewById(R.id.timer_pref_five);
+	//
+	// return new
+	// AlertDialog.Builder(this).setView(v).setTitle(R.string.timer_warning_dialog_title)
+	// .setPositiveButton("OK", new OnClickListener() {
+	// public void onClick(DialogInterface dialog, int which) {
+	// SharedPreferences.Editor edit =
+	// PreferenceManager.getDefaultSharedPreferences(RoundTimerActivity.this)
+	// .edit();
+	// edit.putBoolean("fifteenMinutePref", chkFifteen.isChecked());
+	// edit.putBoolean("tenMinutePref", chkTen.isChecked());
+	// edit.putBoolean("fiveMinutePref", chkFive.isChecked());
+	// edit.commit();
+	// }
+	// }).create();
+	// }
+	// default: {
+	// return super.onCreateDialog(id);
+	// }
+	// }
+	// }
+	//
+	// @Override
+	// protected void onPrepareDialog(int id, Dialog dialog) {
+	// if (id == DIALOG_SET_WARNINGS) {
+	// boolean fifteen = preferences.getBoolean("fifteenMinutePref", false);
+	// boolean ten = preferences.getBoolean("tenMinutePref", false);
+	// boolean five = preferences.getBoolean("fiveMinutePref", false);
+	//
+	// ((CheckBox)
+	// dialog.findViewById(R.id.timer_pref_fifteen)).setChecked(fifteen);
+	// ((CheckBox) dialog.findViewById(R.id.timer_pref_ten)).setChecked(ten);
+	// ((CheckBox) dialog.findViewById(R.id.timer_pref_five)).setChecked(five);
+	// }
+	// }
 
 	@Override
 	public void onActivityResult(final int requestCode, final int resultCode, final Intent intent) {

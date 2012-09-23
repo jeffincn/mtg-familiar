@@ -92,14 +92,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					Bundle args = new Bundle();
 					args.putLong("id", mDbHelper.fetchIdByName(name));
 					ResultListFragment rlFrag = new ResultListFragment();
-					rlFrag.setArguments(args);
-
-					FragmentTransaction fragmentTransaction = anchor.getFamiliarActivity().mFragmentManager.beginTransaction();
-					fragmentTransaction.addToBackStack(null);
-
-					fragmentTransaction.replace(R.id.frag_view, rlFrag);
-					fragmentTransaction.commit();
-					anchor.getFamiliarActivity().hideKeyboard();
+					anchor.startNewFragment(rlFrag, args);
 				}
 				catch (SQLiteDatabaseCorruptException e) {
 					showDialog(CORRUPTION);
@@ -134,14 +127,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					Bundle args = new Bundle();
 					args.putLong("id", mDbHelper.fetchIdByName(name));
 					ResultListFragment rlFrag = new ResultListFragment();
-					rlFrag.setArguments(args);
-
-					FragmentTransaction fragmentTransaction = anchor.getFamiliarActivity().mFragmentManager.beginTransaction();
-					fragmentTransaction.addToBackStack(null);
-
-					fragmentTransaction.replace(R.id.frag_view, rlFrag);
-					fragmentTransaction.commit();
-					anchor.getFamiliarActivity().hideKeyboard();
+					anchor.startNewFragment(rlFrag, args);
 				}
 				catch (SQLiteDatabaseCorruptException e) {
 					showDialog(CORRUPTION);
@@ -181,14 +167,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 
 					// add a fragment
 					ResultListFragment rlFrag = new ResultListFragment();
-					rlFrag.setArguments(args);
-
-					FragmentTransaction fragmentTransaction = anchor.getFamiliarActivity().mFragmentManager.beginTransaction();
-					fragmentTransaction.addToBackStack(null);
-
-					fragmentTransaction.replace(R.id.frag_view, rlFrag);
-					fragmentTransaction.commit();
-					anchor.getFamiliarActivity().hideKeyboard();
+					anchor.startNewFragment(rlFrag, args);
 				}
 				catch (SQLiteDatabaseCorruptException e) {
 					showDialog(CORRUPTION);
@@ -230,13 +209,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					// add a fragment
 					ResultListFragment rlFrag = new ResultListFragment();
 					rlFrag.setArguments(args);
-
-					FragmentTransaction fragmentTransaction = anchor.getFamiliarActivity().mFragmentManager.beginTransaction();
-					fragmentTransaction.addToBackStack(null);
-
-					fragmentTransaction.replace(R.id.frag_view, rlFrag);
-					fragmentTransaction.commit();
-					anchor.getFamiliarActivity().hideKeyboard();
+					anchor.startNewFragment(rlFrag, args);
 				}
 				catch (SQLiteDatabaseCorruptException e) {
 					showDialog(CORRUPTION);
@@ -339,7 +312,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 		// in a transaction. We also want to remove any currently showing
 		// dialog, so make our own transaction and take care of that here.
 		FragmentTransaction ft = getFragmentManager().beginTransaction();
-		Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+		Fragment prev = getFragmentManager().findFragmentByTag(DIALOG_TAG);
 		if (prev != null) {
 			ft.remove(prev);
 		}
@@ -413,7 +386,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 				}
 			}
 		};
-		newFragment.show(ft, "dialog");
+		newFragment.show(ft, DIALOG_TAG);
 	}
 
 }

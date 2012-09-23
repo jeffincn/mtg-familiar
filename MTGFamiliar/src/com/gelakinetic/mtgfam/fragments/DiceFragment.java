@@ -30,7 +30,7 @@ public class DiceFragment extends FamiliarFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
-		
+
 		View myFragmentView = inflater.inflate(R.layout.dice_activity, container, false);
 
 		r = new Random();

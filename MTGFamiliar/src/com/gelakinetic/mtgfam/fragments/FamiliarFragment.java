@@ -2,6 +2,8 @@ package com.gelakinetic.mtgfam.fragments;
 
 import android.app.Instrumentation;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +23,7 @@ public class FamiliarFragment extends SherlockFragment {
 
 	CardDbAdapter								mDbHelper;
 	protected FamiliarFragment	anchor;
+	public static final String	DIALOG_TAG	= "dialog";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -39,13 +42,13 @@ public class FamiliarFragment extends SherlockFragment {
 	}
 
 	@Override
-	public void onResume(){
+	public void onResume() {
 		super.onResume();
 		MyApp appState = ((MyApp) getActivity().getApplicationContext());
 		String classname = this.getClass().getCanonicalName();
 		if (classname.equalsIgnoreCase("com.gelakinetic.mtgfam.fragments.CardViewFragment")) {
 			if (appState.getState() == CardViewFragment.QUITTOSEARCH) {
-				if(this.getFamiliarActivity().mFragmentManager.getBackStackEntryCount() == 0) {
+				if (this.getFamiliarActivity().mFragmentManager.getBackStackEntryCount() == 0) {
 					getActivity().finish();
 				}
 				else {
@@ -57,8 +60,12 @@ public class FamiliarFragment extends SherlockFragment {
 		else {
 			appState.setState(0);
 		}
+
+		// Clear any results. We don't want them persisting past this fragment, and
+		// they should have been looked at by now anyway
+		getFamiliarActivity().getFragmentResults();
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -92,11 +99,31 @@ public class FamiliarFragment extends SherlockFragment {
 	}
 
 	/*
-	 * When the search key is pressed, it will tell the fragment
-	 * If the fragment doesn't care what happens, return false
-	 * Otherwise override this, do whatever, and return true
+	 * When the search key is pressed, it will tell the fragment If the fragment
+	 * doesn't care what happens, return false Otherwise override this, do
+	 * whatever, and return true
 	 */
 	public boolean onInterceptSearchKey() {
 		return false;
+	}
+
+	protected void startNewFragment(FamiliarFragment frag, Bundle args) {
+		frag.setArguments(args);
+
+		FragmentTransaction fragmentTransaction = this.getFamiliarActivity().mFragmentManager.beginTransaction();
+		fragmentTransaction.addToBackStack(null);
+
+		fragmentTransaction.replace(R.id.frag_view, frag);
+		fragmentTransaction.commit();
+		this.getFamiliarActivity().hideKeyboard();
+	}
+
+	void removeDialog() {
+		FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+		Fragment prev = getFragmentManager().findFragmentByTag(DIALOG_TAG);
+		if (prev != null) {
+			ft.remove(prev);
+		}
+		ft.commit();
 	}
 }

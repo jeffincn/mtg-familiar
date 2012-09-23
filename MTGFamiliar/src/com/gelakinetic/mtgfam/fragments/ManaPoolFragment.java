@@ -77,7 +77,7 @@ public class ManaPoolFragment extends FamiliarFragment {
 		if (!loadSuccessful) {
 			// Log.e("Mana Pool", "Failed to locate all views from inflated XML");
 			Toast.makeText(this.getActivity(), "Mana pool failed to load!", Toast.LENGTH_LONG).show();
-			//this.finish();
+			// this.finish();
 			this.getFamiliarActivity().mFragmentManager.popBackStack();
 		}
 
@@ -236,7 +236,7 @@ public class ManaPoolFragment extends FamiliarFragment {
 				update();
 			}
 		});
-		
+
 		return myFragmentView;
 	}
 
@@ -270,9 +270,9 @@ public class ManaPoolFragment extends FamiliarFragment {
 	}
 
 	private void store() {
-		getFamiliarActivity().preferences.edit().putInt("whiteMana", white).putInt("blueMana", blue).putInt("blackMana", black)
-				.putInt("redMana", red).putInt("greenMana", green).putInt("colorlessMana", colorless)
-				.putInt("spellCount", spell).commit();
+		getFamiliarActivity().preferences.edit().putInt("whiteMana", white).putInt("blueMana", blue)
+				.putInt("blackMana", black).putInt("redMana", red).putInt("greenMana", green)
+				.putInt("colorlessMana", colorless).putInt("spellCount", spell).commit();
 	}
 
 	private void update() {

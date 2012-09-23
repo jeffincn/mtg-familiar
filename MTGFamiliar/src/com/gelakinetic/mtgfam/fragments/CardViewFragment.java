@@ -620,7 +620,7 @@ public class CardViewFragment extends FamiliarFragment {
 			}
 			if (error == null) {
 				if (loadTo == DIALOG) {
-					removeDialog(GETIMAGE);
+					removeDialog();
 					showDialog(GETIMAGE);
 				}
 				else if (loadTo == MAINPAGE) {
@@ -740,7 +740,7 @@ public class CardViewFragment extends FamiliarFragment {
 				return;
 			}
 			if (error == null) {
-				anchor.getFamiliarActivity().removeDialog(GETPRICE);
+				anchor.removeDialog();
 				showDialog(GETPRICE);
 			}
 			else {
@@ -841,20 +841,12 @@ public class CardViewFragment extends FamiliarFragment {
 		}
 	}
 
-	protected void dismissDialog(final int id) {
-		// TODO implement
-	}
-
-	protected void removeDialog(final int id) {
-		// TODO implement
-	}
-
 	protected void showDialog(final int id) {
 		// DialogFragment.show() will take care of adding the fragment
 		// in a transaction. We also want to remove any currently showing
 		// dialog, so make our own transaction and take care of that here.
 		FragmentTransaction ft = getFragmentManager().beginTransaction();
-		Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+		Fragment prev = getFragmentManager().findFragmentByTag(DIALOG_TAG);
 		if (prev != null) {
 			ft.remove(prev);
 		}
@@ -1010,7 +1002,7 @@ public class CardViewFragment extends FamiliarFragment {
 				}
 			}
 		};
-		newFragment.show(ft, "dialog");
+		newFragment.show(ft, DIALOG_TAG);
 	}
 
 	@Override
@@ -1097,7 +1089,7 @@ public class CardViewFragment extends FamiliarFragment {
 			case R.id.quittosearch:
 				MyApp appState = ((MyApp) this.getFamiliarActivity().getApplicationContext());
 				appState.setState(QUITTOSEARCH);
-				if(anchor.getFamiliarActivity().mFragmentManager.getBackStackEntryCount() == 0) {
+				if (anchor.getFamiliarActivity().mFragmentManager.getBackStackEntryCount() == 0) {
 					anchor.getFamiliarActivity().finish();
 				}
 				else {

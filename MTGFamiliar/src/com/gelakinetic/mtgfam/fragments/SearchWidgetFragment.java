@@ -1,27 +1,26 @@
 package com.gelakinetic.mtgfam.fragments;
 
+import android.database.Cursor;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
+
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.fragments.SearchViewFragment.SearchCriteria;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.ResultListAdapter;
-
-import android.database.Cursor;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.AdapterView.OnItemClickListener;
 
 public class SearchWidgetFragment extends FamiliarFragment {
 
@@ -55,15 +54,8 @@ public class SearchWidgetFragment extends FamiliarFragment {
 				Bundle args = new Bundle();
 				args.putBoolean(SearchViewFragment.RANDOM, false);
 				args.putSerializable("id", id);
-				ResultListFragment rlFrag = new ResultListFragment();
-				rlFrag.setArguments(args);
-
-				FragmentTransaction fragmentTransaction = anchor.getFamiliarActivity().mFragmentManager.beginTransaction();
-				fragmentTransaction.addToBackStack(null);
-
-				fragmentTransaction.replace(R.id.frag_view, rlFrag);
-				fragmentTransaction.commit();
-				anchor.getFamiliarActivity().hideKeyboard();
+				CardViewFragment cvFrag = new CardViewFragment();
+				anchor.startNewFragment(cvFrag, args);
 			}
 		});
 
@@ -111,14 +103,7 @@ public class SearchWidgetFragment extends FamiliarFragment {
 		args.putBoolean(SearchViewFragment.RANDOM, false);
 		args.putSerializable(SearchViewFragment.CRITERIA, criteria);
 		ResultListFragment rlFrag = new ResultListFragment();
-		rlFrag.setArguments(args);
-
-		FragmentTransaction fragmentTransaction = this.getFamiliarActivity().mFragmentManager.beginTransaction();
-		fragmentTransaction.addToBackStack(null);
-
-		fragmentTransaction.replace(R.id.frag_view, rlFrag);
-		fragmentTransaction.commit();
-		anchor.getFamiliarActivity().hideKeyboard();
+		anchor.startNewFragment(rlFrag, args);
 	}
 
 	private class AutocompleteQueryTask extends AsyncTask<String, Void, Void> {

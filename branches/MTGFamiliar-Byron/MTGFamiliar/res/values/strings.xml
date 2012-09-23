@@ -191,6 +191,24 @@
     <string name="mana_pool_clear_all">Clear All</string>
     
     
+    <!-- Card counters activity -->
+    <string name="card_counters_custom">Custom</string>
+    <string name="card_counters_prompt">Counter Types</string>
+    <string-array name="card_counters_spinner">
+        <item>+1/+1</item>
+    	<item>-0/-1</item>
+		<item>+0/+1</item>
+		<item>-0/-2</item>
+		<item>+0/+2</item>
+		<item>-1/-0</item>
+		<item>+1/+0</item>
+		<item>-1/-1</item>
+		<item>+1/+2</item>
+		<item>-2/-1</item>
+		<item>+2/+2</item>
+    </string-array>
+    
+    
     <!-- Card trading activity -->
     <string name="trader_name">Name</string>
     <string name="trader_add_card">Add Card</string>

@@ -1,49 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical" >
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
 
-    <ScrollView
-        android:id="@+id/scrollView1"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" >
-
-        <LinearLayout
-        	android:id="@+id/trackedcardlist"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" >
-
-            <AutoCompleteTextView
-                android:id="@+id/namesearch"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="@string/search_name"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                android:singleLine="true" >
-
-                <requestFocus />
-            </AutoCompleteTextView>
-            
-	        <TableLayout
-	        	android:id="@+id/cardcounterstable"
+	<ScrollView
+	    android:id="@+id/scrollView1"
+	    android:layout_width="fill_parent"
+	    android:layout_height="0dp"
+	    android:layout_weight="1">
+	
+	    <LinearLayout
+	    	android:id="@+id/trackedcardlist"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="vertical">
+	
+	        <AutoCompleteTextView
+	            android:id="@+id/namesearch"
 	            android:layout_width="fill_parent"
-	            android:layout_height="fill_parent"
-	            android:layout_weight="1" >
-	            <!--
-	            <TableRow
-	                android:id="@+id/tableRow1"
-	                android:layout_width="wrap_content"
-	                android:layout_height="wrap_content" >
-	                <TextView android:text="Hello"/>
-	                <TextView android:text="Hello2" android:layout_weight="1.0" android:layout_gravity="right" android:gravity="right" />
-	            </TableRow>
-	            -->
-	        </TableLayout>
-        </LinearLayout>
-    </ScrollView>
+	            android:layout_height="0dp"
+	            android:layout_weight="1"
+	            android:hint="@string/search_name"
+	            android:imeOptions="actionSearch"
+	            android:inputType="text"
+	            android:singleLine="true" >
+	
+	            <requestFocus />
+	        </AutoCompleteTextView>
+
+		    <TableLayout
+				android:id="@+id/cardcounterstable"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content">
+			</TableLayout>
+	    </LinearLayout>
+	</ScrollView>
+    <!-- content fixed to the bottom of the screen -->
+    <LinearLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="horizontal">
+		<ImageView
+		    android:id="@+id/reset_button"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:onClick="reset"
+		    android:padding="15dp"
+		    android:src="@xml/reset_button_xml" />
+    </LinearLayout>
 </LinearLayout>

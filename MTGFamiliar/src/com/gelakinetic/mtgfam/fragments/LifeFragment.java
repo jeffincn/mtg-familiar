@@ -119,6 +119,56 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 	/** Called when the activity is first created. */
 	@Override
+	public void onCreate(Bundle savedInstanceState){
+		super.onCreate(savedInstanceState);
+
+		timerStart = 1000;
+		timerTick = 100;
+		timerValue = 0;
+		timerLock = new Object();
+		handler = new Handler();
+		
+		runnable = new Runnable() {
+			public void run() {
+				boolean doCommit = false;
+				synchronized (timerLock) {
+					if (timerValue > 0) {
+						timerValue -= timerTick;
+						if (timerValue <= 0) {
+							// This is used instead of having the commit loop here so I don't
+							// have to think about deadlock
+							doCommit = true;
+						}
+					}
+				}
+
+				if (doCommit) {
+					handler.post(new Runnable() {
+						public void run() {
+							for (Player p : players) {
+								synchronized (p.lifeAdapter) {
+									p.lifeAdapter.commit();
+								}
+								synchronized (p.poisonAdapter) {
+									p.poisonAdapter.commit();
+								}
+							}
+						}
+					});
+				}
+			}
+		};
+		scheduler.scheduleWithFixedDelay(runnable, timerTick, timerTick, TimeUnit.MILLISECONDS);
+	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		scheduler.shutdown();
+	}
+	
+	
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 
@@ -179,45 +229,6 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			}
 		});
 
-		timerStart = 1000;
-		timerTick = 100;
-		timerValue = 0;
-		timerLock = new Object();
-		handler = new Handler();
-
-		runnable = new Runnable() {
-			public void run() {
-				boolean doCommit = false;
-				synchronized (timerLock) {
-					if (timerValue > 0) {
-						timerValue -= timerTick;
-						if (timerValue <= 0) {
-							// This is used instead of having the commit loop here so I don't
-							// have to think about deadlock
-							doCommit = true;
-						}
-					}
-				}
-
-				if (doCommit) {
-					handler.post(new Runnable() {
-						public void run() {
-							for (Player p : players) {
-								synchronized (p.lifeAdapter) {
-									p.lifeAdapter.commit();
-								}
-								synchronized (p.poisonAdapter) {
-									p.poisonAdapter.commit();
-								}
-							}
-						}
-					});
-				}
-			}
-		};
-
-		scheduler.scheduleWithFixedDelay(runnable, timerTick, timerTick, TimeUnit.MILLISECONDS);
-
 		setType(LIFE);
 
 		if (getFamiliarActivity().preferences.getBoolean("hasTts", false)) {
@@ -241,7 +252,6 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
-		scheduler.shutdown();
 		if (tts != null) {
 			tts.shutdown();
 		}
@@ -250,7 +260,6 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	@Override
 	public void onPause() {
 		super.onPause();
-
 		if (canGetLock) {
 			wl.release();
 		}

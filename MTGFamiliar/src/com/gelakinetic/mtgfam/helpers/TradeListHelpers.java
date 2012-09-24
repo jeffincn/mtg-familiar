@@ -24,6 +24,7 @@ import android.widget.BaseExpandableListAdapter;
 import com.gelakinetic.mtgfam.activities.CardTradingActivity;
 import com.gelakinetic.mtgfam.activities.WishlistActivity;
 import com.gelakinetic.mtgfam.fragments.CardViewFragment;
+import com.gelakinetic.mtgfam.fragments.TradeFragment;
 
 public class TradeListHelpers {
 
@@ -110,16 +111,16 @@ public class TradeListHelpers {
 		Context											mCtx;
 		private int									priceSetting;
 		private WishlistActivity		wa;
-		private CardTradingActivity	cta;
+		private TradeFragment	cta;
 
-		public FetchPriceTask(CardData _data, Object _toNotify, int ps, CardTradingActivity cta, WishlistActivity wa) {
+		public FetchPriceTask(CardData _data, Object _toNotify, int ps, TradeFragment cta, WishlistActivity wa) {
 			data = _data;
 			toNotify = _toNotify;
 			if (wa != null) {
 				mCtx = (Context) wa;
 			}
 			if (cta != null) {
-				mCtx = (Context) cta;
+				mCtx = (Context) cta.getActivity();
 			}
 			priceSetting = ps;
 			this.cta = cta;

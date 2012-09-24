@@ -231,6 +231,14 @@ public class RoundTimerFragment extends FamiliarFragment {
 						final CheckBox chkFifteen = (CheckBox) v.findViewById(R.id.timer_pref_fifteen);
 						final CheckBox chkTen = (CheckBox) v.findViewById(R.id.timer_pref_ten);
 						final CheckBox chkFive = (CheckBox) v.findViewById(R.id.timer_pref_five);
+						
+						boolean fifteen = getFamiliarActivity().preferences.getBoolean("fifteenMinutePref", false);
+						boolean ten = getFamiliarActivity().preferences.getBoolean("tenMinutePref", false);
+						boolean five = getFamiliarActivity().preferences.getBoolean("fiveMinutePref", false);
+						
+						chkFifteen.setChecked(fifteen);
+						chkTen.setChecked(ten);
+						chkFive.setChecked(five);
 
 						return new AlertDialog.Builder(getActivity()).setView(v).setTitle(R.string.timer_warning_dialog_title)
 								.setPositiveButton("OK", new OnClickListener() {

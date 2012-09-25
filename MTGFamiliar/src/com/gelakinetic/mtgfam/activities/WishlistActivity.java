@@ -194,6 +194,9 @@ public class WishlistActivity extends FamiliarActivity {
 		}
 
 		ArrayList<CardData> lWishlist = new ArrayList<CardData>();
+		cardNames.clear();
+		cardSetNames.clear();
+		cardSetWishlists.clear();
 
 		WishlistHelpers.ReadWishlist(getApplicationContext(), (WishlistActivity) me, mDbHelper, lWishlist);
 
@@ -221,76 +224,96 @@ public class WishlistActivity extends FamiliarActivity {
 		ArrayList<String> setCodes;
 		ArrayList<CardData> lCardlist;
 
-		// if this is the first copy of the card, build a full list of set
-		// code/counts for that card
 		int position = cardNames.indexOf(card.name);
+		//if the card's not in the list yet
 		if (position == -1) {
 			setCodes = new ArrayList<String>();
 			lCardlist = new ArrayList<CardData>();
-			Cursor c;
-			if (verbose) {
-				c = mDbHelper.fetchCardByName(card.name, CardDbAdapter.allData);
-			}
-			else {
-				c = mDbHelper.fetchCardByName(card.name, new String[] { CardDbAdapter.KEY_SET, CardDbAdapter.KEY_NUMBER,
-						CardDbAdapter.KEY_RARITY });
-			}
-			if (c.getCount() == 0) {
-				Toast.makeText(this, R.string.wishlist_toast_no_card, Toast.LENGTH_LONG).show();
-				c.close();
-				return;
-			}
-
-			// make a place holder item for each version set of this card
-			while (!c.isAfterLast()) {
+			if (verbose || card.setCode == "" || card.rarity == 45) {
+				Cursor c;
+				if (card.setCode != "" && card.rarity != 45){
+					c = mDbHelper.fetchCardByNameAndSet(card.name, card.setCode);
+				} else {
+					if (verbose) {
+						c = mDbHelper.fetchLatestCardByName(card.name, CardDbAdapter.allData);
+					} else {
+						c = mDbHelper.fetchLatestCardByName(card.name, new String[] { CardDbAdapter.KEY_SET, CardDbAdapter.KEY_NUMBER,
+								CardDbAdapter.KEY_RARITY });
+					}
+				}
+				if (c.getCount() == 0) {
+					Toast.makeText(this, R.string.wishlist_toast_no_card, Toast.LENGTH_LONG).show();
+					c.close();
+					return;
+				}
 				String setCode = c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET));
 				String tcgName = mDbHelper.getTCGname(setCode);
 				setCodes.add(setCode);
 
 				if (verbose) {
-					lCardlist.add(new TradeListHelpers().new CardData(card.name, tcgName, setCode, 0, 0, "loading", c.getString(c
+					card = mTradeListHelper.new CardData(card.name, tcgName, setCode, card.numberOf, 0, "loading", c.getString(c
 							.getColumnIndex(CardDbAdapter.KEY_NUMBER)), c.getString(c.getColumnIndex(CardDbAdapter.KEY_TYPE)), c
 							.getString(c.getColumnIndex(CardDbAdapter.KEY_MANACOST)), c.getString(c
 							.getColumnIndex(CardDbAdapter.KEY_ABILITY)), c.getString(c.getColumnIndex(CardDbAdapter.KEY_POWER)), c
 							.getString(c.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS)), c.getInt(c
-							.getColumnIndex(CardDbAdapter.KEY_LOYALTY)), c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY))));
+							.getColumnIndex(CardDbAdapter.KEY_LOYALTY)), c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY)));
 				}
 				else {
-					lCardlist.add(new TradeListHelpers().new CardData(card.name, tcgName, setCode, 0, 0, "loading", c.getString(c
+					card = mTradeListHelper.new CardData(card.name, tcgName, setCode, card.numberOf, 0, "loading", c.getString(c
 							.getColumnIndex(CardDbAdapter.KEY_NUMBER)), null, null, null, null, null, 0, c.getInt(c
-							.getColumnIndex(CardDbAdapter.KEY_RARITY))));
+							.getColumnIndex(CardDbAdapter.KEY_RARITY)));
 				}
-				c.moveToNext();
+				c.close();
+				lCardlist.add(card);
+			} else {
+				setCodes.add(card.setCode);
+				lCardlist.add(card);
 			}
-			c.close();
+			//add it (with child lists)
 			cardNames.add(card.name);
 			cardSetNames.add(setCodes);
 			cardSetWishlists.add(lCardlist);
-
-			position = cardNames.indexOf(card.name);
-		}
-		else {
-			// otherwise, we've already made a place holder - just find it
+		} else {
 			setCodes = cardSetNames.get(position);
 			lCardlist = cardSetWishlists.get(position);
-		}
-		// now that we have the correct place holder, add the card or update the
-		// set count with what as passed in
-		if (card.setCode != null && card.setCode != "") {
-			int location = setCodes.indexOf(card.setCode);
+			String setCode = card.setCode;
+			String tcgName = card.tcgName;
+			int rarity = card.rarity;
 			int numberOf = card.numberOf;
-			card = lCardlist.get(location);
-			card.numberOf = numberOf;
-			lCardlist.set(location, card);
+			if (setCode == "" || rarity == 45){
+				Cursor c;
+				c = mDbHelper.fetchLatestCardByName(card.name, new String[] { CardDbAdapter.KEY_SET, CardDbAdapter.KEY_NUMBER,
+						CardDbAdapter.KEY_RARITY });
+				if (c.getCount() == 0) {
+					Toast.makeText(this, R.string.wishlist_toast_no_card, Toast.LENGTH_LONG).show();
+					c.close();
+					return;
+				}
+				setCode = c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET));
+				rarity = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY));
+				c.close();
+				tcgName = mDbHelper.getTCGname(card.setCode);
+			}
+			int location = setCodes.indexOf(card.setCode);
+			if (location != -1) {
+				card = lCardlist.get(location);
+				card.numberOf += numberOf;
+				//we shouldn't need this if it's a pointer
+				//lCardlist.set(location, card);
+			}
+			else {
+				//clone the first item in the list to get whatever details we need
+				card = (CardData) lCardlist.get(0).clone();
+				card.setCode = setCode;
+				card.tcgName = tcgName;
+				card.rarity = rarity;
+				card.numberOf = numberOf;
+				setCodes.add(card.setCode);
+				lCardlist.add(card);
+			}
+		
 		}
-		else {
-			int i = card.numberOf;
-			card = lCardlist.get(0);
-			card.numberOf += i;
-			lCardlist.set(0, card);
-		}
-		cardSetWishlists.set(position, lCardlist);
-
+		
 		if(showTotalPrice || showIndividualPrices) {
 			FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(card, aaExpWishlist, priceSetting, null,
 					(WishlistActivity) me);
@@ -305,7 +328,7 @@ public class WishlistActivity extends FamiliarActivity {
 					final WishlistHelpers wh = new WishlistHelpers();
 					Dialog dialog = (wh).getDialog(cardNames.get(positionForDialog), this,
 							cardSetWishlists.get(positionForDialog));
-					
+
 					final Dialog dlg = dialog;
 					dialog.setOnDismissListener(new OnDismissListener() {
 						@Override
@@ -318,6 +341,10 @@ public class WishlistActivity extends FamiliarActivity {
 									LinearLayout lvSets = (LinearLayout) dlg.findViewById(R.id.setList);
 
 									ArrayList<CardData> cardlist = cardSetWishlists.get(positionForDialog);
+									ArrayList<String> setNames = cardSetNames.get(positionForDialog);
+
+									cardlist.clear();
+									setNames.clear();
 									int totalCards = 0;
 									for (int i = 0; i < lvSets.getChildCount(); i++) {
 										View v = lvSets.getChildAt(i);
@@ -328,12 +355,16 @@ public class WishlistActivity extends FamiliarActivity {
 										catch (NumberFormatException e) {
 											numberField = 0;
 										}
-										CardData cd = cardlist.get(i);
-										int prior = cd.numberOf;
-										cd.numberOf = numberField;
-										totalCards += numberField;
-										if (prior != numberField && numberField != 0) {
+
+										if(numberField >0 ){
+											String setName = ((TextView) v.findViewById(R.id.cardset)).getText().toString();
+											String setCode = mDbHelper.getSetCode(setName);
+											totalCards += numberField;
+											CardData cd = mTradeListHelper.new CardData(cardNames.get(positionForDialog), setName, setCode, numberField, 0, "loading",
+														null, null, null, null, null, null, CardDbAdapter.NOONECARES, '-');
+											
 											if (showTotalPrice || showIndividualPrices){
+												cd = TradeListHelpers.FetchCardData(mCtx,cd);
 												cd.message = ("loading");
 												FetchPriceTask task = mTradeListHelper.new FetchPriceTask(cd, aaExpWishlist, priceSetting, null,
 														(WishlistActivity) me);
@@ -341,8 +372,9 @@ public class WishlistActivity extends FamiliarActivity {
 											}
 											else
 												cd = mTradeListHelper.FetchCardData(mCtx, cd);
+											setNames.add(setName);
+											cardlist.add(cd);
 										}
-										cardlist.set(i, cd);
 									}
 									if (totalCards == 0) {
 										cardSetNames.remove(positionForDialog);
@@ -587,12 +619,18 @@ public class WishlistActivity extends FamiliarActivity {
 				ViewGroup parent) {
 			View v = convertView;
 			CardData data = WishlistActivity.cardSetWishlists.get(groupPosition).get(childPosition);
-			// empty view for 0-count rows
-			if (data == null || data.numberOf == 0)
-				v = new View(mCtx);
-			else {
+
+			if (v == null) {
 				LayoutInflater inf = getLayoutInflater();
 				v = inf.inflate(R.layout.wishlist_cardset_row, null);
+			}
+			
+//			// empty view for 0-count rows
+//			if (data == null || data.numberOf == 0)
+//				v = new View(mCtx);
+//			else {
+//				LayoutInflater inf = getLayoutInflater();
+//				v = inf.inflate(R.layout.wishlist_cardset_row, null);
 				TextView setField = (TextView) v.findViewById(R.id.wishlistRowSet);
 				TextView priceField = (TextView) v.findViewById(R.id.wishlistRowPrice);
 
@@ -621,13 +659,13 @@ public class WishlistActivity extends FamiliarActivity {
 						break;
 				}
 				priceField.setText((showIndividualPrices?"":"x") + data.numberOf + (showIndividualPrices? ("x" + (data.hasPrice() ? data.getPriceString() : data.message)):""));
-				if (data.hasPrice()) {
+				if (data.hasPrice() || !showIndividualPrices) {
 					priceField.setTextColor(resources.getColor(R.color.light_gray));
 				}
 				else {
 					priceField.setTextColor(resources.getColor(R.color.red));
 				}
-			}
+//			}
 			return v;
 		}
 

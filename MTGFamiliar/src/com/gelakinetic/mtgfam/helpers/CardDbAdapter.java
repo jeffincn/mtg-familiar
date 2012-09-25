@@ -356,7 +356,10 @@ public class CardDbAdapter {
 
 		args.put(KEY_NAME_TCGPLAYER, name);
 
-		return mDb.update(DATABASE_TABLE_SETS, args, KEY_CODE + " = '" + code + "'", null) > 0;
+		boolean wasSuccess = mDb.update(DATABASE_TABLE_SETS, args, KEY_CODE + " = '" + code + "'", null) > 0;
+		if (wasSuccess)
+				saturateSetCache();
+		return wasSuccess;
 	}
 
 	/**
@@ -510,6 +513,39 @@ public class CardDbAdapter {
 		}
 		sql += " FROM " + DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = " + DATABASE_TABLE_CARDS
 				+ "." + KEY_SET + " WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + name + "' ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC";
+		Cursor mCursor = null;
+
+		try {
+			mCursor = mDb.rawQuery(sql, null);
+		}
+		catch (SQLiteException e) {
+			showDbErrorToast();
+		}
+		catch (IllegalStateException e) {
+			showDbErrorToast();
+		}
+
+		if (mCursor != null) {
+			mCursor.moveToFirst();
+		}
+		return mCursor;
+	}
+
+	public Cursor fetchLatestCardByName(String name, String[] fields) throws SQLException {
+		name = name.replace("'", "''").replace("æ", "Æ");
+		String sql = "SELECT ";
+		boolean first = true;
+		for (String field : fields) {
+			if (first) {
+				first = false;
+			}
+			else {
+				sql += ", ";
+			}
+			sql += DATABASE_TABLE_CARDS + "." + field;
+		}
+		sql += " FROM " + DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = " + DATABASE_TABLE_CARDS
+				+ "." + KEY_SET + " WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + name + "' ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC LIMIT 1";
 		Cursor mCursor = null;
 
 		try {
@@ -1217,16 +1253,68 @@ public class CardDbAdapter {
 		return -1;
 	}
 
-	public String getTCGname(String setCode) {
-		Cursor mCursor = null;
-		String name = null;
-		String statement = "(" + KEY_CODE + " = '" + setCode + "')";
+	//use a hash map for performance
+	private HashMap<String,String>							setSymbolsNames;
+	private HashMap<String,String>							setNamesSymbols;
+	public void saturateSetCache(){
+		setSymbolsNames = new HashMap<String,String>();
+		setNamesSymbols = new HashMap<String,String>();
+		Cursor setCursor = fetchAllTcgNames();
+		setCursor.moveToFirst();
+
+		setSymbolsNames.clear();
+		setNamesSymbols.clear();
+
+		for (int i = 0; i < setCursor.getCount(); i++) {
+			setSymbolsNames.put(setCursor.getString(setCursor.getColumnIndex(CardDbAdapter.KEY_CODE)),
+					setCursor.getString(setCursor.getColumnIndex(CardDbAdapter.KEY_NAME_TCGPLAYER)));
+			setNamesSymbols.put(setCursor.getString(setCursor.getColumnIndex(CardDbAdapter.KEY_NAME_TCGPLAYER)),
+					setCursor.getString(setCursor.getColumnIndex(CardDbAdapter.KEY_CODE)));
+			setCursor.moveToNext();
+		}
+
+		setCursor.close();
+	}
+	
+	public String getTCGname(String setCode){
+		if(setSymbolsNames == null || mDbHelper == null)
+			saturateSetCache();
+		return setSymbolsNames.get(setCode);
+	}
+
+	public String getSetCode(String TCGname){
+		if(setSymbolsNames == null || mDbHelper == null)
+			saturateSetCache();
+		return setNamesSymbols.get(TCGname);
+	}
+
+//	public String getTCGname(String setCode) {
+//		Cursor mCursor = null;
+//		String name = null;
+//		String statement = "(" + KEY_CODE + " = '" + setCode + "')";
+//		try {
+//			mCursor = mDb.query(true, DATABASE_TABLE_SETS, new String[] { KEY_NAME_TCGPLAYER }, statement, null, null, null,
+//					KEY_NAME_TCGPLAYER, null);
+//			mCursor.moveToFirst();
+//			name = mCursor.getString(mCursor.getColumnIndex(KEY_NAME_TCGPLAYER));
+//			mCursor.close();
+//		}
+//		catch (SQLiteException e) {
+//			showDbErrorToast();
+//		}
+//		catch (IllegalStateException e) {
+//			showDbErrorToast();
+//		}
+//
+//		return name;
+//	}
+
+	public Cursor fetchAllTcgNames() {
+
+		Cursor c = null;
 		try {
-			mCursor = mDb.query(true, DATABASE_TABLE_SETS, new String[] { KEY_NAME_TCGPLAYER }, statement, null, null, null,
-					KEY_NAME_TCGPLAYER, null);
-			mCursor.moveToFirst();
-			name = mCursor.getString(mCursor.getColumnIndex(KEY_NAME_TCGPLAYER));
-			mCursor.close();
+			c = mDb.query(DATABASE_TABLE_SETS, new String[] { KEY_NAME_TCGPLAYER, KEY_CODE }, null, null, null,
+					null, KEY_DATE + " DESC");
 		}
 		catch (SQLiteException e) {
 			showDbErrorToast();
@@ -1235,9 +1323,9 @@ public class CardDbAdapter {
 			showDbErrorToast();
 		}
 
-		return name;
+		return c;
 	}
-
+	
 	public Cursor getAllNames() {
 		try {
 			return mDb.query(true, DATABASE_TABLE_CARDS, new String[] { /* KEY_ID, */KEY_NAME }, null, null, null, null,

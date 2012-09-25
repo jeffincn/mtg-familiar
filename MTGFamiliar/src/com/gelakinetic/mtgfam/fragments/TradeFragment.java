@@ -156,7 +156,7 @@ public class TradeFragment extends FamiliarFragment {
 						numberfield.setText("1");
 						return;
 					}
-					CardData data = mTradeListHelper.new CardData(cardName, tcgName, setCode, numberOf, 0, "loading", null);
+					CardData data = mTradeListHelper.new CardData(cardName, tcgName, setCode, numberOf, 0, "loading", null, '-');
 					
 					lTradeLeft.add(0, data);
 					aaTradeLeft.notifyDataSetChanged();
@@ -198,7 +198,7 @@ public class TradeFragment extends FamiliarFragment {
 						numberfield.setText("1");
 						return;
 					}
-					CardData data = mTradeListHelper.new CardData(cardName, tcgName, setCode, numberOf, 0, "loading", null);
+					CardData data = mTradeListHelper.new CardData(cardName, tcgName, setCode, numberOf, 0, "loading", null, '-');
 
 					lTradeRight.add(0, data);
 					aaTradeRight.notifyDataSetChanged();
@@ -633,7 +633,7 @@ public class TradeFragment extends FamiliarFragment {
 					int side = Integer.parseInt(parts[0]);
 					int numberOf = Integer.parseInt(parts[3]);
 					
-					CardData cd = mTradeListHelper.new CardData(cardName, tcgName, cardSet, numberOf, 0, "loading", null);
+					CardData cd = mTradeListHelper.new CardData(cardName, tcgName, cardSet, numberOf, 0, "loading", null, '-');
 					if (side == CardDbAdapter.LEFT) {
 						lTradeLeft.add(0, cd);
 						FetchPriceTask loadPrice = 

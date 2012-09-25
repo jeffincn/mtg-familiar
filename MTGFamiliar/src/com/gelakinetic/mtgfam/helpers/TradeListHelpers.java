@@ -40,7 +40,7 @@ public class TradeListHelpers {
 	// private static final int AVG_PRICE = 1;
 	private static final int		HIGH_PRICE				= 2;
 
-	public CardData FetchCardData(Context mCtx, CardData _data) {
+	public static CardData FetchCardData(Context mCtx, CardData _data) {
 		CardData data = _data;
 		try {
 			CardDbAdapter mDbHelper = new CardDbAdapter(mCtx);
@@ -260,7 +260,7 @@ public class TradeListHelpers {
 		}
 	}
 
-	public class CardData {
+	public class CardData implements Cloneable {
 
 		public String	name;
 		public String	cardNumber;
@@ -295,7 +295,7 @@ public class TradeListHelpers {
 			this.rarity = rarity;
 		}
 
-		public CardData(String name, String tcgName, String setCode, int numberOf, int price, String message, String number) {
+		public CardData(String name, String tcgName, String setCode, int numberOf, int price, String message, String number, int rarity) {
 			this.name = name;
 			this.cardNumber = number;
 			this.setCode = setCode;
@@ -303,12 +303,15 @@ public class TradeListHelpers {
 			this.numberOf = numberOf;
 			this.price = price;
 			this.message = message;
+			this.rarity = rarity;
 		}
 
-		public CardData(String cardName, String cardSet, int numberOf) {
+		public CardData(String cardName, String cardSet, int numberOf, String number, int rarity) {
 			this.name = cardName;
 			this.numberOf = numberOf;
 			this.setCode = cardSet;
+			this.cardNumber = number;
+			this.rarity = rarity;
 		}
 
 		public String getPriceString() {
@@ -322,7 +325,7 @@ public class TradeListHelpers {
 		public static final String	delimiter	= "%";
 
 		public String toString() {
-			return this.name + delimiter + this.setCode + delimiter + this.numberOf + '\n';
+			return this.name + delimiter + this.setCode + delimiter + this.numberOf + delimiter + this.cardNumber + delimiter + this.rarity + '\n';
 		}
 
 		public String toString(int side) {
@@ -332,5 +335,15 @@ public class TradeListHelpers {
 		public String toReadableString(boolean includeTcgName) {
 			return String.valueOf(this.numberOf) + ' ' + this.name + (includeTcgName?" (" + this.tcgName + ')':"") + '\n';
 		}
+
+		public Object clone() { 
+	        try {
+				return super.clone();
+			} catch (CloneNotSupportedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+			} 
+		} 
 	}
 }

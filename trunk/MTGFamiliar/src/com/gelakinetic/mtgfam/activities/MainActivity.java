@@ -27,10 +27,10 @@ import android.support.v4.app.FragmentTransaction;
 
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.fragments.CardViewFragment;
-import com.gelakinetic.mtgfam.fragments.LifeFragment;
 import com.gelakinetic.mtgfam.fragments.ResultListFragment;
 import com.gelakinetic.mtgfam.fragments.SearchViewFragment;
 import com.gelakinetic.mtgfam.fragments.SearchViewFragment.SearchCriteria;
+import com.gelakinetic.mtgfam.fragments.WishlistFragment;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 
 public class MainActivity extends FamiliarActivity {
@@ -85,7 +85,7 @@ public class MainActivity extends FamiliarActivity {
 
 				// TODO a preference should toggle what fragment is loaded
 				//SearchViewFragment svFrag = new SearchViewFragment();
-				LifeFragment svFrag = new LifeFragment();
+				WishlistFragment svFrag = new WishlistFragment();
 				fragmentTransaction.add(R.id.frag_view, svFrag);
 				fragmentTransaction.commit();
 			}

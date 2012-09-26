@@ -11,7 +11,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnDismissListener;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,14 +21,14 @@ import android.widget.Toast;
 
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.activities.FamiliarActivity;
-import com.gelakinetic.mtgfam.activities.WishlistActivity;
+import com.gelakinetic.mtgfam.fragments.FamiliarFragment;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
 
 public class WishlistHelpers {
 	private static final String wishlistName = "card.wishlist";
 
-	private static final int DONE = 1;
-	private static final int CANCEL = 2;
+	public static final int DONE = 1;
+	public static final int CANCEL = 2;
 	
 	public static void WriteWishlist(Context mCtx, ArrayList<CardData> lWishlist) {
 		try {
@@ -112,7 +111,7 @@ public class WishlistHelpers {
 						CardData cd = (tlh).new CardData(cardName, cardSet,
 								numberOf, number, rarity);
 						if (rarity == '-' || number == null)
-							cd = (tlh).FetchCardData(mCtx, cd);
+							cd = TradeListHelpers.FetchCardData(mCtx, cd);
 						wishlist.add(cd);
 					}
 				}
@@ -145,8 +144,7 @@ public class WishlistHelpers {
 		}
 	}
 
-	public static void ReadWishlist(Context mCtx, WishlistActivity activity,
-			CardDbAdapter mDbHelper, ArrayList<CardData> lWishlist) {
+	public static void ReadWishlist(Context mCtx, CardDbAdapter mDbHelper, ArrayList<CardData> lWishlist) {
 		String[] files = mCtx.fileList();
 		Boolean wishlistExists = false;
 		for (String fileName : files) {
@@ -182,7 +180,7 @@ public class WishlistHelpers {
 							tcgName, cardSet, numberOf, 0, "loading", number,
 							rarity);
 					if (rarity == '-' || number == null)
-						cd = tradeListHelper.FetchCardData(mCtx, cd);
+						cd = TradeListHelpers.FetchCardData(mCtx, cd);
 					lWishlist.add(0, cd);
 				}
 			} catch (NumberFormatException e) {
@@ -197,27 +195,60 @@ public class WishlistHelpers {
 	// Variables for the dialog. Like the highlander, there should only be one
 	public int dismissReason = 0;
 	LinearLayout lvSets;
-	Context mCtx;
 	public ArrayList<CardData> lCardlist;
 	String cardName;
 	FamiliarActivity act;
 
-	public Dialog getDialog(String cn, final FamiliarActivity fa) {
-		return getDialog(cn, fa, null);
+	public void onDialogDismissed(){
+		switch (dismissReason) {
+		case CANCEL:
+			// this will refill the dialog with the values in the
+			// wishlist otherwise the changed values will persist in the
+			// dialog even if they aren't saved
+			fillWishlistDialog(null);
+			bindWishlistRows();
+			break;
+		case DONE:
+		default:
+			ArrayList<CardData> newCards = new ArrayList<CardData>();
+	
+			for (int i = 0; i < lvSets.getChildCount(); i++) {
+				View v = lvSets.getChildAt(i);
+				int numberField;
+				try {
+					numberField = Integer.valueOf(((EditText) v
+							.findViewById(R.id.numberInput)).getText()
+							.toString());
+				} catch (NumberFormatException e) {
+					numberField = 0;
+				}
+				if (numberField != 0) {
+					// return the CardData at that position
+					CardData cd = (CardData) lCardlist.get(i);
+					cd.numberOf = numberField;
+					newCards.add(cd);
+				}
+			}
+			WishlistHelpers.ResetCards(act, cardName, newCards);
+			break;
+		}
+	}
+	
+	public Dialog getDialog(String cn, final FamiliarFragment ff) {
+		return getDialog(cn, ff, null);
 	}
 
-	public Dialog getDialog(String cn, final FamiliarActivity fa,
+	public Dialog getDialog(String cn, final FamiliarFragment ff,
 			ArrayList<CardData> list) {
 
-		act = fa;
+		act = ff.getFamiliarActivity();
 		cardName = cn;
-		mCtx = act;
-		AlertDialog.Builder b = new AlertDialog.Builder((Context) fa);
+		AlertDialog.Builder b = new AlertDialog.Builder((Context) act);
 		// dialog = new Dialog(act);
 
 		b.setTitle(cardName + " in the Wishlist");
 
-		View view = fa.getLayoutInflater().inflate(
+		View view = act.getLayoutInflater().inflate(
 				R.layout.card_setwishlist_dialog, null);
 		lvSets = (LinearLayout) view.findViewById(R.id.setList);
 		b.setView(view);
@@ -241,44 +272,6 @@ public class WishlistHelpers {
 				});
 
 		AlertDialog dialog = b.create();
-
-		dialog.setOnDismissListener(new OnDismissListener() {
-			@Override
-			public void onDismiss(DialogInterface di) {
-				switch (dismissReason) {
-				case CANCEL:
-					// this will refill the dialog with the values in the
-					// wishlist otherwise the changed values will persist in the
-					// dialog even if they aren't saved
-					fillWishlistDialog(null);
-					bindWishlistRows();
-					break;
-				case DONE:
-				default:
-					ArrayList<CardData> newCards = new ArrayList<CardData>();
-
-					for (int i = 0; i < lvSets.getChildCount(); i++) {
-						View v = lvSets.getChildAt(i);
-						int numberField;
-						try {
-							numberField = Integer.valueOf(((EditText) v
-									.findViewById(R.id.numberInput)).getText()
-									.toString());
-						} catch (NumberFormatException e) {
-							numberField = 0;
-						}
-						if (numberField != 0) {
-							// return the CardData at that position
-							CardData cd = (CardData) lCardlist.get(i);
-							cd.numberOf = numberField;
-							newCards.add(cd);
-						}
-					}
-					WishlistHelpers.ResetCards(mCtx, cardName, newCards);
-					break;
-				}
-			}
-		});
 
 		fillWishlistDialog(list);
 		bindWishlistRows();
@@ -309,10 +302,11 @@ public class WishlistHelpers {
 		ArrayList<CardData> lWishlist = new ArrayList<CardData>();
 		if(list == null){
 			// Read the wishlist
-			ReadWishlist(act, null, act.mDbHelper, lWishlist);
+			ReadWishlist(act, act.mDbHelper, lWishlist);
 		}
 		else
-			lWishlist = (ArrayList<CardData>) list.clone();
+			//lWishlist = (ArrayList<CardData>) list.clone();
+			lWishlist = new ArrayList<CardData>(list);
 
 		// For each card in the wishlist
 		for (int i = 0; i < lWishlist.size(); i++) {

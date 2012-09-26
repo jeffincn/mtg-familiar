@@ -417,7 +417,6 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		if (prev != null) {
 			ft.remove(prev);
 		}
-		ft.addToBackStack(null);
 
 		// Create and show the dialog.
 		FamiliarDialogFragment newFragment = new FamiliarDialogFragment() {

@@ -13,9 +13,12 @@ public class FamiliarDialogFragment extends SherlockDialogFragment {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
 	}
-
+	
 	@Override
 	public void onDestroyView() {
+		if(getDialog() != null){
+			getDialog().dismiss();
+		}
 		if (getDialog() != null && getRetainInstance())
 			getDialog().setOnDismissListener(null);
 		super.onDestroyView();

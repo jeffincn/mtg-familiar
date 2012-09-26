@@ -850,11 +850,22 @@ public class CardViewFragment extends FamiliarFragment {
 		if (prev != null) {
 			ft.remove(prev);
 		}
-		ft.addToBackStack(null);
 
 		// Create and show the dialog.
 		FamiliarDialogFragment newFragment = new FamiliarDialogFragment() {
 
+			private WishlistHelpers	wh = new WishlistHelpers();
+
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				super.onDismiss(dialog);
+				switch(id) {
+					case WISHLIST_COUNTS:
+						wh.onDialogDismissed();
+						break;
+				}
+			}
+			
 			@Override
 			public Dialog onCreateDialog(Bundle savedInstanceState) {
 				switch (id) {
@@ -993,7 +1004,7 @@ public class CardViewFragment extends FamiliarFragment {
 						return dialog;
 					}
 					case WISHLIST_COUNTS: {
-						return (new WishlistHelpers()).getDialog(cardName, this.getFamiliarActivity());
+						return wh .getDialog(cardName, anchor);
 					}
 					default: {
 						savedInstanceState.putInt("id", id);

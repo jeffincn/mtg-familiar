@@ -21,10 +21,9 @@ import android.os.AsyncTask;
 import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 
-import com.gelakinetic.mtgfam.activities.CardTradingActivity;
-import com.gelakinetic.mtgfam.activities.WishlistActivity;
 import com.gelakinetic.mtgfam.fragments.CardViewFragment;
 import com.gelakinetic.mtgfam.fragments.TradeFragment;
+import com.gelakinetic.mtgfam.fragments.WishlistFragment;
 
 public class TradeListHelpers {
 
@@ -110,21 +109,21 @@ public class TradeListHelpers {
 		String											price	= "";
 		Context											mCtx;
 		private int									priceSetting;
-		private WishlistActivity		wa;
+		private WishlistFragment		wf;
 		private TradeFragment	cta;
 
-		public FetchPriceTask(CardData _data, Object _toNotify, int ps, TradeFragment cta, WishlistActivity wa) {
+		public FetchPriceTask(CardData _data, Object _toNotify, int ps, TradeFragment cta, WishlistFragment wf) {
 			data = _data;
 			toNotify = _toNotify;
-			if (wa != null) {
-				mCtx = (Context) wa;
+			if (wf != null) {
+				mCtx = wf.getActivity();
 			}
 			if (cta != null) {
 				mCtx = (Context) cta.getActivity();
 			}
 			priceSetting = ps;
 			this.cta = cta;
-			this.wa = wa;
+			this.wf = wf;
 		}
 
 		@Override
@@ -191,8 +190,8 @@ public class TradeListHelpers {
 			}
 			data.price = (int) (dPrice * 100);
 
-			if (wa != null) {
-				wa.UpdateTotalPrices();
+			if (wf != null) {
+				wf.UpdateTotalPrices();
 			}
 			else if (cta != null) {
 				cta.UpdateTotalPrices();

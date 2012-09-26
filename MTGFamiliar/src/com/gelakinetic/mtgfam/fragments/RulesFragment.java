@@ -235,7 +235,6 @@ public class RulesFragment extends FamiliarFragment {
 		if (prev != null) {
 			ft.remove(prev);
 		}
-		ft.addToBackStack(null);
 
 		// Create and show the dialog.
 		FamiliarDialogFragment newFragment = new FamiliarDialogFragment() {

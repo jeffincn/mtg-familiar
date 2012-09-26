@@ -10,49 +10,39 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.activities.CardTradingActivity;
-import com.gelakinetic.mtgfam.fragments.SearchViewFragment.SearchCriteria;
-import com.gelakinetic.mtgfam.helpers.AutocompleteCursorAdapter;
-import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
-import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
-import com.gelakinetic.mtgfam.helpers.ResultListAdapter;
-import com.gelakinetic.mtgfam.helpers.TradeListHelpers;
-import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
-import com.gelakinetic.mtgfam.helpers.TradeListHelpers.FetchPriceTask;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
+
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.gelakinetic.mtgfam.R;
+import com.gelakinetic.mtgfam.helpers.AutocompleteCursorAdapter;
+import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
+import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
+import com.gelakinetic.mtgfam.helpers.TradeListHelpers;
+import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
+import com.gelakinetic.mtgfam.helpers.TradeListHelpers.FetchPriceTask;
 
 public class TradeFragment extends FamiliarFragment {
 	private final static int			DIALOG_UPDATE_CARD		= 1;
@@ -281,11 +271,17 @@ public class TradeFragment extends FamiliarFragment {
 		if (prev != null) {
 			ft.remove(prev);
 		}
-		ft.addToBackStack(null);
 
 		// Create and show the dialog.
 		FamiliarDialogFragment newFragment = new FamiliarDialogFragment() {
 			
+			@Override
+			public void onDestroy() {
+				super.onDestroy();
+				removeDialog();
+			}
+			
+			@Override
 			public Dialog onCreateDialog(Bundle savedInstanceState) {
 				switch (id) {
 					case DIALOG_UPDATE_CARD: {
@@ -368,12 +364,6 @@ public class TradeFragment extends FamiliarFragment {
 								removeDialog();
 							}
 						});
-		
-						dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-							public void onDismiss(DialogInterface dialog) {
-								removeDialog();
-							}
-						});
 						return dialog;
 					}
 					case DIALOG_PRICE_SETTING: {
@@ -413,12 +403,6 @@ public class TradeFragment extends FamiliarFragment {
 		
 						Dialog dialog = builder.create();
 		
-						dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-							public void onDismiss(DialogInterface dialog) {
-								removeDialog();
-							}
-						});
-		
 						return dialog;
 					}
 					case DIALOG_SAVE_TRADE: {
@@ -451,12 +435,6 @@ public class TradeFragment extends FamiliarFragment {
 						});
 		
 						Dialog dialog = builder.create();
-		
-						dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-							public void onDismiss(DialogInterface dialog) {
-								removeDialog();
-							}
-						});
 						return dialog;
 					}
 					case DIALOG_LOAD_TRADE: {
@@ -497,12 +475,6 @@ public class TradeFragment extends FamiliarFragment {
 						});
 		
 						dialog = builder.create();
-		
-						dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-							public void onDismiss(DialogInterface dialog) {
-								removeDialog();
-							}
-						});
 						return dialog;
 					}
 					case DIALOG_DELETE_TRADE: {
@@ -538,12 +510,6 @@ public class TradeFragment extends FamiliarFragment {
 						});
 		
 						dialog = builder.create();
-		
-						dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-							public void onDismiss(DialogInterface dialog) {
-								removeDialog();
-							}
-						});
 						return dialog;
 					}
 					case DIALOG_CONFIRMATION: {

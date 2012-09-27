@@ -76,7 +76,6 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 	private int									pendingDialog		= -1;
 	public FragmentManager			mFragmentManager;
 	private Bundle							mFragResults;
-	private FragmentTransaction	fragmentTransaction;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -162,12 +161,7 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 			@Override
 			public void onClosed() {
 				
-				if(fragmentTransaction != null){
-					fragmentTransaction.commit();
-					fragmentTransaction = null;
-				}
-				
-				else if (pendingDialog != -1) {
+				if (pendingDialog != -1) {
 					showDialog(pendingDialog);
 					pendingDialog = -1;
 				}
@@ -286,8 +280,10 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 	}
 
 	protected void replaceFragment(Fragment frag) {
-		fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
+		FragmentTransaction fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
 		fragmentTransaction.replace(R.id.frag_view, frag);
+		fragmentTransaction.commit();
+		this.getSupportFragmentManager().executePendingTransactions();
 		this.hideKeyboard();
 		showAbove();
 	}

@@ -25,6 +25,7 @@ import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -40,12 +41,19 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.gelakinetic.mtgfam.R;
+import com.gelakinetic.mtgfam.fragments.DiceFragment;
 import com.gelakinetic.mtgfam.fragments.FamiliarFragment;
+import com.gelakinetic.mtgfam.fragments.LifeFragment;
+import com.gelakinetic.mtgfam.fragments.ManaPoolFragment;
+import com.gelakinetic.mtgfam.fragments.MoJhoStoFragment;
 import com.gelakinetic.mtgfam.fragments.RoundTimerFragment;
+import com.gelakinetic.mtgfam.fragments.RulesFragment;
+import com.gelakinetic.mtgfam.fragments.SearchViewFragment;
+import com.gelakinetic.mtgfam.fragments.TradeFragment;
+import com.gelakinetic.mtgfam.fragments.WishlistFragment;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.DbUpdaterService;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
-import com.gelakinetic.mtgfam.helpers.MyApp;
 import com.gelakinetic.mtgfam.helpers.RoundTimerService;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.SlidingMenu.OnClosedListener;
@@ -65,10 +73,10 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 
 	private static final int		TTS_CHECK_CODE	= 23;
 
-	private Class<?>						pendingClass		= null;
 	private int									pendingDialog		= -1;
 	public FragmentManager			mFragmentManager;
 	private Bundle							mFragResults;
+	private FragmentTransaction	fragmentTransaction;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -91,7 +99,8 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 		getSlidingMenu().setBehindScrollScale(0.0f);
 		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
 		setBehindContentView(R.layout.sliding_menu);
-
+	
+		
 		me = this;
 		mCtx = this;
 
@@ -107,22 +116,7 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 			int lastLegalityUpdate = preferences.getInt("lastLegalityUpdate", 0);
 			// days to ms
 			if (((curTime / 1000) - lastLegalityUpdate) > (updatefrequency * 24 * 60 * 60)) {
-				// If we should be updating, check to see if we already are
-				MyApp appState = (MyApp) getApplicationContext();
-				boolean update;
-				synchronized (this) {
-					if (!appState.isUpdating()) {
-						appState.setUpdating(true);
-						update = true;
-					}
-					else {
-						update = false;
-					}
-				}
-
-				if (update) {
-					startService(new Intent(this, DbUpdaterService.class));
-				}
+				startService(new Intent(this, DbUpdaterService.class));
 			}
 		}
 
@@ -167,11 +161,12 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 		getSlidingMenu().setOnClosedListener(new OnClosedListener() {
 			@Override
 			public void onClosed() {
-				if (pendingClass != null) {
-					Intent i = new Intent(mCtx, pendingClass);
-					startActivity(i);
-					pendingClass = null;
+				
+				if(fragmentTransaction != null){
+					fragmentTransaction.commit();
+					fragmentTransaction = null;
 				}
+				
 				else if (pendingDialog != -1) {
 					showDialog(pendingDialog);
 					pendingDialog = -1;
@@ -192,55 +187,55 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 		 */
 		nbplayerbutton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				slidingActivityLauncher(NPlayerLifeActivity.class);
+				replaceFragment(new LifeFragment());
 			}
 		});
 
 		search.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				slidingActivityLauncher(SearchActivity.class);
+				replaceFragment(new SearchViewFragment());
 			}
 		});
 
 		rules.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				slidingActivityLauncher(RulesActivity.class);
+				replaceFragment(new RulesFragment());
 			}
 		});
 
 		rng.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				slidingActivityLauncher(DiceActivity.class);
+				replaceFragment(new DiceFragment());
 			}
 		});
 
 		manapool.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				slidingActivityLauncher(ManaPoolActivity.class);
+				replaceFragment(new ManaPoolFragment());
 			}
 		});
 
 		randomCard.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				slidingActivityLauncher(RandomCardActivity.class);
+				replaceFragment(new MoJhoStoFragment());
 			}
 		});
 
 		roundTimer.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				slidingActivityLauncher(RoundTimerActivity.class);
+				replaceFragment(new RoundTimerFragment());
 			}
 		});
 
 		trader.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				slidingActivityLauncher(CardTradingActivity.class);
+				replaceFragment(new TradeFragment());
 			}
 		});
 
 		wishlist.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				slidingActivityLauncher(WishlistActivity.class);
+				replaceFragment(new WishlistFragment());
 			}
 		});
 
@@ -259,7 +254,9 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 		});
 		preferencesButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				slidingActivityLauncher(PreferencesActivity.class);
+				//TODO
+				Intent i = new Intent(mCtx, PreferencesActivity.class);
+				startActivity(i);
 			}
 		});
 		donate.setOnClickListener(new View.OnClickListener() {
@@ -288,6 +285,13 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 		}
 	}
 
+	protected void replaceFragment(Fragment frag) {
+		fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
+		fragmentTransaction.replace(R.id.frag_view, frag);
+		this.hideKeyboard();
+		showAbove();
+	}
+
 	public void hideKeyboard() {
 		try {
 			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -297,11 +301,6 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 			// eat it
 		}
 
-	}
-
-	protected void slidingActivityLauncher(final Class<?> class1) {
-		pendingClass = class1;
-		showAbove();
 	}
 
 	protected void slidingDialogLauncher(final int id) {

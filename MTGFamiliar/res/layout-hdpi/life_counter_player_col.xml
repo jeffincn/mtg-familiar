@@ -63,7 +63,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
                 <ListView
                     android:id="@+id/player_history"
-                    android:layout_height="wrap_content"
+                    android:layout_height="fill_parent"
                     android:padding="1dp" android:layout_width="fill_parent" android:paddingLeft="36dp">
                 </ListView>
             </LinearLayout>

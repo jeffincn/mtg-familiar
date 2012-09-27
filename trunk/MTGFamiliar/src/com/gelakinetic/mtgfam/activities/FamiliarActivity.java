@@ -489,17 +489,12 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 	public Runnable						timerUpdate					= new Runnable() {
 																									@Override
 																									public void run() {
-																										displayTimeLeft();
-
 																										if (endTime > SystemClock.elapsedRealtime()) {
-																											getSupportActionBar().setDisplayShowTitleEnabled(true);
-																											timeShowing = true;
+																											displayTimeLeft();
 																											timerHandler.postDelayed(timerUpdate, 200);
 																										}
 																										else {
-																											timeShowing = false;
-																											getSupportActionBar().setDisplayShowTitleEnabled(false);
-																											timerHandler.removeCallbacks(timerUpdate);
+																											stopUpdatingDisplay();
 																										}
 																									}
 																								};
@@ -510,7 +505,6 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 																										endTime = intent.getLongExtra(RoundTimerService.EXTRA_END_TIME,
 																												SystemClock.elapsedRealtime());
 																										startUpdatingDisplay();
-																										timerHandler.postDelayed(timerUpdate, 200);
 																									}
 																								};
 
@@ -532,15 +526,15 @@ public abstract class FamiliarActivity extends SlidingFragmentActivity {
 
 	public void startUpdatingDisplay() {
 		updatingDisplay = true;
-		displayTimeLeft();
+		timeShowing = true;
 		timerHandler.removeCallbacks(timerUpdate);
-		timerHandler.postDelayed(timerUpdate, 200);
+		timerHandler.postDelayed(timerUpdate, 1);
+		getSupportActionBar().setDisplayShowTitleEnabled(true);
 	}
 
 	public void stopUpdatingDisplay() {
 		updatingDisplay = false;
 		timeShowing = false;
-		displayTimeLeft();
 		timerHandler.removeCallbacks(timerUpdate);
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 	}

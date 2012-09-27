@@ -23,7 +23,7 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 
 import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.activities.RoundTimerActivity;
+import com.gelakinetic.mtgfam.activities.MainActivity;
 import com.gelakinetic.mtgfam.fragments.RoundTimerFragment;
 
 public class RoundTimerService extends Service implements OnInitListener {
@@ -309,8 +309,9 @@ public class RoundTimerService extends Service implements OnInitListener {
 
 		c = getApplication().getApplicationContext();
 
-		Intent notificationIntent = new Intent(c, RoundTimerActivity.class);
-		contentIntent = PendingIntent.getActivity(c, 0, notificationIntent, 0);
+		Intent notificationIntent = new Intent(c, MainActivity.class);
+		notificationIntent.setAction(MainActivity.ACTION_ROUND_TIMER);
+		contentIntent = PendingIntent.getActivity(c, 7, notificationIntent, 0);
 
 		tts = new TextToSpeech(this, this);
 	}

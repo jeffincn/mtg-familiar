@@ -23,17 +23,24 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.fragments.CardViewFragment;
 import com.gelakinetic.mtgfam.fragments.ResultListFragment;
+import com.gelakinetic.mtgfam.fragments.RoundTimerFragment;
 import com.gelakinetic.mtgfam.fragments.SearchViewFragment;
 import com.gelakinetic.mtgfam.fragments.SearchViewFragment.SearchCriteria;
-import com.gelakinetic.mtgfam.fragments.WishlistFragment;
+import com.gelakinetic.mtgfam.fragments.SearchWidgetFragment;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 
 public class MainActivity extends FamiliarActivity {
+
+	public static String	ACTION_WIDGET_SEARCH = "android.intent.action.WIDGET_SEARCH";
+	public static String	ACTION_MAIN = "android.intent.action.MAIN";
+	public static String	ACTION_FULL_SEARCH = "android.intent.action.FULL_SEARCH";
+	public static String	ACTION_ROUND_TIMER = "android.intent.action.ROUND_TIMER";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -80,13 +87,26 @@ public class MainActivity extends FamiliarActivity {
 		}
 		else {
 			if (savedInstanceState == null) {
+				String action = getIntent().getAction();
+				// TODO a preference should toggle what fragment is loaded
+				Fragment frag = new SearchViewFragment();
+				
 				mFragmentManager = getSupportFragmentManager();
 				FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-
-				// TODO a preference should toggle what fragment is loaded
-				//SearchViewFragment svFrag = new SearchViewFragment();
-				WishlistFragment svFrag = new WishlistFragment();
-				fragmentTransaction.add(R.id.frag_view, svFrag);
+								
+				if(action != null){
+					if(action.equals(ACTION_FULL_SEARCH)){
+						frag = new SearchViewFragment();
+					}
+					else if(action.equals(ACTION_WIDGET_SEARCH)){
+						frag = new SearchWidgetFragment();
+					}
+					else if(action.equals(ACTION_ROUND_TIMER)){
+						frag = new RoundTimerFragment();
+					}
+				}
+				
+				fragmentTransaction.add(R.id.frag_view, frag);
 				fragmentTransaction.commit();
 			}
 		}

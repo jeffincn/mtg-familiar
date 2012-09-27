@@ -21,13 +21,9 @@ package com.gelakinetic.mtgfam.helpers;
 
 import android.app.Application;
 
-import com.gelakinetic.mtgfam.activities.FamiliarActivity;
-
 public class MyApp extends Application {
 
 	private int	myState;
-	private boolean updating;
-	private FamiliarActivity updatingActivity;
 
 	public int getState() {
 		return myState;
@@ -35,13 +31,5 @@ public class MyApp extends Application {
 
 	public void setState(int s) {
 		myState = s;
-	}
-	
-	public boolean isUpdating() {
-		return this.updating;
-	}
-	
-	public void setUpdating(boolean updating) {
-		this.updating = updating;
 	}
 }

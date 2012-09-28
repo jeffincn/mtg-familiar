@@ -32,10 +32,11 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,6 +59,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 	private static final int								LIFE											= 0;
 	private static final int								POISON										= 1;
+	private static final int								COMMANDER								= 2;
 	public static final int									INITIAL_LIFE							= 20;
 	public static final int									INITIAL_POISON						= 0;
 	public static final int									TERMINAL_LIFE							= 0;
@@ -75,6 +77,8 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	private int															playerHeight;
 	private LinearLayout										mainLayout;
 	private LinearLayout										doublePlayer;
+	private GridView											edhGrid;
+	private CommanderAdapter									commanderAdapter;
 	private int															playersInRow;
 
 	private int															orientation;
@@ -283,6 +287,20 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		removeDialog();
 
 		mainLayout = (LinearLayout) this.getView().findViewById(R.id.playerList);
+		if (displayMode == commanderDisplay){
+			ScrollView parent = (ScrollView) mainLayout.getParent();
+			mainLayout = (LinearLayout) this.getView().findViewById(R.id.info_layout);
+			parent.setVisibility(View.GONE);
+			
+			
+			LayoutInflater inflater = (LayoutInflater) this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			LinearLayout edhLayout = (LinearLayout) inflater.inflate(R.layout.life_counter_player_edh_row_bot, null);
+			edhGrid = (GridView) edhLayout.findViewById(R.id.edh_grid);
+			mainLayout.addView(edhLayout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
+			
+			commanderAdapter = new CommanderAdapter(getActivity());
+			edhGrid.setAdapter(commanderAdapter);
+		}
 		playersInRow = 0;
 
 		if (canGetLock) {
@@ -336,8 +354,23 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 					lifeDefault = 20;
 				}
 
-				addPlayer(data[0], Integer.parseInt(data[1]), Integer.parseInt(data[3]), lhist, phist, getActivity(),
-						lifeDefault);
+				int[] cLife;
+				try {
+					String[] commanderLifeString = data[6].split(",");
+					cLife = new int[commanderLifeString.length];
+					for (int idx = 0; idx < commanderLifeString.length; idx++) {
+						cLife[idx] = Integer.parseInt(commanderLifeString[idx]);
+					}
+				}
+				catch (NumberFormatException e){
+					cLife = null;
+				}
+				catch (ArrayIndexOutOfBoundsException e) {
+					cLife = null;
+				}
+				
+				addPlayer(data[0], Integer.parseInt(data[1]), Integer.parseInt(data[3]), lhist, phist, getActivity(), lifeDefault, cLife);
+
 				numPlayers++;
 			}
 			String lastName = players.get(players.size() - 1).name;
@@ -350,7 +383,11 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			}
 		}
 
-		setType(activeType);
+		if (displayMode == commanderDisplay){
+			setType(COMMANDER);
+		} else {
+			setType(activeType);
+		}
 	}
 
 	private void restartFragment() {
@@ -372,6 +409,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		listSizeWidth = playerScrollView.getWidth();
 		listSizeHeight = playerScrollView.getHeight();
 
+		if(displayMode == commanderDisplay){
+			LinearLayout info = (LinearLayout) this.getActivity().findViewById(R.id.info_layout);
+			listSizeWidth = info.getWidth();
+			listSizeHeight = info.getHeight();
+		}
+		
 		if (orientation == LANDSCAPE) {
 			listSizeHeight = LayoutParams.MATCH_PARENT;
 			switch (players.size()) {
@@ -405,6 +448,11 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 		for (Player p : players) {
 			p.setLayoutSize(listSizeWidth, listSizeHeight);
+		}
+		
+		if(displayMode == commanderDisplay){
+			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(listSizeWidth, listSizeHeight);
+			((LinearLayout)edhGrid.getParent()).setLayoutParams(layoutParams);
 		}
 	}
 
@@ -581,6 +629,14 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	}
 
 	private void setType(int type) {
+		if (type == COMMANDER){
+			for (Player p : players){
+				p.setAdapter(COMMANDER);
+			}
+			activeType = LIFE;
+			return;
+		}		
+		
 		activeType = type;
 
 		switch (activeType) {
@@ -602,11 +658,11 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	}
 
 	private void addPlayer(String name, int initialLife, int initialPoison, int[] lhist, int[] phist, Context context) {
-		addPlayer(name, initialLife, initialPoison, lhist, phist, context, INITIAL_LIFE);
+		addPlayer(name, initialLife, initialPoison, lhist, phist, context, INITIAL_LIFE, null);
 	}
 
 	private void addPlayer(String name, int initialLife, int initialPoison, int[] lhist, int[] phist, Context context,
-			int defaultLife) {
+			int defaultLife, int[] comDamage) {
 		LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		LinearLayout layout;
 		if (orientation == LANDSCAPE) {
@@ -620,7 +676,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		if (name == null) {
 			name = "Player " + numPlayers;
 		}
-		Player p = new Player(name, initialLife, initialPoison, lhist, phist, context, defaultLife);
+		Player p = new Player(name, initialLife, initialPoison, lhist, phist, context, defaultLife, comDamage);
 		p.addButtons((Button) layout.findViewById(R.id.player_minus1), (Button) layout.findViewById(R.id.player_plus1),
 				(Button) layout.findViewById(R.id.player_minus5), (Button) layout.findViewById(R.id.player_plus5));
 		p.addOutputViews((TextView) layout.findViewById(R.id.player_name),
@@ -649,25 +705,17 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			}
 		}
 		else if (displayMode == commanderDisplay && orientation != LANDSCAPE) {
-			LinearLayout halfFillLayout = (LinearLayout) inflater.inflate(R.layout.life_counter_player_double_row, null);
-			LinearLayout playerPlacement = (LinearLayout) halfFillLayout.findViewById(R.id.playerLeft);
-			LinearLayout commanderPlacement = (LinearLayout) halfFillLayout.findViewById(R.id.playerRight);
-
-			LinearLayout lifeHistoryParent = (LinearLayout) (layout.findViewById(R.id.player_history)).getParent();
-			lifeHistoryParent.setVisibility(View.GONE);
-			playerPlacement.addView(layout);
-
-			RelativeLayout commander = (RelativeLayout) inflater.inflate(R.layout.n_player_commander_life_tracker, null);
-			commanderPlacement.addView(commander);
-
-			ListView commanderList = (ListView) commander.findViewById(R.id.edh_list);
-			p.addCommanderView(commanderList);
-			for (Player addTo : players) {
-				addTo.commanderDamage.add(0);
+			layout.setVisibility(View.GONE);
+			mainLayout.addView(layout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
+			commanderAdapter.notifyDataSetChanged();
+			
+			if (players.size() == 1){
+				layout.setVisibility(View.VISIBLE);
 			}
-
-			mainLayout.addView(halfFillLayout);
-
+			
+			for(int idx = 0; idx < players.size(); idx++){
+				players.get(idx).commanderDamage.add(0);
+			}
 		}
 		else {
 			mainLayout.addView(layout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
@@ -721,6 +769,52 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		restartFragment();
 	}
 
+	private class CommanderPlayerAdapter extends BaseAdapter {
+		private Context						context;
+		private Player						owningPlayer;
+		
+		public CommanderPlayerAdapter(Context _context, Player _owningPlayer){
+			context = _context;
+			owningPlayer = _owningPlayer;
+		}
+		
+		public int getCount() {
+			return players.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return null;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return 0;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			TextView name;
+			final TextView damage;
+			LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			View v = vi.inflate(R.layout.life_counter_player_edh_commander_row, null);
+			name = (TextView) v.findViewById(R.id.edh_commander_row_name);
+			damage = (TextView) v.findViewById(R.id.edh_commander_row_damage);
+			if (name == null || damage == null) {
+				TextView error = new TextView(context);
+				error.setText("ERROR!");
+				return error;
+			}
+			name.setText(players.get(position).name);
+			damage.setText(String.valueOf(owningPlayer.commanderDamage.get(position)));
+			
+			final int pos = position;
+			
+			return v;
+		}
+	}
+		
+	
 	private class CommanderAdapter extends BaseAdapter {
 		private Context	context;
 
@@ -757,9 +851,27 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			}
 			name.setText(players.get(position).name);
 			damage.setText(String.valueOf(row.get(position)));
+			
+			final int pos = position;
+			
+			v.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					change_visible_edh_player(pos);
+				}
+			});
 
 			return v;
 		}
+	}
+	
+	private void change_visible_edh_player(int _which){
+		for(Player player : players){
+			player.layout.setVisibility(View.GONE);
+		}
+		
+		players.get(_which).layout.setVisibility(View.VISIBLE);
 	}
 
 	private class HistoryAdapter extends BaseAdapter {
@@ -991,13 +1103,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		private Button						plusButton5;
 		private ListView					history;
 		private HistoryAdapter		lifeAdapter, poisonAdapter;
-		private CommanderAdapter	commanderAdapter;
-		private ListView					commanderDamageLayout;
+		private CommanderPlayerAdapter commanderAdapter;
 		private LinearLayout			layout;
 
 		public static final int		CONSTRAINT_POISON	= 0, CONSTRAINT_LIFE = Integer.MAX_VALUE - 1;
 
-		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context, int _defaultLife) {
+		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context, int _defaultLife, int[] comDamage) {
 			name = n;
 			life = l;
 			defaultLife = _defaultLife;
@@ -1005,9 +1116,8 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			this.lifeAdapter = new HistoryAdapter(context, life);
 			this.poisonAdapter = new HistoryAdapter(context, poison);
 
-			this.commanderAdapter = new CommanderAdapter(context);
 			commanderDamage = new ArrayList<Integer>();
-			for (int idx = 0; idx < players.size(); idx++) {
+			for(int idx = 0; idx < players.size(); idx++){
 				commanderDamage.add(0);
 			}
 
@@ -1025,8 +1135,24 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			else {
 				this.poisonAdapter = new HistoryAdapter(context, poison);
 			}
+			
+			
+			if (comDamage != null) {
+				commanderDamage = new ArrayList<Integer>();
+				for(int idx = 0; idx < players.size(); idx++){
+					commanderDamage.add(comDamage[idx]);
+				}
+				this.commanderAdapter = new CommanderPlayerAdapter(context, this);
+			} 
+			else {
+				this.commanderAdapter = new CommanderPlayerAdapter(context, this);
+			}
 		}
 
+		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context) {
+			this(n, l, p, lhist, phist, context, INITIAL_LIFE, null);
+		}
+		
 		public void setLayoutSize(int listSizeWidth, int listSizeHeight) {
 			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(listSizeWidth, listSizeHeight);
 			layout.setLayoutParams(layoutParams);
@@ -1048,18 +1174,15 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 				case POISON:
 					history.setAdapter(this.poisonAdapter);
 					break;
+				case COMMANDER:
+					history.setAdapter(this.commanderAdapter);
+					break;
 			}
 			history.invalidate();
 		}
 
 		public void hideHistory() {
 			((View) history.getParent()).setVisibility(View.GONE);
-		}
-
-		public void addCommanderView(ListView rl) {
-			commanderDamageLayout = rl;
-
-			commanderDamageLayout.setAdapter(this.commanderAdapter);
 		}
 
 		public void addOutputViews(TextView n, TextView l, ListView lv) {
@@ -1091,6 +1214,8 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 							totalAtPosition = poisonAdapter.clearToPosition(arg2);
 							poison = totalAtPosition;
 							break;
+						case COMMANDER:
+							return false;
 					}
 					refreshTextViews();
 					return false;
@@ -1154,6 +1279,14 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 					break;
 			}
 			setValue(type, value + delta);
+		}
+		
+		private void incrementCommanderValue(int fromCommander, int delta) {
+			int currentDamage = commanderDamage.get(fromCommander);
+			commanderDamage.set(fromCommander, currentDamage + delta);
+			commanderAdapter.notifyDataSetChanged();
+			
+			incrementValue(LIFE, delta);
 		}
 
 		public void addButtons(Button minus1, Button plus1, Button minus5, Button plus5) {
@@ -1235,7 +1368,18 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			}
 
 			data += ";" + defaultLife;
-
+			
+			first = true;
+			for (Integer i : commanderDamage) {
+				if (first) {
+					first = false;
+					data += ";" + i;
+				}
+				else {
+					data += "," + i;
+				}
+			}
+			
 			return data + ";\n";
 		}
 

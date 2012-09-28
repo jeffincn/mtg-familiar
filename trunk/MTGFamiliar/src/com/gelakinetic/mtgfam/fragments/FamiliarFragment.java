@@ -15,13 +15,13 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.activities.FamiliarActivity;
+import com.gelakinetic.mtgfam.activities.MainActivity;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.MyApp;
 
 public class FamiliarFragment extends SherlockFragment {
 
-	CardDbAdapter								mDbHelper;
+	public CardDbAdapter								mDbHelper;
 	protected FamiliarFragment	anchor;
 	public static final String	DIALOG_TAG	= "dialog";
 
@@ -30,7 +30,7 @@ public class FamiliarFragment extends SherlockFragment {
 		super.onCreate(savedInstanceState);
 
 		anchor = this;
-		mDbHelper = new CardDbAdapter(this.getFamiliarActivity());
+		mDbHelper = new CardDbAdapter(this.getMainActivity());
 		mDbHelper.openReadable();
 		this.setHasOptionsMenu(true);
 	}
@@ -48,11 +48,11 @@ public class FamiliarFragment extends SherlockFragment {
 		String classname = this.getClass().getCanonicalName();
 		if (classname.equalsIgnoreCase("com.gelakinetic.mtgfam.fragments.CardViewFragment")) {
 			if (appState.getState() == CardViewFragment.QUITTOSEARCH) {
-				if (this.getFamiliarActivity().mFragmentManager.getBackStackEntryCount() == 0) {
+				if (this.getMainActivity().mFragmentManager.getBackStackEntryCount() == 0) {
 					getActivity().finish();
 				}
 				else {
-					getFamiliarActivity().mFragmentManager.popBackStack();
+					getMainActivity().mFragmentManager.popBackStack();
 				}
 				return;
 			}
@@ -63,7 +63,7 @@ public class FamiliarFragment extends SherlockFragment {
 
 		// Clear any results. We don't want them persisting past this fragment, and
 		// they should have been looked at by now anyway
-		getFamiliarActivity().getFragmentResults();
+		getMainActivity().getFragmentResults();
 	}
 
 	@Override
@@ -94,8 +94,8 @@ public class FamiliarFragment extends SherlockFragment {
 				}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 	}
 
-	public FamiliarActivity getFamiliarActivity() {
-		return (FamiliarActivity) this.getActivity();
+	public MainActivity getMainActivity() {
+		return (MainActivity) this.getActivity();
 	}
 
 	/*
@@ -110,12 +110,12 @@ public class FamiliarFragment extends SherlockFragment {
 	protected void startNewFragment(FamiliarFragment frag, Bundle args) {
 		frag.setArguments(args);
 
-		FragmentTransaction fragmentTransaction = this.getFamiliarActivity().mFragmentManager.beginTransaction();
+		FragmentTransaction fragmentTransaction = this.getMainActivity().mFragmentManager.beginTransaction();
 		fragmentTransaction.addToBackStack(null);
 
 		fragmentTransaction.replace(R.id.frag_view, frag);
 		fragmentTransaction.commit();
-		this.getFamiliarActivity().hideKeyboard();
+		this.getMainActivity().hideKeyboard();
 	}
 
 	void removeDialog() {

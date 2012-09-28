@@ -340,7 +340,7 @@ public class SearchViewFragment extends FamiliarFragment {
 		setspinner.setAdapter(printingsAdapter);
 
 		boolean consolidate = true;
-		consolidate = getFamiliarActivity().preferences.getBoolean("consolidateSearch", true);
+		consolidate = getMainActivity().preferences.getBoolean("consolidateSearch", true);
 		setspinner.setSelection(consolidate ? CardDbAdapter.MOSTRECENTPRINTING : CardDbAdapter.ALLPRINTINGS);
 
 		setButton.setOnClickListener(new View.OnClickListener() {
@@ -832,7 +832,7 @@ public class SearchViewFragment extends FamiliarFragment {
 								.setView(dialogLayout).setPositiveButton(R.string.dialog_ok, new OnClickListener() {
 									public void onClick(DialogInterface dialog, int which) {
 										// finish();
-										anchor.getFamiliarActivity().mFragmentManager.popBackStack();
+										anchor.getMainActivity().mFragmentManager.popBackStack();
 									}
 								}).setCancelable(false).create();
 						return dialog;

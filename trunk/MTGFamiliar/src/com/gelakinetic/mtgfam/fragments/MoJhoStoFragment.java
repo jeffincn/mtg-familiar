@@ -324,7 +324,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 			public Dialog onCreateDialog(Bundle savedInstanceState) {
 				switch (id) {
 					case RULESDIALOG: {
-						AlertDialog.Builder builder = new AlertDialog.Builder(this.getFamiliarActivity());
+						AlertDialog.Builder builder = new AlertDialog.Builder(this.getMainActivity());
 						builder.setNeutralButton(R.string.dialog_play, new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								dialog.cancel();
@@ -335,7 +335,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 						return builder.create();
 					}
 					case MOMIR_IMAGE: {
-						Dialog d = new Dialog(this.getFamiliarActivity());
+						Dialog d = new Dialog(this.getMainActivity());
 						d.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 						d.setContentView(R.layout.image_dialog);
@@ -345,7 +345,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 						return d;
 					}
 					case STONEHEWER_IMAGE: {
-						Dialog d = new Dialog(this.getFamiliarActivity());
+						Dialog d = new Dialog(this.getMainActivity());
 						d.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 						d.setContentView(R.layout.image_dialog);
@@ -355,7 +355,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 						return d;
 					}
 					case JHOIRA_IMAGE: {
-						Dialog d = new Dialog(this.getFamiliarActivity());
+						Dialog d = new Dialog(this.getMainActivity());
 						d.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 						d.setContentView(R.layout.image_dialog);
@@ -365,16 +365,16 @@ public class MoJhoStoFragment extends FamiliarFragment {
 						return d;
 					}
 					case CORRUPTION: {
-						View dialogLayout = this.getFamiliarActivity().getLayoutInflater()
+						View dialogLayout = this.getMainActivity().getLayoutInflater()
 								.inflate(R.layout.simple_message_layout, null);
 						TextView text = (TextView) dialogLayout.findViewById(R.id.message);
 						text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.error_corruption)));
 						text.setMovementMethod(LinkMovementMethod.getInstance());
 
-						return new AlertDialog.Builder(this.getFamiliarActivity()).setTitle(R.string.error).setView(dialogLayout)
+						return new AlertDialog.Builder(this.getMainActivity()).setTitle(R.string.error).setView(dialogLayout)
 								.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int which) {
-										anchor.getFamiliarActivity().finish();
+										anchor.getMainActivity().finish();
 									}
 								}).setCancelable(false).create();
 					}

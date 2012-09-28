@@ -198,7 +198,7 @@ public class TradeListHelpers {
 			}
 			try {
 				if (toNotify instanceof ArrayAdapter<?>)
-					((ArrayAdapter<CardData>) toNotify).notifyDataSetChanged();
+					((ArrayAdapter<?>) toNotify).notifyDataSetChanged();
 				else
 					((BaseExpandableListAdapter) toNotify).notifyDataSetChanged();
 			}

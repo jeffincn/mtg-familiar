@@ -13,7 +13,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.activities.FamiliarActivity;
+import com.gelakinetic.mtgfam.activities.MainActivity;
 
 public class ManaPoolFragment extends FamiliarFragment {
 	private Button	whiteMinus, blueMinus, blackMinus, redMinus, greenMinus, colorlessMinus, spellMinus;
@@ -78,7 +78,7 @@ public class ManaPoolFragment extends FamiliarFragment {
 			// Log.e("Mana Pool", "Failed to locate all views from inflated XML");
 			Toast.makeText(this.getActivity(), "Mana pool failed to load!", Toast.LENGTH_LONG).show();
 			// this.finish();
-			this.getFamiliarActivity().mFragmentManager.popBackStack();
+			this.getMainActivity().mFragmentManager.popBackStack();
 		}
 
 		whiteMinus.setOnClickListener(new Button.OnClickListener() {
@@ -260,17 +260,17 @@ public class ManaPoolFragment extends FamiliarFragment {
 	}
 
 	private void load() {
-		white = getFamiliarActivity().preferences.getInt("whiteMana", 0);
-		blue = getFamiliarActivity().preferences.getInt("blueMana", 0);
-		black = getFamiliarActivity().preferences.getInt("blackMana", 0);
-		red = getFamiliarActivity().preferences.getInt("redMana", 0);
-		green = getFamiliarActivity().preferences.getInt("greenMana", 0);
-		colorless = getFamiliarActivity().preferences.getInt("colorlessMana", 0);
-		spell = getFamiliarActivity().preferences.getInt("spellCount", 0);
+		white = getMainActivity().preferences.getInt("whiteMana", 0);
+		blue = getMainActivity().preferences.getInt("blueMana", 0);
+		black = getMainActivity().preferences.getInt("blackMana", 0);
+		red = getMainActivity().preferences.getInt("redMana", 0);
+		green = getMainActivity().preferences.getInt("greenMana", 0);
+		colorless = getMainActivity().preferences.getInt("colorlessMana", 0);
+		spell = getMainActivity().preferences.getInt("spellCount", 0);
 	}
 
 	private void store() {
-		getFamiliarActivity().preferences.edit().putInt("whiteMana", white).putInt("blueMana", blue)
+		getMainActivity().preferences.edit().putInt("whiteMana", white).putInt("blueMana", blue)
 				.putInt("blackMana", black).putInt("redMana", red).putInt("greenMana", green)
 				.putInt("colorlessMana", colorless).putInt("spellCount", spell).commit();
 	}
@@ -285,8 +285,8 @@ public class ManaPoolFragment extends FamiliarFragment {
 		}
 	}
 
-	public static void reset(FamiliarActivity fa) {
-		fa.preferences.edit().putInt("whiteMana", 0).putInt("blueMana", 0).putInt("blackMana", 0).putInt("redMana", 0)
+	public static void reset(MainActivity ma) {
+		ma.preferences.edit().putInt("whiteMana", 0).putInt("blueMana", 0).putInt("blackMana", 0).putInt("redMana", 0)
 				.putInt("greenMana", 0).putInt("colorlessMana", 0).putInt("spellCount", 0).commit();
 	}
 
@@ -299,7 +299,7 @@ public class ManaPoolFragment extends FamiliarFragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.clear_all:
-				reset(this.getFamiliarActivity());
+				reset(this.getMainActivity());
 				load();
 				update();
 				return true;

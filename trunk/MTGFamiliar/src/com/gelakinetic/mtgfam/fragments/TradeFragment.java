@@ -98,7 +98,7 @@ public class TradeFragment extends FamiliarFragment {
 
 		mTradeListHelper = new TradeListHelpers();
 		
-		editor = getFamiliarActivity().preferences.edit();
+		editor = getMainActivity().preferences.edit();
 
 		namefield = (AutoCompleteTextView) myFragmentView.findViewById(R.id.namesearch);
 		namefield.setAdapter(new AutocompleteCursorAdapter(this.getActivity(), null));
@@ -235,7 +235,7 @@ public class TradeFragment extends FamiliarFragment {
 	public void onResume() {
 		super.onResume();
 		
-		priceSetting = Integer.parseInt(getFamiliarActivity().preferences.getString("tradePrice", String.valueOf(AVG_PRICE)));
+		priceSetting = Integer.parseInt(getMainActivity().preferences.getString("tradePrice", String.valueOf(AVG_PRICE)));
 
 		try {
 			// Test to see if the autosave file exist, then load the trade it if does.

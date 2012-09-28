@@ -12,8 +12,6 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.v4.os.ParcelableCompat;
-import android.support.v4.os.ParcelableCompatCreatorCallbacks;
 import android.util.AttributeSet;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -35,7 +33,7 @@ public class SlidingMenu extends RelativeLayout {
 	private OnOpenListener mOpenListener;
 	private OnCloseListener mCloseListener;
 
-    private boolean mSlidingEnabled;
+  //private boolean mSlidingEnabled;
 
 	public static void attachSlidingMenu(Activity activity, SlidingMenu sm, boolean slidingTitle) {
 
@@ -61,7 +59,7 @@ public class SlidingMenu extends RelativeLayout {
 			View above = content.getChildAt(0);
 			content.removeAllViews();
 			sm.setContent(above);
-			content.addView(sm, LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+			content.addView(sm, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 		}
 	}
 
@@ -389,7 +387,7 @@ public class SlidingMenu extends RelativeLayout {
 			super.writeToParcel(out, flags);
 			out.writeBooleanArray(new boolean[]{mBehindShowing});
 		}
-
+/*
 		public static final Parcelable.Creator<SavedState> CREATOR
 		= ParcelableCompat.newCreator(new ParcelableCompatCreatorCallbacks<SavedState>() {
 
@@ -401,7 +399,7 @@ public class SlidingMenu extends RelativeLayout {
 				return new SavedState[size];
 			}
 		});
-
+*/
 		SavedState(Parcel in) {
 			super(in);
 			boolean[] showing = new boolean[1];

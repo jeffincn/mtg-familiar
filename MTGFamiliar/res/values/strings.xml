@@ -51,6 +51,8 @@
     
     
     <!-- Main menu activity -->
+    <string name="main_pages">PAGES</string>
+    <string name="main_extras">EXTRAS</string>
     <string name="main_card_search">Card Search</string>
     <string name="main_life_counter">Life Counter</string>
     <string name="main_mana_pool">Mana Pool</string>

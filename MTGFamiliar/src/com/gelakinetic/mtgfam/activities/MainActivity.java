@@ -66,6 +66,7 @@ import com.gelakinetic.mtgfam.fragments.FamiliarDialogFragment;
 import com.gelakinetic.mtgfam.fragments.FamiliarFragment;
 import com.gelakinetic.mtgfam.fragments.LifeFragment;
 import com.gelakinetic.mtgfam.fragments.ManaPoolFragment;
+import com.gelakinetic.mtgfam.fragments.MenuFragment;
 import com.gelakinetic.mtgfam.fragments.MoJhoStoFragment;
 import com.gelakinetic.mtgfam.fragments.ResultListFragment;
 import com.gelakinetic.mtgfam.fragments.RoundTimerFragment;
@@ -90,9 +91,9 @@ public class MainActivity extends SlidingFragmentActivity {
 	public static String			ACTION_FULL_SEARCH		= "android.intent.action.FULL_SEARCH";
 	public static String			ACTION_ROUND_TIMER		= "android.intent.action.ROUND_TIMER";
 
-	private static final int	ABOUTDIALOG						= 100;
-	private static final int	CHANGELOGDIALOG				= 101;
-	private static final int	DONATEDIALOG					= 102;
+	public static final int			ABOUTDIALOG						= 100;
+	public static final int			CHANGELOGDIALOG				= 101;
+	public static final int			DONATEDIALOG					= 102;
 
 	private PackageInfo				pInfo;
 
@@ -137,7 +138,12 @@ public class MainActivity extends SlidingFragmentActivity {
 		getSlidingMenu().setBehindOffsetRes(R.dimen.actionbar_home_width);
 		getSlidingMenu().setBehindScrollScale(0.0f);
 		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
-		setBehindContentView(R.layout.sliding_menu);
+		getSlidingMenu().setShadowWidthRes(R.dimen.shadow_width);
+		getSlidingMenu().setShadowDrawable(R.drawable.sliding_menu_shadow);
+		setBehindContentView(R.layout.fragment_menu);
+		getSupportFragmentManager().beginTransaction()
+		.add(R.id.frag_menu, new MenuFragment())
+		.commit();
 
 		me = this;
 
@@ -161,119 +167,11 @@ public class MainActivity extends SlidingFragmentActivity {
 		updatingDisplay = false;
 		timeShowing = false;
 
-		TextView search = (TextView) findViewById(R.id.cardsearch);
-		TextView rules = (TextView) findViewById(R.id.rules);
-		TextView rng = (TextView) findViewById(R.id.rng);
-		TextView manapool = (TextView) findViewById(R.id.manapool);
-		TextView randomCard = (TextView) findViewById(R.id.randomCard);
-		TextView nbplayerbutton = (TextView) findViewById(R.id.Nplayerlifecounter);
-		TextView roundTimer = (TextView) findViewById(R.id.roundTimer);
-		TextView trader = (TextView) findViewById(R.id.trade);
-		TextView wishlist = (TextView) findViewById(R.id.wishlist);
-
-		TextView checkUpdate = (TextView) findViewById(R.id.checkUpdate);
-		TextView preferencesButton = (TextView) findViewById(R.id.preferences);
-		TextView donate = (TextView) findViewById(R.id.donate);
-		TextView whatsnew = (TextView) findViewById(R.id.whatsnew);
-		TextView aboutapp = (TextView) findViewById(R.id.aboutapp);
-
 		getSlidingMenu().setOnOpenedListener(new OnOpenedListener() {
 			@Override
 			public void onOpened() {
 				// Close the keyboard if the slidingMenu is opened
 				hideKeyboard();
-			}
-		});
-
-		/*
-		 * Activity Launchers
-		 */
-		nbplayerbutton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				replaceFragment(new LifeFragment());
-			}
-		});
-
-		search.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				replaceFragment(new SearchViewFragment());
-			}
-		});
-
-		rules.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				replaceFragment(new RulesFragment());
-			}
-		});
-
-		rng.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				replaceFragment(new DiceFragment());
-			}
-		});
-
-		manapool.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				replaceFragment(new ManaPoolFragment());
-			}
-		});
-
-		randomCard.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				replaceFragment(new MoJhoStoFragment());
-			}
-		});
-
-		roundTimer.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				replaceFragment(new RoundTimerFragment());
-			}
-		});
-
-		trader.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				replaceFragment(new TradeFragment());
-			}
-		});
-
-		wishlist.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				replaceFragment(new WishlistFragment());
-			}
-		});
-
-		/*
-		 * Old Main Page Menu Buttons
-		 */
-		checkUpdate.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				// Set the last legality update time back to zero on a forced update
-				SharedPreferences.Editor editor = preferences.edit();
-				editor.putInt("lastLegalityUpdate", 0);
-				editor.commit();
-				startService(new Intent(me, DbUpdaterService.class));
-				showAbove();
-			}
-		});
-		preferencesButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				Intent i = new Intent(me, PreferencesActivity.class);
-				startActivity(i);
-			}
-		});
-		donate.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				showDialogFragment(DONATEDIALOG);
-			}
-		});
-		whatsnew.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				showDialogFragment(CHANGELOGDIALOG);
-			}
-		});
-		aboutapp.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				showDialogFragment(ABOUTDIALOG);
 			}
 		});
 
@@ -375,7 +273,7 @@ public class MainActivity extends SlidingFragmentActivity {
 		}
 	};
 	
-	protected void showDialogFragment(final int id) {
+	public void showDialogFragment(final int id) {
 		// DialogFragment.show() will take care of adding the fragment
 		// in a transaction. We also want to remove any currently showing
 		// dialog, so make our own transaction and take care of that here.

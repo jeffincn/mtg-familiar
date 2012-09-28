@@ -36,6 +36,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
 import com.gelakinetic.mtgfam.R;
@@ -43,19 +44,19 @@ import com.gelakinetic.mtgfam.activities.MainActivity;
 
 public class DbUpdaterService extends IntentService {
 
-	public static final int STATUS_NOTIFICATION = 31;
-	public static final int UPDATED_NOTIFICATION = 32;
+	public static final int				STATUS_NOTIFICATION		= 31;
+	public static final int				UPDATED_NOTIFICATION	= 32;
 
-	protected SharedPreferences mPreferences;
-	protected CardDbAdapter mDbHelper;
-	protected NotificationManager mNotificationManager;
-	protected PendingIntent mNotificationIntent;
+	protected SharedPreferences		mPreferences;
+	protected CardDbAdapter				mDbHelper;
+	protected NotificationManager	mNotificationManager;
+	protected PendingIntent				mNotificationIntent;
 
-	protected Notification mUpdateNotification;
-	protected Handler mHandler = new Handler();
-	protected Runnable mProgressUpdater;
+	protected Notification				mUpdateNotification;
+	protected Handler							mHandler							= new Handler();
+	protected Runnable						mProgressUpdater;
 
-	protected int mProgress;
+	protected int									mProgress;
 
 	public DbUpdaterService() {
 		super("com.gelakinetic.mtgfam.helpers.DbUpdaterService");
@@ -71,16 +72,20 @@ public class DbUpdaterService extends IntentService {
 		Intent intent = new Intent(this, MainActivity.class);
 		mNotificationIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
-		mUpdateNotification = new Notification(R.drawable.rt_notification_icon, getString(R.string.update_notification), System.currentTimeMillis());
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getApplicationContext());
+		mUpdateNotification = builder.setContentTitle(getString(R.string.app_name))
+				.setContentText(getString(R.string.update_notification)).setSmallIcon(R.drawable.rt_notification_icon)
+				.setContentIntent(mNotificationIntent).setWhen(System.currentTimeMillis()).getNotification();
+
 		mUpdateNotification.flags |= Notification.FLAG_ONGOING_EVENT;
 		mUpdateNotification.flags |= Notification.FLAG_ONLY_ALERT_ONCE;
-		mUpdateNotification.setLatestEventInfo(this, getString(R.string.app_name), getString(R.string.update_notification), mNotificationIntent);
 	}
 
 	@Override
 	public void onHandleIntent(Intent intent) {
 
-		//this.publishProgress(new String[] { "indeterminate", mCtx.getString(R.string.update_legality) });
+		// this.publishProgress(new String[] { "indeterminate",
+		// mCtx.getString(R.string.update_legality) });
 
 		showStatusNotification();
 
@@ -88,14 +93,15 @@ public class DbUpdaterService extends IntentService {
 		ProgressReporter reporter = new ProgressReporter();
 		mDbHelper.openTransactional();
 
-		try {				
+		try {
 			ArrayList<String[]> patchInfo = JsonParser.readUpdateJsonStream(mPreferences);
 
 			URL legal = new URL("https://sites.google.com/site/mtgfamiliar/manifests/legality.json");
 			InputStream in = new BufferedInputStream(legal.openStream());
 			JsonParser.readLegalityJsonStream(in, mDbHelper, mPreferences);
 
-			//this.publishProgress(new String[] { "indeterminate", mCtx.getString(R.string.update_cards) });
+			// this.publishProgress(new String[] { "indeterminate",
+			// mCtx.getString(R.string.update_cards) });
 
 			if (patchInfo != null) {
 
@@ -128,10 +134,13 @@ public class DbUpdaterService extends IntentService {
 			// eat it
 		}
 
-		//this.publishProgress(new String[] { "indeterminate", mCtx.getString(R.string.update_rules) });
+		// this.publishProgress(new String[] { "indeterminate",
+		// mCtx.getString(R.string.update_rules) });
 
-		// Instead of using a hardcoded string, the default lastRulesUpdate is the timestamp of when the APK was built.
-		// This is a safe assumption to make, since any market release will have the latest database baked in.
+		// Instead of using a hardcoded string, the default lastRulesUpdate is the
+		// timestamp of when the APK was built.
+		// This is a safe assumption to make, since any market release will have the
+		// latest database baked in.
 		long lastRulesUpdate = mPreferences.getLong("lastRulesUpdate", BuildDate.get(this).getTime());
 		RulesParser rp = new RulesParser(new Date(lastRulesUpdate), mDbHelper, this, reporter);
 		boolean newRulesParsed = false;
@@ -140,14 +149,16 @@ public class DbUpdaterService extends IntentService {
 				switchToUpdating(getString(R.string.update_updating_rules));
 				int code = rp.loadRulesAndGlossary();
 
-				//Only save the timestamp of this if the update was 100% successful; if
-				//something went screwy, we should let them know and try again next update.
-				if(code == RulesParser.SUCCESS) {
-					newRulesParsed = true;	
+				// Only save the timestamp of this if the update was 100% successful; if
+				// something went screwy, we should let them know and try again next
+				// update.
+				if (code == RulesParser.SUCCESS) {
+					newRulesParsed = true;
 					updatedStuff.add(getString(R.string.update_added_rules));
 				}
 				else {
-					//TODO - We should indicate failure here somehow (toasts don't work in the async task)
+					// TODO - We should indicate failure here somehow (toasts don't work
+					// in the async task)
 				}
 
 				switchToChecking();
@@ -156,8 +167,8 @@ public class DbUpdaterService extends IntentService {
 
 		long curTime = new Date().getTime();
 		SharedPreferences.Editor editor = mPreferences.edit();
-		editor.putInt("lastLegalityUpdate", (int)(curTime / 1000));
-		if(newRulesParsed) {
+		editor.putInt("lastLegalityUpdate", (int) (curTime / 1000));
+		if (newRulesParsed) {
 			editor.putLong("lastRulesUpdate", curTime);
 		}
 		editor.commit();
@@ -180,7 +191,10 @@ public class DbUpdaterService extends IntentService {
 
 	protected void switchToChecking() {
 		mHandler.removeCallbacks(mProgressUpdater);
-		mUpdateNotification.setLatestEventInfo(this, getString(R.string.app_name), getString(R.string.update_notification), mNotificationIntent);
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getApplicationContext());
+		mUpdateNotification = builder.setContentTitle(getString(R.string.app_name))
+				.setContentText(getString(R.string.update_notification)).setContentIntent(mNotificationIntent)
+				.getNotification();
 
 		mNotificationManager.notify(STATUS_NOTIFICATION, mUpdateNotification);
 	}
@@ -195,7 +209,7 @@ public class DbUpdaterService extends IntentService {
 
 		mNotificationManager.notify(STATUS_NOTIFICATION, mUpdateNotification);
 
-		mProgressUpdater = new Runnable() {    		
+		mProgressUpdater = new Runnable() {
 			public void run() {
 				contentView.setProgressBar(R.id.progress_notification_bar, 100, mProgress, false);
 				mNotificationManager.notify(STATUS_NOTIFICATION, mUpdateNotification);
@@ -206,37 +220,40 @@ public class DbUpdaterService extends IntentService {
 	}
 
 	protected void showUpdatedNotification(List<String> newStuff) {
-		if(newStuff.size() < 1) {
+		if (newStuff.size() < 1) {
 			return;
 		}
 
 		String title = getString(R.string.app_name);
 		String body = getString(R.string.update_added) + " ";
-		for(int i = 0; i < newStuff.size(); i++) {
+		for (int i = 0; i < newStuff.size(); i++) {
 			body += newStuff.get(i);
-			if(i < newStuff.size() - 1) {
+			if (i < newStuff.size() - 1) {
 				body += ", ";
 			}
 		}
 
-		Notification notification = new Notification(R.drawable.rt_notification_icon, body, System.currentTimeMillis());
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getApplicationContext());
+		Notification notification = builder.setContentTitle(title)
+				.setContentText(body).setSmallIcon(R.drawable.rt_notification_icon)
+				.setContentIntent(mNotificationIntent).setWhen(System.currentTimeMillis()).getNotification();
+		
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
-		notification.setLatestEventInfo(this, title, body, mNotificationIntent);
 
 		mNotificationManager.notify(UPDATED_NOTIFICATION, notification);
 	}
 
-	protected class ProgressReporter implements JsonParser.CardProgressReporter,
-	RulesParser.ProgressReporter {
+	protected class ProgressReporter implements JsonParser.CardProgressReporter, RulesParser.ProgressReporter {
 		public void reportJsonCardProgress(String... args) {
-			if(args.length == 3) {
-				//We only care about this; it has a number
+			if (args.length == 3) {
+				// We only care about this; it has a number
 				mProgress = Integer.parseInt(args[2]);
 			}
 		}
+
 		public void reportRulesProgress(String... args) {
-			if(args.length == 3) {
-				//We only care about this; it has a number
+			if (args.length == 3) {
+				// We only care about this; it has a number
 				mProgress = Integer.parseInt(args[2]);
 			}
 		}

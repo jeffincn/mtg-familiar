@@ -20,10 +20,11 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 package com.gelakinetic.mtgfam.fragments;
 
 import java.io.BufferedInputStream;
-import java.io.DataInputStream;
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -184,15 +185,15 @@ public class CardViewFragment extends FamiliarFragment {
 		cardID = extras.getLong("id");
 		isRandom = extras.getBoolean(SearchViewFragment.RANDOM);
 		isSingle = extras.getBoolean("isSingle", false);
-		if (getFamiliarActivity().preferences.getBoolean("picFirst", false)) {
+		if (getMainActivity().preferences.getBoolean("picFirst", false)) {
 			loadTo = MAINPAGE;
 		}
 		else {
 			loadTo = DIALOG;
 		}
-		scroll_results = getFamiliarActivity().preferences.getBoolean("scrollresults", false);
+		scroll_results = getMainActivity().preferences.getBoolean("scrollresults", false);
 
-		progDialog = new ProgressDialog(this.getFamiliarActivity());
+		progDialog = new ProgressDialog(this.getMainActivity());
 		progDialog.setTitle("");
 		progDialog.setMessage("Loading. Please wait...");
 		progDialog.setIndeterminate(true);
@@ -216,7 +217,7 @@ public class CardViewFragment extends FamiliarFragment {
 		if (isSingle) {
 			Bundle res = new Bundle();
 			res.putBoolean("isSingle", isSingle);
-			this.getFamiliarActivity().setFragmentResult(res);
+			this.getMainActivity().setFragmentResult(res);
 		}
 
 		if (progDialog.isShowing()) {
@@ -368,16 +369,16 @@ public class CardViewFragment extends FamiliarFragment {
 				public void onClick(View v) {
 					Bundle res = new Bundle();
 					res.putInt("resultCode", RANDOMLEFT);
-					anchor.getFamiliarActivity().setFragmentResult(res);
-					anchor.getFamiliarActivity().mFragmentManager.popBackStack();
+					anchor.getMainActivity().setFragmentResult(res);
+					anchor.getMainActivity().mFragmentManager.popBackStack();
 				}
 			});
 			rightRandom.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					Bundle res = new Bundle();
 					res.putInt("resultCode", RANDOMRIGHT);
-					anchor.getFamiliarActivity().setFragmentResult(res);
-					anchor.getFamiliarActivity().mFragmentManager.popBackStack();
+					anchor.getMainActivity().setFragmentResult(res);
+					anchor.getMainActivity().mFragmentManager.popBackStack();
 				}
 			});
 			leftRandom.setVisibility(View.VISIBLE);
@@ -415,8 +416,8 @@ public class CardViewFragment extends FamiliarFragment {
 					Bundle res = new Bundle();
 					res.putInt("resultCode", SWIPELEFT);
 					res.putLong("lastID", cardID);
-					anchor.getFamiliarActivity().setFragmentResult(res);
-					anchor.getFamiliarActivity().mFragmentManager.popBackStack();
+					anchor.getMainActivity().setFragmentResult(res);
+					anchor.getMainActivity().mFragmentManager.popBackStack();
 				}
 			});
 			rightRandom.setOnClickListener(new View.OnClickListener() {
@@ -424,8 +425,8 @@ public class CardViewFragment extends FamiliarFragment {
 					Bundle res = new Bundle();
 					res.putInt("resultCode", SWIPERIGHT);
 					res.putLong("lastID", cardID);
-					anchor.getFamiliarActivity().setFragmentResult(res);
-					anchor.getFamiliarActivity().mFragmentManager.popBackStack();
+					anchor.getMainActivity().setFragmentResult(res);
+					anchor.getMainActivity().mFragmentManager.popBackStack();
 				}
 			});
 			leftRandom.setVisibility(View.VISIBLE);
@@ -543,21 +544,21 @@ public class CardViewFragment extends FamiliarFragment {
 				picurl = picurl.toLowerCase();
 
 				URL u = new URL(picurl);
-				cardPicture = new BitmapDrawable(anchor.getFamiliarActivity().getResources(), u.openStream());
+				cardPicture = new BitmapDrawable(anchor.getMainActivity().getResources(), u.openStream());
 
 				int height = 0, width = 0;
 				float scale = 0;
 				int border = 16;
-				Display display = ((WindowManager) anchor.getFamiliarActivity().getSystemService(Context.WINDOW_SERVICE))
+				Display display = ((WindowManager) anchor.getMainActivity().getSystemService(Context.WINDOW_SERVICE))
 						.getDefaultDisplay();
 				if (loadTo == MAINPAGE) {
 					Rect rectgle = new Rect();
-					Window window = anchor.getFamiliarActivity().getWindow();
+					Window window = anchor.getMainActivity().getWindow();
 					window.getDecorView().getWindowVisibleDisplayFrame(rectgle);
 
 					LinearLayout scrollButtons = (LinearLayout) myFragmentView.findViewById(R.id.scrollButtons);
 
-					height = (display.getHeight() - rectgle.top - anchor.getFamiliarActivity().getSupportActionBar().getHeight() - scrollButtons
+					height = (display.getHeight() - rectgle.top - anchor.getMainActivity().getSupportActionBar().getHeight() - scrollButtons
 							.getHeight()) - border;
 					width = display.getWidth() - border;
 				}
@@ -608,7 +609,7 @@ public class CardViewFragment extends FamiliarFragment {
 		private BitmapDrawable resize(BitmapDrawable image, int newWidth, int newHeight) {
 			Bitmap d = ((BitmapDrawable) image).getBitmap();
 			Bitmap bitmapOrig = Bitmap.createScaledBitmap(d, newWidth, newHeight, true);
-			return new BitmapDrawable(anchor.getFamiliarActivity().getResources(), bitmapOrig);
+			return new BitmapDrawable(anchor.getMainActivity().getResources(), bitmapOrig);
 		}
 
 		@Override
@@ -736,7 +737,7 @@ public class CardViewFragment extends FamiliarFragment {
 			}
 
 			if (XMLhandler != null && XMLhandler.hiprice == null && error == null) {
-				Toast.makeText(anchor.getFamiliarActivity(), "Card Price Not Found", Toast.LENGTH_SHORT).show();
+				Toast.makeText(anchor.getMainActivity(), "Card Price Not Found", Toast.LENGTH_SHORT).show();
 				return;
 			}
 			if (error == null) {
@@ -744,7 +745,7 @@ public class CardViewFragment extends FamiliarFragment {
 				showDialog(GETPRICE);
 			}
 			else {
-				Toast.makeText(anchor.getFamiliarActivity(), error, Toast.LENGTH_SHORT).show();
+				Toast.makeText(anchor.getMainActivity(), error, Toast.LENGTH_SHORT).show();
 			}
 		}
 
@@ -763,7 +764,7 @@ public class CardViewFragment extends FamiliarFragment {
 
 			URL url;
 			InputStream is = null;
-			DataInputStream dis;
+			BufferedReader br;
 			String line;
 
 			rulingsArrayList = new ArrayList<Ruling>();
@@ -771,10 +772,10 @@ public class CardViewFragment extends FamiliarFragment {
 			try {
 				url = new URL("http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multiverseId);
 				is = url.openStream(); // throws an IOException
-				dis = new DataInputStream(new BufferedInputStream(is));
+				br = new BufferedReader(new InputStreamReader(new BufferedInputStream(is)));
 
 				String date = null, ruling;
-				while ((line = dis.readLine()) != null) {
+				while ((line = br.readLine()) != null) {
 					if (line.contains("rulingDate") && line.contains("</td>")) {
 						date = (line.replace("<autocard>", "").replace("</autocard>", "")).split(">")[1].split("<")[0];
 					}
@@ -818,7 +819,7 @@ public class CardViewFragment extends FamiliarFragment {
 				showDialog(CARDRULINGS);
 			}
 			else {
-				Toast.makeText(anchor.getFamiliarActivity(), "No Internet Connection", Toast.LENGTH_SHORT).show();
+				Toast.makeText(anchor.getMainActivity(), "No Internet Connection", Toast.LENGTH_SHORT).show();
 			}
 		}
 
@@ -872,10 +873,10 @@ public class CardViewFragment extends FamiliarFragment {
 					case GETIMAGE: {
 
 						if (cardPicture == null) {
-							return new Dialog(this.getFamiliarActivity());
+							return new Dialog(this.getMainActivity());
 						}
 
-						Dialog dialog = new Dialog(this.getFamiliarActivity());
+						Dialog dialog = new Dialog(this.getMainActivity());
 						dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 						dialog.setContentView(R.layout.image_dialog);
@@ -890,7 +891,7 @@ public class CardViewFragment extends FamiliarFragment {
 							return null;
 						}
 
-						Dialog dialog = new Dialog(this.getFamiliarActivity());
+						Dialog dialog = new Dialog(this.getMainActivity());
 						dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 						dialog.setContentView(R.layout.legality_dialog);
@@ -908,7 +909,7 @@ public class CardViewFragment extends FamiliarFragment {
 							fillMaps.add(map);
 						}
 
-						SimpleAdapter adapter = new SimpleAdapter(this.getFamiliarActivity(), fillMaps, R.layout.legal_row, from,
+						SimpleAdapter adapter = new SimpleAdapter(this.getMainActivity(), fillMaps, R.layout.legal_row, from,
 								to);
 						ListView lv = (ListView) dialog.findViewById(R.id.legallist);
 						lv.setAdapter(adapter);
@@ -920,7 +921,7 @@ public class CardViewFragment extends FamiliarFragment {
 							return null;
 						}
 
-						Dialog dialog = new Dialog(this.getFamiliarActivity());
+						Dialog dialog = new Dialog(this.getMainActivity());
 						dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 						dialog.setContentView(R.layout.price_dialog);
@@ -954,7 +955,7 @@ public class CardViewFragment extends FamiliarFragment {
 
 							final String[] aSets = sets.toArray(new String[sets.size()]);
 							final Long[] aIds = cardIds.toArray(new Long[cardIds.size()]);
-							AlertDialog.Builder builder = new AlertDialog.Builder(this.getFamiliarActivity());
+							AlertDialog.Builder builder = new AlertDialog.Builder(this.getMainActivity());
 							builder.setTitle("Pick a Set");
 							builder.setItems(aSets, new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialogInterface, int item) {
@@ -973,7 +974,7 @@ public class CardViewFragment extends FamiliarFragment {
 							return null;
 						}
 
-						Dialog dialog = new Dialog(this.getFamiliarActivity());
+						Dialog dialog = new Dialog(this.getMainActivity());
 						dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 						dialog.setContentView(R.layout.rulings_dialog);
@@ -1023,13 +1024,13 @@ public class CardViewFragment extends FamiliarFragment {
 
 		copyView = (TextView) v;
 
-		android.view.MenuInflater inflater = this.getFamiliarActivity().getMenuInflater();
+		android.view.MenuInflater inflater = this.getMainActivity().getMenuInflater();
 		inflater.inflate(R.menu.copy_menu, menu);
 	}
 
 	private static final boolean	useOldClipboard	= (android.os.Build.VERSION.SDK_INT < 11);
 
-	@SuppressLint("NewApi")
+	@SuppressLint({ "NewApi" })
 	@Override
 	public boolean onContextItemSelected(android.view.MenuItem item) {
 		// use a final static boolean for JIT compile-time culling of deprecated
@@ -1054,13 +1055,13 @@ public class CardViewFragment extends FamiliarFragment {
 		}
 
 		if (useOldClipboard) {
-			android.text.ClipboardManager clipboard = (android.text.ClipboardManager) this.getFamiliarActivity()
+			android.text.ClipboardManager clipboard = (android.text.ClipboardManager) this.getMainActivity()
 					.getSystemService(android.content.Context.CLIPBOARD_SERVICE);
 			clipboard.setText(copyText);
 			return true;
 		}
 		else {
-			android.content.ClipboardManager clipboard = (android.content.ClipboardManager) this.getFamiliarActivity()
+			android.content.ClipboardManager clipboard = (android.content.ClipboardManager) this.getMainActivity()
 					.getSystemService(android.content.Context.CLIPBOARD_SERVICE);
 			clipboard.setText(copyText);
 			return true;
@@ -1098,13 +1099,13 @@ public class CardViewFragment extends FamiliarFragment {
 				showDialog(WISHLIST_COUNTS);
 				return true;
 			case R.id.quittosearch:
-				MyApp appState = ((MyApp) this.getFamiliarActivity().getApplicationContext());
+				MyApp appState = ((MyApp) this.getMainActivity().getApplicationContext());
 				appState.setState(QUITTOSEARCH);
-				if (anchor.getFamiliarActivity().mFragmentManager.getBackStackEntryCount() == 0) {
-					anchor.getFamiliarActivity().finish();
+				if (anchor.getMainActivity().mFragmentManager.getBackStackEntryCount() == 0) {
+					anchor.getMainActivity().finish();
 				}
 				else {
-					anchor.getFamiliarActivity().mFragmentManager.popBackStack();
+					anchor.getMainActivity().mFragmentManager.popBackStack();
 				}
 				return true;
 			default:

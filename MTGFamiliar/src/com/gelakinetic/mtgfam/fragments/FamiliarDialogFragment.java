@@ -4,7 +4,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
-import com.gelakinetic.mtgfam.activities.FamiliarActivity;
+import com.gelakinetic.mtgfam.activities.MainActivity;
 
 public class FamiliarDialogFragment extends SherlockDialogFragment {
 
@@ -31,7 +31,7 @@ public class FamiliarDialogFragment extends SherlockDialogFragment {
 		return null;
 	}
 
-	protected FamiliarActivity getFamiliarActivity() {
-		return (FamiliarActivity) this.getActivity();
+	protected MainActivity getMainActivity() {
+		return (MainActivity) this.getActivity();
 	}
 }

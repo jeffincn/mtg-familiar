@@ -71,14 +71,14 @@ public class RulesFragment extends FamiliarFragment {
 		super.onCreateView(inflater, container, savedInstanceState);
 		View myFragmentView = inflater.inflate(R.layout.rules_activity, container, false);
 
-		Bundle res = anchor.getFamiliarActivity().getFragmentResults();
+		Bundle res = anchor.getMainActivity().getFragmentResults();
 		if (res != null) {
 			int resultCode = res.getInt("resultCode");
 			if (resultCode == RESULT_QUIT_TO_MAIN) {
 				Bundle result = new Bundle();
 				result.putInt("resultCode", RESULT_QUIT_TO_MAIN);
-				this.getFamiliarActivity().setFragmentResult(result);
-				this.getFamiliarActivity().mFragmentManager.popBackStack();
+				this.getMainActivity().setFragmentResult(result);
+				this.getMainActivity().mFragmentManager.popBackStack();
 			}
 		}
 
@@ -180,7 +180,7 @@ public class RulesFragment extends FamiliarFragment {
 				else {
 					c.close();
 					Toast.makeText(getActivity(), "No results found.", Toast.LENGTH_SHORT).show();
-					getFamiliarActivity().mFragmentManager.popBackStack();
+					getMainActivity().mFragmentManager.popBackStack();
 				}
 			}
 			catch (SQLiteDatabaseCorruptException e) {
@@ -190,7 +190,7 @@ public class RulesFragment extends FamiliarFragment {
 		}
 		else {
 			Toast.makeText(getActivity(), "No results found.", Toast.LENGTH_SHORT).show();
-			getFamiliarActivity().mFragmentManager.popBackStack();
+			getMainActivity().mFragmentManager.popBackStack();
 		}
 
 		list.setSelection(position);
@@ -301,7 +301,7 @@ public class RulesFragment extends FamiliarFragment {
 						return new AlertDialog.Builder(this.getActivity()).setTitle(R.string.error).setView(dialogLayout)
 								.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
 									public void onClick(DialogInterface dialog, int which) {
-										anchor.getFamiliarActivity().mFragmentManager.popBackStack();
+										anchor.getMainActivity().mFragmentManager.popBackStack();
 									}
 								}).setCancelable(false).create();
 					}
@@ -321,8 +321,8 @@ public class RulesFragment extends FamiliarFragment {
 			case R.id.rules_menu_exit:
 				Bundle result = new Bundle();
 				result.putInt("resultCode", RESULT_QUIT_TO_MAIN);
-				this.getFamiliarActivity().setFragmentResult(result);
-				this.getFamiliarActivity().mFragmentManager.popBackStack();
+				this.getMainActivity().setFragmentResult(result);
+				this.getMainActivity().mFragmentManager.popBackStack();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

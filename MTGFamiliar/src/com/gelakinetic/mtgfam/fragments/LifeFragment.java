@@ -183,10 +183,10 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		listSizeHeight = -10;
 		listSizeWidth = -10;
 
-		canGetLock = getFamiliarActivity().preferences.getBoolean("wakelock", true);
-		displayMode = Integer.parseInt(getFamiliarActivity().preferences.getString("displayMode",
+		canGetLock = getMainActivity().preferences.getBoolean("wakelock", true);
+		displayMode = Integer.parseInt(getMainActivity().preferences.getString("displayMode",
 				String.valueOf(normalDisplay)));
-		editor = getFamiliarActivity().preferences.edit();
+		editor = getMainActivity().preferences.edit();
 
 		if (orientation == LANDSCAPE && displayMode == compactDisplay) {
 			displayMode = normalDisplay;
@@ -231,7 +231,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 		setType(LIFE);
 
-		if (getFamiliarActivity().preferences.getBoolean("hasTts", false)) {
+		if (getMainActivity().preferences.getBoolean("hasTts", false)) {
 			tts = new TextToSpeech(getActivity(), this);
 		}
 
@@ -291,7 +291,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			wl.acquire();
 		}
 
-		String lifeData = getFamiliarActivity().preferences.getString(PLAYER_DATA, null);
+		String lifeData = getMainActivity().preferences.getString(PLAYER_DATA, null);
 
 		if (lifeData == null || lifeData.length() == 0) {
 			addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, getActivity());
@@ -355,7 +355,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 	private void restartFragment() {
 		try {
-			getFamiliarActivity().getSupportFragmentManager().popBackStack();
+			getMainActivity().getSupportFragmentManager().popBackStack();
 			this.startNewFragment(new LifeFragment(), null);
 		}
 		catch (NullPointerException e) {
@@ -461,12 +461,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 						builder.setMessage(getString(R.string.life_counter_clear_dialog_text)).setCancelable(true)
 								.setPositiveButton(getString(R.string.dialog_both), new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int id) {
-										ManaPoolFragment.reset(getFamiliarActivity());
+										ManaPoolFragment.reset(getMainActivity());
 										reset(EVERYTHING);
 									}
 								}).setNeutralButton(getString(R.string.dialog_life), new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int id) {
-										ManaPoolFragment.reset(getFamiliarActivity());
+										ManaPoolFragment.reset(getMainActivity());
 										reset(JUST_TOTALS);
 									}
 								}).setNegativeButton(getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {

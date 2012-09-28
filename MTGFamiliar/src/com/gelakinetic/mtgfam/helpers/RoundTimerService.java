@@ -21,6 +21,7 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
+import android.support.v4.app.NotificationCompat;
 
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.activities.MainActivity;
@@ -38,16 +39,8 @@ public class RoundTimerService extends Service implements OnInitListener {
 	public static String				CANCEL_FILTER						= "com.gelakinetic.mtgfam.CANCEL_FILTER";
 	public static String				TTS_INITIALIZED_FILTER	= "com.gelakinetic.mtgfam.HAS_TTS_FILTER";
 
-	private static int					NOTIFICATION_ID					= 53;																				// Arbitrary;
-																																																		// we
-																																																		// just
-																																																		// need
-																																																		// something
-																																																		// no
-																																																		// one
-																																																		// else
-																																																		// is
-																																																		// using
+	// Arbitrary; we just need something no one else is using
+	private static int					NOTIFICATION_ID					= 53;
 
 	public static String				EXTRA_END_TIME					= "EndTime";
 	public static String				EXTRA_TTS_INITIALIZED		= "TtsInitialized";
@@ -344,9 +337,11 @@ public class RoundTimerService extends Service implements OnInitListener {
 		then.add(Calendar.MILLISECOND, (int) (endTime - SystemClock.elapsedRealtime()));
 		String messageText = String.format(timerStartText, then);
 
-		Notification n = new Notification(R.drawable.rt_notification_icon, messageText, System.currentTimeMillis());
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getApplication().getApplicationContext());
+		Notification n = builder.setSmallIcon(R.drawable.rt_notification_icon).setWhen(System.currentTimeMillis())
+				.setContentTitle(titleText).setContentText(messageText).setContentIntent(contentIntent).getNotification();
+
 		n.flags |= Notification.FLAG_ONGOING_EVENT;
-		n.setLatestEventInfo(c, titleText, messageText, contentIntent);
 
 		// Clear any existing notifications just in case there's still one there
 		nm.cancel(NOTIFICATION_ID);
@@ -356,9 +351,10 @@ public class RoundTimerService extends Service implements OnInitListener {
 	}
 
 	private void showEndNotification() {
-		Notification n = new Notification(R.drawable.rt_notification_icon, timerEndText, System.currentTimeMillis());
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getApplication().getApplicationContext());
+		Notification n = builder.setSmallIcon(R.drawable.rt_notification_icon).setWhen(System.currentTimeMillis())
+				.setContentTitle(titleText).setContentText(timerEndText).setContentIntent(contentIntent).getNotification();
 		n.flags |= Notification.FLAG_AUTO_CANCEL;
-		n.setLatestEventInfo(getApplication().getApplicationContext(), titleText, timerEndText, contentIntent);
 
 		nm.cancel(NOTIFICATION_ID);
 

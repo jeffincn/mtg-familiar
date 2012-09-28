@@ -82,7 +82,7 @@ public class RoundTimerFragment extends FamiliarFragment {
 																												else {
 																													actionButton.setText(R.string.timer_start);
 																												}
-																												getFamiliarActivity().timerHandler.postDelayed(
+																												getMainActivity().timerHandler.postDelayed(
 																														updateButtonTextTask, 200);
 																											}
 																										};
@@ -119,13 +119,13 @@ public class RoundTimerFragment extends FamiliarFragment {
 		Intent i = new Intent(RoundTimerService.REQUEST_FILTER);
 		getActivity().sendBroadcast(i);
 
-		if (getFamiliarActivity().preferences.getBoolean("hasTts", false)) {
+		if (getMainActivity().preferences.getBoolean("hasTts", false)) {
 			// Find out if TTS is initialized
 			i = new Intent(RoundTimerService.TTS_INITIALIZED_FILTER);
 			getActivity().sendBroadcast(i);
 		}
 
-		getFamiliarActivity().timerHandler.postDelayed(updateButtonTextTask, 200);
+		getMainActivity().timerHandler.postDelayed(updateButtonTextTask, 200);
 		return myFragmentView;
 	}
 
@@ -135,7 +135,7 @@ public class RoundTimerFragment extends FamiliarFragment {
 
 		if (firstLoad) {
 			try {
-				int length = Integer.parseInt(getFamiliarActivity().preferences.getString("roundLength", "50"));
+				int length = Integer.parseInt(getMainActivity().preferences.getString("roundLength", "50"));
 				this.hours = length / 60;
 				this.minutes = length % 60;
 			}
@@ -163,7 +163,7 @@ public class RoundTimerFragment extends FamiliarFragment {
 		super.onDestroy();
 		getActivity().unregisterReceiver(resultReceiver);
 		getActivity().unregisterReceiver(ttsReceiver);
-		getFamiliarActivity().timerHandler.removeCallbacks(updateButtonTextTask);
+		getMainActivity().timerHandler.removeCallbacks(updateButtonTextTask);
 	}
 
 	@Override
@@ -189,7 +189,7 @@ public class RoundTimerFragment extends FamiliarFragment {
 		// Handle item selection
 		switch (item.getItemId()) {
 			case R.id.set_timer_ringtone:
-				Uri soundFile = Uri.parse(getFamiliarActivity().preferences.getString("timerSound", RingtoneManager
+				Uri soundFile = Uri.parse(getMainActivity().preferences.getString("timerSound", RingtoneManager
 						.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION).toString()));
 
 				Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
@@ -231,9 +231,9 @@ public class RoundTimerFragment extends FamiliarFragment {
 						final CheckBox chkTen = (CheckBox) v.findViewById(R.id.timer_pref_ten);
 						final CheckBox chkFive = (CheckBox) v.findViewById(R.id.timer_pref_five);
 						
-						boolean fifteen = getFamiliarActivity().preferences.getBoolean("fifteenMinutePref", false);
-						boolean ten = getFamiliarActivity().preferences.getBoolean("tenMinutePref", false);
-						boolean five = getFamiliarActivity().preferences.getBoolean("fiveMinutePref", false);
+						boolean fifteen = getMainActivity().preferences.getBoolean("fifteenMinutePref", false);
+						boolean ten = getMainActivity().preferences.getBoolean("tenMinutePref", false);
+						boolean five = getMainActivity().preferences.getBoolean("fiveMinutePref", false);
 						
 						chkFifteen.setChecked(fifteen);
 						chkTen.setChecked(ten);

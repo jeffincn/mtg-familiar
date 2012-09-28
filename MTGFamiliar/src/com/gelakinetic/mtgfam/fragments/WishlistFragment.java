@@ -166,11 +166,11 @@ public class WishlistFragment extends FamiliarFragment {
 	public void onResume() {
 		super.onResume();
 		doneLoading = false;
-		showTotalPrice = getFamiliarActivity().preferences.getBoolean("showTotalPriceWishlistPref", false);
-		showIndividualPrices = getFamiliarActivity().preferences.getBoolean("showIndividualPricesWishlistPref", true);
-		verbose = getFamiliarActivity().preferences.getBoolean("verboseWishlistPref", false);
+		showTotalPrice = getMainActivity().preferences.getBoolean("showTotalPriceWishlistPref", false);
+		showIndividualPrices = getMainActivity().preferences.getBoolean("showIndividualPricesWishlistPref", true);
+		verbose = getMainActivity().preferences.getBoolean("verboseWishlistPref", false);
 		priceSetting = Integer
-				.parseInt(getFamiliarActivity().preferences.getString("tradePrice", String.valueOf(AVG_PRICE)));
+				.parseInt(getMainActivity().preferences.getString("tradePrice", String.valueOf(AVG_PRICE)));
 
 		if (!showTotalPrice) {
 			tradePrice.setVisibility(View.GONE);

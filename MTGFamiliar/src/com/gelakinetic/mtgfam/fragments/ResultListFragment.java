@@ -75,7 +75,7 @@ public class ResultListFragment extends FamiliarFragment {
 		if (this.isAdded()) {
 			if (c == null || c.getCount() == 0) {
 				Toast.makeText(this.getActivity(), getString(R.string.search_toast_no_results), Toast.LENGTH_SHORT).show();
-				anchor.getFamiliarActivity().mFragmentManager.popBackStack();
+				anchor.getMainActivity().mFragmentManager.popBackStack();
 				return;
 			}
 			else if (c.getCount() == 1) {
@@ -136,7 +136,7 @@ public class ResultListFragment extends FamiliarFragment {
 			});
 		}
 
-		Bundle res = anchor.getFamiliarActivity().getFragmentResults();
+		Bundle res = anchor.getMainActivity().getFragmentResults();
 		if (res != null) {
 			onFragmentResult(res);
 		}
@@ -149,23 +149,23 @@ public class ResultListFragment extends FamiliarFragment {
 			ArrayList<Integer> toList = new ArrayList<Integer>();
 			fromList.add(CardDbAdapter.KEY_NAME);
 			toList.add(R.id.cardname);
-			if (getFamiliarActivity().preferences.getBoolean("setPref", true)) {
+			if (getMainActivity().preferences.getBoolean("setPref", true)) {
 				fromList.add(CardDbAdapter.KEY_SET);
 				toList.add(R.id.cardset);
 			}
-			if (getFamiliarActivity().preferences.getBoolean("manacostPref", true)) {
+			if (getMainActivity().preferences.getBoolean("manacostPref", true)) {
 				fromList.add(CardDbAdapter.KEY_MANACOST);
 				toList.add(R.id.cardcost);
 			}
-			if (getFamiliarActivity().preferences.getBoolean("typePref", true)) {
+			if (getMainActivity().preferences.getBoolean("typePref", true)) {
 				fromList.add(CardDbAdapter.KEY_TYPE);
 				toList.add(R.id.cardtype);
 			}
-			if (getFamiliarActivity().preferences.getBoolean("abilityPref", true)) {
+			if (getMainActivity().preferences.getBoolean("abilityPref", true)) {
 				fromList.add(CardDbAdapter.KEY_ABILITY);
 				toList.add(R.id.cardability);
 			}
-			if (getFamiliarActivity().preferences.getBoolean("ptPref", true)) {
+			if (getMainActivity().preferences.getBoolean("ptPref", true)) {
 				fromList.add(CardDbAdapter.KEY_POWER);
 				toList.add(R.id.cardp);
 				fromList.add(CardDbAdapter.KEY_TOUGHNESS);
@@ -181,7 +181,7 @@ public class ResultListFragment extends FamiliarFragment {
 				to[i] = toList.get(i);
 			}
 
-			ResultListAdapter rla = new ResultListAdapter(anchor.getFamiliarActivity(), R.layout.card_row, c, from, to,
+			ResultListAdapter rla = new ResultListAdapter(anchor.getMainActivity(), R.layout.card_row, c, from, to,
 					this.getResources());
 			lv.setAdapter(rla);
 		}
@@ -253,7 +253,7 @@ public class ResultListFragment extends FamiliarFragment {
 			default:
 				if (bundleIsSingle || (isRandom && !randomFromMenu)) {
 					// TODO check on rotation
-					anchor.getFamiliarActivity().mFragmentManager.popBackStack();
+					anchor.getMainActivity().mFragmentManager.popBackStack();
 				}
 				if (randomFromMenu) {
 					randomFromMenu = false;

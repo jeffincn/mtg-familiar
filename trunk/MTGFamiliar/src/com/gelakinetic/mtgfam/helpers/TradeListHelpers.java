@@ -39,18 +39,23 @@ public class TradeListHelpers {
 	// private static final int AVG_PRICE = 1;
 	private static final int		HIGH_PRICE				= 2;
 
-	public static CardData FetchCardData(Context mCtx, CardData _data) {
+	public static CardData FetchCardData(CardData _data, CardDbAdapter mDbHelper) {
 		CardData data = _data;
 		try {
-			CardDbAdapter mDbHelper = new CardDbAdapter(mCtx);
-			mDbHelper.openReadable();
-
 			Cursor card;
+			boolean opened = false;
+			if(!mDbHelper.mDb.isOpen()) {
+				mDbHelper.openReadable();
+				opened = true;
+			}
 			if (data.setCode == null || data.setCode.equals(""))
 				card = mDbHelper.fetchCardByName(data.name, CardDbAdapter.allData);
 			else
 				card = mDbHelper.fetchCardByNameAndSet(data.name, data.setCode);
 
+			if(opened){
+				mDbHelper.close();
+			}
 			if (card.moveToFirst()) {
 				data.name = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NAME));
 				data.setCode = card.getString(card.getColumnIndex(CardDbAdapter.KEY_SET));
@@ -140,7 +145,12 @@ public class TradeListHelpers {
 				String setCode = data.setCode == null ? "" : data.setCode;
 				String tcgName = data.tcgName == null ? "" : data.tcgName;
 				if (cardNumber == "" || setCode == "" || tcgName == "") {
-					data = FetchCardData(mCtx, data);
+					if(wf != null) {
+						data = FetchCardData(data, wf.mDbHelper);
+					}
+					else if (cta != null) {
+						data = FetchCardData(data, cta.mDbHelper);
+					}
 					if (data.message == card_not_found || data.message == database_busy) {
 						price = data.message;
 						return 1;

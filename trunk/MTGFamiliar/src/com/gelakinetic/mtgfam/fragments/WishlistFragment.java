@@ -530,7 +530,7 @@ public class WishlistFragment extends FamiliarFragment {
 				}
 				else {
 					if (data.ability == null || data.ability == "") {
-						data = TradeListHelpers.FetchCardData(anchor.getActivity(), data);
+						data = TradeListHelpers.FetchCardData(data, anchor.mDbHelper);
 					}
 					String type = data.type;
 					// we check the actual values for visibility here (instead
@@ -724,6 +724,9 @@ public class WishlistFragment extends FamiliarFragment {
 						}
 						case WishlistHelpers.DONE:
 						default: {
+							if(dlg == null) {
+								return;
+							}
 							LinearLayout lvSets = (LinearLayout) dlg.findViewById(R.id.setList);
 
 							ArrayList<CardData> cardlist = cardSetWishlists.get(positionForDialog);
@@ -750,14 +753,14 @@ public class WishlistFragment extends FamiliarFragment {
 											numberField, 0, "loading", null, null, null, null, null, null, CardDbAdapter.NOONECARES, '-');
 
 									if (showTotalPrice || showIndividualPrices) {
-										cd = TradeListHelpers.FetchCardData(anchor.getActivity(), cd);
+										cd = TradeListHelpers.FetchCardData(cd, anchor.mDbHelper);
 										cd.message = ("loading");
 										FetchPriceTask task = mTradeListHelper.new FetchPriceTask(cd, aaExpWishlist, priceSetting, null,
 												(WishlistFragment) anchor);
 										TradeListHelpers.addTaskAndExecute(task);
 									}
 									else
-										cd = TradeListHelpers.FetchCardData(anchor.getActivity(), cd);
+										cd = TradeListHelpers.FetchCardData(cd, anchor.mDbHelper);
 									setNames.add(setName);
 									cardlist.add(cd);
 								}
@@ -781,8 +784,13 @@ public class WishlistFragment extends FamiliarFragment {
 				switch (id) {
 					case DIALOG_UPDATE_CARD: {
 						if (doneLoading) {
-							dlg = (wh).getDialog(cardNames.get(positionForDialog), anchor,
-									cardSetWishlists.get(positionForDialog));
+							try{
+								dlg = (wh).getDialog(cardNames.get(positionForDialog), anchor, this.getMainActivity(), 
+										cardSetWishlists.get(positionForDialog));
+							}
+							catch(IndexOutOfBoundsException ex){
+								dlg = (wh).getDialog(cardNames.get(positionForDialog), anchor, this.getMainActivity());
+							}
 							return dlg;
 						}
 						else {

@@ -87,8 +87,6 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	private Editor													editor;
 	private ImageView												lifeButton;
 	private ImageView												poisonButton;
-	private ImageView												dieButton;
-	private ImageView												poolButton;
 	private ImageView												resetButton;
 	private LifeFragment										anchor;
 	private int															activeType;
@@ -199,8 +197,6 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 		poisonButton = (ImageView) myFragmentView.findViewById(R.id.poison_button);
 		lifeButton = (ImageView) myFragmentView.findViewById(R.id.life_button);
-		dieButton = (ImageView) myFragmentView.findViewById(R.id.die_button);
-		poolButton = (ImageView) myFragmentView.findViewById(R.id.pool_button);
 		resetButton = (ImageView) myFragmentView.findViewById(R.id.reset_button);
 
 		anchor = this;
@@ -215,16 +211,6 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			public void onClick(View view) {
 				setType(LIFE);
 				update();
-			}
-		});
-		dieButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				anchor.startNewFragment(new DiceFragment(), null);
-			}
-		});
-		poolButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				anchor.startNewFragment(new ManaPoolFragment(), null);
 			}
 		});
 		resetButton.setOnClickListener(new View.OnClickListener() {

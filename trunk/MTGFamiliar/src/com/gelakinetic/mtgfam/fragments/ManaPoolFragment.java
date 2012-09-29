@@ -75,7 +75,6 @@ public class ManaPoolFragment extends FamiliarFragment {
 			}
 		}
 		if (!loadSuccessful) {
-			// Log.e("Mana Pool", "Failed to locate all views from inflated XML");
 			Toast.makeText(this.getActivity(), "Mana pool failed to load!", Toast.LENGTH_LONG).show();
 			// this.finish();
 			this.getMainActivity().mFragmentManager.popBackStack();

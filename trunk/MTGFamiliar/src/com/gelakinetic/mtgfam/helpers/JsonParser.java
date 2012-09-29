@@ -19,6 +19,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam.helpers;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -272,7 +273,6 @@ public class JsonParser {
 								}
 							}
 							mDbHelper.createCard(c);
-							// mMain.cardAdded();
 							elementsParsed++;
 							progReport.reportJsonCardProgress(new String[] { dialogText, dialogText,
 									"" + (int) Math.round(100 * elementsParsed / (double) numTotalElements) });
@@ -285,11 +285,9 @@ public class JsonParser {
 			}
 			if (s.equalsIgnoreCase("w")) { // num_cards
 				numTotalElements = reader.nextInt();
-				// mMain.setNumCards(reader.nextInt());
 			}
 		}
 		reader.endObject();
-		//task.publicPublishProgress(new String[] { "Done Parsing " + setName, "Done Parsing " + setName, "0" });
 		reader.close();
 		return;
 	}
@@ -350,7 +348,7 @@ public class JsonParser {
 		return patchInfo;
 	}
 
-	public static void readLegalityJsonStream(InputStream in, CardDbAdapter cda, SharedPreferences settings)
+	public static void readLegalityJsonStream(CardDbAdapter cda, SharedPreferences settings, boolean reparseDatabase)
 			throws IOException {
 
 		CardDbAdapter mDbHelper;
@@ -362,6 +360,9 @@ public class JsonParser {
 		String jsonArrayName;
 		String jsonTopLevelName;
 
+		URL legal = new URL("https://sites.google.com/site/mtgfamiliar/manifests/legality.json");
+		InputStream in = new BufferedInputStream(legal.openStream());
+		
 		JsonReader reader = new JsonReader(new InputStreamReader(in, "ISO-8859-1"));
 
 		mDbHelper = cda;
@@ -376,8 +377,10 @@ public class JsonParser {
 				// compare date, maybe return, update sharedprefs
 				String spDate = settings.getString("date", null);
 				if (spDate != null && spDate.equals(date)) {
-					reader.close();
-					return; // dates match, nothing new here.
+					if(!reparseDatabase){ // if we're reparsing, screw the date
+						reader.close();
+						return; // dates match, nothing new here.
+					}
 				}
 
 				mDbHelper.dropLegalTables();
@@ -434,7 +437,7 @@ public class JsonParser {
 		return;
 	}
 
-	public static void readTCGNameJsonStream(SharedPreferences settings, CardDbAdapter mDbHelper) throws MalformedURLException, IOException{
+	public static void readTCGNameJsonStream(SharedPreferences settings, CardDbAdapter mDbHelper, boolean reparseDatabase) throws MalformedURLException, IOException{
 		URL update;
 		String label;
 		String date = null;
@@ -452,7 +455,7 @@ public class JsonParser {
 			if (label.equals("Date")) {
 				String lastUpdate = settings.getString("lastTCGNameUpdate", "");
 				date = reader.nextString();
-				if (lastUpdate.equals(date)) {
+				if (lastUpdate.equals(date) && !reparseDatabase) {
 					reader.close();
 					return;
 				}

@@ -1005,7 +1005,7 @@ public class CardViewFragment extends FamiliarFragment {
 						return dialog;
 					}
 					case WISHLIST_COUNTS: {
-						return wh .getDialog(cardName, anchor);
+						return wh.getDialog(cardName, anchor, this.getMainActivity());
 					}
 					default: {
 						savedInstanceState.putInt("id", id);

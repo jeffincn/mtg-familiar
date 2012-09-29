@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:paddingTop="5dp"
-    android:paddingBottom="5dp"
+    android:padding="2dp"
     android:layout_height="match_parent" >
 
     <ImageView
         android:id="@+id/menu_icon"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:padding="5dp"
+        android:paddingRight="10dp"
         android:scaleType="centerInside"
         android:src="@drawable/card_search_icon" />
 
@@ -19,11 +18,10 @@
         android:id="@+id/menu_title"
         style="@style/text"
         android:layout_width="match_parent"
-		android:padding="10dp"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/menu_icon"
         android:text="@string/main_card_search"
-        android:textSize="20sp" />
+        android:textSize="20dp" />
 
 </RelativeLayout>

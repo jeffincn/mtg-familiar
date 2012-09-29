@@ -246,7 +246,6 @@ public class WishlistHelpers {
 		this.ma = ma;
 		cardName = cn;
 		AlertDialog.Builder b = new AlertDialog.Builder(ma);
-		// dialog = new Dialog(act);
 
 		b.setTitle(cardName + " in the Wishlist");
 
@@ -284,10 +283,13 @@ public class WishlistHelpers {
 	public void fillWishlistDialog(ArrayList<CardData> list) {
 		lCardlist = new ArrayList<CardData>();
 		lCardlist.clear();
+		
+		boolean opened = false;
 		if(!ff.mDbHelper.mDb.isOpen()) {
-			// this is a rotation, db is closed
-			return;			
+			ff.mDbHelper.openReadable();
+			opened = true;
 		}
+		
 		Cursor c = ff.mDbHelper.fetchCardByName(cardName,
 				new String[] { CardDbAdapter.KEY_SET, CardDbAdapter.KEY_NUMBER, CardDbAdapter.KEY_RARITY });
 		// make a place holder item for each version set of this card
@@ -310,9 +312,9 @@ public class WishlistHelpers {
 			// Read the wishlist
 			ReadWishlist(ma, ff.mDbHelper, lWishlist);
 		}
-		else
-			//lWishlist = (ArrayList<CardData>) list.clone();
+		else {
 			lWishlist = new ArrayList<CardData>(list);
+		}
 
 		// For each card in the wishlist
 		for (int i = 0; i < lWishlist.size(); i++) {
@@ -328,6 +330,9 @@ public class WishlistHelpers {
 					}
 				}
 			}
+		}
+		if(opened) {
+			ff.mDbHelper.close();
 		}
 	}
 

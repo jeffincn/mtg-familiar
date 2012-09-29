@@ -24,17 +24,17 @@ import com.gelakinetic.mtgfam.helpers.ResultListAdapter;
 
 public class ResultListFragment extends FamiliarFragment {
 
-	private int				cursorPosition;
-	private int				cursorPositionOffset;
+	private static int				cursorPosition;
+	private static int				cursorPositionOffset;
 	private ListView	lv;
-	private boolean		isSingle;
-	private boolean		isRandom;
-	private int				numChoices;
-	private int[]			randomSequence;
+	private static boolean		isSingle;
+	private static boolean		isRandom;
+	private static int				numChoices;
+	private static int[]		randomSequence;
 	private Cursor		c;
-	private int				randomIndex;
-	private boolean		randomFromMenu;
-	private long			id;
+	private static int				randomIndex;
+	private static boolean		randomFromMenu;
+	private static long			id;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

@@ -243,7 +243,8 @@ public class TradeFragment extends FamiliarFragment {
 			LoadTrade(autosaveName + tradeExtension);
 		}
 		catch (FileNotFoundException e) {
-			// Do nothing if the file doesn't exist
+			// Do nothing if the file doesn't exist, but mark it as loaded otherwise prices won't update
+			doneLoading = true;
 		}
 	}
 	

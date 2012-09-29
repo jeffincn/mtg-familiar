@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gelakinetic.mtgfam.R;
+import com.gelakinetic.mtgfam.activities.MainActivity;
 import com.gelakinetic.mtgfam.fragments.FamiliarFragment;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
 
@@ -73,7 +74,7 @@ public class WishlistHelpers {
 	}
 
 	public static void ResetCards(Context mCtx, String newName,
-			ArrayList<CardData> newCards) {
+			ArrayList<CardData> newCards, CardDbAdapter mDbHelper) {
 
 		ArrayList<CardData> wishlist = new ArrayList<CardData>();
 
@@ -110,7 +111,7 @@ public class WishlistHelpers {
 						CardData cd = (tlh).new CardData(cardName, cardSet,
 								numberOf, number, rarity);
 						if (rarity == '-' || number == null)
-							cd = TradeListHelpers.FetchCardData(mCtx, cd);
+							cd = TradeListHelpers.FetchCardData(cd, mDbHelper);
 						wishlist.add(cd);
 					}
 				}
@@ -179,7 +180,7 @@ public class WishlistHelpers {
 							tcgName, cardSet, numberOf, 0, "loading", number,
 							rarity);
 					if (rarity == '-' || number == null)
-						cd = TradeListHelpers.FetchCardData(mCtx, cd);
+						cd = TradeListHelpers.FetchCardData(cd, mDbHelper);
 					lWishlist.add(0, cd);
 				}
 			} catch (NumberFormatException e) {
@@ -196,8 +197,8 @@ public class WishlistHelpers {
 	LinearLayout lvSets;
 	public ArrayList<CardData> lCardlist;
 	String cardName;
-//	MainActivity act;
 	FamiliarFragment ff;
+	MainActivity ma;
 
 	public void onDialogDismissed(){
 		switch (dismissReason) {
@@ -229,26 +230,27 @@ public class WishlistHelpers {
 					newCards.add(cd);
 				}
 			}
-			WishlistHelpers.ResetCards(ff.getActivity(), cardName, newCards);
+			WishlistHelpers.ResetCards(ma, cardName, newCards, ff.mDbHelper);
 			break;
 		}
 	}
 	
-	public Dialog getDialog(String cn, final FamiliarFragment ff) {
-		return getDialog(cn, ff, null);
+	public Dialog getDialog(String cn, final FamiliarFragment ff, MainActivity ma) {
+		return getDialog(cn, ff, ma, null);
 	}
 
 	public Dialog getDialog(String cn, final FamiliarFragment ff,
-			ArrayList<CardData> list) {
+			MainActivity ma, ArrayList<CardData> list) {
 
-		this.ff = ff;//.getMainActivity();
+		this.ff = ff;
+		this.ma = ma;
 		cardName = cn;
-		AlertDialog.Builder b = new AlertDialog.Builder(ff.getActivity());
+		AlertDialog.Builder b = new AlertDialog.Builder(ma);
 		// dialog = new Dialog(act);
 
 		b.setTitle(cardName + " in the Wishlist");
 
-		View view = ff.getActivity().getLayoutInflater().inflate(
+		View view = ma.getLayoutInflater().inflate(
 				R.layout.card_setwishlist_dialog, null);
 		lvSets = (LinearLayout) view.findViewById(R.id.setList);
 		b.setView(view);
@@ -282,6 +284,10 @@ public class WishlistHelpers {
 	public void fillWishlistDialog(ArrayList<CardData> list) {
 		lCardlist = new ArrayList<CardData>();
 		lCardlist.clear();
+		if(!ff.mDbHelper.mDb.isOpen()) {
+			// this is a rotation, db is closed
+			return;			
+		}
 		Cursor c = ff.mDbHelper.fetchCardByName(cardName,
 				new String[] { CardDbAdapter.KEY_SET, CardDbAdapter.KEY_NUMBER, CardDbAdapter.KEY_RARITY });
 		// make a place holder item for each version set of this card
@@ -302,7 +308,7 @@ public class WishlistHelpers {
 		ArrayList<CardData> lWishlist = new ArrayList<CardData>();
 		if(list == null){
 			// Read the wishlist
-			ReadWishlist(ff.getActivity(), ff.mDbHelper, lWishlist);
+			ReadWishlist(ma, ff.mDbHelper, lWishlist);
 		}
 		else
 			//lWishlist = (ArrayList<CardData>) list.clone();
@@ -329,7 +335,7 @@ public class WishlistHelpers {
 		lvSets.removeAllViews();
 
 		for (CardData cd : lCardlist) {
-			LayoutInflater inf = ff.getActivity().getLayoutInflater();
+			LayoutInflater inf = ma.getLayoutInflater();
 			View v = inf.inflate(R.layout.card_setwishlist_row, null);
 
 			EditText numberField = (EditText) v.findViewById(R.id.numberInput);

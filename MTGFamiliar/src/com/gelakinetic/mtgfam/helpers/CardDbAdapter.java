@@ -73,7 +73,7 @@ public class CardDbAdapter {
 	private static final String		DATABASE_TABLE_RULES					= "rules";
 	private static final String		DATABASE_TABLE_GLOSSARY				= "glossary";
 
-	public static final int				DATABASE_VERSION							= 27;
+	public static final int				DATABASE_VERSION							= 28;
 
 	public static final String		KEY_ID												= "_id";
 	public static final String		KEY_NAME											= SearchManager.SUGGEST_COLUMN_TEXT_1;							// "name";
@@ -119,7 +119,7 @@ public class CardDbAdapter {
 	public static final String		KEY_DEFINITION								= "definition";
 
 	private DatabaseHelper				mDbHelper;
-	private SQLiteDatabase				mDb;
+	public  SQLiteDatabase				mDb;
 
 	private static final String		DATABASE_CREATE_CARDS					= "create table " + DATABASE_TABLE_CARDS + "(" + KEY_ID
 			+ " integer primary key autoincrement, " + KEY_NAME
@@ -192,12 +192,6 @@ public class CardDbAdapter {
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			System.out.print(oldVersion + " to " + newVersion);
-			// Log.w(TAG, "Upgrading database from version " + oldVersion + " to " +
-			// newVersion + ", which will destroy all old data");
-			// db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_CARDS);
-			// db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_SETS);
-			// onCreate(db);
 		}
 	}
 

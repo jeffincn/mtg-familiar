@@ -18,9 +18,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.gelakinetic.mtgfam.helpers;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -81,50 +79,56 @@ public class DbUpdaterService extends IntentService {
 		mUpdateNotification.flags |= Notification.FLAG_ONLY_ALERT_ONCE;
 	}
 
+	// Throw this switch to reparse the entire database from a custom URL (currently UpToRTR.josn.gzip
+	// THIS SHOULD NEVER EVER EVER BE TRUE IN A PLAY STORE RELEASE
+	private static final boolean reparseDatabase = false;
+
 	@Override
 	public void onHandleIntent(Intent intent) {
 
 		// this.publishProgress(new String[] { "indeterminate",
 		// mCtx.getString(R.string.update_legality) });
 
+		mDbHelper.openTransactional();
+
 		showStatusNotification();
 
 		ArrayList<String> updatedStuff = new ArrayList<String>();
 		ProgressReporter reporter = new ProgressReporter();
-		mDbHelper.openTransactional();
 
 		try {
-			ArrayList<String[]> patchInfo = JsonParser.readUpdateJsonStream(mPreferences);
+			if(reparseDatabase) {
+				mDbHelper.dropCreateDB();
+				JsonParser.readLegalityJsonStream(mDbHelper, mPreferences, reparseDatabase);
+				GZIPInputStream upToGIS = new GZIPInputStream(new URL("https://sites.google.com/site/mtgfamiliar/patches/UpToRTR.json.gzip").openStream());
+				switchToUpdating(String.format(getString(R.string.update_updating_set), "EVERYTHING!!"));
+				JsonParser.readCardJsonStream(upToGIS, reporter, "upToRTR", mDbHelper, this);
+				JsonParser.readTCGNameJsonStream(mPreferences, mDbHelper, reparseDatabase);
+			}
+			else {
+				JsonParser.readLegalityJsonStream(mDbHelper, mPreferences, reparseDatabase);
+				ArrayList<String[]> patchInfo = JsonParser.readUpdateJsonStream(mPreferences);
+				if (patchInfo != null) {
 
-			URL legal = new URL("https://sites.google.com/site/mtgfamiliar/manifests/legality.json");
-			InputStream in = new BufferedInputStream(legal.openStream());
-			JsonParser.readLegalityJsonStream(in, mDbHelper, mPreferences);
+					for (int i = 0; i < patchInfo.size(); i++) {
+						String[] set = patchInfo.get(i);
+						if (!mDbHelper.doesSetExist(set[2])) {
+							try {
+								switchToUpdating(String.format(getString(R.string.update_updating_set), set[0]));
+								GZIPInputStream gis = new GZIPInputStream(new URL(set[1]).openStream());
+								JsonParser.readCardJsonStream(gis, reporter, set[0], mDbHelper, this);
+								updatedStuff.add(set[0]);
+							}
+							catch (MalformedURLException e) {
+							}
+							catch (IOException e) {
+							}
 
-			// this.publishProgress(new String[] { "indeterminate",
-			// mCtx.getString(R.string.update_cards) });
-
-			if (patchInfo != null) {
-
-				for (int i = 0; i < patchInfo.size(); i++) {
-					String[] set = patchInfo.get(i);
-					if (!mDbHelper.doesSetExist(set[2])) {
-						try {
-							switchToUpdating(String.format(getString(R.string.update_updating_set), set[0]));
-							GZIPInputStream gis = new GZIPInputStream(new URL(set[1]).openStream());
-							JsonParser.readCardJsonStream(gis, reporter, set[0], mDbHelper, this);
-							updatedStuff.add(set[0]);
+							switchToChecking();
 						}
-						catch (MalformedURLException e) {
-							// Log.e("JSON error", e.toString());
-						}
-						catch (IOException e) {
-							// Log.e("JSON error", e.toString());
-						}
-
-						switchToChecking();
 					}
+					JsonParser.readTCGNameJsonStream(mPreferences, mDbHelper, reparseDatabase);
 				}
-				JsonParser.readTCGNameJsonStream(mPreferences, mDbHelper);
 			}
 		}
 		catch (MalformedURLException e1) {
@@ -142,6 +146,9 @@ public class DbUpdaterService extends IntentService {
 		// This is a safe assumption to make, since any market release will have the
 		// latest database baked in.
 		long lastRulesUpdate = mPreferences.getLong("lastRulesUpdate", BuildDate.get(this).getTime());
+		if(reparseDatabase) {
+			lastRulesUpdate = 0; //1979 anybody?
+		}
 		RulesParser rp = new RulesParser(new Date(lastRulesUpdate), mDbHelper, this, reporter);
 		boolean newRulesParsed = false;
 		if (rp.needsToUpdate()) {
@@ -237,7 +244,7 @@ public class DbUpdaterService extends IntentService {
 		Notification notification = builder.setContentTitle(title)
 				.setContentText(body).setSmallIcon(R.drawable.rt_notification_icon)
 				.setContentIntent(mNotificationIntent).setWhen(System.currentTimeMillis()).getNotification();
-		
+
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
 
 		mNotificationManager.notify(UPDATED_NOTIFICATION, notification);

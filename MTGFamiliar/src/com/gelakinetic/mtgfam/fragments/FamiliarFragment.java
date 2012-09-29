@@ -42,6 +42,12 @@ public class FamiliarFragment extends SherlockFragment {
 	}
 
 	@Override
+	public void onPause() {
+		super.onPause();
+		removeDialog();
+	}
+	
+	@Override
 	public void onResume() {
 		super.onResume();
 		MyApp appState = ((MyApp) getActivity().getApplicationContext());
@@ -119,11 +125,16 @@ public class FamiliarFragment extends SherlockFragment {
 	}
 
 	void removeDialog() {
-		FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-		Fragment prev = getFragmentManager().findFragmentByTag(DIALOG_TAG);
-		if (prev != null) {
-			ft.remove(prev);
+		try {
+			FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+			Fragment prev = getFragmentManager().findFragmentByTag(DIALOG_TAG);
+			if (prev != null) {
+				ft.remove(prev);
+			}
+			ft.commit();
 		}
-		ft.commit();
+		catch(NullPointerException e) {
+			// eat it
+		}
 	}
 }

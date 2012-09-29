@@ -1,9 +1,23 @@
 package com.gelakinetic.mtgfam.fragments;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -15,6 +29,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.activities.MainActivity;
@@ -31,15 +46,18 @@ public class MenuFragment extends ListFragment {
 		super.onResume();
 		// TODO just to be safe?
 		if (!(getActivity() instanceof MainActivity))
-			throw new IllegalStateException("MenuFragment must be attached to an instance of MainActivity");
+			throw new IllegalStateException(
+					"MenuFragment must be attached to an instance of MainActivity");
 		if (getActivity().findViewById(R.id.frag_view) == null)
-			throw new IllegalStateException("MenuFragment must be attached to an Activity with R.id.frag_view");
+			throw new IllegalStateException(
+					"MenuFragment must be attached to an Activity with R.id.frag_view");
 		mActivity = (MainActivity) getActivity();
 		// add everything
 		mAdapter = new SlidingMenuAdapter(mActivity);
 		mAdapter.addHeader(R.string.main_pages);
 		mAdapter.addItem(R.string.main_card_search, R.drawable.card_search_icon);
-		mAdapter.addItem(R.string.main_life_counter, R.drawable.life_counter_icon);
+		mAdapter.addItem(R.string.main_life_counter,
+				R.drawable.life_counter_icon);
 		mAdapter.addItem(R.string.main_mana_pool, R.drawable.mana_pool_icon);
 		mAdapter.addItem(R.string.main_dice, R.drawable.dice_icon);
 		mAdapter.addItem(R.string.main_trade, R.drawable.trade_icon);
@@ -48,16 +66,19 @@ public class MenuFragment extends ListFragment {
 		mAdapter.addItem(R.string.main_rules, R.drawable.rules_icon);
 		mAdapter.addItem(R.string.main_mojhosto, R.drawable.mojhosto_icon);
 		mAdapter.addHeader(R.string.main_extras);
-		mAdapter.addItem(R.string.main_force_update_title);
 		mAdapter.addItem(R.string.main_settings_title);
-		mAdapter.addItem(R.string.main_donate_title);
+		mAdapter.addItem(R.string.main_force_update_title);
+		mAdapter.addItem(R.string.main_export_data_title);
+		mAdapter.addItem(R.string.main_import_data_title);
 		mAdapter.addItem(R.string.main_whats_new_title);
 		mAdapter.addItem(R.string.main_about_title);
+		mAdapter.addItem(R.string.main_donate_title);
 		setListAdapter(mAdapter);
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.sliding_menu_list, null);
 	}
 
@@ -66,61 +87,151 @@ public class MenuFragment extends ListFragment {
 		SlidingMenuItem item = mAdapter.getItem(position);
 		Fragment fragment = null;
 		switch (item.title) {
-		case R.string.main_card_search: 
+		case R.string.main_card_search:
 			fragment = new SearchViewFragment();
 			break;
-		case R.string.main_life_counter: 
+		case R.string.main_life_counter:
 			fragment = new LifeFragment();
 			break;
 		case R.string.main_mana_pool:
 			fragment = new ManaPoolFragment();
 			break;
-		case R.string.main_dice: 
+		case R.string.main_dice:
 			fragment = new DiceFragment();
 			break;
-		case R.string.main_trade: 
+		case R.string.main_trade:
 			fragment = new TradeFragment();
 			break;
-		case R.string.main_wishlist: 
+		case R.string.main_wishlist:
 			fragment = new WishlistFragment();
 			break;
-		case R.string.main_timer: 
+		case R.string.main_timer:
 			fragment = new RoundTimerFragment();
 			break;
-		case R.string.main_rules: 
+		case R.string.main_rules:
 			fragment = new RulesFragment();
 			break;
-		case R.string.main_mojhosto: 
+		case R.string.main_mojhosto:
 			fragment = new MoJhoStoFragment();
 			break;
 		case R.string.main_force_update_title:
-			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
+			SharedPreferences preferences = PreferenceManager
+					.getDefaultSharedPreferences(mActivity);
 			SharedPreferences.Editor editor = preferences.edit();
 			editor.putInt("lastLegalityUpdate", 0);
 			editor.commit();
-			mActivity.startService(new Intent(mActivity, DbUpdaterService.class));
+			mActivity
+					.startService(new Intent(mActivity, DbUpdaterService.class));
 			mActivity.showAbove();
 			break;
-		case R.string.main_settings_title: 
+		case R.string.main_settings_title:
 			Intent i = new Intent(mActivity, PreferencesActivity.class);
 			startActivity(i);
 			break;
-		case R.string.main_donate_title: 
+		case R.string.main_donate_title:
 			mActivity.showDialogFragment(MainActivity.DONATEDIALOG);
 			break;
 		case R.string.main_whats_new_title:
 			mActivity.showDialogFragment(MainActivity.CHANGELOGDIALOG);
 			break;
-		case R.string.main_about_title: 
+		case R.string.main_about_title:
 			mActivity.showDialogFragment(MainActivity.ABOUTDIALOG);
 			break;
+		case R.string.main_import_data_title: {
+			File sdCard = Environment.getExternalStorageDirectory();
+			File zipIn = new File(sdCard, "MTGFamiliarBackip.zip");
+			try {
+				unZipIt(new ZipFile(zipIn));
+				Toast.makeText(mActivity, getString(R.string.main_import_success), Toast.LENGTH_SHORT).show();
+			} catch (ZipException e) {
+				Toast.makeText(mActivity, getString(R.string.main_import_fail), Toast.LENGTH_SHORT).show();
+			} catch (IOException e) {
+				Toast.makeText(mActivity, getString(R.string.main_import_fail), Toast.LENGTH_SHORT).show();
+			}
+			mActivity.showAbove();
+			break;
+		}
+		case R.string.main_export_data_title: {
+			String[] fileNames = mActivity.fileList();
+			File[] files = new File[fileNames.length];
+			for (int j = 0; j < fileNames.length; j++) {
+				files[j] = new File(mActivity.getFilesDir(), fileNames[j]);
+			}
+			File sdCard = Environment.getExternalStorageDirectory();
+			File zipOut = new File(sdCard, "MTGFamiliarBackip.zip");
+			try {
+				zipIt(zipOut, files);
+				Toast.makeText(mActivity, getString(R.string.main_export_success) + " " + zipOut.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+			} catch (IOException e) {
+				Toast.makeText(mActivity, getString(R.string.main_export_fail), Toast.LENGTH_SHORT).show();				
+			}
+			mActivity.showAbove();
+			break;
+		}
 		}
 		if (fragment != null)
 			replaceFragment(fragment);
 	}
 
+	public void unZipIt(ZipFile zipFile) throws IOException {
+		Enumeration<? extends ZipEntry> entries;
+
+		entries = zipFile.entries();
+
+		while (entries.hasMoreElements()) {
+			ZipEntry entry = (ZipEntry) entries.nextElement();
+
+			if (entry.isDirectory()) {
+				// Assume directories are stored parents first then children.
+				// This is not robust, just for demonstration purposes.
+				(new File(entry.getName())).mkdir();
+				continue;
+			}
+
+			InputStream in = zipFile.getInputStream(entry);
+			OutputStream out = new BufferedOutputStream(new FileOutputStream(
+					new File(mActivity.getFilesDir(), entry.getName())));
+			byte[] buffer = new byte[1024];
+			int len;
+			while ((len = in.read(buffer)) >= 0) {
+				out.write(buffer, 0, len);
+			}
+
+			in.close();
+			out.close();
+		}
+
+		zipFile.close();
+	}
+
+	public void zipIt(File zipFile, File[] files) throws IOException {
+
+		byte[] buffer = new byte[1024];
+
+		FileOutputStream fos = new FileOutputStream(zipFile);
+		ZipOutputStream zos = new ZipOutputStream(fos);
+
+		for (File file : files) {
+
+			ZipEntry ze = new ZipEntry(file.getName());
+			zos.putNextEntry(ze);
+
+			FileInputStream in = new FileInputStream(file);
+
+			int len;
+			while ((len = in.read(buffer)) > 0) {
+				zos.write(buffer, 0, len);
+			}
+			in.close();
+		}
+
+		zos.closeEntry();
+		zos.close();
+	}
+
 	protected void replaceFragment(Fragment frag) {
-		FragmentTransaction fragmentTransaction = mActivity.getSupportFragmentManager().beginTransaction();
+		FragmentTransaction fragmentTransaction = mActivity
+				.getSupportFragmentManager().beginTransaction();
 		fragmentTransaction.replace(R.id.frag_view, frag);
 		fragmentTransaction.commit();
 		mActivity.hideKeyboard();
@@ -131,6 +242,7 @@ public class MenuFragment extends ListFragment {
 		public int title;
 		public int icon;
 		public boolean isHeader;
+
 		public SlidingMenuItem(int title, int icon, boolean isHeader) {
 			this.title = title;
 			this.icon = icon;
@@ -175,11 +287,15 @@ public class MenuFragment extends ListFragment {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			SlidingMenuItem item = getItem(position);
 			if (convertView == null) {
-				int layout = item.isHeader ? R.layout.sliding_menu_header : R.layout.sliding_menu_item;
-				convertView = LayoutInflater.from(getContext()).inflate(layout, null);
+				int layout = item.isHeader ? R.layout.sliding_menu_header
+						: R.layout.sliding_menu_item;
+				convertView = LayoutInflater.from(getContext()).inflate(layout,
+						null);
 			}
-			((TextView) convertView.findViewById(R.id.menu_title)).setText(item.title);
-			ImageView icon = (ImageView) convertView.findViewById(R.id.menu_icon);
+			((TextView) convertView.findViewById(R.id.menu_title))
+					.setText(item.title);
+			ImageView icon = (ImageView) convertView
+					.findViewById(R.id.menu_icon);
 			if (icon != null) {
 				if (item.icon > 0) {
 					icon.setVisibility(View.VISIBLE);
@@ -189,7 +305,7 @@ public class MenuFragment extends ListFragment {
 				}
 			}
 			return convertView;
-		}		
+		}
 
 	}
 

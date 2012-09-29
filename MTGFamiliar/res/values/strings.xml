@@ -85,6 +85,15 @@
  	- 1.8.1: Round timer now always visible in the ActionBar&lt;br />&lt;br /> 
  	- 1.8.1: More bugfixes!
     </string>
+    
+    <string name="main_export_data_title">Export Data to SD</string>
+    <string name="main_export_success">Successfully exported data to </string>
+    <string name="main_export_fail">Failed to export data to SD card</string>
+    
+    <string name="main_import_data_title">Import Data from SD</string>
+    <string name="main_import_success">Import succeeded</string>
+    <string name="main_import_fail">Import failed. Please put MTGFamiliarBackup.zip in the root of your SD card</string>
+    
     <string name="main_about_title">About App</string>
     <string name="main_about_text">This app is my gift to the MTG community.&lt;br />&lt;br />
 		Please send questions, comments, concerns, and praise to &lt;a href="mailto:mtg.familiar@gmail.com">mtg.familiar@gmail.com&lt;/a>.&lt;br />&lt;br />

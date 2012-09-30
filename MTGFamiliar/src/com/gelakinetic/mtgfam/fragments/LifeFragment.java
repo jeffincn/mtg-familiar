@@ -1,6 +1,8 @@
 package com.gelakinetic.mtgfam.fragments;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.concurrent.Executors;
@@ -13,14 +15,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
+import android.speech.tts.TextToSpeech.OnUtteranceCompletedListener;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -114,6 +120,8 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 	private TextToSpeech										tts;
 	private boolean													ttsInitialized						= false;
+	private MediaPlayer mediaPlayer;
+	private ArrayList<TtsSentence> sentences;
 
 	private GatheringsIO										gIO;
 	private MenuItem												announceLifeTotals				= null;
@@ -223,6 +231,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 		if (getMainActivity().preferences.getBoolean("hasTts", false)) {
 			tts = new TextToSpeech(getActivity(), this);
+			mediaPlayer = MediaPlayer.create(getActivity(), R.raw.over_9000);
 		}
 
 		playerScrollView = (FrameLayout) myFragmentView.findViewById(R.id.playerScrollView);
@@ -1389,7 +1398,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 	private void announceLifeTotals() {
 		if (ttsInitialized) {
-			boolean first = true;
+			sentences = new ArrayList<TtsSentence>();
 			for (Player p : players) {
 				// Format: "{name} has {quantity} {life | poison counter(s)}", depending
 				// on the current mode
@@ -1398,8 +1407,15 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 				sentence += " has ";
 
 				if (activeType == LIFE) {
-					sentence += String.valueOf(p.life);
-					sentence += " life";
+					if(p.life > 9000) {
+						sentences.add(new TtsSentence(sentence, "9000"));
+						sentences.add(new TtsSentence("life", null));
+					}
+					else {
+						sentence += String.valueOf(p.life);
+						sentence += " life";	
+						sentences.add(new TtsSentence(sentence, null));
+					}
 				}
 				else {
 					sentence += String.valueOf(p.poison);
@@ -1407,21 +1423,35 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 					if (p.poison != 1) {
 						sentence += "s";
 					}
-				}
-
-				if (first) {
-					// Flush on the first one, so we interrupt if it's already going
-					tts.speak(sentence, TextToSpeech.QUEUE_FLUSH, null);
-					first = false;
-				}
-				else {
-					// Otherwise, add to the queue
-					tts.speak(sentence, TextToSpeech.QUEUE_ADD, null);
+					sentences.add(new TtsSentence(sentence, null));
 				}
 			}
+			
+			speakFromList();
 		}
 		else {
 			Toast.makeText(this.getActivity(), "You do not have text-to-speech installed", Toast.LENGTH_LONG).show();
+		}
+	}
+	
+	private void speakFromList() {
+		boolean first = true;
+		while(sentences.size() > 0) {
+			TtsSentence s = sentences.remove(0); //Dequeue the first sentence
+			String sentence = s.getSentence();
+			HashMap<String, String> params = s.getParams();
+			
+			if(first) {
+				tts.speak(sentence, TextToSpeech.QUEUE_FLUSH, params);
+				first = false;
+			}
+			else {
+				tts.speak(sentence, TextToSpeech.QUEUE_ADD, params);
+			}
+			
+			if(params != null) {
+				break; //Interrupt if we have params; that means we want to shout
+			}
 		}
 	}
 
@@ -1471,6 +1501,67 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		ttsInitialized = true;
 		if (announceLifeTotals != null) {
 			announceLifeTotals.setVisible(ttsInitialized);
+		}
+//		tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+//			public void onStart(String utteranceId) {
+//				//Do nothing
+//			}
+//			
+//			public void onError(String utteranceId) {
+//				//Do nothing
+//			}
+//			
+//			public void onDone(String utteranceId) {
+//				//If the utterance ID is correct, shout that it's OVER NINE THOUSAAAAAAAAND
+//				mediaPlayer.stop();
+//				mediaPlayer.start();
+//			}
+//		});
+		tts.setOnUtteranceCompletedListener(new OnUtteranceCompletedListener() {
+			public void onUtteranceCompleted(String utteranceId) {
+				// If the utterance ID is correct, shout that it's OVER NINE THOUSAAAAAAAAND
+				Log.i("LifeCounter", "Utterance completed, id=" + utteranceId);
+				if(utteranceId != null && utteranceId.equals("9000")) {
+					try {
+						mediaPlayer.stop();
+						mediaPlayer.prepare();
+						mediaPlayer.start();
+					} 
+					catch (Exception e) {
+						Log.w("LifeCounter", "Exception while preparing media file: " + e.getMessage());
+					}
+				}
+			}
+		});
+		mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
+			public void onCompletion(MediaPlayer mp) {
+				speakFromList();
+			}
+		});
+	}
+	
+	private class TtsSentence {
+		private String sentence;
+		private String id;
+		
+		public TtsSentence(String sentence, String id) {
+			this.sentence = sentence;
+			this.id = id;
+		}
+		
+		public String getSentence() {
+			return this.sentence;
+		}
+		
+		public HashMap<String, String> getParams() {
+			if(this.id == null) {
+				return null;
+			}
+			else {
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, this.id);
+				return params;
+			}
 		}
 	}
 }

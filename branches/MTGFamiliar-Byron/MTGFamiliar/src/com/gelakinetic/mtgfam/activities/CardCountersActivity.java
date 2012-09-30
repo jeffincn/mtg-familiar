@@ -42,7 +42,7 @@ public class CardCountersActivity extends FamiliarActivity {
     private boolean resetting;
     private MtgCountersCard selectedCard;
 
-
+    
     private class MtgCountersCard extends MtgCard {
         public int id;
         public ArrayList<String> counters;
@@ -61,7 +61,6 @@ public class CardCountersActivity extends FamiliarActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.card_counters);
 
-		selectedCard = new MtgCountersCard();
 		cards = new ArrayList<MtgCountersCard>();
         editor = preferences.edit();
 
@@ -176,35 +175,14 @@ public class CardCountersActivity extends FamiliarActivity {
         card.power = power;
         card.toughness = toughness;
         cards.add(card);
-        selectedCard = card;
 
         addCardToLayout(card);
 	}
 
 
-	// USED? NEEDED? REMOVE! :D
-    private void addCardToLayoutById(int cardId) {
-        // Get the P/T for the card in the text field
-        String[] dbFields = new String[] { CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_POWER, CardDbAdapter.KEY_TOUGHNESS };
-        Cursor c = this.mDbHelper.fetchCard(cardId, dbFields);
-        String name = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME));
-        float power = c.getFloat(c.getColumnIndex(CardDbAdapter.KEY_POWER));
-        float toughness = c.getFloat(c.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS));
-
-        MtgCountersCard card = new MtgCountersCard();
-        card.id = cardId;
-        card.name = name;
-        card.power = power;
-        card.toughness = toughness;
-        cards.add(card);
-        selectedCard = card;
-        
-        addCardToLayout(card);
-    }
-
-
     // Add the given card to this activit's layout
 	private void addCardToLayout(MtgCountersCard cardToAdd) {
+	    //final MtgCountersCard card = cardToAdd;
         LayoutInflater inflater = getLayoutInflater();
 
         TableLayout table = (TableLayout) findViewById(R.id.cardcounterstable);
@@ -214,15 +192,20 @@ public class CardCountersActivity extends FamiliarActivity {
         TextView ptView = (TextView) row.findViewById(R.id.cardpowertougness);
         ptView.setText((int)cardToAdd.power + "/" + (int)cardToAdd.toughness);
 
+        row.setTag(cardToAdd);
+
         row.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
+                selectedCard = (MtgCountersCard) v.getTag(); // get the card associated with the clicked row
+
                 // No counters? Show the add counters dialog
                 if (selectedCard.counters.isEmpty()) {
                     showAddCounterDialog();
                     return;
                 }
+
                 // There are counters, so view them and optionally add or remove
                 // View, Add or Remove Counters Dialog
                 AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
@@ -266,7 +249,17 @@ public class CardCountersActivity extends FamiliarActivity {
         startActivity(intent);
 	}
 
+	
+	private void addCounterToSelectedCard(String counter) {
+	    selectedCard.addCounter(counter);
+	}
 
+
+	private void removeCounterFromSelectedCard(int counterIndex) {
+        selectedCard.counters.remove(counterIndex);
+    }
+
+    
     private void showRemoveCountersDialog() {
         final CharSequence[] items = selectedCard.counters.toArray(new CharSequence[selectedCard.counters.size()]);
 
@@ -275,8 +268,8 @@ public class CardCountersActivity extends FamiliarActivity {
 
         builder.setItems(items, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-                Toast.makeText(mCtx, items[item], Toast.LENGTH_SHORT).show();
-                selectedCard.counters.remove(item);
+                //Toast.makeText(mCtx, items[item], Toast.LENGTH_SHORT).show();
+                removeCounterFromSelectedCard(item);
             }
         });
         builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
@@ -293,15 +286,15 @@ public class CardCountersActivity extends FamiliarActivity {
         LayoutInflater inflater = (LayoutInflater) mCtx.getSystemService(LAYOUT_INFLATER_SERVICE);
         final View layout = inflater.inflate(R.layout.card_counters_dialog, (ViewGroup) findViewById(R.id.cardcounters_dialog));
 
-        AlertDialog.Builder builder1 = new AlertDialog.Builder(mCtx);
-        builder1.setView(layout);
-        builder1.setTitle("Add Counter");
-        builder1.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
+        builder.setView(layout);
+        builder.setTitle("Add Counter");
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.cancel();
             }
         });
-        builder1.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // get the radio selected
                 RadioButton customCounterRadio = (RadioButton) layout.findViewById(R.id.card_counters_customradio);
@@ -311,7 +304,7 @@ public class CardCountersActivity extends FamiliarActivity {
                 if (customCounterRadio.isChecked()) {
                     EditText counterText = (EditText) layout.findViewById(R.id.card_counters_customedit);
                     counter = counterText.getText().toString();
-                    // Custom counter was empty, show error
+                    // Custom counter was blank/empty, show error
                     if (counter.length() == 0) {
                         dialog.cancel();
                         Toast.makeText(mCtx, "Tried to add a blank counter", Toast.LENGTH_LONG).show();
@@ -323,11 +316,11 @@ public class CardCountersActivity extends FamiliarActivity {
                     TextView counterView = (TextView) counterText.getSelectedView();
                     counter = counterView.getText().toString();
                 }
-                selectedCard.addCounter(counter);
+                addCounterToSelectedCard(counter);
                 dialog.dismiss();
             }
         });
-        AlertDialog addCounterDialog = builder1.create();
+        AlertDialog addCounterDialog = builder.create();
         addCounterDialog.show();
     }
 

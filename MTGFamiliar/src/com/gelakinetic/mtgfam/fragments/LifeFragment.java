@@ -62,6 +62,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	private static final int								DIALOG_SET_PLAYER_NAME		= 3;
 	private static final int								DIALOG_CHANGE_DISPLAY			= 4;
 	private static final int								SET_GATHERING							= 5;
+	private static final int								DIALOG_EDH_DAMAGE				=6;
 
 	private static final int								LIFE											= 0;
 	private static final int								POISON										= 1;
@@ -85,6 +86,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	private LinearLayout										doublePlayer;
 	private GridView											edhGrid;
 	private CommanderAdapter									commanderAdapter;
+	private int													visibleEDHPlayer;
 	private int															playersInRow;
 
 	private int															orientation;
@@ -450,8 +452,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			((LinearLayout)edhGrid.getParent()).setLayoutParams(layoutParams);
 		}
 	}
-
+	
 	protected void showDialog(final int id) {
+		showDialog(id, null);
+	}
+
+	protected void showDialog(final int id, final Bundle args) {
 		// DialogFragment.show() will take care of adding the fragment
 		// in a transaction. We also want to remove any currently showing
 		// dialog, so make our own transaction and take care of that here.
@@ -592,6 +598,55 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 						Dialog dialog = builder.create();
 						return dialog;
 					}
+					case DIALOG_EDH_DAMAGE: {
+						int fromCommander = args.getInt("fromCommander");
+						int player = args.getInt("Player");
+						String commanderName = players.get(fromCommander).name;
+						
+						View view = LayoutInflater.from(getActivity()).inflate(R.layout.life_counter_edh_dialog, null);
+						AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+						builder.setTitle("Damage from " + commanderName + "'s Commander").setView(view);
+						final TextView currentLife = (TextView)view.findViewById(R.id.commander_dialog_current_life);
+						final TextView currentDamage = (TextView) view.findViewById(R.id.commander_dialog_current_damage);
+
+						Button plusOne = (Button) view.findViewById(R.id.commander_plus1);
+						Button minusOne = (Button) view.findViewById(R.id.commander_minus1);
+						
+						plusOne.setOnClickListener(new View.OnClickListener() {
+							
+							@Override
+							public void onClick(View v) {
+								int life = Integer.parseInt((String) currentLife.getText());
+								int damage = Integer.parseInt((String) currentDamage.getText());
+								
+								damage = damage + 1;
+								currentDamage.setText(String.valueOf(damage));
+								
+								life = life - 1;
+								currentLife.setText(String.valueOf(life));
+							}
+						});
+						
+						minusOne.setOnClickListener(new View.OnClickListener() {
+							
+							@Override
+							public void onClick(View v) {
+								int life = Integer.parseInt((String) currentLife.getText());
+								int damage = Integer.parseInt((String) currentDamage.getText());
+								
+								damage = damage - 1;
+								currentDamage.setText(String.valueOf(damage));
+								
+								life = life + 1;
+								currentLife.setText(String.valueOf(life));
+							}
+						});
+						
+						builder.setNegativeButton(R.string.dialog_cancel, null);
+						builder.setPositiveButton(R.string.dialog_ok, null);
+						Dialog dialog = builder.create();
+						return dialog;
+					}
 					default: {
 						savedInstanceState.putInt("id", id);
 						return super.onCreateDialog(savedInstanceState);
@@ -706,6 +761,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			
 			if (players.size() == 1){
 				layout.setVisibility(View.VISIBLE);
+				visibleEDHPlayer = 0;
 			}
 			
 			for(int idx = 0; idx < players.size(); idx++){
@@ -805,6 +861,18 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			
 			final int pos = position;
 			
+			v.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					Bundle fromBundle = new Bundle();
+					fromBundle.putInt("player", visibleEDHPlayer);
+					fromBundle.putInt("fromCommander", pos);
+					showDialog(DIALOG_EDH_DAMAGE, fromBundle);
+				}
+			});
+
+			
 			return v;
 		}
 	}
@@ -867,6 +935,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		}
 		
 		players.get(_which).layout.setVisibility(View.VISIBLE);
+		visibleEDHPlayer = _which;
 	}
 
 	private class HistoryAdapter extends BaseAdapter {

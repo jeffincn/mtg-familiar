@@ -220,7 +220,7 @@ public class CardViewFragment extends FamiliarFragment {
 			this.getMainActivity().setFragmentResult(res);
 		}
 
-		if (progDialog.isShowing()) {
+		if (progDialog != null && progDialog.isShowing()) {
 			progDialog.cancel();
 		}
 		if (asyncTask != null) {

@@ -251,6 +251,25 @@ public class SlidingMenu extends RelativeLayout {
 	}
 
 	@SuppressWarnings("deprecation")
+	public void setBehindWidthRes(int resID) {
+		int i = (int) getContext().getResources().getDimension(resID);
+		int width;
+		Display display = ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
+				.getDefaultDisplay();
+		try {
+			Class<?> cls = Display.class;
+			Class<?>[] parameterTypes = {Point.class};
+			Point parameter = new Point();
+			Method method = cls.getMethod("getSize", parameterTypes);
+			method.invoke(display, parameter);
+			width = parameter.x;
+		} catch (Exception e) {
+			width = display.getWidth();
+		}
+		setBehindOffset(width-i);
+	}
+	
+	@SuppressWarnings("deprecation")
 	public void setBehindWidth(int i) {
 		int width;
 		Display display = ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))

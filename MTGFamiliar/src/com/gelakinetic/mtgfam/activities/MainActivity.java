@@ -111,24 +111,25 @@ public class MainActivity extends SlidingFragmentActivity {
 		catch (NameNotFoundException e) {
 			pInfo = null;
 		}
-		
+
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-    int lastVersion = preferences.getInt("lastVersion", 0);
-    if (pInfo.versionCode != lastVersion) {
-            showDialogFragment(CHANGELOGDIALOG);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putInt("lastVersion", pInfo.versionCode);
-            editor.commit();
-            firstRun  = true;
-    }
+		int lastVersion = preferences.getInt("lastVersion", 0);
+		if (pInfo.versionCode != lastVersion) {
+			showDialogFragment(CHANGELOGDIALOG);
+			SharedPreferences.Editor editor = preferences.edit();
+			editor.putInt("lastVersion", pInfo.versionCode);
+			editor.commit();
+			firstRun  = true;
+		}
 
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(false);
 
-		getSlidingMenu().setBehindOffsetRes(R.dimen.actionbar_home_width);
+//		getSlidingMenu().setBehindOffsetRes(R.dimen.actionbar_home_width);
+		getSlidingMenu().setBehindWidthRes(R.dimen.sliding_menu_width);
 		getSlidingMenu().setBehindScrollScale(0.0f);
 		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
 		getSlidingMenu().setShadowWidthRes(R.dimen.shadow_width);
@@ -250,22 +251,22 @@ public class MainActivity extends SlidingFragmentActivity {
 
 	public static final int OPEN = 0;
 	public static final int CLOSE = 1;
-	
+
 	private static Handler	bounceHandler = new Handler(){
 		@Override
 		public void handleMessage(Message msg){
 			super.handleMessage(msg);
 			switch(msg.arg1) {
-				case OPEN:
-					me.showBehind();
-					break;
-				case CLOSE:
-					me.showAbove();
-					break;
+			case OPEN:
+				me.showBehind();
+				break;
+			case CLOSE:
+				me.showAbove();
+				break;
 			}
 		}
 	};
-	
+
 	public void showDialogFragment(final int id) {
 		// DialogFragment.show() will take care of adding the fragment
 		// in a transaction. We also want to remove any currently showing
@@ -286,7 +287,7 @@ public class MainActivity extends SlidingFragmentActivity {
 				if(firstRun) {
 					firstRun = false;
 					Runnable r = new Runnable(){
-						
+
 						@Override
 						public void run() {
 							long timeStarted = System.currentTimeMillis();
@@ -298,99 +299,99 @@ public class MainActivity extends SlidingFragmentActivity {
 							msg.arg1 = CLOSE;
 							bounceHandler.sendMessage(msg);
 						}};
-						
+
 						Thread t = new Thread(r);
 						t.start();
 				}
 			}
-			
+
 			@Override
 			public Dialog onCreateDialog(Bundle savedInstanceState) {
 				switch (id) {
-					case DONATEDIALOG: {
-						AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
-						builder.setTitle("Donate to the Devs");
-						builder.setNeutralButton(R.string.dialog_thanks, new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								dialog.cancel();
-							}
-						});
-
-						LayoutInflater inflater = this.getActivity().getLayoutInflater();
-						View dialoglayout = inflater.inflate(R.layout.about_dialog, (ViewGroup) findViewById(R.id.dialog_layout_root));
-
-						TextView text = (TextView) dialoglayout.findViewById(R.id.aboutfield);
-						text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.main_donate_text)));
-						text.setMovementMethod(LinkMovementMethod.getInstance());
-
-						text.setTextSize(15);
-
-						ImageView paypal = (ImageView) dialoglayout.findViewById(R.id.imageview1);
-						paypal.setImageResource(R.drawable.paypal);
-						paypal.setOnClickListener(new View.OnClickListener() {
-							public void onClick(View v) {
-								Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri
-										.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ALR4TSXWPPHUL"));
-
-								startActivity(myIntent);
-							}
-						});
-						((ImageView) dialoglayout.findViewById(R.id.imageview2)).setVisibility(View.GONE);
-
-						builder.setView(dialoglayout);
-						return builder.create();
-					}
-					case ABOUTDIALOG: {
-						AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
-
-						// You have to catch the exception because the package stuff is all
-						// run-time
-						if (pInfo != null) {
-							builder.setTitle("About " + getString(R.string.app_name) + " " + pInfo.versionName);
+				case DONATEDIALOG: {
+					AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+					builder.setTitle("Donate to the Devs");
+					builder.setNeutralButton(R.string.dialog_thanks, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.cancel();
 						}
-						else {
-							builder.setTitle("About " + getString(R.string.app_name));
+					});
+
+					LayoutInflater inflater = this.getActivity().getLayoutInflater();
+					View dialoglayout = inflater.inflate(R.layout.about_dialog, (ViewGroup) findViewById(R.id.dialog_layout_root));
+
+					TextView text = (TextView) dialoglayout.findViewById(R.id.aboutfield);
+					text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.main_donate_text)));
+					text.setMovementMethod(LinkMovementMethod.getInstance());
+
+					text.setTextSize(15);
+
+					ImageView paypal = (ImageView) dialoglayout.findViewById(R.id.imageview1);
+					paypal.setImageResource(R.drawable.paypal);
+					paypal.setOnClickListener(new View.OnClickListener() {
+						public void onClick(View v) {
+							Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri
+									.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ALR4TSXWPPHUL"));
+
+							startActivity(myIntent);
 						}
+					});
+					((ImageView) dialoglayout.findViewById(R.id.imageview2)).setVisibility(View.GONE);
 
-						builder.setNeutralButton("Thanks!", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								dialog.cancel();
-							}
-						});
+					builder.setView(dialoglayout);
+					return builder.create();
+				}
+				case ABOUTDIALOG: {
+					AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
 
-						LayoutInflater inflater = this.getActivity().getLayoutInflater();
-						View dialoglayout = inflater.inflate(R.layout.about_dialog, (ViewGroup) findViewById(R.id.dialog_layout_root));
-
-						TextView text = (TextView) dialoglayout.findViewById(R.id.aboutfield);
-						text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.main_about_text)));
-						text.setMovementMethod(LinkMovementMethod.getInstance());
-
-						builder.setView(dialoglayout);
-						return builder.create();
+					// You have to catch the exception because the package stuff is all
+					// run-time
+					if (pInfo != null) {
+						builder.setTitle("About " + getString(R.string.app_name) + " " + pInfo.versionName);
 					}
-					case CHANGELOGDIALOG: {
-						AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+					else {
+						builder.setTitle("About " + getString(R.string.app_name));
+					}
 
-						if (pInfo != null) {
-							builder.setTitle("What's New in Version " + pInfo.versionName);
+					builder.setNeutralButton("Thanks!", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.cancel();
 						}
-						else {
-							builder.setTitle("What's New");
+					});
+
+					LayoutInflater inflater = this.getActivity().getLayoutInflater();
+					View dialoglayout = inflater.inflate(R.layout.about_dialog, (ViewGroup) findViewById(R.id.dialog_layout_root));
+
+					TextView text = (TextView) dialoglayout.findViewById(R.id.aboutfield);
+					text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.main_about_text)));
+					text.setMovementMethod(LinkMovementMethod.getInstance());
+
+					builder.setView(dialoglayout);
+					return builder.create();
+				}
+				case CHANGELOGDIALOG: {
+					AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+
+					if (pInfo != null) {
+						builder.setTitle("What's New in Version " + pInfo.versionName);
+					}
+					else {
+						builder.setTitle("What's New");
+					}
+
+					builder.setNeutralButton("Enjoy!", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.cancel();
 						}
+					});
 
-						builder.setNeutralButton("Enjoy!", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								dialog.cancel();
-							}
-						});
-
-						builder.setMessage(ImageGetterHelper.jellyBeanHack(getString(R.string.main_whats_new_text)));
-						return builder.create();
-					}
-					default: {
-						savedInstanceState.putInt("id", id);
-						return super.onCreateDialog(savedInstanceState);
-					}
+					builder.setMessage(ImageGetterHelper.jellyBeanHack(getString(R.string.main_whats_new_text)));
+					return builder.create();
+				}
+				default: {
+					savedInstanceState.putInt("id", id);
+					return super.onCreateDialog(savedInstanceState);
+				}
 				}
 			}
 		};
@@ -448,9 +449,9 @@ public class MainActivity extends SlidingFragmentActivity {
 
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			case android.R.id.home:
-				toggle();
-				return true;
+		case android.R.id.home:
+			toggle();
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -468,18 +469,18 @@ public class MainActivity extends SlidingFragmentActivity {
 	 */
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(R.string.name_search_hint).setIcon(R.drawable.menu_search)
-				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+		.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				new Thread(new Runnable() {
 					@Override
-					public boolean onMenuItemClick(MenuItem item) {
-						new Thread(new Runnable() {
-							@Override
-							public void run() {
-								new Instrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_SEARCH);
-							}
-						}).start();
-						return true;
+					public void run() {
+						new Instrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_SEARCH);
 					}
-				}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				}).start();
+				return true;
+			}
+		}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 		return true;
 	}
@@ -494,42 +495,42 @@ public class MainActivity extends SlidingFragmentActivity {
 	public boolean						timeShowing;
 
 	public Runnable						timerUpdate					= new Runnable() {
-																									@Override
-																									public void run() {
-																										if (endTime > SystemClock.elapsedRealtime()) {
-																											displayTimeLeft();
-																											timerHandler.postDelayed(timerUpdate, 200);
-																										}
-																										else {
-																											stopUpdatingDisplay();
-																										}
-																									}
-																								};
+		@Override
+		public void run() {
+			if (endTime > SystemClock.elapsedRealtime()) {
+				displayTimeLeft();
+				timerHandler.postDelayed(timerUpdate, 200);
+			}
+			else {
+				stopUpdatingDisplay();
+			}
+		}
+	};
 
 	public BroadcastReceiver	endTimeReceiver			= new BroadcastReceiver() {
-																									@Override
-																									public void onReceive(Context context, Intent intent) {
-																										endTime = intent.getLongExtra(RoundTimerService.EXTRA_END_TIME,
-																												SystemClock.elapsedRealtime());
-																										startUpdatingDisplay();
-																									}
-																								};
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			endTime = intent.getLongExtra(RoundTimerService.EXTRA_END_TIME,
+					SystemClock.elapsedRealtime());
+			startUpdatingDisplay();
+		}
+	};
 
 	public BroadcastReceiver	cancelTimeReceiver	= new BroadcastReceiver() {
-																									@Override
-																									public void onReceive(Context context, Intent intent) {
-																										endTime = 0;
-																										stopUpdatingDisplay();
-																									}
-																								};
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			endTime = 0;
+			stopUpdatingDisplay();
+		}
+	};
 
 	public BroadcastReceiver	startTimeReceiver		= new BroadcastReceiver() {
-																									@Override
-																									public void onReceive(Context context, Intent intent) {
-																										Intent i = new Intent(RoundTimerService.REQUEST_FILTER);
-																										sendBroadcast(i);
-																									}
-																								};
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Intent i = new Intent(RoundTimerService.REQUEST_FILTER);
+			sendBroadcast(i);
+		}
+	};
 
 	public void startUpdatingDisplay() {
 		updatingDisplay = true;
@@ -592,20 +593,20 @@ public class MainActivity extends SlidingFragmentActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
-			case TTS_CHECK_CODE:
-				if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
-					// We have TTS, so flag it as such
-					SharedPreferences.Editor edit = preferences.edit();
-					edit.putBoolean("hasTts", true);
-					edit.commit();
-				}
-				else {
-					showTtsWarningIfShould();
-				}
-				break;
-			default:
-				super.onActivityResult(requestCode, resultCode, data);
-				break;
+		case TTS_CHECK_CODE:
+			if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+				// We have TTS, so flag it as such
+				SharedPreferences.Editor edit = preferences.edit();
+				edit.putBoolean("hasTts", true);
+				edit.commit();
+			}
+			else {
+				showTtsWarningIfShould();
+			}
+			break;
+		default:
+			super.onActivityResult(requestCode, resultCode, data);
+			break;
 		}
 	}
 
@@ -619,15 +620,15 @@ public class MainActivity extends SlidingFragmentActivity {
 
 			// Then display a dialog informing them of TTS
 			AlertDialog dialog = new Builder(this)
-					.setTitle("Text-to-Speech")
-					.setMessage(
-							"This application has text-to-speech capability for some of its features, but you don't "
-									+ "seem to have it installed. If you want to install it, use the \"Install Text-to-Speech\" link "
-									+ "in the settings menu.").setPositiveButton("OK", new OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							// Do nothing, just dismiss
-						}
-					}).create();
+			.setTitle("Text-to-Speech")
+			.setMessage(
+					"This application has text-to-speech capability for some of its features, but you don't "
+							+ "seem to have it installed. If you want to install it, use the \"Install Text-to-Speech\" link "
+							+ "in the settings menu.").setPositiveButton("OK", new OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+									// Do nothing, just dismiss
+								}
+							}).create();
 
 			dialog.show();
 		}

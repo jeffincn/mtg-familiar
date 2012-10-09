@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -14,10 +15,12 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 
@@ -89,6 +92,7 @@ public class TradeListHelpers {
 		executeIfAvailableSpace();
 	}
 	
+	@SuppressLint("NewApi")
 	public static void executeIfAvailableSpace()
 	{
 		if(currentExecutingTasks.size() < MAX_SIMULTANEOUS_THREADS)
@@ -96,7 +100,20 @@ public class TradeListHelpers {
 			FetchPriceTask toExecute = pendingTasks.poll();
 			if(toExecute != null){
 				currentExecutingTasks.add(toExecute);
-				toExecute.execute();
+				Log.e("execute task!!!", toExecute.data.name);
+				
+
+				boolean API_LEVEL_11 = android.os.Build.VERSION.SDK_INT > 11;
+
+				if(API_LEVEL_11) {
+					toExecute.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void[])null);
+				}
+				else {
+					toExecute.execute((Void[])null);
+				}
+				//TODO total hack, but onPostExecute isn't called without this pause
+				long start = System.currentTimeMillis();
+				while(start + 333 > System.currentTimeMillis()){;}
 			}
 		}
 	}
@@ -108,7 +125,7 @@ public class TradeListHelpers {
 		}
 	}
 	
-	public class FetchPriceTask extends AsyncTask<Void, Void, Integer> {
+	public class FetchPriceTask extends AsyncTask<Void, Void, Void> {
 		CardData										data;
 		Object											toNotify;
 		String											price	= "";
@@ -130,13 +147,9 @@ public class TradeListHelpers {
 			this.cta = cta;
 			this.wf = wf;
 		}
-
+    
 		@Override
-		protected void onPreExecute() {
-		}
-
-		@Override
-		protected Integer doInBackground(Void... params) {
+		protected Void doInBackground(Void... params) {
 			URL priceurl = null;
 
 			try {
@@ -144,6 +157,9 @@ public class TradeListHelpers {
 				String cardNumber = data.cardNumber == null ? "" : data.cardNumber;
 				String setCode = data.setCode == null ? "" : data.setCode;
 				String tcgName = data.tcgName == null ? "" : data.tcgName;
+				
+				Log.e("doInBackground", cardName);
+				
 				if (cardNumber == "" || setCode == "" || tcgName == "") {
 					if(wf != null) {
 						data = FetchCardData(data, wf.mDbHelper);
@@ -153,7 +169,8 @@ public class TradeListHelpers {
 					}
 					if (data.message == card_not_found || data.message == database_busy) {
 						price = data.message;
-						return 1;
+						Log.e("doInBackground", price);
+						return null;
 					}
 				}
 
@@ -172,22 +189,23 @@ public class TradeListHelpers {
 			catch (MalformedURLException e) {
 				priceurl = null;
 				price = mangled_url;
-				return 1;
+				Log.e("doInBackground", price);
+				return null;
 			}
 
 			price = fetchPrice(priceurl);
 
 			if (price.equals(fetch_failed)) {
-				return 1;
+				Log.e("doInBackground", price);
+				return null;
 			}
-			return 0;
+			Log.e("doInBackground", price);
+			return null;
 		}
 
-		// Look into progress bar "loading..." style updating
-
 		@Override
-		protected void onPostExecute(Integer result) {
-
+		protected void onPostExecute(Void result) {
+			Log.e("onPostExecute", data.name);
 			double dPrice;
 			try {
 				dPrice = Double.parseDouble(price);

@@ -15,8 +15,8 @@
   -->
 
 <resources>
-    <dimen name="actionbar_home_width">60dp</dimen>
     <dimen name="list_padding">10dp</dimen>
     <dimen name="shadow_width">30dp</dimen>
     <dimen name="listitem_horizontal">10dp</dimen>
+    <dimen name="sliding_menu_width">260dp</dimen>
 </resources>

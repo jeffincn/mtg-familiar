@@ -17,6 +17,18 @@
     <PreferenceScreen 
         android:title="@string/pref_screen_general">
         
+        <PreferenceCategory 
+             android:title="@string/pref_cat_default_fragment">
+
+            <ListPreference 
+	            android:entries="@array/default_fragment_array_entries"
+	            android:entryValues="@array/default_fragment_array_entries"
+	            android:title="@string/pref_default_fragment_mode_title"
+	            android:summary="@string/pref_default_fragment_mode_summary"
+	            android:key="defaultFragment"
+				android:defaultValue="@string/main_card_search"/>
+		</PreferenceCategory>
+        	        
 	    <PreferenceCategory 
 	        android:title="@string/pref_cat_updates">
 	

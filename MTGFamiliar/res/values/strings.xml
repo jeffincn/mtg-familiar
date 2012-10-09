@@ -75,15 +75,11 @@
     </string>
     <string name="main_whats_new_title">What\'s New</string>
     <string name="main_whats_new_text">
-	- Create a Gathering: Set life counter defaults for different groups&lt;br />&lt;br />
- 	- Wishlist: Add cards from the card\'s menu&lt;br />&lt;br />
- 	- Life Counter Compact Mode: Fit four players on the same screen&lt;br />&lt;br />
- 	- Round timer display in the life counter: No need to switch to check the clock&lt;br />&lt;br /> 
- 	- Actionbar for everybody! Ice Cream Sandwitch UI goodness&lt;br />&lt;br /> 
- 	- Brand new updater: faster and out of the way&lt;br />&lt;br /> 
- 	- Database stability improvements and bugfixes&lt;br />&lt;br /> 
- 	- 1.8.1: Round timer now always visible in the ActionBar&lt;br />&lt;br /> 
- 	- 1.8.1: More bugfixes!
+	- New Sliding Menu navigation. Touch the button in the top left to open it up. Change your default page in the Settings&lt;br />&lt;br />
+ 	- Export and Import data to an SD Card&lt;br />&lt;br />
+ 	- New EDH mode for the Life Counter&lt;br />&lt;br />
+ 	- Save and load default search parameters&lt;br />&lt;br />
+ 	- Various and sundry bugfixes
     </string>
     
     <string name="main_export_data_title">Export Data to SD</string>
@@ -277,6 +273,9 @@
     <string name="pref_screen_timer">Round Timer</string>
     <string name="pref_screen_trade_wishlist">Trade &amp; Wishlist</string>
     
+    <string name="pref_cat_default_fragment">Default Page</string>
+	<string name="pref_default_fragment_mode_title">Default Page</string>
+	<string name="pref_default_fragment_mode_summary">The first thing you see when you open the app</string>
     <string name="pref_cat_updates">Database Updates</string>
     <string name="pref_auto_updates_title">Automatic Updates</string>
     <string name="pref_auto_updates_summary">Check for new sets and bannings when the app opens</string>
@@ -513,4 +512,15 @@
         <item >1</item>
         <item >2</item>
     </string-array>
+	<string-array name="default_fragment_array_entries">
+		<item>@string/main_card_search</item>
+		<item>@string/main_life_counter</item>
+		<item>@string/main_mana_pool</item>
+		<item>@string/main_dice</item>
+		<item>@string/main_trade</item>
+		<item>@string/main_wishlist</item>
+		<item>@string/main_timer</item>
+		<item>@string/main_rules</item>
+		<item>@string/main_mojhosto</item>
+	</string-array>
 </resources>

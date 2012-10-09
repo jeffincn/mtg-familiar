@@ -61,14 +61,21 @@ import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.fragments.CardViewFragment;
+import com.gelakinetic.mtgfam.fragments.DiceFragment;
 import com.gelakinetic.mtgfam.fragments.FamiliarDialogFragment;
 import com.gelakinetic.mtgfam.fragments.FamiliarFragment;
+import com.gelakinetic.mtgfam.fragments.LifeFragment;
+import com.gelakinetic.mtgfam.fragments.ManaPoolFragment;
 import com.gelakinetic.mtgfam.fragments.MenuFragment;
+import com.gelakinetic.mtgfam.fragments.MoJhoStoFragment;
 import com.gelakinetic.mtgfam.fragments.ResultListFragment;
 import com.gelakinetic.mtgfam.fragments.RoundTimerFragment;
+import com.gelakinetic.mtgfam.fragments.RulesFragment;
 import com.gelakinetic.mtgfam.fragments.SearchViewFragment;
 import com.gelakinetic.mtgfam.fragments.SearchViewFragment.SearchCriteria;
 import com.gelakinetic.mtgfam.fragments.SearchWidgetFragment;
+import com.gelakinetic.mtgfam.fragments.TradeFragment;
+import com.gelakinetic.mtgfam.fragments.WishlistFragment;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.DbUpdaterService;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
@@ -222,8 +229,41 @@ public class MainActivity extends SlidingFragmentActivity {
 			if (savedInstanceState == null) {
 				String action = getIntent().getAction();
 				// TODO a preference should toggle what fragment is loaded
-				Fragment frag = new SearchViewFragment();
-
+				
+				String defaultFragment = preferences.getString("defaultFragment", getString(R.string.main_card_search));
+				
+				Fragment frag;
+				if(defaultFragment.equals(this.getString(R.string.main_card_search))) {
+					frag = new SearchViewFragment();
+				}
+				else if(defaultFragment.equals(this.getString(R.string.main_life_counter))) {
+					frag = new LifeFragment();
+				}
+				else if(defaultFragment.equals(this.getString(R.string.main_mana_pool))) {
+					frag = new ManaPoolFragment();
+				}
+				else if(defaultFragment.equals(this.getString(R.string.main_dice))) {
+					frag = new DiceFragment();
+				}
+				else if(defaultFragment.equals(this.getString(R.string.main_trade))) {
+					frag = new TradeFragment();
+				}
+				else if(defaultFragment.equals(this.getString(R.string.main_wishlist))) {
+					frag = new WishlistFragment();
+				}
+				else if(defaultFragment.equals(this.getString(R.string.main_timer))) {
+					frag = new RoundTimerFragment();
+				}
+				else if(defaultFragment.equals(this.getString(R.string.main_rules))) {
+					frag = new RulesFragment();
+				}
+				else if(defaultFragment.equals(this.getString(R.string.main_mojhosto))) {
+					frag = new MoJhoStoFragment();
+				}
+				else {
+					frag = new SearchViewFragment();
+				}
+				
 				mFragmentManager = getSupportFragmentManager();
 				FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
 

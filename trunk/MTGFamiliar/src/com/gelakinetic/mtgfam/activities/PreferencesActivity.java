@@ -48,7 +48,12 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
 						new Thread(new Runnable() {
 							@Override
 							public void run() {
-								new Instrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_SEARCH);
+								try{
+									new Instrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_SEARCH);
+								}
+								catch(java.lang.SecurityException e){
+									//apparently this can inject an event into another app if the user switches fast enough
+								}
 							}
 						}).start();
 						return true;

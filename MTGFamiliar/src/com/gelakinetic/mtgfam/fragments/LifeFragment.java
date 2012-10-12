@@ -36,6 +36,7 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridView;
@@ -599,16 +600,20 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 						return dialog;
 					}
 					case DIALOG_EDH_DAMAGE: {
-						int fromCommander = args.getInt("fromCommander");
-						int player = args.getInt("Player");
+						final int fromCommander = args.getInt("fromCommander");
+						final int player = args.getInt("player");
 						String commanderName = players.get(fromCommander).name;
+						int commanderDamageCurrent = players.get(player).commanderDamage.get(fromCommander);
 						
 						View view = LayoutInflater.from(getActivity()).inflate(R.layout.life_counter_edh_dialog, null);
 						AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
 						builder.setTitle("Damage from " + commanderName + "'s Commander").setView(view);
-						final TextView currentLife = (TextView)view.findViewById(R.id.commander_dialog_current_life);
-						final TextView currentDamage = (TextView) view.findViewById(R.id.commander_dialog_current_damage);
-
+						final TextView cDamage = (TextView)view.findViewById(R.id.commander_dialog_current_cDamage);
+						final TextView deltaChange = (TextView) view.findViewById(R.id.commander_dialog_delta);
+						
+						cDamage.setText(String.valueOf(commanderDamageCurrent));
+						
+						CheckBox poison = (CheckBox) view.findViewById(R.id.commander_dialog_poison);
 						Button plusOne = (Button) view.findViewById(R.id.commander_plus1);
 						Button minusOne = (Button) view.findViewById(R.id.commander_minus1);
 						
@@ -616,14 +621,14 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 							
 							@Override
 							public void onClick(View v) {
-								int life = Integer.parseInt((String) currentLife.getText());
-								int damage = Integer.parseInt((String) currentDamage.getText());
+								int camage = Integer.parseInt((String) cDamage.getText());
+								int delta = Integer.parseInt((String) deltaChange.getText());
 								
-								damage = damage + 1;
-								currentDamage.setText(String.valueOf(damage));
+								delta = delta + 1;
+								deltaChange.setText(String.valueOf(delta));
 								
-								life = life - 1;
-								currentLife.setText(String.valueOf(life));
+								camage = camage + 1;
+								cDamage.setText(String.valueOf(camage));
 							}
 						});
 						
@@ -631,19 +636,28 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 							
 							@Override
 							public void onClick(View v) {
-								int life = Integer.parseInt((String) currentLife.getText());
-								int damage = Integer.parseInt((String) currentDamage.getText());
+								int camage = Integer.parseInt((String) cDamage.getText());
+								int delta = Integer.parseInt((String) deltaChange.getText());
 								
-								damage = damage - 1;
-								currentDamage.setText(String.valueOf(damage));
+								delta = delta - 1;
+								deltaChange.setText(String.valueOf(delta));
 								
-								life = life + 1;
-								currentLife.setText(String.valueOf(life));
+								camage = camage - 1;
+								cDamage.setText(String.valueOf(camage));
 							}
 						});
 						
 						builder.setNegativeButton(R.string.dialog_cancel, null);
-						builder.setPositiveButton(R.string.dialog_ok, null);
+						builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface arg0, int arg1) {
+								int delta = Integer.parseInt((String) deltaChange.getText());
+								
+								players.get(player).incrementCommanderValue(fromCommander, delta);
+								players.get(player).commanderAdapter.notifyDataSetChanged();
+							}
+						});
+						
 						Dialog dialog = builder.create();
 						return dialog;
 					}
@@ -904,7 +918,6 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			TextView name, damage;
 			LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			View v = vi.inflate(R.layout.commander_adapter_row, null);
-			ArrayList<Integer> row = players.get(position).commanderDamage;
 			name = (TextView) v.findViewById(R.id.commander_player_name);
 			damage = (TextView) v.findViewById(R.id.commander_damage);
 			if (name == null || damage == null) {
@@ -913,7 +926,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 				return error;
 			}
 			name.setText(players.get(position).name);
-			damage.setText(String.valueOf(row.get(position)));
+			damage.setText(String.valueOf(players.get(position).life));
 			
 			final int pos = position;
 			
@@ -1343,6 +1356,10 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 					break;
 			}
 			setValue(type, value + delta);
+			
+			if (displayMode == COMMANDER){
+				commanderAdapter.notifyDataSetChanged();
+			}
 		}
 		
 		private void incrementCommanderValue(int fromCommander, int delta) {

@@ -30,8 +30,8 @@ public class RulesParser {
 
 	// URLs and the regex
 	private final String						source								= "http://www.wizards.com/Magic/TCG/Article.aspx?x=magic/rules";
-	private final String						prefix								= "http://www.wizards.com";
-	private final String						regex									= "(/magic/comprules/MagicCompRules_[0-9]{8}\\.txt)";
+	private final String						prefix								= "http://media.wizards.com/images/magic/tcg/resources/rules/";
+	private final String						regex									= "(MagicCompRules_[0-9]{8}\\.txt)";
 
 	// Delimiting tokens
 	// NOTE: If WotC changes their rules file format drastically, these may need

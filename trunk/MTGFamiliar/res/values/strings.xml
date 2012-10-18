@@ -75,12 +75,16 @@
     </string>
     <string name="main_whats_new_title">What\'s New</string>
     <string name="main_whats_new_text">
-	- New Sliding Menu navigation. Touch the button in the top left to open it up. Change your default page in the Settings&lt;br />&lt;br />
- 	- Export and Import data to an SD Card&lt;br />&lt;br />
+	- New Sliding Menu navigation! Touch the button in the top left to open the menu, and change your default page in General Settings&lt;br />&lt;br />
+ 	- Export and Import data to an SD card&lt;br />&lt;br />
  	- New EDH mode for the Life Counter&lt;br />&lt;br />
  	- Save and load default search parameters&lt;br />&lt;br />
  	- Various and sundry bugfixes
     </string>
+    
+    <string name="main_tts_warning_title">Text-to-Speech</string>
+    <string name="main_tts_warning_text">This application has text-to-speech capability for some of its features, but you don\'t seem to have it installed. 
+        If you want to install it, use the "Install Text-to-Speech" link in the settings menu.</string>
     
     <string name="main_export_data_title">Export Data to SD</string>
     <string name="main_export_success">Successfully exported data to </string>

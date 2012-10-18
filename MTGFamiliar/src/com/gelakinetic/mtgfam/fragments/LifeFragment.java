@@ -1,6 +1,5 @@
 package com.gelakinetic.mtgfam.fragments;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1584,46 +1583,52 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 	@Override
 	public void onInit(int status) {
-		ttsInitialized = true;
-		if (announceLifeTotals != null) {
-			announceLifeTotals.setVisible(ttsInitialized);
-		}
-//		tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-//			public void onStart(String utteranceId) {
-//				//Do nothing
-//			}
-//			
-//			public void onError(String utteranceId) {
-//				//Do nothing
-//			}
-//			
-//			public void onDone(String utteranceId) {
-//				//If the utterance ID is correct, shout that it's OVER NINE THOUSAAAAAAAAND
-//				mediaPlayer.stop();
-//				mediaPlayer.start();
-//			}
-//		});
-		tts.setOnUtteranceCompletedListener(new OnUtteranceCompletedListener() {
-			public void onUtteranceCompleted(String utteranceId) {
-				// If the utterance ID is correct, shout that it's OVER NINE THOUSAAAAAAAAND
-				Log.i("LifeCounter", "Utterance completed, id=" + utteranceId);
-				if(utteranceId != null && utteranceId.equals("9000")) {
-					try {
-						mediaPlayer.stop();
-						mediaPlayer.prepare();
-						mediaPlayer.start();
-					} 
-					catch (Exception e) {
-						Log.w("LifeCounter", "Exception while preparing media file: " + e.getMessage());
+		if(status == TextToSpeech.SUCCESS) {
+			ttsInitialized = true;
+			if (announceLifeTotals != null) {
+				announceLifeTotals.setVisible(ttsInitialized);
+			}
+	//		tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+	//			public void onStart(String utteranceId) {
+	//				//Do nothing
+	//			}
+	//			
+	//			public void onError(String utteranceId) {
+	//				//Do nothing
+	//			}
+	//			
+	//			public void onDone(String utteranceId) {
+	//				//If the utterance ID is correct, shout that it's OVER NINE THOUSAAAAAAAAND
+	//				mediaPlayer.stop();
+	//				mediaPlayer.start();
+	//			}
+	//		});
+			tts.setOnUtteranceCompletedListener(new OnUtteranceCompletedListener() {
+				public void onUtteranceCompleted(String utteranceId) {
+					// If the utterance ID is correct, shout that it's OVER NINE THOUSAAAAAAAAND
+					Log.i("LifeCounter", "Utterance completed, id=" + utteranceId);
+					if(utteranceId != null && utteranceId.equals("9000")) {
+						try {
+							mediaPlayer.stop();
+							mediaPlayer.prepare();
+							mediaPlayer.start();
+						} 
+						catch (Exception e) {
+							Log.w("LifeCounter", "Exception while preparing media file: " + e.getMessage());
+						}
 					}
 				}
-			}
-		});
-		mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
-			public void onCompletion(MediaPlayer mp) {
-				speakFromList();
-			}
-		});
+			});
+			mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
+				public void onCompletion(MediaPlayer mp) {
+					speakFromList();
+				}
+			});
+		}
+		else {
+			ttsInitialized = false;
+			getMainActivity().showTtsWarningIfShould();
+		}
 	}
 	
 	private class TtsSentence {

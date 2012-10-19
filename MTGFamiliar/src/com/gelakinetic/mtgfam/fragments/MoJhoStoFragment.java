@@ -5,11 +5,9 @@ import java.util.Random;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.text.method.LinkMovementMethod;
@@ -220,13 +218,9 @@ public class MoJhoStoFragment extends FamiliarFragment {
 
 		rand = new Random(System.currentTimeMillis());
 
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-		boolean b = preferences.getBoolean("mojhostoFirstTime", true);
-		if (b) {
+		if (getMainActivity().getPreferencesAdapter().getMojhostoFirstTime()) {
 			showDialog(RULESDIALOG);
-			SharedPreferences.Editor editor = preferences.edit();
-			editor.putBoolean("mojhostoFirstTime", false);
-			editor.commit();
+			getMainActivity().getPreferencesAdapter().setMojhostoFirstTime(false);
 		}
 	}
 

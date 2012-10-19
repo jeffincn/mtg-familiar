@@ -11,14 +11,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.media.MediaPlayer;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
-import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.support.v4.app.NotificationCompat;
@@ -50,6 +47,7 @@ public class RoundTimerService extends Service implements OnInitListener {
 	private MediaPlayer player;
 	private TextToSpeech tts;
 	private boolean ttsInitialized = false;
+	private PreferencesAdapter prefAdapter;
 
 	private NotificationManager nm;
 	private AlarmManager alarm;
@@ -73,8 +71,7 @@ public class RoundTimerService extends Service implements OnInitListener {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(RoundTimerService.this);
-			if (ttsInitialized && settings.getBoolean("fifteenMinutePref", false)) {
+			if (ttsInitialized && prefAdapter.getFifteenMinutePref()) {
 				tts.speak("The round will end in fifteen minutes", TextToSpeech.QUEUE_FLUSH, null);
 			}
 		}
@@ -84,8 +81,7 @@ public class RoundTimerService extends Service implements OnInitListener {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(RoundTimerService.this);
-			if (ttsInitialized && settings.getBoolean("tenMinutePref", false)) {
+			if (ttsInitialized && prefAdapter.getTenMinutePref()) {
 				tts.speak("The round will end in ten minutes", TextToSpeech.QUEUE_FLUSH, null);
 			}
 		}
@@ -95,8 +91,7 @@ public class RoundTimerService extends Service implements OnInitListener {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(RoundTimerService.this);
-			if (ttsInitialized && settings.getBoolean("fiveMinutePref", false)) {
+			if (ttsInitialized && prefAdapter.getFiveMinutePref()) {
 				tts.speak("The round will end in five minutes", TextToSpeech.QUEUE_FLUSH, null);
 			}
 		}
@@ -106,8 +101,7 @@ public class RoundTimerService extends Service implements OnInitListener {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(RoundTimerService.this);
-			soundFile = Uri.parse(settings.getString("timerSound", RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION).toString()));
+			soundFile = Uri.parse(prefAdapter.getTimerSound());
 
 			// When we get the alarm broadcast, we first start playing the alert sound
 			player = MediaPlayer.create(RoundTimerService.this, soundFile);
@@ -259,6 +253,7 @@ public class RoundTimerService extends Service implements OnInitListener {
 		alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
 
 		c = getApplication().getApplicationContext();
+		prefAdapter = new PreferencesAdapter(this);
 
 		Intent notificationIntent = new Intent(c, MainActivity.class);
 		notificationIntent.setAction(MainActivity.ACTION_ROUND_TIMER);

@@ -259,19 +259,23 @@ public class ManaPoolFragment extends FamiliarFragment {
 	}
 
 	private void load() {
-		white = getMainActivity().preferences.getInt("whiteMana", 0);
-		blue = getMainActivity().preferences.getInt("blueMana", 0);
-		black = getMainActivity().preferences.getInt("blackMana", 0);
-		red = getMainActivity().preferences.getInt("redMana", 0);
-		green = getMainActivity().preferences.getInt("greenMana", 0);
-		colorless = getMainActivity().preferences.getInt("colorlessMana", 0);
-		spell = getMainActivity().preferences.getInt("spellCount", 0);
+		white = getMainActivity().getPreferencesAdapter().getWhiteMana();
+		blue = getMainActivity().getPreferencesAdapter().getBlueMana();
+		black = getMainActivity().getPreferencesAdapter().getBlackMana();
+		red = getMainActivity().getPreferencesAdapter().getRedMana();
+		green = getMainActivity().getPreferencesAdapter().getGreenMana();
+		colorless = getMainActivity().getPreferencesAdapter().getColorlessMana();
+		spell = getMainActivity().getPreferencesAdapter().getSpellCount();
 	}
 
 	private void store() {
-		getMainActivity().preferences.edit().putInt("whiteMana", white).putInt("blueMana", blue)
-				.putInt("blackMana", black).putInt("redMana", red).putInt("greenMana", green)
-				.putInt("colorlessMana", colorless).putInt("spellCount", spell).commit();
+		getMainActivity().getPreferencesAdapter().setWhiteMana(white);
+		getMainActivity().getPreferencesAdapter().setBlueMana(blue);
+		getMainActivity().getPreferencesAdapter().setBlackMana(black);
+		getMainActivity().getPreferencesAdapter().setRedMana(red);
+		getMainActivity().getPreferencesAdapter().setGreenMana(green);
+		getMainActivity().getPreferencesAdapter().setColorlessMana(colorless);
+		getMainActivity().getPreferencesAdapter().setSpellCount(spell);
 	}
 
 	private void update() {
@@ -285,8 +289,13 @@ public class ManaPoolFragment extends FamiliarFragment {
 	}
 
 	public static void reset(MainActivity ma) {
-		ma.preferences.edit().putInt("whiteMana", 0).putInt("blueMana", 0).putInt("blackMana", 0).putInt("redMana", 0)
-				.putInt("greenMana", 0).putInt("colorlessMana", 0).putInt("spellCount", 0).commit();
+		ma.getPreferencesAdapter().setWhiteMana(0);
+		ma.getPreferencesAdapter().setBlueMana(0);
+		ma.getPreferencesAdapter().setBlackMana(0);
+		ma.getPreferencesAdapter().setRedMana(0);
+		ma.getPreferencesAdapter().setGreenMana(0);
+		ma.getPreferencesAdapter().setColorlessMana(0);
+		ma.getPreferencesAdapter().setSpellCount(0);
 	}
 
 	@Override

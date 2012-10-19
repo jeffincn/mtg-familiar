@@ -185,13 +185,13 @@ public class CardViewFragment extends FamiliarFragment {
 		cardID = extras.getLong("id");
 		isRandom = extras.getBoolean(SearchViewFragment.RANDOM);
 		isSingle = extras.getBoolean("isSingle", false);
-		if (getMainActivity().preferences.getBoolean("picFirst", false)) {
+		if (getMainActivity().getPreferencesAdapter().getPicFirst()) {
 			loadTo = MAINPAGE;
 		}
 		else {
 			loadTo = DIALOG;
 		}
-		scroll_results = getMainActivity().preferences.getBoolean("scrollresults", false);
+		scroll_results = getMainActivity().getPreferencesAdapter().getScrollResults();
 
 		progDialog = new ProgressDialog(this.getMainActivity());
 		progDialog.setTitle("");

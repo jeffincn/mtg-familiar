@@ -12,7 +12,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -71,7 +70,6 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	public static final int									INITIAL_POISON						= 0;
 	public static final int									TERMINAL_LIFE							= 0;
 	public static final int									TERMINAL_POISON						= 10;
-	private static final String							PLAYER_DATA								= "player_data";
 	protected static final int							EVERYTHING								= 0;
 	protected static final int							JUST_TOTALS								= 1;
 
@@ -92,7 +90,6 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	private int															orientation;
 	private boolean													canGetLock;
 
-	private Editor													editor;
 	private ImageView												lifeButton;
 	private ImageView												poisonButton;
 	private ImageView												resetButton;
@@ -195,10 +192,8 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		listSizeHeight = -10;
 		listSizeWidth = -10;
 
-		canGetLock = getMainActivity().preferences.getBoolean("wakelock", true);
-		displayMode = Integer.parseInt(getMainActivity().preferences.getString("displayMode",
-				String.valueOf(normalDisplay)));
-		editor = getMainActivity().preferences.edit();
+		canGetLock = getMainActivity().getPreferencesAdapter().getWakelock();
+		displayMode = Integer.parseInt(getMainActivity().getPreferencesAdapter().getDisplayMode());
 
 		if (orientation == LANDSCAPE && displayMode == compactDisplay) {
 			displayMode = normalDisplay;
@@ -269,8 +264,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			for (Player p : players) {
 				playerData += p.toString();
 			}
-			editor.putString(PLAYER_DATA, playerData);
-			editor.commit();
+			getMainActivity().getPreferencesAdapter().setPlayerData(playerData);
 		}
 		resetting = false;
 	}
@@ -304,7 +298,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			wl.acquire();
 		}
 
-		String lifeData = getMainActivity().preferences.getString(PLAYER_DATA, null);
+		String lifeData = getMainActivity().getPreferencesAdapter().getPlayerData();
 
 		if (lifeData == null || lifeData.length() == 0) {
 			addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, getActivity());
@@ -583,8 +577,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 										displayMode = which;
 
 										// And also update the preference
-										editor.putString("displayMode", String.valueOf(displayMode));
-										editor.commit();
+										getMainActivity().getPreferencesAdapter().setDisplayMode(String.valueOf(displayMode));
 
 										restartFragment();
 
@@ -817,16 +810,15 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		setType(LIFE);
 
 		if (type == EVERYTHING) {
-			editor.putString(PLAYER_DATA, null);
+			getMainActivity().getPreferencesAdapter().setPlayerData(null);
 		}
 		else if (type == JUST_TOTALS) {
 			String data = "";
 			for (Player p : players) {
 				data += p.toFreshString();
 			}
-			editor.putString(PLAYER_DATA, data);
+			getMainActivity().getPreferencesAdapter().setPlayerData(data);
 		}
-		editor.commit();
 
 		restartFragment();
 	}

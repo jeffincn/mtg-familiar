@@ -31,9 +31,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
@@ -45,7 +43,7 @@ public class DbUpdaterService extends IntentService {
 	public static final int				STATUS_NOTIFICATION		= 31;
 	public static final int				UPDATED_NOTIFICATION	= 32;
 
-	protected SharedPreferences		mPreferences;
+	protected PreferencesAdapter mPrefAdapter;
 	protected CardDbAdapter				mDbHelper;
 	protected NotificationManager	mNotificationManager;
 	protected PendingIntent				mNotificationIntent;
@@ -55,7 +53,7 @@ public class DbUpdaterService extends IntentService {
 	protected Runnable						mProgressUpdater;
 
 	protected int									mProgress;
-
+	
 	public DbUpdaterService() {
 		super("com.gelakinetic.mtgfam.helpers.DbUpdaterService");
 	}
@@ -63,7 +61,7 @@ public class DbUpdaterService extends IntentService {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+		mPrefAdapter = new PreferencesAdapter(this);
 		mDbHelper = new CardDbAdapter(this);
 		mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
@@ -99,15 +97,15 @@ public class DbUpdaterService extends IntentService {
 		try {
 			if(reparseDatabase) {
 				mDbHelper.dropCreateDB();
-				JsonParser.readLegalityJsonStream(mDbHelper, mPreferences, reparseDatabase);
+				JsonParser.readLegalityJsonStream(mDbHelper, mPrefAdapter, reparseDatabase);
 				GZIPInputStream upToGIS = new GZIPInputStream(new URL("https://sites.google.com/site/mtgfamiliar/patches/UpToRTR.json.gzip").openStream());
 				switchToUpdating(String.format(getString(R.string.update_updating_set), "EVERYTHING!!"));
 				JsonParser.readCardJsonStream(upToGIS, reporter, "upToRTR", mDbHelper, this);
-				JsonParser.readTCGNameJsonStream(mPreferences, mDbHelper, reparseDatabase);
+				JsonParser.readTCGNameJsonStream(mPrefAdapter, mDbHelper, reparseDatabase);
 			}
 			else {
-				JsonParser.readLegalityJsonStream(mDbHelper, mPreferences, reparseDatabase);
-				ArrayList<String[]> patchInfo = JsonParser.readUpdateJsonStream(mPreferences);
+				JsonParser.readLegalityJsonStream(mDbHelper, mPrefAdapter, reparseDatabase);
+				ArrayList<String[]> patchInfo = JsonParser.readUpdateJsonStream(mPrefAdapter);
 				if (patchInfo != null) {
 
 					for (int i = 0; i < patchInfo.size(); i++) {
@@ -127,7 +125,7 @@ public class DbUpdaterService extends IntentService {
 							switchToChecking();
 						}
 					}
-					JsonParser.readTCGNameJsonStream(mPreferences, mDbHelper, reparseDatabase);
+					JsonParser.readTCGNameJsonStream(mPrefAdapter, mDbHelper, reparseDatabase);
 				}
 			}
 		}
@@ -145,7 +143,7 @@ public class DbUpdaterService extends IntentService {
 		// timestamp of when the APK was built.
 		// This is a safe assumption to make, since any market release will have the
 		// latest database baked in.
-		long lastRulesUpdate = mPreferences.getLong("lastRulesUpdate", BuildDate.get(this).getTime());
+		long lastRulesUpdate = mPrefAdapter.getLastRulesUpdate();
 		if(reparseDatabase) {
 			lastRulesUpdate = 0; //1979 anybody?
 		}
@@ -173,12 +171,10 @@ public class DbUpdaterService extends IntentService {
 		}
 
 		long curTime = new Date().getTime();
-		SharedPreferences.Editor editor = mPreferences.edit();
-		editor.putInt("lastLegalityUpdate", (int) (curTime / 1000));
+		mPrefAdapter.setLastLegalityUpdate((int)(curTime / 1000));
 		if (newRulesParsed) {
-			editor.putLong("lastRulesUpdate", curTime);
+			mPrefAdapter.setLastRulesUpdate(curTime);
 		}
-		editor.commit();
 
 		mDbHelper.closeTransactional();
 

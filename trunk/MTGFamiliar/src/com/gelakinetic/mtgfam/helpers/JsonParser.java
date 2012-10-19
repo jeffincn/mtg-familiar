@@ -28,7 +28,6 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import com.gelakinetic.mtgfam.R;
 import com.google.gson.stream.JsonReader;
@@ -292,7 +291,7 @@ public class JsonParser {
 		return;
 	}
 
-	public static ArrayList<String[]> readUpdateJsonStream(SharedPreferences settings) throws MalformedURLException, IOException {
+	public static ArrayList<String[]> readUpdateJsonStream(PreferencesAdapter prefAdapter) throws MalformedURLException, IOException {
 		ArrayList<String[]> patchInfo = new ArrayList<String[]>();
 		URL update;
 		String label;
@@ -308,7 +307,7 @@ public class JsonParser {
 			label = reader.nextName();
 
 			if (label.equals("Date")) {
-				String lastUpdate = settings.getString("lastUpdate", "");
+				String lastUpdate = prefAdapter.getLastUpdate();
 				date = reader.nextString();
 				if (lastUpdate.equals(date)) {
 					reader.close();
@@ -341,14 +340,12 @@ public class JsonParser {
 		reader.endObject();
 		reader.close();
 
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putString("lastUpdate", date);
-		editor.commit();
+		prefAdapter.setLastUpdate(date);
 
 		return patchInfo;
 	}
 
-	public static void readLegalityJsonStream(CardDbAdapter cda, SharedPreferences settings, boolean reparseDatabase)
+	public static void readLegalityJsonStream(CardDbAdapter cda, PreferencesAdapter prefAdapter, boolean reparseDatabase)
 			throws IOException {
 
 		CardDbAdapter mDbHelper;
@@ -375,7 +372,7 @@ public class JsonParser {
 				date = reader.nextString();
 
 				// compare date, maybe return, update sharedprefs
-				String spDate = settings.getString("date", null);
+				String spDate = prefAdapter.getDate();
 				if (spDate != null && spDate.equals(date)) {
 					if(!reparseDatabase){ // if we're reparsing, screw the date
 						reader.close();
@@ -430,14 +427,12 @@ public class JsonParser {
 		}
 		reader.endObject();
 
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putString("date", date);
-		editor.commit();
+		prefAdapter.setDate(date);
 		reader.close();
 		return;
 	}
 
-	public static void readTCGNameJsonStream(SharedPreferences settings, CardDbAdapter mDbHelper, boolean reparseDatabase) throws MalformedURLException, IOException{
+	public static void readTCGNameJsonStream(PreferencesAdapter prefAdapter, CardDbAdapter mDbHelper, boolean reparseDatabase) throws MalformedURLException, IOException{
 		URL update;
 		String label;
 		String date = null;
@@ -453,7 +448,7 @@ public class JsonParser {
 			label = reader.nextName();
 
 			if (label.equals("Date")) {
-				String lastUpdate = settings.getString("lastTCGNameUpdate", "");
+				String lastUpdate = prefAdapter.getLastTCGNameUpdate();
 				date = reader.nextString();
 				if (lastUpdate.equals(date) && !reparseDatabase) {
 					reader.close();
@@ -482,8 +477,6 @@ public class JsonParser {
 		reader.endObject();
 		reader.close();
 
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putString("lastTCGNameUpdate", date);
-		editor.commit();
+		prefAdapter.setLastTCGNameUpdate(date);
 	}
 }

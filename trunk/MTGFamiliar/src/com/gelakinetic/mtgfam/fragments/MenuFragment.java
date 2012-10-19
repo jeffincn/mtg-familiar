@@ -16,10 +16,8 @@ import java.util.zip.ZipOutputStream;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
@@ -116,13 +114,8 @@ public class MenuFragment extends ListFragment {
 			fragment = new MoJhoStoFragment();
 			break;
 		case R.string.main_force_update_title:
-			SharedPreferences preferences = PreferenceManager
-					.getDefaultSharedPreferences(mActivity);
-			SharedPreferences.Editor editor = preferences.edit();
-			editor.putInt("lastLegalityUpdate", 0);
-			editor.commit();
-			mActivity
-					.startService(new Intent(mActivity, DbUpdaterService.class));
+			mActivity.getPreferencesAdapter().setLastLegalityUpdate(0);
+			mActivity.startService(new Intent(mActivity, DbUpdaterService.class));
 			mActivity.showAbove();
 			break;
 		case R.string.main_settings_title:

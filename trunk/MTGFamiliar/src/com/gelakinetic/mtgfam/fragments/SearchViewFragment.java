@@ -340,7 +340,7 @@ public class SearchViewFragment extends FamiliarFragment {
 		setspinner.setAdapter(printingsAdapter);
 
 		boolean consolidate = true;
-		consolidate = getMainActivity().preferences.getBoolean("consolidateSearch", true);
+		consolidate = getMainActivity().getPreferencesAdapter().getConsolidateSearch();
 		setspinner.setSelection(consolidate ? CardDbAdapter.MOSTRECENTPRINTING : CardDbAdapter.ALLPRINTINGS);
 
 		setButton.setOnClickListener(new View.OnClickListener() {

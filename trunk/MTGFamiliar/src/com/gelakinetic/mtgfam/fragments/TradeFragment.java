@@ -14,7 +14,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -84,12 +83,9 @@ public class TradeFragment extends FamiliarFragment {
 	public static final String		price_invalid					= "Price Invalid";
 	public static final String		card_corrupted					= "Card Data corrupted, discarding.";
 
-	private static final int		AVG_PRICE							= 1;
-
 	private static final String		autosaveName					= "autosave";
 	private static final String		tradeExtension				= ".trade";
 	private boolean					doneLoading				= false;
-	private Editor					editor;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -97,8 +93,6 @@ public class TradeFragment extends FamiliarFragment {
 		View myFragmentView = inflater.inflate(R.layout.trader_activity, container, false);
 
 		mTradeListHelper = new TradeListHelpers();
-		
-		editor = getMainActivity().preferences.edit();
 
 		namefield = (AutoCompleteTextView) myFragmentView.findViewById(R.id.namesearch);
 		namefield.setAdapter(new AutocompleteCursorAdapter(this.getActivity(), null));
@@ -235,7 +229,7 @@ public class TradeFragment extends FamiliarFragment {
 	public void onResume() {
 		super.onResume();
 		
-		priceSetting = Integer.parseInt(getMainActivity().preferences.getString("tradePrice", String.valueOf(AVG_PRICE)));
+		priceSetting = Integer.parseInt(getMainActivity().getPreferencesAdapter().getTradePrice());
 
 		try {
 			// Test to see if the autosave file exist, then load the trade it if does.
@@ -395,8 +389,7 @@ public class TradeFragment extends FamiliarFragment {
 										aaTradeRight.notifyDataSetChanged();
 		
 										// And also update the preference
-										editor.putString("tradePrice", String.valueOf(priceSetting));
-										editor.commit();
+										getMainActivity().getPreferencesAdapter().setTradePrice(String.valueOf(priceSetting));
 		
 										removeDialog();
 									}

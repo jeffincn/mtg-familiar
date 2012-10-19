@@ -102,7 +102,7 @@ public class DiceFragment extends FamiliarFragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-		boolean d2AsCoin = this.getMainActivity().preferences.getBoolean("d2AsCoin", true);
+		boolean d2AsCoin = this.getMainActivity().getPreferencesAdapter().getD2AsCoin();
 
 		if (d2 != null) {
 			if (d2AsCoin) {

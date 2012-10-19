@@ -32,7 +32,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
@@ -40,7 +39,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -77,6 +75,7 @@ import com.gelakinetic.mtgfam.fragments.WishlistFragment;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.DbUpdaterService;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
+import com.gelakinetic.mtgfam.helpers.PreferencesAdapter;
 import com.gelakinetic.mtgfam.helpers.RoundTimerService;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.SlidingMenu.OnOpenedListener;
@@ -96,8 +95,8 @@ public class MainActivity extends SlidingFragmentActivity {
 	private PackageInfo pInfo;
 
 	protected static MainActivity me;
-	public SharedPreferences preferences;
-
+	private PreferencesAdapter prefAdapter;
+	
 	public FragmentManager mFragmentManager;
 	private Bundle mFragResults;
 	private boolean firstRun = false;
@@ -114,15 +113,13 @@ public class MainActivity extends SlidingFragmentActivity {
 		catch (NameNotFoundException e) {
 			pInfo = null;
 		}
+		
+		prefAdapter = new PreferencesAdapter(this);
 
-		preferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-		int lastVersion = preferences.getInt("lastVersion", 0);
+		int lastVersion = prefAdapter.getLastVersion();
 		if (pInfo.versionCode != lastVersion) {
 			showDialogFragment(CHANGELOGDIALOG);
-			SharedPreferences.Editor editor = preferences.edit();
-			editor.putInt("lastVersion", pInfo.versionCode);
-			editor.commit();
+			prefAdapter.setLastVersion(pInfo.versionCode);
 			firstRun = true;
 		}
 
@@ -142,12 +139,12 @@ public class MainActivity extends SlidingFragmentActivity {
 
 		me = this;
 
-		boolean autoupdate = preferences.getBoolean("autoupdate", true);
+		boolean autoupdate = prefAdapter.getAutoUpdate();
 		if (autoupdate) {
 			// Only update the banning list if it hasn't been updated recently
 			long curTime = new Date().getTime();
-			int updatefrequency = Integer.valueOf(preferences.getString("updatefrequency", "3"));
-			int lastLegalityUpdate = preferences.getInt("lastLegalityUpdate", 0);
+			int updatefrequency = Integer.valueOf(prefAdapter.getUpdateFrequency());
+			int lastLegalityUpdate = prefAdapter.getLastLegalityUpdate();
 			// days to ms
 			if (((curTime / 1000) - lastLegalityUpdate) > (updatefrequency * 24 * 60 * 60)) {
 				startService(new Intent(this, DbUpdaterService.class));
@@ -193,7 +190,7 @@ public class MainActivity extends SlidingFragmentActivity {
 			hideKeyboard();
 		}
 		else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-			boolean consolidate = preferences.getBoolean("consolidateSearch", true);
+			boolean consolidate = prefAdapter.getConsolidateSearch();
 			String query = intent.getStringExtra(SearchManager.QUERY);
 			SearchCriteria sc = new SearchCriteria();
 			sc.Name = query;
@@ -216,7 +213,7 @@ public class MainActivity extends SlidingFragmentActivity {
 				String action = getIntent().getAction();
 				// TODO a preference should toggle what fragment is loaded
 
-				String defaultFragment = preferences.getString("defaultFragment", getString(R.string.main_card_search));
+				String defaultFragment = prefAdapter.getDefaultFragment();
 
 				Fragment frag;
 				if (defaultFragment.equals(this.getString(R.string.main_card_search))) {
@@ -634,13 +631,11 @@ public class MainActivity extends SlidingFragmentActivity {
 	 */
 
 	public void showTtsWarningIfShould() {
-		SharedPreferences.Editor edit = preferences.edit();
-		boolean shouldShow = preferences.getBoolean("ttsShowDialog", true);
+		boolean shouldShow = prefAdapter.getTtsShowDialog();
 
 		if (shouldShow) {
 			// So we don't display this dialog again and bother the user
-			edit.putBoolean("ttsShowDialog", false);
-			edit.commit();
+			prefAdapter.setTtsShowDialog(false);
 
 			// Then display a dialog informing them of TTS
 			AlertDialog dialog = new Builder(this).setTitle(R.string.main_tts_warning_title).setMessage(R.string.main_tts_warning_text)
@@ -680,5 +675,9 @@ public class MainActivity extends SlidingFragmentActivity {
 			}
 		}
 		return super.onKeyDown(keyCode, event);
+	}
+	
+	public PreferencesAdapter getPreferencesAdapter() {
+		return this.prefAdapter;
 	}
 }

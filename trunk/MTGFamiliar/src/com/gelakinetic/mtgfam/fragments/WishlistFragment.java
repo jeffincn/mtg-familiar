@@ -8,12 +8,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.text.Html.ImageGetter;
@@ -77,7 +75,6 @@ public class WishlistFragment extends FamiliarFragment {
 	public static final String										number_of_invalid			= "Number of Cards Invalid";
 	public static final String										price_invalid					= "Price Invalid";
 
-	private static final int											AVG_PRICE							= 1;
 	private boolean																doneLoading						= false;
 
 	@Override
@@ -166,11 +163,10 @@ public class WishlistFragment extends FamiliarFragment {
 	public void onResume() {
 		super.onResume();
 		doneLoading = false;
-		showTotalPrice = getMainActivity().preferences.getBoolean("showTotalPriceWishlistPref", false);
-		showIndividualPrices = getMainActivity().preferences.getBoolean("showIndividualPricesWishlistPref", true);
-		verbose = getMainActivity().preferences.getBoolean("verboseWishlistPref", false);
-		priceSetting = Integer
-				.parseInt(getMainActivity().preferences.getString("tradePrice", String.valueOf(AVG_PRICE)));
+		showTotalPrice = getMainActivity().getPreferencesAdapter().getShowTotalWishlistPrice();
+		showIndividualPrices = getMainActivity().getPreferencesAdapter().getShowIndividualWishlistPrices();
+		verbose = getMainActivity().getPreferencesAdapter().getVerboseWishlist();
+		priceSetting = Integer.parseInt(getMainActivity().getPreferencesAdapter().getTradePrice());
 
 		if (!showTotalPrice) {
 			tradePrice.setVisibility(View.GONE);
@@ -824,10 +820,7 @@ public class WishlistFragment extends FamiliarFragment {
 											}
 
 											// And also update the preference
-											SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(
-													anchor.getActivity()).edit();
-											edit.putString("tradePrice", String.valueOf(priceSetting));
-											edit.commit();
+											getMainActivity().getPreferencesAdapter().setTradePrice(String.valueOf(priceSetting));
 
 											removeDialog();
 										}

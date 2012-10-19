@@ -149,23 +149,23 @@ public class ResultListFragment extends FamiliarFragment {
 			ArrayList<Integer> toList = new ArrayList<Integer>();
 			fromList.add(CardDbAdapter.KEY_NAME);
 			toList.add(R.id.cardname);
-			if (getMainActivity().preferences.getBoolean("setPref", true)) {
+			if (getMainActivity().getPreferencesAdapter().getSetPref()) {
 				fromList.add(CardDbAdapter.KEY_SET);
 				toList.add(R.id.cardset);
 			}
-			if (getMainActivity().preferences.getBoolean("manacostPref", true)) {
+			if (getMainActivity().getPreferencesAdapter().getManaCostPref()) {
 				fromList.add(CardDbAdapter.KEY_MANACOST);
 				toList.add(R.id.cardcost);
 			}
-			if (getMainActivity().preferences.getBoolean("typePref", true)) {
+			if (getMainActivity().getPreferencesAdapter().getTypePref()) {
 				fromList.add(CardDbAdapter.KEY_TYPE);
 				toList.add(R.id.cardtype);
 			}
-			if (getMainActivity().preferences.getBoolean("abilityPref", true)) {
+			if (getMainActivity().getPreferencesAdapter().getAbilityPref()) {
 				fromList.add(CardDbAdapter.KEY_ABILITY);
 				toList.add(R.id.cardability);
 			}
-			if (getMainActivity().preferences.getBoolean("ptPref", true)) {
+			if (getMainActivity().getPreferencesAdapter().getPTPref()) {
 				fromList.add(CardDbAdapter.KEY_POWER);
 				toList.add(R.id.cardp);
 				fromList.add(CardDbAdapter.KEY_TOUGHNESS);

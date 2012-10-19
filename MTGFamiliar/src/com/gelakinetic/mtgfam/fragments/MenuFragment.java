@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -152,13 +153,13 @@ public class MenuFragment extends ListFragment {
 			break;
 		}
 		case R.string.main_export_data_title: {
-			String[] fileNames = mActivity.fileList();
-			File[] files = new File[fileNames.length];
-			for (int j = 0; j < fileNames.length; j++) {
-				files[j] = new File(mActivity.getFilesDir(), fileNames[j]);
-			}
+			ArrayList<File> files = findAllFiles(mActivity.getFilesDir());
+
 			File sdCard = Environment.getExternalStorageDirectory();
 			File zipOut = new File(sdCard, "MTGFamiliarBackip.zip");
+			if(zipOut.exists()) {
+				zipOut.delete();
+			}
 			try {
 				zipIt(zipOut, files);
 				Toast.makeText(mActivity, getString(R.string.main_export_success) + " " + zipOut.getAbsolutePath(), Toast.LENGTH_SHORT).show();
@@ -171,6 +172,19 @@ public class MenuFragment extends ListFragment {
 		}
 		if (fragment != null)
 			replaceFragment(fragment);
+	}
+	
+	ArrayList<File> findAllFiles(File dir) {
+		ArrayList<File> files = new  ArrayList<File>();
+		for(File tmp : dir.listFiles()) {
+			if(tmp.isDirectory()) {
+				files.addAll(findAllFiles(tmp));
+			}
+			else {
+				files.add(tmp);
+			}
+		}
+		return files;
 	}
 
 	public void unZipIt(ZipFile zipFile) throws IOException {
@@ -186,6 +200,17 @@ public class MenuFragment extends ListFragment {
 				// This is not robust, just for demonstration purposes.
 				(new File(entry.getName())).mkdir();
 				continue;
+			}
+			String[] path = entry.getName().split("/");
+			String pathCat = "";
+			if(path.length > 1) {
+				for(int i=0; i < path.length-1; i++) {
+					pathCat += path[i] + "/";
+					File tmp = new File(mActivity.getFilesDir(), pathCat);
+					if(!tmp.exists()) {
+						tmp.mkdir();
+					}
+				}
 			}
 
 			InputStream in = zipFile.getInputStream(entry);
@@ -204,16 +229,15 @@ public class MenuFragment extends ListFragment {
 		zipFile.close();
 	}
 
-	public void zipIt(File zipFile, File[] files) throws IOException {
+	public void zipIt(File zipFile, ArrayList<File> files) throws IOException {
 
 		byte[] buffer = new byte[1024];
 
 		FileOutputStream fos = new FileOutputStream(zipFile);
 		ZipOutputStream zos = new ZipOutputStream(fos);
-
+		int fileDirLen = (int) mActivity.getFilesDir().getAbsolutePath().length()+1;
 		for (File file : files) {
-
-			ZipEntry ze = new ZipEntry(file.getName());
+			ZipEntry ze = new ZipEntry(file.getAbsolutePath().substring(fileDirLen));
 			zos.putNextEntry(ze);
 
 			FileInputStream in = new FileInputStream(file);

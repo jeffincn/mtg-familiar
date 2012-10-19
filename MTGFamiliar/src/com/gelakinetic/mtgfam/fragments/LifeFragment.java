@@ -231,10 +231,8 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 		setType(LIFE);
 
-		if (getMainActivity().preferences.getBoolean("hasTts", false)) {
-			tts = new TextToSpeech(getActivity(), this);
-			mediaPlayer = MediaPlayer.create(getActivity(), R.raw.over_9000);
-		}
+		tts = new TextToSpeech(getActivity(), this);
+		mediaPlayer = MediaPlayer.create(getActivity(), R.raw.over_9000);
 
 		playerScrollView = (FrameLayout) myFragmentView.findViewById(R.id.playerScrollView);
 

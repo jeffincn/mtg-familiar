@@ -123,11 +123,9 @@ public class RoundTimerFragment extends FamiliarFragment {
 		Intent i = new Intent(RoundTimerService.REQUEST_FILTER);
 		getActivity().sendBroadcast(i);
 
-		if (getMainActivity().preferences.getBoolean("hasTts", false)) {
-			// Find out if TTS is initialized
-			i = new Intent(RoundTimerService.TTS_INITIALIZED_FILTER);
-			getActivity().sendBroadcast(i);
-		}
+		// Find out if TTS is initialized
+		i = new Intent(RoundTimerService.TTS_INITIALIZED_FILTER);
+		getActivity().sendBroadcast(i);
 
 		getMainActivity().timerHandler.postDelayed(updateButtonTextTask, 200);
 		return myFragmentView;

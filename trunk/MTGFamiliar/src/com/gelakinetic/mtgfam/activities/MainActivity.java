@@ -640,6 +640,7 @@ public class MainActivity extends SlidingFragmentActivity {
 		if (shouldShow) {
 			// So we don't display this dialog again and bother the user
 			edit.putBoolean("ttsShowDialog", false);
+			edit.commit();
 
 			// Then display a dialog informing them of TTS
 			AlertDialog dialog = new Builder(this).setTitle(R.string.main_tts_warning_title).setMessage(R.string.main_tts_warning_text)
@@ -652,11 +653,6 @@ public class MainActivity extends SlidingFragmentActivity {
 
 			dialog.show();
 		}
-
-		// Also, even if we aren't showing the dialog, set a boolean indicating
-		// that we don't have TTS
-		edit.putBoolean("hasTts", false);
-		edit.commit();
 	}
 
 	public void setFragmentResult(Bundle result) {

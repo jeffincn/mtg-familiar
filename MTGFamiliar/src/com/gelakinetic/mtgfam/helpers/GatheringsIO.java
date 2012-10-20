@@ -105,11 +105,6 @@ public class GatheringsIO {
 		writeGatheringXML(gathering, _players, _gatheringName);
 	}
 	
-	public void writeDefaultGatheringXML(ArrayList<GatheringsPlayerData> _players){
-		//Don't add .xml, it is appeneded just before the write.
-		writeGatheringXML(DEFAULTFILE, _players, "default");
-	}
-	
 	public void writeGatheringXML(String _fileName, ArrayList<GatheringsPlayerData> _players, String _gatheringName) {
 		String dataXML = "";
 		

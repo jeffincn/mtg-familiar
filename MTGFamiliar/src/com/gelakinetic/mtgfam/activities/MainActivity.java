@@ -429,14 +429,6 @@ public class MainActivity extends SlidingFragmentActivity {
 		newFragment.show(ft, FamiliarFragment.DIALOG_TAG);
 	}
 
-	protected void replaceFragment(Fragment frag) {
-		FragmentTransaction fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
-		fragmentTransaction.replace(R.id.frag_view, frag);
-		fragmentTransaction.commit();
-		this.hideKeyboard();
-		showAbove();
-	}
-
 	public void hideKeyboard() {
 		try {
 			InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);

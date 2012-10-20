@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -33,10 +32,7 @@ public class TradeListHelpers {
 	public static final String	card_not_found		= "Card Not Found";
 	public static final String	mangled_url				= "Mangled URL";
 	public static final String	database_busy			= "Database Busy";
-	public static final String	card_dne					= "Card Does Not Exist";
 	public static final String	fetch_failed			= "Fetch Failed";
-	public static final String	number_of_invalid	= "Number of Cards Invalid";
-	public static final String	price_invalid			= "Price Invalid";
 
 	private static final int		LOW_PRICE					= 0;
 	// private static final int AVG_PRICE = 1;

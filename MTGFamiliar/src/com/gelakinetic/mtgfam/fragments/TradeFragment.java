@@ -80,7 +80,6 @@ public class TradeFragment extends FamiliarFragment {
 	public static final String		card_dne							= "Card Does Not Exist";
 	public static final String		fetch_failed					= "Fetch Failed";
 	public static final String		number_of_invalid			= "Number of Cards Invalid";
-	public static final String		price_invalid					= "Price Invalid";
 	public static final String		card_corrupted					= "Card Data corrupted, discarding.";
 
 	private static final String		autosaveName					= "autosave";
@@ -248,15 +247,7 @@ public class TradeFragment extends FamiliarFragment {
 		SaveTrade(autosaveName + tradeExtension);
 		TradeListHelpers.cancelAllTasks();
 	}
-	
-	protected void dismissDialog(final int id) {
-		// TODO implement
-	}
-
-	protected void removeDialog(final int id) {
-		// TODO implement
-	}
-	
+		
 	private void showDialog(final int id) {
 		// DialogFragment.show() will take care of adding the fragment
 		// in a transaction. We also want to remove any currently showing

@@ -59,20 +59,6 @@ public class WishlistHelpers {
 		return readableWishlist.toString();
 	}
 
-	public static void AppendCard(Context mCtx, CardData card) {
-		try {
-			FileOutputStream fos = mCtx.openFileOutput(wishlistName,
-					Context.MODE_APPEND);
-			fos.write(card.toString().getBytes());
-			fos.close();
-		} catch (FileNotFoundException e) {
-			Toast.makeText(mCtx, "FileNotFoundException", Toast.LENGTH_LONG)
-					.show();
-		} catch (IOException e) {
-			Toast.makeText(mCtx, "IOException", Toast.LENGTH_LONG).show();
-		}
-	}
-
 	public static void ResetCards(Context mCtx, String newName,
 			ArrayList<CardData> newCards, CardDbAdapter mDbHelper) {
 

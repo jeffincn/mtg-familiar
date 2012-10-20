@@ -72,8 +72,6 @@ public class WishlistFragment extends FamiliarFragment {
 	public static final String										database_busy					= "Database Busy";
 	public static final String										card_dne							= "Card Does Not Exist";
 	public static final String										fetch_failed					= "Fetch Failed";
-	public static final String										number_of_invalid			= "Number of Cards Invalid";
-	public static final String										price_invalid					= "Price Invalid";
 
 	private boolean																doneLoading						= false;
 

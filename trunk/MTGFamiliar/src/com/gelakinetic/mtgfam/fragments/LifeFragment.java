@@ -68,8 +68,6 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	private static final int								COMMANDER								= 2;
 	public static final int									INITIAL_LIFE							= 20;
 	public static final int									INITIAL_POISON						= 0;
-	public static final int									TERMINAL_LIFE							= 0;
-	public static final int									TERMINAL_POISON						= 10;
 	protected static final int							EVERYTHING								= 0;
 	protected static final int							JUST_TOTALS								= 1;
 

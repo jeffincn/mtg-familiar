@@ -1,79 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:minHeight="50dp"
     android:orientation="vertical" >
-
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp" android:baselineAligned="false">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@xml/textview_backdrop"
-            android:orientation="vertical" >
-
-            <TextView
-                android:id="@+id/textView1"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="Commander Damage"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <TextView
-                android:id="@+id/commander_dialog_current_cDamage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@xml/textview_backdrop"
-                android:gravity="bottom|center"
-                android:text="@string/mana_pool_zero"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@xml/textview_backdrop"
-            android:orientation="vertical" >
-
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="Change"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-<TextView
-    android:id="@+id/commander_dialog_delta"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@xml/textview_backdrop"
-    android:gravity="center"
-    android:text="@string/mana_pool_zero"
-    android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        </LinearLayout>
-
-    </LinearLayout>
+        android:layout_height="match_parent"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="1"
+        android:background="@xml/textview_backdrop"
+        android:baselineAligned="false" >
 
-    <CheckBox
-        android:id="@+id/commander_dialog_poison"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:checked="false"
-        android:text="Poison" />
-
+        <ListView
+            android:id="@+id/commander_damage_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/history_adapter_row" >
+
+        </ListView>
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

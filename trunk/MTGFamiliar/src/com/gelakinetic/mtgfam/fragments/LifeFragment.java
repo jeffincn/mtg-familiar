@@ -81,7 +81,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	private LinearLayout										mainLayout;
 	private LinearLayout										doublePlayer;
 	private GridView											edhGrid;
-	private CommanderAdapter									commanderAdapter;
+	private CommanderTopViewAdapter									commanderPlayersAdapter;
 	private int													visibleEDHPlayer;
 	private int															playersInRow;
 
@@ -285,8 +285,8 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			edhGrid = (GridView) edhLayout.findViewById(R.id.edh_grid);
 			mainLayout.addView(edhLayout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
 			
-			commanderAdapter = new CommanderAdapter(getActivity());
-			edhGrid.setAdapter(commanderAdapter);
+			commanderPlayersAdapter = new CommanderTopViewAdapter(getActivity());
+			edhGrid.setAdapter(commanderPlayersAdapter);
 		}
 		playersInRow = 0;
 
@@ -596,12 +596,11 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 						View view = LayoutInflater.from(getActivity()).inflate(R.layout.life_counter_edh_dialog, null);
 						AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
 						builder.setTitle("Damage from " + commanderName + "'s Commander").setView(view);
-						final TextView cDamage = (TextView)view.findViewById(R.id.commander_dialog_current_cDamage);
-						final TextView deltaChange = (TextView) view.findViewById(R.id.commander_dialog_delta);
+						final ListView cDamage = (ListView)view.findViewById(R.id.commander_damage_list);
+						cDamage.setAdapter(new HistoryAdapter(this.getActivity(), 0));
+						((HistoryAdapter)(cDamage.getAdapter())).addHistory(new int[] {0}, 0);
+						((HistoryAdapter)(cDamage.getAdapter())).list.get(0).set(0, commanderDamageCurrent);
 						
-						cDamage.setText(String.valueOf(commanderDamageCurrent));
-						
-						CheckBox poison = (CheckBox) view.findViewById(R.id.commander_dialog_poison);
 						Button plusOne = (Button) view.findViewById(R.id.commander_plus1);
 						Button minusOne = (Button) view.findViewById(R.id.commander_minus1);
 						
@@ -609,14 +608,16 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 							
 							@Override
 							public void onClick(View v) {
-								int camage = Integer.parseInt((String) cDamage.getText());
-								int delta = Integer.parseInt((String) deltaChange.getText());
+								int currentDamage = ((HistoryAdapter)(cDamage.getAdapter())).list.get(0).get(0);
+								int currentDelta = ((HistoryAdapter)(cDamage.getAdapter())).list.get(0).get(1);
 								
-								delta = delta + 1;
-								deltaChange.setText(String.valueOf(delta));
+								currentDamage += 1;
+								currentDelta += 1;
 								
-								camage = camage + 1;
-								cDamage.setText(String.valueOf(camage));
+								((HistoryAdapter)(cDamage.getAdapter())).list.get(0).set(0, currentDamage);
+								((HistoryAdapter)(cDamage.getAdapter())).list.get(0).set(1, currentDelta);
+								
+								((HistoryAdapter)(cDamage.getAdapter())).notifyDataSetChanged();
 							}
 						});
 						
@@ -624,14 +625,17 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 							
 							@Override
 							public void onClick(View v) {
-								int camage = Integer.parseInt((String) cDamage.getText());
-								int delta = Integer.parseInt((String) deltaChange.getText());
+								int currentDamage = ((HistoryAdapter)(cDamage.getAdapter())).list.get(0).get(0);
+								int currentDelta = ((HistoryAdapter)(cDamage.getAdapter())).list.get(0).get(1);
 								
-								delta = delta - 1;
-								deltaChange.setText(String.valueOf(delta));
+								currentDamage -= 1;
+								currentDelta -= 1;
 								
-								camage = camage - 1;
-								cDamage.setText(String.valueOf(camage));
+								((HistoryAdapter)(cDamage.getAdapter())).list.get(0).set(0, currentDamage);
+								((HistoryAdapter)(cDamage.getAdapter())).list.get(0).set(1, currentDelta);
+								
+								((HistoryAdapter)(cDamage.getAdapter())).notifyDataSetChanged();
+
 							}
 						});
 						
@@ -639,7 +643,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 						builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface arg0, int arg1) {
-								int delta = Integer.parseInt((String) deltaChange.getText());
+								int delta = ((HistoryAdapter)(cDamage.getAdapter())).list.get(0).get(1);
 								
 								players.get(player).incrementCommanderValue(fromCommander, delta);
 								players.get(player).commanderAdapter.notifyDataSetChanged();
@@ -759,7 +763,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		else if (displayMode == commanderDisplay && orientation != LANDSCAPE) {
 			layout.setVisibility(View.GONE);
 			mainLayout.addView(layout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
-			commanderAdapter.notifyDataSetChanged();
+			commanderPlayersAdapter.notifyDataSetChanged();
 			
 			if (players.size() == 1){
 				layout.setVisibility(View.VISIBLE);
@@ -879,10 +883,10 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	}
 		
 	
-	private class CommanderAdapter extends BaseAdapter {
+	private class CommanderTopViewAdapter extends BaseAdapter {
 		private Context	context;
 
-		public CommanderAdapter(Context _context) {
+		public CommanderTopViewAdapter(Context _context) {
 			context = _context;
 		}
 
@@ -1203,7 +1207,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			
 			if (comDamage != null) {
 				commanderDamage = new ArrayList<Integer>();
-				for(int idx = 0; idx < players.size(); idx++){
+				for(int idx = 0; idx < comDamage.length; idx++){
 					commanderDamage.add(comDamage[idx]);
 				}
 				this.commanderAdapter = new CommanderPlayerAdapter(context, this);
@@ -1354,7 +1358,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			commanderDamage.set(fromCommander, currentDamage + delta);
 			commanderAdapter.notifyDataSetChanged();
 			
-			incrementValue(LIFE, delta);
+			incrementValue(LIFE, -delta);
+			lifeAdapter.commit();
+			poisonAdapter.commit();
+			refreshTextViews();
+			
+			commanderPlayersAdapter.notifyDataSetChanged();
 		}
 
 		public void addButtons(Button minus1, Button plus1, Button minus5, Button plus5) {

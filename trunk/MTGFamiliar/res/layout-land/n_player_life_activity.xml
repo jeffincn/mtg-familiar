@@ -24,10 +24,11 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     android:orientation="horizontal">
     
     <LinearLayout
+        android:id="@+id/info_layout"
         android:layout_width="0dp"
         android:layout_height="fill_parent"
-        android:orientation="vertical"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:orientation="vertical" >
 
 	    <HorizontalScrollView
 	        android:id="@+id/playerScrollView"
@@ -80,6 +81,15 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
             android:scaleType="center"
             android:padding="15dp"
             android:src="@drawable/life_button" />
+
+        <ImageView
+            android:id="@+id/commander_button"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:padding="15dp"
+            android:scaleType="center"
+            android:src="@drawable/commander_button" />
 
         <ImageView
             android:id="@+id/reset_button"

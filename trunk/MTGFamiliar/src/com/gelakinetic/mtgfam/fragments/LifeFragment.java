@@ -13,6 +13,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
@@ -90,6 +91,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 	private ImageView												lifeButton;
 	private ImageView												poisonButton;
+	private ImageView												commanderButton;
 	private ImageView												resetButton;
 	private LifeFragment										anchor;
 	private int															activeType;
@@ -200,6 +202,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 		poisonButton = (ImageView) myFragmentView.findViewById(R.id.poison_button);
 		lifeButton = (ImageView) myFragmentView.findViewById(R.id.life_button);
+		commanderButton = (ImageView) myFragmentView.findViewById(R.id.commander_button);
 		resetButton = (ImageView) myFragmentView.findViewById(R.id.reset_button);
 
 		anchor = this;
@@ -214,6 +217,13 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			public void onClick(View view) {
 				setType(LIFE);
 				update();
+			}
+		});
+		commanderButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				setType(COMMANDER);
+				update();
+				updateViews();
 			}
 		});
 		resetButton.setOnClickListener(new View.OnClickListener() {
@@ -275,18 +285,22 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 		mainLayout = (LinearLayout) this.getView().findViewById(R.id.playerList);
 		if (displayMode == commanderDisplay){
-			ScrollView parent = (ScrollView) mainLayout.getParent();
-			mainLayout = (LinearLayout) this.getView().findViewById(R.id.info_layout);
-			parent.setVisibility(View.GONE);
-			
-			
-			LayoutInflater inflater = (LayoutInflater) this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			LinearLayout edhLayout = (LinearLayout) inflater.inflate(R.layout.life_counter_player_edh_row_bot, null);
-			edhGrid = (GridView) edhLayout.findViewById(R.id.edh_grid);
-			mainLayout.addView(edhLayout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
-			
+			//Really this is just outside the next if for landscape modes, where it will always be ignored
+			//But its a lot easier then wrapping everything with IsPortrait, No, ok ignore.
 			commanderPlayersAdapter = new CommanderTopViewAdapter(getActivity());
-			edhGrid.setAdapter(commanderPlayersAdapter);
+			if (orientation == PORTRAIT) {
+				ScrollView parent = (ScrollView) mainLayout.getParent();
+				mainLayout = (LinearLayout) this.getView().findViewById(R.id.info_layout);
+				parent.setVisibility(View.GONE);
+				
+				
+				LayoutInflater inflater = (LayoutInflater) this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				LinearLayout edhLayout = (LinearLayout) inflater.inflate(R.layout.life_counter_player_edh_row_bot, null);
+				edhGrid = (GridView) edhLayout.findViewById(R.id.edh_grid);
+				mainLayout.addView(edhLayout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
+				
+				edhGrid.setAdapter(commanderPlayersAdapter);
+			}
 		}
 		playersInRow = 0;
 
@@ -437,7 +451,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			p.setLayoutSize(listSizeWidth, listSizeHeight);
 		}
 		
-		if(displayMode == commanderDisplay){
+		if(displayMode == commanderDisplay && orientation == PORTRAIT){
 			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(listSizeWidth, listSizeHeight);
 			((LinearLayout)edhGrid.getParent()).setLayoutParams(layoutParams);
 		}
@@ -557,6 +571,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 											return;
 										}
 										playerToHaveNameChanged.setName(newName);
+										updateViews();
 									}
 								}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int whichButton) {
@@ -666,6 +681,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	private void update() {
 		switch (activeType) {
 			case LIFE:
+			case COMMANDER:
 				for (Player p : players) {
 					if (p.TVlife != null) {
 						p.TVlife.setTextColor(0xFFFFFFFF);
@@ -683,16 +699,15 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 				break;
 		}
 	}
+	
+	private void updateViews() {
+		commanderPlayersAdapter.notifyDataSetChanged();
+		for (Player p : players) {
+			p.commanderAdapter.notifyDataSetChanged();
+		}
+	}
 
-	private void setType(int type) {
-		if (type == COMMANDER){
-			for (Player p : players){
-				p.setAdapter(COMMANDER);
-			}
-			activeType = LIFE;
-			return;
-		}		
-		
+	private void setType(int type) {		
 		activeType = type;
 
 		switch (activeType) {
@@ -710,6 +725,14 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 					p.setAdapter(type);
 				}
 				break;
+			case COMMANDER:
+				lifeButton.setImageResource(R.drawable.life_button);
+				poisonButton.setImageResource(R.drawable.poison_button);
+				for (Player p : players) {
+					p.setAdapter(type);
+				}
+				break;
+				
 		}
 	}
 
@@ -760,7 +783,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 				playersInRow = 0;
 			}
 		}
-		else if (displayMode == commanderDisplay && orientation != LANDSCAPE) {
+		else if (displayMode == commanderDisplay) {
 			layout.setVisibility(View.GONE);
 			mainLayout.addView(layout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
 			commanderPlayersAdapter.notifyDataSetChanged();
@@ -772,6 +795,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			
 			for(int idx = 0; idx < players.size(); idx++){
 				players.get(idx).commanderDamage.add(0);
+				players.get(idx).commanderAdapter.notifyDataSetChanged();
 			}
 		}
 		else {
@@ -793,12 +817,17 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			restartFragment();
 		}
 		else if (displayMode == commanderDisplay) {
+			if (index == visibleEDHPlayer){
+				change_visible_edh_player(-1);
+			}
+			
 			mainLayout.removeView((View) players.get(index).layout.getParent().getParent());
 			players.remove(index);
 
 			for (Player removeFrom : players) {
 				removeFrom.commanderDamage.remove(index);
 			}
+			updateViews();
 		}
 		else {
 			mainLayout.removeView(players.get(index).layout);
@@ -936,6 +965,10 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	private void change_visible_edh_player(int _which){
 		for(Player player : players){
 			player.layout.setVisibility(View.GONE);
+		}
+		
+		if (_which == -1){
+			return;
 		}
 		
 		players.get(_which).layout.setVisibility(View.VISIBLE);
@@ -1124,7 +1157,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			relativeString += relativeValue;
 			relative.setText(relativeString);
 
-			int color;
+			int color = Color.parseColor("#4fa5d5");
 			switch (activeType) {
 				case POISON:
 					// Positive poison is bad, so display red; otherwise show green
@@ -1132,10 +1165,11 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 							.getInteger(R.color.green);
 					break;
 				case LIFE:
-				default:
 					// Negative life is bad, so display red; otherwise show green
 					color = (relativeValue < 0) ? context.getResources().getInteger(R.color.red) : context.getResources()
 							.getInteger(R.color.green);
+					break;
+				default:					
 					break;
 			}
 
@@ -1265,6 +1299,9 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 				case POISON:
 					history.setAdapter(this.poisonAdapter);
 					break;
+				case COMMANDER:
+					history.setAdapter(this.commanderAdapter);
+					break;
 			}
 			refreshTextViews();
 
@@ -1302,7 +1339,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 		public void refreshTextViews() {
 			TVname.setText(name);
-			if (activeType == LIFE) {
+			if (activeType == LIFE || activeType == COMMANDER) {
 				TVlife.setText("" + life);
 				TVlife.setTextColor(0xFFFFFFFF);
 			}
@@ -1315,6 +1352,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		private void setValue(int type, int value) {
 			switch (type) {
 				case LIFE:
+				case COMMANDER:
 					if (value > CONSTRAINT_LIFE) {
 						value = CONSTRAINT_LIFE;
 					}
@@ -1332,6 +1370,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			int value = 0;
 			switch (type) {
 				case LIFE:
+				case COMMANDER:
 					value = life;
 					if (value + delta > CONSTRAINT_LIFE) {
 						delta = CONSTRAINT_LIFE - value;
@@ -1488,7 +1527,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 				sentence += p.name;
 				sentence += " has ";
 
-				if (activeType == LIFE) {
+				if (activeType == LIFE || activeType == COMMANDER) {
 					if(p.life > 9000) {
 						sentences.add(new TtsSentence(sentence, "9000"));
 						sentences.add(new TtsSentence("life", null));

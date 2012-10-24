@@ -80,12 +80,13 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
             android:src="@drawable/life_button" />
 
         <ImageView
+            android:id="@+id/commander_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:scaleType="center"
             android:padding="15dp"
-            android:src="@drawable/blank_button" />
+            android:scaleType="center"
+            android:src="@drawable/commander_button" />
 
         <ImageView
             android:id="@+id/life_button"

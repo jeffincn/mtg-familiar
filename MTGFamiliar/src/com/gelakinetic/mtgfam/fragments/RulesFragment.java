@@ -151,7 +151,7 @@ public class RulesFragment extends FamiliarFragment {
 					c.close();
 					if (!isGlossary && category == -1 && keyword == null) {
 						// If it's the initial rules page, add a Glossary link to the end
-						rules.add(new GlossaryItem("Glossary", "", true));
+						rules.add(new GlossaryItem(getString(R.string.rules_glossary), "", true));
 					}
 					int listItemResource = R.layout.rules_list_item;
 					if (category >= 0 && subcategory < 0) {
@@ -188,7 +188,7 @@ public class RulesFragment extends FamiliarFragment {
 				}
 				else {
 					c.close();
-					Toast.makeText(getActivity(), "No results found.", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getActivity(), R.string.rules_no_results_toast, Toast.LENGTH_SHORT).show();
 					getMainActivity().mFragmentManager.popBackStack();
 				}
 			}
@@ -198,7 +198,7 @@ public class RulesFragment extends FamiliarFragment {
 			}
 		}
 		else {
-			Toast.makeText(getActivity(), "No results found.", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getActivity(), R.string.rules_no_results_toast, Toast.LENGTH_SHORT).show();
 			getMainActivity().mFragmentManager.popBackStack();
 		}
 
@@ -288,8 +288,7 @@ public class RulesFragment extends FamiliarFragment {
 							public void onClick(DialogInterface dialog, int which) {
 								String keyword = input.getText().toString().trim();
 								if (keyword.length() < 3) {
-									Toast.makeText(anchor.getActivity(), "Your search term must be at least 3 characters long.",
-											Toast.LENGTH_LONG).show();
+									Toast.makeText(anchor.getActivity(), R.string.rules_short_key_toast, Toast.LENGTH_LONG).show();
 								}
 								else {
 									searchArgs = new Bundle();

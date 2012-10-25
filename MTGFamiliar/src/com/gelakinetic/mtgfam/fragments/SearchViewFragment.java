@@ -174,18 +174,18 @@ public class SearchViewFragment extends FamiliarFragment {
 
 		selectedFormat = -1;
 
-		setDialog = new AlertDialog.Builder(this.getActivity()).setTitle("Sets")
+		setDialog = new AlertDialog.Builder(this.getActivity()).setTitle(R.string.search_sets)
 				.setMultiChoiceItems(setNames, setChecked, new DialogSelectionClickHandler())
-				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
-		formatDialog = new AlertDialog.Builder(this.getActivity()).setTitle("Formats")
+				.setPositiveButton(R.string.dialog_ok, new DialogButtonClickHandler()).create();
+		formatDialog = new AlertDialog.Builder(this.getActivity()).setTitle(R.string.search_formats)
 				.setSingleChoiceItems(formatNames, selectedFormat, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
 						selectedFormat = which;
 					}
-				}).setPositiveButton("OK", new DialogButtonClickHandler()).create();
-		rarityDialog = new AlertDialog.Builder(this.getActivity()).setTitle("Rarities")
+				}).setPositiveButton(R.string.dialog_ok, new DialogButtonClickHandler()).create();
+		rarityDialog = new AlertDialog.Builder(this.getActivity()).setTitle(R.string.search_rarities)
 				.setMultiChoiceItems(rarityNames, rarityChecked, new DialogSelectionClickHandler())
-				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
+				.setPositiveButton(R.string.dialog_ok, new DialogButtonClickHandler()).create();
 
 	}
 
@@ -600,18 +600,18 @@ public class SearchViewFragment extends FamiliarFragment {
 		}
 		this.removeDialog();
 
-		setDialog = new AlertDialog.Builder(this.getActivity()).setTitle("Sets")
+		setDialog = new AlertDialog.Builder(this.getActivity()).setTitle(R.string.search_sets)
 				.setMultiChoiceItems(setNames, setChecked, new DialogSelectionClickHandler())
-				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
-		formatDialog = new AlertDialog.Builder(this.getActivity()).setTitle("Formats")
+				.setPositiveButton(R.string.dialog_ok, new DialogButtonClickHandler()).create();
+		formatDialog = new AlertDialog.Builder(this.getActivity()).setTitle(R.string.search_formats)
 				.setSingleChoiceItems(formatNames, selectedFormat, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
 						selectedFormat = which;
 					}
-				}).setPositiveButton("OK", new DialogButtonClickHandler()).create();
-		rarityDialog = new AlertDialog.Builder(this.getActivity()).setTitle("Rarities")
+				}).setPositiveButton(R.string.dialog_ok, new DialogButtonClickHandler()).create();
+		rarityDialog = new AlertDialog.Builder(this.getActivity()).setTitle(R.string.search_rarities)
 				.setMultiChoiceItems(rarityNames, rarityChecked, new DialogSelectionClickHandler())
-				.setPositiveButton("OK", new DialogButtonClickHandler()).create();
+				.setPositiveButton(R.string.dialog_ok, new DialogButtonClickHandler()).create();
 
 		setButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
 		formatButton.getBackground().setColorFilter(0xFFFFFFFF, Mode.DST);
@@ -627,7 +627,7 @@ public class SearchViewFragment extends FamiliarFragment {
 			os.close();
 		}
 		catch (IOException e) {
-			Toast.makeText(this.getActivity(), "Could not save search options.", Toast.LENGTH_LONG).show();
+			Toast.makeText(this.getActivity(), R.string.search_toast_cannot_save, Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -732,27 +732,27 @@ public class SearchViewFragment extends FamiliarFragment {
 
 			this.removeDialog();
 
-			setDialog = new AlertDialog.Builder(this.getActivity()).setTitle("Sets")
+			setDialog = new AlertDialog.Builder(this.getActivity()).setTitle(R.string.search_sets)
 					.setMultiChoiceItems(setNames, setChecked, new DialogSelectionClickHandler())
-					.setPositiveButton("OK", new DialogButtonClickHandler()).create();
-			formatDialog = new AlertDialog.Builder(this.getActivity()).setTitle("Formats")
+					.setPositiveButton(R.string.dialog_ok, new DialogButtonClickHandler()).create();
+			formatDialog = new AlertDialog.Builder(this.getActivity()).setTitle(R.string.search_formats)
 					.setSingleChoiceItems(formatNames, selectedFormat, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
 							selectedFormat = which;
 						}
-					}).setPositiveButton("OK", new DialogButtonClickHandler()).create();
-			rarityDialog = new AlertDialog.Builder(this.getActivity()).setTitle("Rarities")
+					}).setPositiveButton(R.string.dialog_ok, new DialogButtonClickHandler()).create();
+			rarityDialog = new AlertDialog.Builder(this.getActivity()).setTitle(R.string.search_rarities)
 					.setMultiChoiceItems(rarityNames, rarityChecked, new DialogSelectionClickHandler())
-					.setPositiveButton("OK", new DialogButtonClickHandler()).create();
+					.setPositiveButton(R.string.dialog_ok, new DialogButtonClickHandler()).create();
 
 			checkDialogButtonColors();
 
 		}
 		catch (IOException e) {
-			Toast.makeText(this.getActivity(), "Could not load search options.", Toast.LENGTH_LONG).show();
+			Toast.makeText(this.getActivity(), R.string.search_toast_cannot_load, Toast.LENGTH_LONG).show();
 		}
 		catch (ClassNotFoundException e) {
-			Toast.makeText(this.getActivity(), "Could not load search options.", Toast.LENGTH_LONG).show();
+			Toast.makeText(this.getActivity(), R.string.search_toast_cannot_load, Toast.LENGTH_LONG).show();
 		}
 	}
 

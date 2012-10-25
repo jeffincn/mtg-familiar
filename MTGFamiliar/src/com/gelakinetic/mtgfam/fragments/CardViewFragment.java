@@ -154,6 +154,7 @@ public class CardViewFragment extends FamiliarFragment {
 	private boolean										scroll_results;
 	private View											myFragmentView;
 
+	@SuppressLint("NewApi")
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
@@ -196,7 +197,7 @@ public class CardViewFragment extends FamiliarFragment {
 
 		progDialog = new ProgressDialog(this.getMainActivity());
 		progDialog.setTitle("");
-		progDialog.setMessage("Loading. Please wait...");
+		progDialog.setMessage(getString(R.string.card_view_loading_dialog));
 		progDialog.setIndeterminate(true);
 		progDialog.setCancelable(true);
 		progDialog.setOnCancelListener(new OnCancelListener() {
@@ -474,16 +475,16 @@ public class CardViewFragment extends FamiliarFragment {
 					formats[i] = cFormats.getString(cFormats.getColumnIndex(CardDbAdapter.KEY_NAME));
 					switch (mDbHelper.checkLegality(cardName, formats[i])) {
 						case CardDbAdapter.LEGAL:
-							legalities[i] = "Legal";
+							legalities[i] = getString(R.string.card_view_legal);
 							break;
 						case CardDbAdapter.RESTRICTED:
-							legalities[i] = "Restricted";
+							legalities[i] = getString(R.string.card_view_restricted);
 							break;
 						case CardDbAdapter.BANNED:
-							legalities[i] = "Banned";
+							legalities[i] = getString(R.string.card_view_banned);
 							break;
 						default:
-							legalities[i] = "Error";
+							legalities[i] = getString(R.string.card_view_error);
 							break;
 					}
 					cFormats.moveToNext();
@@ -986,7 +987,7 @@ public class CardViewFragment extends FamiliarFragment {
 							final String[] aSets = sets.toArray(new String[sets.size()]);
 							final Long[] aIds = cardIds.toArray(new Long[cardIds.size()]);
 							AlertDialog.Builder builder = new AlertDialog.Builder(this.getMainActivity());
-							builder.setTitle("Pick a Set");
+							builder.setTitle(R.string.card_view_set_dialog_title);
 							builder.setItems(aSets, new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialogInterface, int item) {
 									try {
@@ -1023,7 +1024,7 @@ public class CardViewFragment extends FamiliarFragment {
 
 						String message = "";
 						if (rulingsArrayList.size() == 0) {
-							message = "No rulings for this card";
+							message = getString(R.string.card_view_no_rulings);
 						}
 						else {
 							for (Ruling r : rulingsArrayList) {
@@ -1039,7 +1040,7 @@ public class CardViewFragment extends FamiliarFragment {
 						textViewUrl.setMovementMethod(LinkMovementMethod.getInstance());
 						textViewUrl.setText(Html
 								.fromHtml("<a href=http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=" + multiverseId
-										+ ">Gatherer Page</a>"));
+										+ ">" + getString(R.string.card_view_gatherer_page) + "</a>"));
 
 						return dialog;
 					}

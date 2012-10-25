@@ -84,17 +84,16 @@ public class DbUpdaterService extends IntentService {
 	@Override
 	public void onHandleIntent(Intent intent) {
 
-		// this.publishProgress(new String[] { "indeterminate",
-		// mCtx.getString(R.string.update_legality) });
-
-		mDbHelper.openTransactional();
-
-		showStatusNotification();
-
-		ArrayList<String> updatedStuff = new ArrayList<String>();
 		ProgressReporter reporter = new ProgressReporter();
-
+		ArrayList<String> updatedStuff = new ArrayList<String>();
+		
 		try {
+
+			mDbHelper.openTransactional();
+
+			showStatusNotification();
+
+
 			if(reparseDatabase) {
 				mDbHelper.dropCreateDB();
 				JsonParser.readLegalityJsonStream(mDbHelper, mPrefAdapter, reparseDatabase);
@@ -130,57 +129,62 @@ public class DbUpdaterService extends IntentService {
 			}
 		}
 		catch (MalformedURLException e1) {
-			// eat it
+			// eat it, maybe we can still update rules
 		}
 		catch (IOException e) {
-			// eat it
+			// eat it, maybe we can still update rules
 		}
-
-		// this.publishProgress(new String[] { "indeterminate",
-		// mCtx.getString(R.string.update_rules) });
+		catch (FamiliarDbException e) {
+			// eat it, maybe we can still update rules
+		}
 
 		// Instead of using a hardcoded string, the default lastRulesUpdate is the
 		// timestamp of when the APK was built.
 		// This is a safe assumption to make, since any market release will have the
 		// latest database baked in.
-		long lastRulesUpdate = mPrefAdapter.getLastRulesUpdate();
-		if(reparseDatabase) {
-			lastRulesUpdate = 0; //1979 anybody?
-		}
-		RulesParser rp = new RulesParser(new Date(lastRulesUpdate), mDbHelper, this, reporter);
-		boolean newRulesParsed = false;
-		if (rp.needsToUpdate()) {
-			if (rp.parseRules()) {
-				switchToUpdating(getString(R.string.update_updating_rules));
-				int code = rp.loadRulesAndGlossary();
-
-				// Only save the timestamp of this if the update was 100% successful; if
-				// something went screwy, we should let them know and try again next
-				// update.
-				if (code == RulesParser.SUCCESS) {
-					newRulesParsed = true;
-					updatedStuff.add(getString(R.string.update_added_rules));
-				}
-				else {
-					// TODO - We should indicate failure here somehow (toasts don't work
-					// in the async task)
-				}
-
-				switchToChecking();
+		try{
+			long lastRulesUpdate = mPrefAdapter.getLastRulesUpdate();
+			if(reparseDatabase) {
+				lastRulesUpdate = 0; //1979 anybody?
 			}
+			RulesParser rp = new RulesParser(new Date(lastRulesUpdate), mDbHelper, this, reporter);
+			boolean newRulesParsed = false;
+			if (rp.needsToUpdate()) {
+				if (rp.parseRules()) {
+					switchToUpdating(getString(R.string.update_updating_rules));
+					int code = rp.loadRulesAndGlossary();
+	
+					// Only save the timestamp of this if the update was 100% successful; if
+					// something went screwy, we should let them know and try again next
+					// update.
+					if (code == RulesParser.SUCCESS) {
+						newRulesParsed = true;
+						updatedStuff.add(getString(R.string.update_added_rules));
+					}
+					else {
+						// TODO - We should indicate failure here somehow (toasts don't work
+						// in the async task)
+					}
+	
+					switchToChecking();
+				}
+			}
+
+			long curTime = new Date().getTime();
+			mPrefAdapter.setLastLegalityUpdate((int)(curTime / 1000));
+			if (newRulesParsed) {
+				mPrefAdapter.setLastRulesUpdate(curTime);
+			}
+	
+			mDbHelper.closeTransactional();
+	
+			cancelStatusNotification();
+			showUpdatedNotification(updatedStuff);
 		}
-
-		long curTime = new Date().getTime();
-		mPrefAdapter.setLastLegalityUpdate((int)(curTime / 1000));
-		if (newRulesParsed) {
-			mPrefAdapter.setLastRulesUpdate(curTime);
+		catch(FamiliarDbException e) {
+			// TODO
 		}
-
-		mDbHelper.closeTransactional();
-
-		cancelStatusNotification();
-		showUpdatedNotification(updatedStuff);
-
+		
 		return;
 	}
 

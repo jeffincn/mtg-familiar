@@ -17,6 +17,7 @@ import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.activities.MainActivity;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
+import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 import com.gelakinetic.mtgfam.helpers.MyApp;
 
 public class FamiliarFragment extends SherlockFragment {
@@ -31,7 +32,12 @@ public class FamiliarFragment extends SherlockFragment {
 
 		anchor = this;
 		mDbHelper = new CardDbAdapter(this.getMainActivity());
-		mDbHelper.openReadable();
+		try {
+			mDbHelper.openReadable();
+		} catch (FamiliarDbException e) {
+			mDbHelper.showDbErrorToast(this.getActivity());
+			this.getMainActivity().getFragmentManager().popBackStack();
+		}
 		this.setHasOptionsMenu(true);
 	}
 

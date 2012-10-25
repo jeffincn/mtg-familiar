@@ -38,6 +38,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
+import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 
 public class RulesFragment extends FamiliarFragment {
@@ -107,18 +108,26 @@ public class RulesFragment extends FamiliarFragment {
 		boolean clickable;
 		Cursor c;
 
-		if (isGlossary) {
-			c = mDbHelper.getGlossaryTerms();
-			clickable = false;
+		try {
+			if (isGlossary) {
+				c = mDbHelper.getGlossaryTerms();
+				clickable = false;
+			}
+			else if (keyword == null) {
+				c = mDbHelper.getRules(category, subcategory);
+				clickable = subcategory == -1;
+			}
+			else {
+				c = mDbHelper.getRulesByKeyword(keyword, category, subcategory);
+				clickable = false;
+			}
 		}
-		else if (keyword == null) {
-			c = mDbHelper.getRules(category, subcategory);
-			clickable = subcategory == -1;
+		catch (FamiliarDbException e) {
+			mDbHelper.showDbErrorToast(this.getActivity());
+			this.getMainActivity().getFragmentManager().popBackStack();
+			return myFragmentView;
 		}
-		else {
-			c = mDbHelper.getRulesByKeyword(keyword, category, subcategory);
-			clickable = false;
-		}
+		
 		if (c != null) {
 			try {
 				if (c.getCount() > 0) {
@@ -262,8 +271,13 @@ public class RulesFragment extends FamiliarFragment {
 							header = getString(R.string.rules_search_all);
 						}
 						else {
-							header = String.format(getString(R.string.rules_search_cat),
-									mDbHelper.getCategoryName(category, subcategory));
+							try {
+								header = String.format(getString(R.string.rules_search_cat),
+										mDbHelper.getCategoryName(category, subcategory));
+							} catch (FamiliarDbException e) {
+								header = String.format(getString(R.string.rules_search_cat),
+										getString(R.string.rules_this_cat));
+							}
 						}
 						View v = this.getActivity().getLayoutInflater().inflate(R.layout.rules_search_dialog, null);
 						((TextView) v.findViewById(R.id.keyword_search_desc)).setText(header);

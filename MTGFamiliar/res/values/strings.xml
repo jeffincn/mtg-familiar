@@ -246,6 +246,7 @@
     <string name="rules_search_title">Keyword Search</string>
     <string name="rules_search_all">Search all rules for:</string>
     <string name="rules_search_cat">Search within %s for:</string>
+    <string name="rules_this_cat">this category:</string>
     
     
     <!-- MoJhoSto activity -->

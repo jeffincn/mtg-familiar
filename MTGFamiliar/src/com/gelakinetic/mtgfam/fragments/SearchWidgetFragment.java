@@ -20,6 +20,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.fragments.SearchViewFragment.SearchCriteria;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
+import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 import com.gelakinetic.mtgfam.helpers.ResultListAdapter;
 
 public class SearchWidgetFragment extends FamiliarFragment {
@@ -112,13 +113,23 @@ public class SearchWidgetFragment extends FamiliarFragment {
 
 		@Override
 		protected Void doInBackground(String... params) {
-			c = mDbHelper.PrefixSearch(params[0], new String[] { CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME });
+			try {
+				c = mDbHelper.PrefixSearch(params[0], new String[] { CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME });
+			} catch (FamiliarDbException e) {
+				c = null;
+			}
 			return null;
 		}
 
 		@Override
 		protected void onPostExecute(Void param) {
-			fillData(c);
+			if(c != null) {
+				fillData(c);
+			}
+			else {
+				mDbHelper.showDbErrorToast(anchor.getActivity());
+				anchor.getMainActivity().getFragmentManager().popBackStack();
+			}
 		}
 	}
 

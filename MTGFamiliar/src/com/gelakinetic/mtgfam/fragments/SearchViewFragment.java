@@ -13,7 +13,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
@@ -21,7 +20,6 @@ import android.graphics.PorterDuff.Mode;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,7 +40,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.AutocompleteCursorAdapter;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
-import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
+import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 
 public class SearchViewFragment extends FamiliarFragment {
 
@@ -72,7 +70,6 @@ public class SearchViewFragment extends FamiliarFragment {
 	protected static final int		SETLIST								= 1;
 	protected static final int		FORMATLIST						= 2;
 	protected static final int		RARITYLIST						= 3;
-	protected static final int		CORRUPTION						= 4;
 
 	public static final String		CRITERIA							= "criteria";
 	public static final String		RANDOM								= "random";
@@ -122,12 +119,19 @@ public class SearchViewFragment extends FamiliarFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Cursor setCursor = mDbHelper.fetchAllSets();
+		Cursor setCursor;
 		try {
+			setCursor = mDbHelper.fetchAllSets();
 			setCursor.moveToFirst();
 		}
+		catch (FamiliarDbException e) {
+			mDbHelper.showDbErrorToast(this.getActivity());
+			this.getMainActivity().getFragmentManager().popBackStack();
+			return;
+		}
 		catch (SQLiteDatabaseCorruptException e) {
-			showDialog(CORRUPTION);
+			mDbHelper.showDbErrorToast(this.getActivity());
+			this.getMainActivity().getFragmentManager().popBackStack();
 			return;
 		}
 
@@ -144,7 +148,14 @@ public class SearchViewFragment extends FamiliarFragment {
 
 		setCursor.close();
 
-		Cursor c = mDbHelper.fetchAllFormats();
+		Cursor c;
+		try {
+			c = mDbHelper.fetchAllFormats();
+		} catch (FamiliarDbException e) {
+			mDbHelper.showDbErrorToast(this.getActivity());
+			this.getMainActivity().getFragmentManager().popBackStack();
+			return;
+		}
 		if (c != null) {
 			formatNames = new String[c.getCount()];
 			c.moveToFirst();
@@ -821,21 +832,6 @@ public class SearchViewFragment extends FamiliarFragment {
 					}
 					case RARITYLIST: {
 						return rarityDialog;
-					}
-					case CORRUPTION: {
-						View dialogLayout = this.getActivity().getLayoutInflater().inflate(R.layout.simple_message_layout, null);
-						TextView text = (TextView) dialogLayout.findViewById(R.id.message);
-						text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.error_corruption)));
-						text.setMovementMethod(LinkMovementMethod.getInstance());
-
-						AlertDialog dialog = new AlertDialog.Builder(this.getActivity()).setTitle(R.string.error)
-								.setView(dialogLayout).setPositiveButton(R.string.dialog_ok, new OnClickListener() {
-									public void onClick(DialogInterface dialog, int which) {
-										// finish();
-										anchor.getMainActivity().mFragmentManager.popBackStack();
-									}
-								}).setCancelable(false).create();
-						return dialog;
 					}
 					default: {
 						savedInstanceState.putInt("id", id);

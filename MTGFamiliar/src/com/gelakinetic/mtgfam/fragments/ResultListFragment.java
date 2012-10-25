@@ -20,6 +20,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.fragments.SearchViewFragment.SearchCriteria;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
+import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 import com.gelakinetic.mtgfam.helpers.ResultListAdapter;
 
 public class ResultListFragment extends FamiliarFragment {
@@ -49,29 +50,36 @@ public class ResultListFragment extends FamiliarFragment {
 				CardDbAdapter.KEY_POWER, CardDbAdapter.KEY_TOUGHNESS, CardDbAdapter.KEY_LOYALTY };
 
 		Bundle args = this.getArguments();
-		if ((id = args.getLong("id")) != 0L) {
-			c = mDbHelper.fetchCard(id, null);
+		try {
+			if ((id = args.getLong("id")) != 0L) {
+				c = mDbHelper.fetchCard(id, null);
+			}
+			else if ((id = args.getLong("id0")) != 0L) {
+				long id1 = args.getLong("id1");
+				long id2 = args.getLong("id2");
+				Cursor cs[] = new Cursor[3];
+				cs[0] = mDbHelper.fetchCard(id, null);
+				cs[1] = mDbHelper.fetchCard(id1, null);
+				cs[2] = mDbHelper.fetchCard(id2, null);
+				c = new MergeCursor(cs);
+			}
+			else {
+				SearchCriteria criteria = (SearchCriteria) args.getSerializable(SearchViewFragment.CRITERIA);
+				int setLogic = criteria.Set_Logic;
+				boolean consolidate = (setLogic == CardDbAdapter.MOSTRECENTPRINTING || setLogic == CardDbAdapter.FIRSTPRINTING) ? true
+						: false;
+				c = mDbHelper.Search(criteria.Name, criteria.Text, criteria.Type, criteria.Color, criteria.Color_Logic,
+						criteria.Set, criteria.Pow_Choice, criteria.Pow_Logic, criteria.Tou_Choice, criteria.Tou_Logic, criteria.Cmc,
+						criteria.Cmc_Logic, criteria.Format, criteria.Rarity, criteria.Flavor, criteria.Artist, criteria.Type_Logic,
+						criteria.Text_Logic, criteria.Set_Logic, true, returnTypes, consolidate);
+			}
 		}
-		else if ((id = args.getLong("id0")) != 0L) {
-			long id1 = args.getLong("id1");
-			long id2 = args.getLong("id2");
-			Cursor cs[] = new Cursor[3];
-			cs[0] = mDbHelper.fetchCard(id, null);
-			cs[1] = mDbHelper.fetchCard(id1, null);
-			cs[2] = mDbHelper.fetchCard(id2, null);
-			c = new MergeCursor(cs);
+		catch (FamiliarDbException e) {
+			mDbHelper.showDbErrorToast(this.getActivity());
+			this.getMainActivity().getFragmentManager().popBackStack();
+			return;
 		}
-		else {
-			SearchCriteria criteria = (SearchCriteria) args.getSerializable(SearchViewFragment.CRITERIA);
-			int setLogic = criteria.Set_Logic;
-			boolean consolidate = (setLogic == CardDbAdapter.MOSTRECENTPRINTING || setLogic == CardDbAdapter.FIRSTPRINTING) ? true
-					: false;
-			c = mDbHelper.Search(criteria.Name, criteria.Text, criteria.Type, criteria.Color, criteria.Color_Logic,
-					criteria.Set, criteria.Pow_Choice, criteria.Pow_Logic, criteria.Tou_Choice, criteria.Tou_Logic, criteria.Cmc,
-					criteria.Cmc_Logic, criteria.Format, criteria.Rarity, criteria.Flavor, criteria.Artist, criteria.Type_Logic,
-					criteria.Text_Logic, criteria.Set_Logic, true, returnTypes, consolidate);
-		}
-
+		
 		if (this.isAdded()) {
 			if (c == null || c.getCount() == 0) {
 				Toast.makeText(this.getActivity(), getString(R.string.search_toast_no_results), Toast.LENGTH_SHORT).show();

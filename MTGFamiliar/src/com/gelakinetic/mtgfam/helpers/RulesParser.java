@@ -293,8 +293,9 @@ public class RulesParser {
 	 * @return SUCCESS if nothing goes wrong, ERRORS if some errors occur but some
 	 *         data is loaded, and FAILURE if everything fails and no data is
 	 *         loaded.
+	 * @throws FamiliarDbException 
 	 */
-	public int loadRulesAndGlossary() {
+	public int loadRulesAndGlossary() throws FamiliarDbException {
 		try {
 			mDbHelper.dropRulesTables();
 			mDbHelper.createRulesTables();

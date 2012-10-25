@@ -10,7 +10,6 @@ import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,13 +19,13 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
+import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 
 public class MoJhoStoFragment extends FamiliarFragment {
@@ -52,7 +51,6 @@ public class MoJhoStoFragment extends FamiliarFragment {
 	protected static final int	MOMIR_IMAGE				= 2;
 	protected static final int	STONEHEWER_IMAGE	= 3;
 	protected static final int	JHOIRA_IMAGE			= 4;
-	protected static final int	CORRUPTION				= 5;
 
 	/*
 	 * (non-Javadoc)
@@ -92,8 +90,13 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					ResultListFragment rlFrag = new ResultListFragment();
 					anchor.startNewFragment(rlFrag, args);
 				}
+				catch (FamiliarDbException e) {
+					mDbHelper.showDbErrorToast(anchor.getActivity());
+					anchor.getMainActivity().getFragmentManager().popBackStack();
+				}
 				catch (SQLiteDatabaseCorruptException e) {
-					showDialog(CORRUPTION);
+					mDbHelper.showDbErrorToast(anchor.getActivity());
+					anchor.getMainActivity().getFragmentManager().popBackStack();
 					return;
 				}
 			}
@@ -127,8 +130,13 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					ResultListFragment rlFrag = new ResultListFragment();
 					anchor.startNewFragment(rlFrag, args);
 				}
+				catch (FamiliarDbException e) {
+					mDbHelper.showDbErrorToast(anchor.getActivity());
+					anchor.getMainActivity().getFragmentManager().popBackStack();
+				}
 				catch (SQLiteDatabaseCorruptException e) {
-					showDialog(CORRUPTION);
+					mDbHelper.showDbErrorToast(anchor.getActivity());
+					anchor.getMainActivity().getFragmentManager().popBackStack();
 					return;
 				}
 			}
@@ -167,8 +175,13 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					ResultListFragment rlFrag = new ResultListFragment();
 					anchor.startNewFragment(rlFrag, args);
 				}
+				catch (FamiliarDbException e) {
+					mDbHelper.showDbErrorToast(anchor.getActivity());
+					anchor.getMainActivity().getFragmentManager().popBackStack();
+				}
 				catch (SQLiteDatabaseCorruptException e) {
-					showDialog(CORRUPTION);
+					mDbHelper.showDbErrorToast(anchor.getActivity());
+					anchor.getMainActivity().getFragmentManager().popBackStack();
 					return;
 				}
 			}
@@ -209,8 +222,13 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					rlFrag.setArguments(args);
 					anchor.startNewFragment(rlFrag, args);
 				}
+				catch (FamiliarDbException e) {
+					mDbHelper.showDbErrorToast(anchor.getActivity());
+					anchor.getMainActivity().getFragmentManager().popBackStack();
+				}
 				catch (SQLiteDatabaseCorruptException e) {
-					showDialog(CORRUPTION);
+					mDbHelper.showDbErrorToast(anchor.getActivity());
+					anchor.getMainActivity().getFragmentManager().popBackStack();
 					return;
 				}
 			}
@@ -357,20 +375,6 @@ public class MoJhoStoFragment extends FamiliarFragment {
 						ImageView image = (ImageView) d.findViewById(R.id.cardimage);
 						image.setImageResource(R.drawable.jhoira_full);
 						return d;
-					}
-					case CORRUPTION: {
-						View dialogLayout = this.getMainActivity().getLayoutInflater()
-								.inflate(R.layout.simple_message_layout, null);
-						TextView text = (TextView) dialogLayout.findViewById(R.id.message);
-						text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.error_corruption)));
-						text.setMovementMethod(LinkMovementMethod.getInstance());
-
-						return new AlertDialog.Builder(this.getMainActivity()).setTitle(R.string.error).setView(dialogLayout)
-								.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int which) {
-										anchor.getMainActivity().finish();
-									}
-								}).setCancelable(false).create();
 					}
 					default: {
 						savedInstanceState.putInt("id", id);

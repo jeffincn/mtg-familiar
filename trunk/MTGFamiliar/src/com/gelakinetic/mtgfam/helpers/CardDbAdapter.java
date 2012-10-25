@@ -1679,7 +1679,7 @@ public class CardDbAdapter {
 		}
 	}
 
-	private void showDbErrorToast(Context ctx) {
+	public void showDbErrorToast(Context ctx) {
 		try {
 			Toast.makeText(ctx, ctx.getString(R.string.error_database),
 					Toast.LENGTH_LONG).show();

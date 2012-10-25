@@ -60,7 +60,7 @@ public class WishlistHelpers {
 	}
 
 	public static void ResetCards(Context mCtx, String newName,
-			ArrayList<CardData> newCards, CardDbAdapter mDbHelper) {
+			ArrayList<CardData> newCards, CardDbAdapter mDbHelper) throws FamiliarDbException {
 
 		ArrayList<CardData> wishlist = new ArrayList<CardData>();
 
@@ -130,7 +130,7 @@ public class WishlistHelpers {
 		}
 	}
 
-	public static void ReadWishlist(Context mCtx, CardDbAdapter mDbHelper, ArrayList<CardData> lWishlist) {
+	public static void ReadWishlist(Context mCtx, CardDbAdapter mDbHelper, ArrayList<CardData> lWishlist) throws FamiliarDbException {
 		String[] files = mCtx.fileList();
 		Boolean wishlistExists = false;
 		for (String fileName : files) {
@@ -192,7 +192,11 @@ public class WishlistHelpers {
 			// this will refill the dialog with the values in the
 			// wishlist otherwise the changed values will persist in the
 			// dialog even if they aren't saved
-			fillWishlistDialog(null);
+			try {
+				fillWishlistDialog(null);
+			} catch (FamiliarDbException e1) {
+				// eat it
+			}
 			bindWishlistRows();
 			break;
 		case DONE:
@@ -216,17 +220,21 @@ public class WishlistHelpers {
 					newCards.add(cd);
 				}
 			}
-			WishlistHelpers.ResetCards(ma, cardName, newCards, ff.mDbHelper);
+			try {
+				WishlistHelpers.ResetCards(ma, cardName, newCards, ff.mDbHelper);
+			} catch (FamiliarDbException e) {
+				// eat it
+			}
 			break;
 		}
 	}
 	
-	public Dialog getDialog(String cn, final FamiliarFragment ff, MainActivity ma) {
+	public Dialog getDialog(String cn, final FamiliarFragment ff, MainActivity ma) throws FamiliarDbException {
 		return getDialog(cn, ff, ma, null);
 	}
 
 	public Dialog getDialog(String cn, final FamiliarFragment ff,
-			MainActivity ma, ArrayList<CardData> list) {
+			MainActivity ma, ArrayList<CardData> list) throws FamiliarDbException {
 
 		this.ff = ff;
 		this.ma = ma;
@@ -266,7 +274,7 @@ public class WishlistHelpers {
 		return dialog;
 	}
 
-	public void fillWishlistDialog(ArrayList<CardData> list) {
+	public void fillWishlistDialog(ArrayList<CardData> list) throws FamiliarDbException {
 		lCardlist = new ArrayList<CardData>();
 		lCardlist.clear();
 		

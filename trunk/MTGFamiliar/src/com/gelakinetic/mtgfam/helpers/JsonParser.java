@@ -346,7 +346,7 @@ public class JsonParser {
 	}
 
 	public static void readLegalityJsonStream(CardDbAdapter cda, PreferencesAdapter prefAdapter, boolean reparseDatabase)
-			throws IOException {
+			throws IOException, FamiliarDbException {
 
 		CardDbAdapter mDbHelper;
 		String date = null;
@@ -432,7 +432,7 @@ public class JsonParser {
 		return;
 	}
 
-	public static void readTCGNameJsonStream(PreferencesAdapter prefAdapter, CardDbAdapter mDbHelper, boolean reparseDatabase) throws MalformedURLException, IOException{
+	public static void readTCGNameJsonStream(PreferencesAdapter prefAdapter, CardDbAdapter mDbHelper, boolean reparseDatabase) throws MalformedURLException, IOException, FamiliarDbException{
 		URL update;
 		String label;
 		String date = null;

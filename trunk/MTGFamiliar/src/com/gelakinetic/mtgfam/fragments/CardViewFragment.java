@@ -84,6 +84,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
+import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 import com.gelakinetic.mtgfam.helpers.MyApp;
 import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler;
@@ -205,7 +206,12 @@ public class CardViewFragment extends FamiliarFragment {
 			}
 		});
 
-		setInfoFromID(cardID);
+		try {
+			setInfoFromID(cardID);
+		} catch (FamiliarDbException e) {
+			mDbHelper.showDbErrorToast(anchor.getActivity());
+			anchor.getMainActivity().getFragmentManager().popBackStack();
+		}
 
 		return myFragmentView;
 	}
@@ -228,7 +234,7 @@ public class CardViewFragment extends FamiliarFragment {
 		}
 	}
 
-	private void setInfoFromID(long id) {
+	private void setInfoFromID(long id) throws FamiliarDbException {
 
 		cardPicture = null;
 
@@ -354,8 +360,14 @@ public class CardViewFragment extends FamiliarFragment {
 					else if (number.contains("b")) {
 						number = number.replace("b", "a");
 					}
-					long id = mDbHelper.getTransform(setCode, number);
-					setInfoFromID(id);
+					try {
+						long id = mDbHelper.getTransform(setCode, number);
+						setInfoFromID(id);
+					} catch (FamiliarDbException e) {
+						mDbHelper.showDbErrorToast(anchor.getActivity());
+						anchor.getMainActivity().getFragmentManager().popBackStack();
+					}
+					
 				}
 			});
 			transform.setVisibility(View.VISIBLE);
@@ -452,31 +464,36 @@ public class CardViewFragment extends FamiliarFragment {
 		@Override
 		protected Long doInBackground(String... params) {
 
-			Cursor cFormats = mDbHelper.fetchAllFormats();
-			formats = new String[cFormats.getCount()];
-			legalities = new String[cFormats.getCount()];
-
-			cFormats.moveToFirst();
-			for (int i = 0; i < cFormats.getCount(); i++) {
-				formats[i] = cFormats.getString(cFormats.getColumnIndex(CardDbAdapter.KEY_NAME));
-				switch (mDbHelper.checkLegality(cardName, formats[i])) {
-					case CardDbAdapter.LEGAL:
-						legalities[i] = "Legal";
-						break;
-					case CardDbAdapter.RESTRICTED:
-						legalities[i] = "Restricted";
-						break;
-					case CardDbAdapter.BANNED:
-						legalities[i] = "Banned";
-						break;
-					default:
-						legalities[i] = "Error";
-						break;
+			try {
+				Cursor cFormats = mDbHelper.fetchAllFormats();
+				formats = new String[cFormats.getCount()];
+				legalities = new String[cFormats.getCount()];
+	
+				cFormats.moveToFirst();
+				for (int i = 0; i < cFormats.getCount(); i++) {
+					formats[i] = cFormats.getString(cFormats.getColumnIndex(CardDbAdapter.KEY_NAME));
+					switch (mDbHelper.checkLegality(cardName, formats[i])) {
+						case CardDbAdapter.LEGAL:
+							legalities[i] = "Legal";
+							break;
+						case CardDbAdapter.RESTRICTED:
+							legalities[i] = "Restricted";
+							break;
+						case CardDbAdapter.BANNED:
+							legalities[i] = "Banned";
+							break;
+						default:
+							legalities[i] = "Error";
+							break;
+					}
+					cFormats.moveToNext();
 				}
-				cFormats.moveToNext();
+	
+				cFormats.close();
 			}
-
-			cFormats.close();
+			catch(FamiliarDbException e) {
+				legalities = null;
+			}
 
 			return null;
 		}
@@ -724,6 +741,9 @@ public class CardViewFragment extends FamiliarFragment {
 			catch (ParserConfigurationException e) {
 				error = "ParserConfigurationException";
 				XMLhandler = null;
+			} catch (FamiliarDbException e) {
+				error = "FamiliarDbException";
+				XMLhandler = null;
 			}
 			return null;
 		}
@@ -745,6 +765,11 @@ public class CardViewFragment extends FamiliarFragment {
 				showDialog(GETPRICE);
 			}
 			else {
+				if(error.equals("FamiliarDbException")) {
+					mDbHelper.showDbErrorToast(anchor.getActivity());
+					anchor.getMainActivity().getFragmentManager().popBackStack();
+					return;
+				}
 				Toast.makeText(anchor.getMainActivity(), error, Toast.LENGTH_SHORT).show();
 			}
 		}
@@ -890,6 +915,11 @@ public class CardViewFragment extends FamiliarFragment {
 						if (formats == null) {
 							return null;
 						}
+						if(legalities == null) {
+							mDbHelper.showDbErrorToast(anchor.getActivity());
+							anchor.getMainActivity().getFragmentManager().popBackStack();
+							return null;
+						}
 
 						Dialog dialog = new Dialog(this.getMainActivity());
 						dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -959,13 +989,22 @@ public class CardViewFragment extends FamiliarFragment {
 							builder.setTitle("Pick a Set");
 							builder.setItems(aSets, new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialogInterface, int item) {
-									setInfoFromID(aIds[item]);
+									try {
+										setInfoFromID(aIds[item]);
+									} catch (FamiliarDbException e) {
+										mDbHelper.showDbErrorToast(anchor.getActivity());
+										anchor.getMainActivity().getFragmentManager().popBackStack();
+									}
 								}
 							});
 							return builder.create();
 						}
 						catch (SQLException e) {
-							// Should we do something here?
+							mDbHelper.showDbErrorToast(anchor.getActivity());
+							anchor.getMainActivity().getFragmentManager().popBackStack();
+						} catch (FamiliarDbException e) {
+							mDbHelper.showDbErrorToast(anchor.getActivity());
+							anchor.getMainActivity().getFragmentManager().popBackStack();
 						}
 					}
 					case CARDRULINGS: {
@@ -1005,7 +1044,13 @@ public class CardViewFragment extends FamiliarFragment {
 						return dialog;
 					}
 					case WISHLIST_COUNTS: {
-						return wh.getDialog(cardName, anchor, this.getMainActivity());
+						try {
+							return wh.getDialog(cardName, anchor, this.getMainActivity());
+						} catch (FamiliarDbException e) {
+							mDbHelper.showDbErrorToast(anchor.getActivity());
+							anchor.getMainActivity().getFragmentManager().popBackStack();
+							return null;
+						}
 					}
 					default: {
 						savedInstanceState.putInt("id", id);

@@ -38,6 +38,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.AutocompleteCursorAdapter;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
+import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
@@ -311,7 +312,13 @@ public class TradeFragment extends FamiliarFragment {
 						changeSet.setOnClickListener(new OnClickListener() {
 							public void onClick(View v) {
 								removeDialog();
-								ChangeSet(side, position);
+								try {
+									ChangeSet(side, position);
+								} catch (FamiliarDbException e) {
+									mDbHelper.showDbErrorToast(anchor.getActivity());
+									anchor.getMainActivity().getFragmentManager().popBackStack();
+									return;
+								}
 							}
 						});
 		
@@ -618,7 +625,7 @@ public class TradeFragment extends FamiliarFragment {
 		doneLoading = true;
 	}
 
-	protected void ChangeSet(final String _side, final int _position) {
+	protected void ChangeSet(final String _side, final int _position) throws FamiliarDbException {
 		CardData data = (_side.equals("left") ? lTradeLeft.get(_position) : lTradeRight.get(_position));
 		String name = data.name;
 

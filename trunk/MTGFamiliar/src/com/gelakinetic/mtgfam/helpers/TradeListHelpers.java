@@ -33,12 +33,14 @@ public class TradeListHelpers {
 	public static final String	mangled_url				= "Mangled URL";
 	public static final String	database_busy			= "Database Busy";
 	public static final String	fetch_failed			= "Fetch Failed";
+	public static final String	familiarDbException		= "FamiliarDbException";
+	
 
 	private static final int		LOW_PRICE					= 0;
 	// private static final int AVG_PRICE = 1;
 	private static final int		HIGH_PRICE				= 2;
 
-	public static CardData FetchCardData(CardData _data, CardDbAdapter mDbHelper) {
+	public static CardData FetchCardData(CardData _data, CardDbAdapter mDbHelper) throws FamiliarDbException {
 		CardData data = _data;
 		try {
 			Cursor card;
@@ -185,6 +187,11 @@ public class TradeListHelpers {
 			catch (MalformedURLException e) {
 				priceurl = null;
 				price = mangled_url;
+				Log.e("doInBackground", price);
+				return null;
+			} catch (FamiliarDbException e) {
+				priceurl = null;
+				price = familiarDbException;
 				Log.e("doInBackground", price);
 				return null;
 			}

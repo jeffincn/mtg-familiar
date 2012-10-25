@@ -294,6 +294,9 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			//But its a lot easier then wrapping everything with IsPortrait > No > OK ignore commander stuff.
 			commanderPlayersAdapter = new CommanderTopViewAdapter(getActivity());
 			if (orientation == PORTRAIT) {
+				ScrollView parent = (ScrollView) mainLayout.getParent();		
+				mainLayout = (LinearLayout) this.getView().findViewById(R.id.info_layout);		
+				parent.setVisibility(View.GONE);
 				
 				LayoutInflater inflater = (LayoutInflater) this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 				LinearLayout edhLayout = (LinearLayout) inflater.inflate(R.layout.life_counter_player_edh_grid, null);

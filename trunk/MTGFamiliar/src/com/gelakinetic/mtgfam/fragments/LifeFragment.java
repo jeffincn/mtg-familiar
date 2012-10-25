@@ -68,6 +68,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	private static final int								POISON										= 1;
 	private static final int								COMMANDER								= 2;
 	public static final int									INITIAL_LIFE							= 20;
+	public static final int									INITIAL_LIFE_COMMANDER					= 40;
 	public static final int									INITIAL_POISON						= 0;
 	protected static final int							EVERYTHING								= 0;
 	protected static final int							JUST_TOTALS								= 1;
@@ -231,6 +232,10 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 				showDialog(DIALOG_RESET_CONFIRM);
 			}
 		});
+		
+		if (displayMode != commanderDisplay){
+			commanderButton.setVisibility(View.GONE);
+		}
 
 		setType(LIFE);
 
@@ -313,8 +318,8 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		String lifeData = getMainActivity().getPreferencesAdapter().getPlayerData();
 
 		if (lifeData == null || lifeData.length() == 0) {
-			addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, getActivity());
-			addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, getActivity());
+			addPlayer(null, (displayMode != commanderDisplay ? INITIAL_LIFE : INITIAL_LIFE_COMMANDER), INITIAL_POISON, null, null, getActivity());
+			addPlayer(null, (displayMode != commanderDisplay ? INITIAL_LIFE : INITIAL_LIFE_COMMANDER), INITIAL_POISON, null, null, getActivity());
 		}
 		else if (players.size() == 0) {
 			numPlayers = 0;
@@ -714,6 +719,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			case LIFE:
 				lifeButton.setImageResource(R.drawable.life_button_highlighted);
 				poisonButton.setImageResource(R.drawable.poison_button);
+				commanderButton.setImageResource(R.drawable.commander_button);
 				for (Player p : players) {
 					p.setAdapter(type);
 				}
@@ -721,6 +727,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			case POISON:
 				lifeButton.setImageResource(R.drawable.life_button);
 				poisonButton.setImageResource(R.drawable.poison_button_highlighted);
+				commanderButton.setImageResource(R.drawable.commander_button);
 				for (Player p : players) {
 					p.setAdapter(type);
 				}
@@ -728,6 +735,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			case COMMANDER:
 				lifeButton.setImageResource(R.drawable.life_button);
 				poisonButton.setImageResource(R.drawable.poison_button);
+				commanderButton.setImageResource(R.drawable.commander_button_highlighted);
 				for (Player p : players) {
 					p.setAdapter(type);
 				}
@@ -788,7 +796,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			mainLayout.addView(layout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
 			commanderPlayersAdapter.notifyDataSetChanged();
 			
-			if (players.size() == 1){
+			if (players.size() == 1 || orientation == LANDSCAPE){
 				layout.setVisibility(View.VISIBLE);
 				visibleEDHPlayer = 0;
 			}

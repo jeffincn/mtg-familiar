@@ -291,16 +291,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		mainLayout = (LinearLayout) this.getView().findViewById(R.id.playerList);
 		if (displayMode == commanderDisplay){
 			//Really this is just outside the next if for landscape modes, where it will always be ignored
-			//But its a lot easier then wrapping everything with IsPortrait, No, ok ignore.
+			//But its a lot easier then wrapping everything with IsPortrait > No > OK ignore commander stuff.
 			commanderPlayersAdapter = new CommanderTopViewAdapter(getActivity());
 			if (orientation == PORTRAIT) {
-				ScrollView parent = (ScrollView) mainLayout.getParent();
-				mainLayout = (LinearLayout) this.getView().findViewById(R.id.info_layout);
-				parent.setVisibility(View.GONE);
-				
 				
 				LayoutInflater inflater = (LayoutInflater) this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				LinearLayout edhLayout = (LinearLayout) inflater.inflate(R.layout.life_counter_player_edh_row_bot, null);
+				LinearLayout edhLayout = (LinearLayout) inflater.inflate(R.layout.life_counter_player_edh_grid, null);
 				edhGrid = (GridView) edhLayout.findViewById(R.id.edh_grid);
 				mainLayout.addView(edhLayout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
 				
@@ -352,12 +348,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 					phist = null;
 				}
 
-				int lifeDefault = 20;
+				int lifeDefault = (displayMode != commanderDisplay ? INITIAL_LIFE : INITIAL_LIFE_COMMANDER);
 				try {
 					lifeDefault = Integer.parseInt(data[5]);
 				}
 				catch (Exception e) {
-					lifeDefault = 20;
+					lifeDefault = (displayMode != commanderDisplay ? INITIAL_LIFE : INITIAL_LIFE_COMMANDER);
 				}
 
 				int[] cLife;
@@ -745,7 +741,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	}
 
 	private void addPlayer(String name, int initialLife, int initialPoison, int[] lhist, int[] phist, Context context) {
-		addPlayer(name, initialLife, initialPoison, lhist, phist, context, INITIAL_LIFE, null);
+		addPlayer(name, initialLife, initialPoison, lhist, phist, context, initialLife, null);
 	}
 
 	private void addPlayer(String name, int initialLife, int initialPoison, int[] lhist, int[] phist, Context context,
@@ -945,9 +941,9 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			TextView name, damage;
 			LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			View v = vi.inflate(R.layout.commander_adapter_row, null);
-			name = (TextView) v.findViewById(R.id.commander_player_name);
-			damage = (TextView) v.findViewById(R.id.commander_damage);
+			View v = vi.inflate(R.layout.life_counter_player_edh_commander_row, null);
+			name = (TextView) v.findViewById(R.id.edh_commander_row_name);
+			damage = (TextView) v.findViewById(R.id.edh_commander_row_damage);
 			if (name == null || damage == null) {
 				TextView error = new TextView(context);
 				error.setText("ERROR!");
@@ -1396,7 +1392,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			setValue(type, value + delta);
 			
 			if (displayMode == COMMANDER){
-				commanderAdapter.notifyDataSetChanged();
+				commanderPlayersAdapter.notifyDataSetChanged();
 			}
 		}
 		
@@ -1589,7 +1585,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		// Handle item selection
 		switch (item.getItemId()) {
 			case R.id.add_player:
-				addPlayer(null, INITIAL_LIFE, INITIAL_POISON, null, null, anchor.getActivity());
+				addPlayer(null, (displayMode != commanderDisplay ? INITIAL_LIFE : INITIAL_LIFE_COMMANDER), INITIAL_POISON, null, null, anchor.getActivity());
 				listSizeWidth = -10;
 				onWindowFocusChanged();
 				return true;

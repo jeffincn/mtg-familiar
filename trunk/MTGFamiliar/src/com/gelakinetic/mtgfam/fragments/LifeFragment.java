@@ -494,7 +494,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 						}
 
 						AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
-						builder.setTitle("Load a Gathering");
+						builder.setTitle(R.string.life_counter_gathering_dialog_title);
 						builder.setItems(properNames, new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialogInterface, int item) {
 								int playerNum = players.size();
@@ -561,8 +561,8 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 							nameInput.setText(playerToHaveNameChanged.name);
 							nameInput.selectAll();
 						}
-						Dialog dialog = new AlertDialog.Builder(getActivity()).setTitle("Enter Name").setView(textEntryView)
-								.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+						Dialog dialog = new AlertDialog.Builder(getActivity()).setTitle(R.string.life_counter_edit_name_dialog_title).setView(textEntryView)
+								.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int whichButton) {
 										if (playerToHaveNameChanged == null) {
 											return;
@@ -577,7 +577,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 										playerToHaveNameChanged.setName(newName);
 										updateViews();
 									}
-								}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+								}).setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int whichButton) {
 									}
 								}).create();

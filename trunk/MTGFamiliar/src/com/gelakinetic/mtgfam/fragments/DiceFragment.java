@@ -146,10 +146,10 @@ public class DiceFragment extends FamiliarFragment {
 
 	public void flipCoin() {
 		if (dieOutput != null) {
-			String output = "heads";
+			String output = getString(R.string.dice_heads);
 			dieOutput.setText("");
 			if (r.nextInt(2) == 0) {
-				output = "tails";
+				output = getString(R.string.dice_tails);
 			}
 			final String f_output = output;
 			scheduler.schedule(new Runnable() {

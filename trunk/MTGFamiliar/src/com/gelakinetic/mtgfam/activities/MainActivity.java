@@ -337,8 +337,8 @@ public class MainActivity extends SlidingFragmentActivity {
 				switch (id) {
 					case DONATEDIALOG: {
 						AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
-						builder.setTitle("Donate to the Devs");
-						builder.setNeutralButton(R.string.dialog_thanks, new DialogInterface.OnClickListener() {
+						builder.setTitle(R.string.main_donate_dialog_title);
+						builder.setNeutralButton(R.string.dialog_thanks_anyway, new DialogInterface.OnClickListener() {
 
 							public void onClick(DialogInterface dialog, int id) {
 								dialog.cancel();
@@ -376,13 +376,13 @@ public class MainActivity extends SlidingFragmentActivity {
 						// You have to catch the exception because the package stuff is all
 						// run-time
 						if (pInfo != null) {
-							builder.setTitle("About " + getString(R.string.app_name) + " " + pInfo.versionName);
+							builder.setTitle(getString(R.string.main_about) + " " + getString(R.string.app_name) + " " + pInfo.versionName);
 						}
 						else {
-							builder.setTitle("About " + getString(R.string.app_name));
+							builder.setTitle(getString(R.string.main_about) + " " + getString(R.string.app_name));
 						}
 
-						builder.setNeutralButton("Thanks!", new DialogInterface.OnClickListener() {
+						builder.setNeutralButton(R.string.dialog_thanks, new DialogInterface.OnClickListener() {
 
 							public void onClick(DialogInterface dialog, int id) {
 								dialog.cancel();
@@ -403,13 +403,13 @@ public class MainActivity extends SlidingFragmentActivity {
 						AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
 
 						if (pInfo != null) {
-							builder.setTitle("What's New in Version " + pInfo.versionName);
+							builder.setTitle(getString(R.string.main_whats_new_in_title) +  " " + pInfo.versionName);
 						}
 						else {
-							builder.setTitle("What's New");
+							builder.setTitle(R.string.main_whats_new_title);
 						}
 
-						builder.setNeutralButton("Enjoy!", new DialogInterface.OnClickListener() {
+						builder.setNeutralButton(R.string.dialog_enjoy, new DialogInterface.OnClickListener() {
 
 							public void onClick(DialogInterface dialog, int id) {
 								dialog.cancel();

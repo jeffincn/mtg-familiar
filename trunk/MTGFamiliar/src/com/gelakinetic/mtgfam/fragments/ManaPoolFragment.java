@@ -75,7 +75,7 @@ public class ManaPoolFragment extends FamiliarFragment {
 			}
 		}
 		if (!loadSuccessful) {
-			Toast.makeText(this.getActivity(), "Mana pool failed to load!", Toast.LENGTH_LONG).show();
+			Toast.makeText(this.getActivity(), R.string.mana_pool_error_toast, Toast.LENGTH_LONG).show();
 			// this.finish();
 			this.getMainActivity().mFragmentManager.popBackStack();
 		}

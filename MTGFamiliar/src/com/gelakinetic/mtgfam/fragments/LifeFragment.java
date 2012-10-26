@@ -453,10 +453,15 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 		for (Player p : players) {
 			p.setLayoutSize(listSizeWidth, listSizeHeight);
+			if (displayMode == commanderDisplay) {
+				p.setLayoutSize(listSizeWidth, LayoutParams.MATCH_PARENT);
+			}
 		}
 		
 		if(displayMode == commanderDisplay && orientation == PORTRAIT){
-			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(listSizeWidth, listSizeHeight);
+			//In order to fit better on the screen, especially with small screens make the 
+			//commander grid only take a quarter of the screen.
+			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(listSizeWidth, listSizeHeight / 2);
 			((LinearLayout)edhGrid.getParent()).setLayoutParams(layoutParams);
 		}
 	}

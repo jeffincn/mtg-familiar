@@ -222,6 +222,9 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		});
 		commanderButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
+                if(displayMode != commanderDisplay) {
+                    return;
+                }
 				setType(COMMANDER);
 				update();
 				updateViews();
@@ -232,10 +235,6 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 				showDialog(DIALOG_RESET_CONFIRM);
 			}
 		});
-		
-		if (displayMode != commanderDisplay){
-			commanderButton.setVisibility(View.GONE);
-		}
 
 		setType(LIFE);
 
@@ -723,7 +722,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			case LIFE:
 				lifeButton.setImageResource(R.drawable.life_button_highlighted);
 				poisonButton.setImageResource(R.drawable.poison_button);
-				commanderButton.setImageResource(R.drawable.commander_button);
+                if (displayMode != commanderDisplay){
+                    commanderButton.setImageResource(R.drawable.blank_button);
+                }
+                else {
+                    commanderButton.setImageResource(R.drawable.commander_button);
+                }
 				for (Player p : players) {
 					p.setAdapter(type);
 				}
@@ -731,7 +735,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			case POISON:
 				lifeButton.setImageResource(R.drawable.life_button);
 				poisonButton.setImageResource(R.drawable.poison_button_highlighted);
-				commanderButton.setImageResource(R.drawable.commander_button);
+                if (displayMode != commanderDisplay){
+                    commanderButton.setImageResource(R.drawable.blank_button);
+                }
+                else {
+                    commanderButton.setImageResource(R.drawable.commander_button);
+                }
 				for (Player p : players) {
 					p.setAdapter(type);
 				}
@@ -739,7 +748,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			case COMMANDER:
 				lifeButton.setImageResource(R.drawable.life_button);
 				poisonButton.setImageResource(R.drawable.poison_button);
-				commanderButton.setImageResource(R.drawable.commander_button_highlighted);
+                if (displayMode != commanderDisplay){
+                    commanderButton.setImageResource(R.drawable.blank_button);
+                }
+                else {
+                    commanderButton.setImageResource(R.drawable.commander_button_highlighted);
+                }
 				for (Player p : players) {
 					p.setAdapter(type);
 				}

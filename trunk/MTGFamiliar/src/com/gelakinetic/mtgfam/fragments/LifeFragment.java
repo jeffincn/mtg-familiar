@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
@@ -36,7 +35,6 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridView;
@@ -51,6 +49,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
+import com.gelakinetic.mtgfam.fragments.SearchViewFragment.SearchCriteria;
 import com.gelakinetic.mtgfam.helpers.GatheringsIO;
 import com.gelakinetic.mtgfam.helpers.GatheringsPlayerData;
 
@@ -1571,24 +1570,29 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 				// on the current mode
 				String sentence = "";
 				sentence += p.name;
-				sentence += " has ";
+				sentence += getString(R.string.life_counter_tts_has);
 
 				if (activeType == LIFE || activeType == COMMANDER) {
 					if(p.life > 9000) {
 						sentences.add(new TtsSentence(sentence, "9000"));
-						sentences.add(new TtsSentence("life", null));
+						sentences.add(new TtsSentence(getString(R.string.life_counter_tts_lifes), null));
 					}
 					else {
-						sentence += String.valueOf(p.life);
-						sentence += " life";	
+						sentence += String.valueOf(p.life) + " ";
+						if (p.life != 1) {
+							sentence += getString(R.string.life_counter_tts_lifes);
+						} else {
+							sentence += getString(R.string.life_counter_tts_life);
+						}
 						sentences.add(new TtsSentence(sentence, null));
 					}
 				}
 				else {
-					sentence += String.valueOf(p.poison);
-					sentence += " poison counter";
+					sentence += String.valueOf(p.poison) + " ";
 					if (p.poison != 1) {
-						sentence += "s";
+						sentence += getString(R.string.life_counter_tts_poison_counters);
+					} else {
+						sentence += getString(R.string.life_counter_tts_poison_counter);
 					}
 					sentences.add(new TtsSentence(sentence, null));
 				}
@@ -1646,6 +1650,9 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			case R.id.display_mode:
 				showDialog(DIALOG_CHANGE_DISPLAY);
 				return true;
+			case R.id.search_from_camera:
+				takePictureAndSearchGoogleGogglesIntent();
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
@@ -1661,6 +1668,20 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.life_counter_menu, menu);
+	}
+
+	@Override
+    protected void onGoogleGogglesSuccess(String cardName) {
+    	// this method must be overridden by each class calling takePictureAndSearchGoogleGogglesIntent
+		SearchCriteria searchCriteria = new SearchCriteria();
+		searchCriteria.Name = cardName;
+
+		// add a fragment
+		Bundle args = new Bundle();
+		args.putBoolean(SearchViewFragment.RANDOM, false);
+		args.putSerializable(SearchViewFragment.CRITERIA, searchCriteria);
+		ResultListFragment rlFrag = new ResultListFragment();
+		anchor.startNewFragment(rlFrag, args);
 	}
 
 	@Override

@@ -83,7 +83,10 @@
  	- Export and Import data to an SD card&lt;br />&lt;br />
  	- New EDH mode for the Life Counter&lt;br />&lt;br />
  	- Save and load default search parameters&lt;br />&lt;br />
- 	- Various and sundry bugfixes
+ 	- Various and sundry bugfixes&lt;br />&lt;br />
+ 	- French interface&lt;br />&lt;br />
+ 	- Choice for card image between 7 languages&lt;br />&lt;br />
+ 	- Card search using the camera&lt;br />&lt;br />
     </string>
     
     <string name="main_tts_warning_title">Text-to-Speech</string>
@@ -114,12 +117,13 @@
 		Thanks to my brother for the icon.&lt;br />&lt;br />
 		Thanks to Chedy @ &lt;a href="http://tcgplayer.com">TCGPlayer.com&lt;/a> for the price API.&lt;br />&lt;br />
 		Thanks to Jake Wharton for the magnificent &lt;a href="http://actionbarsherlock.com/">ActionBarSherlock&lt;/a>.&lt;br />&lt;br />
+		Thanks to Aethys for his French Translation and his API for searching a card name using the device camera.&lt;br /&gt;&lt;br /&gt;
 		Special thanks to Richard Garfield and the rest of the folks at &lt;a href="http://www.wizards.com/magic">Wizards of the Coast&lt;/a>.&lt;br />&lt;br />
 		-gelakinetic&lt;br />&lt;br />&lt;br />
 		Magic the Gathering and Magic the Gathering cards are ™ &amp; © Wizards of the Coast LLC.&lt;br />&lt;br />
 		The Android robot is © Google &lt;br />&lt;br />
 		Program licenced under the &lt;a href="http://www.gnu.org/licenses/gpl.html">GNU General Public License v3+&lt;/a>.&lt;br />&lt;br />
-		Media licenced under under the &lt;a href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License&lt;a>.
+		Media licenced under the &lt;a href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License&lt;a>.
 	</string>
     
     
@@ -193,6 +197,12 @@
     <string name="life_counter_gathering_dialog_title">Load a Gathering</string>
     <string name="life_counter_clear_dialog_text">Clear life totals or players?\nMana pool will also be cleared.</string>
     <string name="life_counter_edit_name_dialog_title">Enter Name</string>
+	<string name="life_counter_search_from_photo">Search card from photo</string>
+	<string name="life_counter_tts_has"> has </string>
+	<string name="life_counter_tts_life">life</string>
+	<string name="life_counter_tts_lifes">life</string>	
+	<string name="life_counter_tts_poison_counter">poison counter</string>	
+	<string name="life_counter_tts_poison_counters">poison counters</string>	
     
     
     <!-- Default gathering activity -->
@@ -321,6 +331,8 @@
     <string name="pref_show_art_summary">When viewing a card, load official card image instead of rules text</string>
     <string name="pref_scroll_title">Scroll Results</string>
     <string name="pref_scroll_summary">Show buttons to scroll between search results</string>
+    <string name="pref_card_language_title">Card image language</string>
+    <string name="pref_card_language_summary">Choose the language used to retrieve the card image</string>
     
     <string name="pref_cat_dice">Dice</string>
     <string name="pref_d2_as_coin_title">Treat D2 As Coin</string>
@@ -369,6 +381,17 @@
     <!-- Debug -->
     <string name="main_refresh_db">Refresh DB from APK</string>
     <string name="main_build_db">Build DB from Web</string>
+    
+    
+    <!-- Default language -->
+    <string name="main_card_language">en</string>
+    
+    
+    <!-- Goggles -->
+    <string name="goggles_cssid_expired">CSSID expired!</string>
+    <string name="goggles_3_attempts">Three attempts were broken!</string>
+    <string name="goggles_photo_analysis">Photo analysis…</string>
+    <string name="goggles_no_card_on_photo">No card found on the photo</string>
     
     
     <!-- Arrays -->
@@ -557,4 +580,23 @@
 		<item>@string/main_rules</item>
 		<item>@string/main_mojhosto</item>
 	</string-array>
+	<string-array name="card_language">
+		<item>English</item>
+		<item>French</item>
+		<item>Italian</item>
+		<item>Spanish</item>
+		<item>Japanese</item>
+		<item>Russian</item>
+		<item>German</item>
+	</string-array>
+	<string-array name="card_language_values">
+		<item>en</item>
+		<item>fr</item>
+		<item>it</item>
+		<item>es</item>
+		<item>jp</item>
+		<item>ru</item>
+		<item>de</item>
+	</string-array>
+		
 </resources>

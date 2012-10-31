@@ -153,6 +153,7 @@ public class CardViewFragment extends FamiliarFragment {
 	private boolean										isSingle;
 	private boolean										scroll_results;
 	private View											myFragmentView;
+	private String cardLanguage;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -194,6 +195,7 @@ public class CardViewFragment extends FamiliarFragment {
 			loadTo = DIALOG;
 		}
 		scroll_results = getMainActivity().getPreferencesAdapter().getScrollResults();
+		cardLanguage = getMainActivity().getPreferencesAdapter().getCardLanguage();
 
 		progDialog = new ProgressDialog(this.getMainActivity());
 		progDialog.setTitle("");
@@ -524,102 +526,117 @@ public class CardViewFragment extends FamiliarFragment {
 		@Override
 		protected Long doInBackground(String... params) {
 			error = null;
-			try {
+			String lang = cardLanguage;
 
-				String picurl;
-				if (setCode.equals("PP2")) {
-					picurl = "http://magiccards.info/extras/plane/planechase-2012-edition/" + cardName + ".jpg";
-					picurl = picurl.replace(" ", "-").replace("Æ", "Ae").replace("?", "").replace(",", "").replace("'", "")
-							.replace("!", "");
-				}
-				else if (setCode.equals("PCP")) {
-					if (cardName.equalsIgnoreCase("tazeem")) {
-						cardName = "tazeem-release-promo";
-						picurl = "http://magiccards.info/extras/plane/planechase/" + cardName + ".jpg";
+			boolean bRetry = true;
+			
+			while (bRetry){
+				
+				bRetry = false;
+				
+				try {
+	
+					String picurl;
+					if (setCode.equals("PP2")) {
+						picurl = "http://magiccards.info/extras/plane/planechase-2012-edition/" + cardName + ".jpg";
+						picurl = picurl.replace(" ", "-").replace("Æ", "Ae").replace("?", "").replace(",", "").replace("'", "")
+								.replace("!", "");
 					}
-					if (cardName.equalsIgnoreCase("celestine reef")) {
-						cardName = "celestine-reef-pre-release-promo";
-						picurl = "http://magiccards.info/extras/plane/planechase/" + cardName + ".jpg";
+					else if (setCode.equals("PCP")) {
+						if (cardName.equalsIgnoreCase("tazeem")) {
+							cardName = "tazeem-release-promo";
+							picurl = "http://magiccards.info/extras/plane/planechase/" + cardName + ".jpg";
+						}
+						if (cardName.equalsIgnoreCase("celestine reef")) {
+							cardName = "celestine-reef-pre-release-promo";
+							picurl = "http://magiccards.info/extras/plane/planechase/" + cardName + ".jpg";
+						}
+						if (cardName.equalsIgnoreCase("horizon boughs")) {
+							cardName = "horizon-boughs-gateway-promo";
+							picurl = "http://magiccards.info/extras/plane/planechase/" + cardName + ".jpg";
+						}
+						else {
+							picurl = "http://magiccards.info/extras/plane/planechase/" + cardName + ".jpg";
+						}
+						picurl = picurl.replace(" ", "-").replace("Æ", "Ae").replace("?", "").replace(",", "").replace("'", "")
+								.replace("!", "");
 					}
-					if (cardName.equalsIgnoreCase("horizon boughs")) {
-						cardName = "horizon-boughs-gateway-promo";
-						picurl = "http://magiccards.info/extras/plane/planechase/" + cardName + ".jpg";
+					else if (setCode.equals("ARS")) {
+						picurl = "http://magiccards.info/extras/scheme/archenemy/" + cardName + ".jpg";
+						picurl = picurl.replace(" ", "-").replace("Æ", "Ae").replace("?", "").replace(",", "").replace("'", "")
+								.replace("!", "");
 					}
 					else {
-						picurl = "http://magiccards.info/extras/plane/planechase/" + cardName + ".jpg";
+						picurl = "http://magiccards.info/scans/" + lang + "/" + mtgi_code + "/" + number + ".jpg";
 					}
-					picurl = picurl.replace(" ", "-").replace("Æ", "Ae").replace("?", "").replace(",", "").replace("'", "")
-							.replace("!", "");
+					picurl = picurl.toLowerCase();
+	
+					URL u = new URL(picurl);
+					cardPicture = new BitmapDrawable(anchor.getMainActivity().getResources(), u.openStream());
+	
+					int height = 0, width = 0;
+					float scale = 0;
+					int border = 16;
+					Display display = ((WindowManager) anchor.getMainActivity().getSystemService(Context.WINDOW_SERVICE))
+							.getDefaultDisplay();
+					if (loadTo == MAINPAGE) {
+						Rect rectgle = new Rect();
+						Window window = anchor.getMainActivity().getWindow();
+						window.getDecorView().getWindowVisibleDisplayFrame(rectgle);
+	
+						LinearLayout scrollButtons = (LinearLayout) myFragmentView.findViewById(R.id.scrollButtons);
+	
+						height = (display.getHeight() - rectgle.top - anchor.getMainActivity().getSupportActionBar().getHeight() - scrollButtons
+								.getHeight()) - border;
+						width = display.getWidth() - border;
+					}
+					else if (loadTo == DIALOG) {
+						height = display.getHeight() - border;
+						width = display.getWidth() - border;
+					}
+	
+					float screenAspectRatio = (float) height / (float) (width);
+					float cardAspectRatio = (float) cardPicture.getIntrinsicHeight() / (float) cardPicture.getIntrinsicWidth();
+	
+					if (screenAspectRatio > cardAspectRatio) {
+						scale = (width) / (float) cardPicture.getIntrinsicWidth();
+					}
+					else {
+						scale = (height) / (float) cardPicture.getIntrinsicHeight();
+					}
+	
+					int newWidth = Math.round(cardPicture.getIntrinsicWidth() * scale);
+					int newHeight = Math.round(cardPicture.getIntrinsicHeight() * scale);
+	
+					cardPicture = resize(cardPicture, newWidth, newHeight);
 				}
-				else if (setCode.equals("ARS")) {
-					picurl = "http://magiccards.info/extras/scheme/archenemy/" + cardName + ".jpg";
-					picurl = picurl.replace(" ", "-").replace("Æ", "Ae").replace("?", "").replace(",", "").replace("'", "")
-							.replace("!", "");
+				catch (FileNotFoundException e) {
+					// internet works, image not found
+					if (lang == "en") {
+						error = "Image Not Found";
+					} else {
+						// If image doesn't exist in the preferred language, let's retry with "en"
+						lang = "en";
+						bRetry = true;
+					}
 				}
-				else {
-					picurl = "http://magiccards.info/scans/en/" + mtgi_code + "/" + number + ".jpg";
+				catch (ConnectException e) {
+					// no internet
+					error = "No Internet Connection";
 				}
-				picurl = picurl.toLowerCase();
-
-				URL u = new URL(picurl);
-				cardPicture = new BitmapDrawable(anchor.getMainActivity().getResources(), u.openStream());
-
-				int height = 0, width = 0;
-				float scale = 0;
-				int border = 16;
-				Display display = ((WindowManager) anchor.getMainActivity().getSystemService(Context.WINDOW_SERVICE))
-						.getDefaultDisplay();
-				if (loadTo == MAINPAGE) {
-					Rect rectgle = new Rect();
-					Window window = anchor.getMainActivity().getWindow();
-					window.getDecorView().getWindowVisibleDisplayFrame(rectgle);
-
-					LinearLayout scrollButtons = (LinearLayout) myFragmentView.findViewById(R.id.scrollButtons);
-
-					height = (display.getHeight() - rectgle.top - anchor.getMainActivity().getSupportActionBar().getHeight() - scrollButtons
-							.getHeight()) - border;
-					width = display.getWidth() - border;
+				catch (UnknownHostException e) {
+					// no internet
+					error = "No Internet Connection";
 				}
-				else if (loadTo == DIALOG) {
-					height = display.getHeight() - border;
-					width = display.getWidth() - border;
+				catch (MalformedURLException e) {
+					error = "MalformedURLException";
 				}
-
-				float screenAspectRatio = (float) height / (float) (width);
-				float cardAspectRatio = (float) cardPicture.getIntrinsicHeight() / (float) cardPicture.getIntrinsicWidth();
-
-				if (screenAspectRatio > cardAspectRatio) {
-					scale = (width) / (float) cardPicture.getIntrinsicWidth();
+				catch (IOException e) {
+					error = "No Internet Connection";
 				}
-				else {
-					scale = (height) / (float) cardPicture.getIntrinsicHeight();
+				catch (NullPointerException e) {
+					error = "Image load failed. Please try again later.";
 				}
-
-				int newWidth = Math.round(cardPicture.getIntrinsicWidth() * scale);
-				int newHeight = Math.round(cardPicture.getIntrinsicHeight() * scale);
-
-				cardPicture = resize(cardPicture, newWidth, newHeight);
-			}
-			catch (FileNotFoundException e) {
-				// internet works, image not found
-				error = "Image Not Found";
-			}
-			catch (ConnectException e) {
-				// no internet
-				error = "No Internet Connection";
-			}
-			catch (UnknownHostException e) {
-				// no internet
-				error = "No Internet Connection";
-			}
-			catch (MalformedURLException e) {
-				error = "MalformedURLException";
-			}
-			catch (IOException e) {
-				error = "No Internet Connection";
-			}
-			catch (NullPointerException e) {
-				error = "Image load failed. Please try again later.";
 			}
 			return null;
 		}

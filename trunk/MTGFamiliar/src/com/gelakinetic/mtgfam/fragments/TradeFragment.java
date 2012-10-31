@@ -28,6 +28,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,6 +56,7 @@ public class TradeFragment extends FamiliarFragment {
 	private int										positionForDialog;
 
 	private AutoCompleteTextView	namefield;
+	private ImageButton				camerabutton;
 
 	private Button					bAddTradeLeft;
 	private TextView				tradePriceLeft;
@@ -97,6 +99,8 @@ public class TradeFragment extends FamiliarFragment {
 		namefield = (AutoCompleteTextView) myFragmentView.findViewById(R.id.namesearch);
 		namefield.setAdapter(new AutocompleteCursorAdapter(this.getActivity(), null));
 
+		camerabutton = (ImageButton) myFragmentView.findViewById(R.id.cameraButton);
+
 		numberfield = (EditText) myFragmentView.findViewById(R.id.numberInput);
 		numberfield.setText("1");
 
@@ -114,6 +118,12 @@ public class TradeFragment extends FamiliarFragment {
 		aaTradeRight = new TradeListAdapter(this.getActivity(), R.layout.trader_row, lTradeRight);
 		lvTradeRight.setAdapter(aaTradeRight);
 
+		camerabutton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				takePictureAndSearchGoogleGogglesIntent();
+			}
+		});
+		
 		bAddTradeLeft.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				if (namefield.getText().toString().length() > 0) {
@@ -225,6 +235,12 @@ public class TradeFragment extends FamiliarFragment {
 		return myFragmentView;
 	}
 
+	@Override
+    protected void onGoogleGogglesSuccess(String cardName) {
+    	// this method must be overridden by each class calling takePictureAndSearchGoogleGogglesIntent
+		namefield.setText(cardName);
+	}
+	
 	@Override
 	public void onResume() {
 		super.onResume();

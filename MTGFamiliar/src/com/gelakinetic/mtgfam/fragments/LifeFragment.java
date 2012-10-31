@@ -600,14 +600,24 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 						builder.setSingleChoiceItems(getResources().getStringArray(R.array.display_array_entries), displayMode,
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int which) {
+										removeDialog();
 										displayMode = which;
 
 										// And also update the preference
 										getMainActivity().getPreferencesAdapter().setDisplayMode(String.valueOf(displayMode));
 
-										restartFragment();
-
-										removeDialog();
+										boolean clearPlayers = true;
+										for (Player p : players){
+											if (p.lifeAdapter.count != 0 || p.poisonAdapter.count != 0){
+												clearPlayers = false;
+											}
+										}
+										if (clearPlayers == true){
+											reset(JUST_TOTALS);
+										} else {
+											restartFragment();
+										}
+										
 									}
 
 								});
@@ -768,7 +778,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	}
 
 	private void addPlayer(String name, int initialLife, int initialPoison, int[] lhist, int[] phist, Context context) {
-		addPlayer(name, initialLife, initialPoison, lhist, phist, context, initialLife, null);
+		addPlayer(name, initialLife, initialPoison, lhist, phist, context, -1, null);
 	}
 
 	private void addPlayer(String name, int initialLife, int initialPoison, int[] lhist, int[] phist, Context context,
@@ -1283,7 +1293,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		}
 
 		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context) {
-			this(n, l, p, lhist, phist, context, INITIAL_LIFE, null);
+			this(n, l, p, lhist, phist, context, -1, null);
 		}
 		
 		public void setLayoutSize(int listSizeWidth, int listSizeHeight) {
@@ -1534,7 +1544,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			String data = this.name + ";";
 
 			int initLife = (displayMode != commanderDisplay ? INITIAL_LIFE : INITIAL_LIFE_COMMANDER);
-			if (defaultLife != initLife){
+			if (defaultLife != -1){
 				initLife = defaultLife;
 			}
 			

@@ -1,13 +1,20 @@
 package com.gelakinetic.mtgfam.fragments;
 
+import java.io.IOException;
+
 import android.app.Instrumentation;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
@@ -18,6 +25,7 @@ import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.activities.MainActivity;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
+import com.gelakinetic.mtgfam.helpers.GoogleGoggles;
 import com.gelakinetic.mtgfam.helpers.MyApp;
 
 public class FamiliarFragment extends SherlockFragment {
@@ -25,6 +33,8 @@ public class FamiliarFragment extends SherlockFragment {
 	public CardDbAdapter								mDbHelper;
 	protected FamiliarFragment	anchor;
 	public static final String	DIALOG_TAG	= "dialog";
+
+	public static final int 	ACTIVITY_CAMERA_GOGGLES		= 1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -153,5 +163,76 @@ public class FamiliarFragment extends SherlockFragment {
 		catch(NullPointerException e) {
 			// eat it
 		}
+	}
+	
+    protected void takePictureAndSearchGoogleGogglesIntent() {
+    	Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(takePictureIntent, ACTIVITY_CAMERA_GOGGLES);
+
+    }
+
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+			case ACTIVITY_CAMERA_GOGGLES:
+				switch (resultCode) {
+				case android.app.Activity.RESULT_OK:
+					new GoogleGogglesTask().execute(data);
+					return;
+				}
+				return;
+		}
+		
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+	
+	private class GoogleGogglesTask extends AsyncTask<Intent, Void, Void> {
+
+		private String	cardName;
+
+		@Override
+		protected void onPreExecute() {
+			try {
+				Toast.makeText(anchor.getActivity(),R.string.goggles_photo_analysis,
+						Toast.LENGTH_LONG).show();
+			} catch (RuntimeException re) {
+			}
+		}
+
+		@Override
+		protected Void doInBackground(Intent... params) {
+			try {
+			    Bitmap mImageBitmap = (Bitmap) params[0].getExtras().get("data");
+					
+			    cardName = "";
+			    try {
+			    	cardName = GoogleGoggles.StartCardSearch(mImageBitmap, anchor.getActivity());
+
+				} catch (IOException e) {
+					// Auto-generated catch block
+					e.printStackTrace();
+				}
+			} catch (Exception e) {
+				cardName = null;
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void param) {
+			if(cardName != null && cardName.length() > 0) {
+				onGoogleGogglesSuccess(cardName);
+			}
+			else {
+				try {
+					Toast.makeText(anchor.getActivity(), R.string.goggles_no_card_on_photo,
+							Toast.LENGTH_LONG).show();
+				} catch (RuntimeException re) {
+				}
+			}
+		}
+	}
+
+    protected void onGoogleGogglesSuccess(String cardName) {
+    	// this method must be overridden by each class calling takePictureAndSearchGoogleGogglesIntent
 	}
 }

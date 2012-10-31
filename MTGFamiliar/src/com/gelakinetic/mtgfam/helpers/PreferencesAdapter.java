@@ -57,6 +57,7 @@ public class PreferencesAdapter {
 	
 	private static final String UPDATE_FREQUENCY = "updatefrequency"; //String, default "3"
 	private static final String DEFAULT_FRAGMENT = "defaultFragment"; //String, default R.string.main_card_search
+	private static final String CARD_LANGUAGE = "cardlanguage"; //String, default "en"
 	private static final String DISPLAY_MODE = "displayMode"; //String, default "0"
 	private static final String PLAYER_DATA = "player_data"; //String, default null
 	private static final String ROUND_LENGTH = "roundLength"; //String, default "50"
@@ -678,6 +679,26 @@ public class PreferencesAdapter {
 		this.edit.commit();
 	}
 	
+	//Card language
+	private boolean cardLanguageLoaded = false;
+	private String cardLanguage;
+	
+	public synchronized String getCardLanguage() {
+		if(!this.cardLanguageLoaded) {
+			this.cardLanguage = this.prefs.getString(CARD_LANGUAGE, "en");
+			this.cardLanguageLoaded = true;
+		}
+		return this.cardLanguage;
+	}
+	
+	public synchronized void setCardLanguage(String cardLanguage) {
+		this.cardLanguage = cardLanguage;
+		this.cardLanguageLoaded = true;
+		
+		this.edit.putString(CARD_LANGUAGE, cardLanguage);
+		this.edit.commit();
+	}
+
 	//Default fragment
 	private boolean defaultFragmentLoaded = false;
 	private String defaultFragment;

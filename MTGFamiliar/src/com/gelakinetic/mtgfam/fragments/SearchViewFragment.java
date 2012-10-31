@@ -30,6 +30,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -77,6 +78,7 @@ public class SearchViewFragment extends FamiliarFragment {
 
 	private Button								searchbutton;
 	private AutoCompleteTextView	namefield;
+	private ImageButton							camerabutton;
 	private EditText							textfield;
 	private AutoCompleteTextView	supertypefield;
 	private EditText							subtypefield;
@@ -271,6 +273,7 @@ public class SearchViewFragment extends FamiliarFragment {
 		});
 
 		searchbutton = (Button) myFragmentView.findViewById(R.id.searchbutton);
+		camerabutton = (ImageButton) myFragmentView.findViewById(R.id.cameraButton);
 		// randombutton = (Button) myFragmentView.findViewById(R.id.s);
 
 		checkboxW = (CheckBox) myFragmentView.findViewById(R.id.checkBoxW);
@@ -378,11 +381,24 @@ public class SearchViewFragment extends FamiliarFragment {
 			}
 		});
 
+		camerabutton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				takePictureAndSearchGoogleGogglesIntent();
+			}
+		});
+		
 		checkDialogButtonColors();
 
 		return myFragmentView;
 	}
-
+	
+	@Override
+    protected void onGoogleGogglesSuccess(String cardName) {
+    	// this method must be overridden by each class calling takePictureAndSearchGoogleGogglesIntent
+		namefield.setText(cardName);
+		doSearch(false);
+	}
+    
 	private SearchCriteria parseForm() {
 		SearchCriteria searchCriteria = new SearchCriteria();
 

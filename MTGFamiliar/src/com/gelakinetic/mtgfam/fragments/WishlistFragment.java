@@ -24,6 +24,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ImageButton;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -53,6 +54,7 @@ public class WishlistFragment extends FamiliarFragment {
 	private AutoCompleteTextView									namefield;
 
 	private Button																bAdd;
+	private ImageButton															camerabutton;
 	private TextView															tradePrice;
 	private ExpandableListView										expWishlist;
 	private WishlistAdapter												aaExpWishlist;
@@ -89,12 +91,20 @@ public class WishlistFragment extends FamiliarFragment {
 		numberfield = (EditText) myFragmentView.findViewById(R.id.numberInput);
 		numberfield.setText("1");
 
+		camerabutton = (ImageButton) myFragmentView.findViewById(R.id.cameraButton);
+
 		cardNames = new ArrayList<String>();
 		cardSetNames = new ArrayList<ArrayList<String>>();
 		cardSetWishlists = new ArrayList<ArrayList<CardData>>();
 		bAdd = (Button) myFragmentView.findViewById(R.id.addCard);
 		tradePrice = (TextView) myFragmentView.findViewById(R.id.priceText);
 
+		camerabutton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				takePictureAndSearchGoogleGogglesIntent();
+			}
+		});
+		
 		bAdd.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				if (namefield.getText().length() > 0) {
@@ -148,6 +158,13 @@ public class WishlistFragment extends FamiliarFragment {
 		});
 
 		return myFragmentView;
+	}
+
+	@Override
+    protected void onGoogleGogglesSuccess(String cardName) {
+    	// this method must be overridden by each class calling takePictureAndSearchGoogleGogglesIntent
+		namefield.setText(cardName);
+		bAdd.performClick();
 	}
 
 	@Override

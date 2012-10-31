@@ -126,6 +126,13 @@
 	            android:defaultValue="false"
 	            android:title="@string/pref_scroll_title"
 	            android:summary="@string/pref_scroll_summary" />
+	        
+	        <ListPreference android:entries="@array/card_language"
+	            android:entryValues="@array/card_language_values"
+	            android:key="cardlanguage"
+	            android:summary="@string/pref_card_language_summary"
+	            android:title="@string/pref_card_language_title"
+	            android:defaultValue="@string/main_card_language" />
 	
 	   	</PreferenceCategory>
         	    

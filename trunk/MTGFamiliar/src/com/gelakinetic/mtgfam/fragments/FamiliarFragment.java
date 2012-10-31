@@ -123,13 +123,19 @@ public class FamiliarFragment extends SherlockFragment {
 	public boolean onInterceptSearchKey() {
 		return false;
 	}
+	
+	protected void startNewFragment(FamiliarFragment frag, Bundle args){
+		startNewFragment(frag, args, true);
+	}
 
-	protected void startNewFragment(FamiliarFragment frag, Bundle args) {
+	protected void startNewFragment(FamiliarFragment frag, Bundle args, boolean allowBackStack) {
 		frag.setArguments(args);
 
 		FragmentTransaction fragmentTransaction = this.getMainActivity().mFragmentManager.beginTransaction();
-		fragmentTransaction.addToBackStack(null);
-
+		if (allowBackStack) {
+			fragmentTransaction.addToBackStack(null);
+		}
+		
 		fragmentTransaction.replace(R.id.frag_view, frag);
 		fragmentTransaction.commit();
 		this.getMainActivity().hideKeyboard();

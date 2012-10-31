@@ -211,7 +211,6 @@ public class MainActivity extends SlidingFragmentActivity {
 		else {
 			if (savedInstanceState == null) {
 				String action = getIntent().getAction();
-				// TODO a preference should toggle what fragment is loaded
 
 				String defaultFragment = prefAdapter.getDefaultFragment();
 

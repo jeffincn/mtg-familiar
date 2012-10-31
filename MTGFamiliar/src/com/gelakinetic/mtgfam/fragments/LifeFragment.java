@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
@@ -377,6 +378,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 				numPlayers++;
 			}
+			
 			String lastName = players.get(players.size() - 1).name;
 			try {
 				numPlayers = Integer.parseInt("" + lastName.charAt(lastName.length() - 1));
@@ -397,7 +399,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	private void restartFragment() {
 		try {
 			getMainActivity().getSupportFragmentManager().popBackStack();
-			this.startNewFragment(new LifeFragment(), null);
+			this.startNewFragment(new LifeFragment(), null, false);
 		}
 		catch (NullPointerException e) {
 			// Eat it, although i'm not sure why its here anymore
@@ -478,6 +480,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		if (prev != null) {
 			ft.remove(prev);
 		}
+		ft.addToBackStack(null);
 
 		// Create and show the dialog.
 		FamiliarDialogFragment newFragment = new FamiliarDialogFragment() {
@@ -522,11 +525,13 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 						builder.setMessage(getString(R.string.life_counter_clear_dialog_text)).setCancelable(true)
 								.setPositiveButton(getString(R.string.dialog_both), new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int id) {
+										removeDialog();
 										ManaPoolFragment.reset(getMainActivity());
 										reset(EVERYTHING);
 									}
 								}).setNeutralButton(getString(R.string.dialog_life), new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int id) {
+										removeDialog();
 										ManaPoolFragment.reset(getMainActivity());
 										reset(JUST_TOTALS);
 									}
@@ -1528,7 +1533,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		public String toFreshString() {
 			String data = this.name + ";";
 
-			data += defaultLife + ";";
+			int initLife = (displayMode != commanderDisplay ? INITIAL_LIFE : INITIAL_LIFE_COMMANDER);
+			if (defaultLife != initLife){
+				initLife = defaultLife;
+			}
+			
+			data += initLife + ";";
 			data += ";";
 
 			data += INITIAL_POISON + ";";

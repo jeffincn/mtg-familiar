@@ -191,6 +191,29 @@ public class GatheringCreateFragment extends FamiliarFragment {
 		gIO.writeGatheringXML(players, _gatheringName);
 	}
 
+	private boolean AreAnyFieldsEmpty() {
+		int playersCount = mainLayout.getChildCount();
+
+		for (int idx = 0; idx < playersCount; idx++) {
+			View player = mainLayout.getChildAt(idx);
+
+			EditText customName = (EditText) player.findViewById(R.id.custom_name);
+			String name = customName.getText().toString().trim();
+			if (name.trim().isEmpty()){
+				return true;
+			}
+				
+
+			EditText startingLife = (EditText) player.findViewById(R.id.starting_life);
+			
+			if(startingLife.getText().toString().trim().isEmpty()){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
 	private void AddPlayerRowFromData(GatheringsPlayerData _player) {
 		LayoutInflater inf = this.getActivity().getLayoutInflater();
 		View v = inf.inflate(R.layout.gathering_create_player_row, null);
@@ -290,6 +313,11 @@ public class GatheringCreateFragment extends FamiliarFragment {
 				return true;
 			case R.id.gsave_gathering:
 
+				if (AreAnyFieldsEmpty()){
+					Toast.makeText(mCtx, R.string.gathering_empty_field, Toast.LENGTH_LONG).show();
+					return true;
+				}
+				
 				showDialog(DIALOG_SET_NAME);
 
 				// Intent i = new Intent(this, NPlayerLifeActivity.class);

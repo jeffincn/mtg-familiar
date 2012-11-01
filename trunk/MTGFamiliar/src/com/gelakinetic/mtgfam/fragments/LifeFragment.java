@@ -510,7 +510,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 								ArrayList<GatheringsPlayerData> players = gIO.ReadGatheringXML(fGatherings[item]);
 								for (GatheringsPlayerData player : players) {
-									addPlayer(player.getName(), player.getStartingLife(), INITIAL_POISON, null, null, anchor.getActivity());
+									addPlayer(player.getName(), player.getStartingLife(), INITIAL_POISON, null, null, anchor.getActivity(), player.getStartingLife(), null);
 								}
 
 								restartFragment();

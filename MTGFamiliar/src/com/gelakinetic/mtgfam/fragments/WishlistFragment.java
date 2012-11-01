@@ -121,7 +121,7 @@ public class WishlistFragment extends FamiliarFragment {
 						AddCardOrUpdateSetCounts(data);
 					} catch (FamiliarDbException e) {
 						mDbHelper.showDbErrorToast(anchor.getActivity());
-						anchor.getMainActivity().getFragmentManager().popBackStack();
+						anchor.getMainActivity().getSupportFragmentManager().popBackStack();
 						return;
 					}
 					aaExpWishlist.notifyDataSetChanged();
@@ -206,7 +206,7 @@ public class WishlistFragment extends FamiliarFragment {
 			WishlistHelpers.ReadWishlist(getActivity(), mDbHelper, lWishlist);
 		} catch (FamiliarDbException e1) {
 			mDbHelper.showDbErrorToast(anchor.getActivity());
-			anchor.getMainActivity().getFragmentManager().popBackStack();
+			anchor.getMainActivity().getSupportFragmentManager().popBackStack();
 			return;
 		}
 
@@ -217,7 +217,7 @@ public class WishlistFragment extends FamiliarFragment {
 			}
 		} catch (FamiliarDbException e) {
 			mDbHelper.showDbErrorToast(anchor.getActivity());
-			anchor.getMainActivity().getFragmentManager().popBackStack();
+			anchor.getMainActivity().getSupportFragmentManager().popBackStack();
 			return;
 		}
 		aaExpWishlist.notifyDataSetChanged();
@@ -564,7 +564,7 @@ public class WishlistFragment extends FamiliarFragment {
 							data = TradeListHelpers.FetchCardData(data, anchor.mDbHelper);
 						} catch (FamiliarDbException e) {
 							mDbHelper.showDbErrorToast(anchor.getActivity());
-							anchor.getMainActivity().getFragmentManager().popBackStack();
+							anchor.getMainActivity().getSupportFragmentManager().popBackStack();
 							return v;
 						}
 					}
@@ -737,8 +737,8 @@ public class WishlistFragment extends FamiliarFragment {
 		// DialogFragment.show() will take care of adding the fragment
 		// in a transaction. We also want to remove any currently showing
 		// dialog, so make our own transaction and take care of that here.
-		FragmentTransaction ft = getFragmentManager().beginTransaction();
-		Fragment prev = getFragmentManager().findFragmentByTag(DIALOG_TAG);
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		Fragment prev = getSupportFragmentManager().findFragmentByTag(DIALOG_TAG);
 		if (prev != null) {
 			ft.remove(prev);
 		}
@@ -788,7 +788,7 @@ public class WishlistFragment extends FamiliarFragment {
 										setCode = mDbHelper.getSetCode(setName);
 									} catch (FamiliarDbException e) {
 										mDbHelper.showDbErrorToast(anchor.getActivity());
-										anchor.getMainActivity().getFragmentManager().popBackStack();
+										anchor.getMainActivity().getSupportFragmentManager().popBackStack();
 										return;
 									}
 									totalCards += numberField;
@@ -810,7 +810,7 @@ public class WishlistFragment extends FamiliarFragment {
 									}
 									catch (FamiliarDbException e) {
 										mDbHelper.showDbErrorToast(anchor.getActivity());
-										anchor.getMainActivity().getFragmentManager().popBackStack();
+										anchor.getMainActivity().getSupportFragmentManager().popBackStack();
 										return;
 									}
 								}
@@ -843,12 +843,12 @@ public class WishlistFragment extends FamiliarFragment {
 									dlg = (wh).getDialog(cardNames.get(positionForDialog), anchor, this.getMainActivity());
 								} catch (FamiliarDbException e) {
 									mDbHelper.showDbErrorToast(anchor.getActivity());
-									anchor.getMainActivity().getFragmentManager().popBackStack();
+									anchor.getMainActivity().getSupportFragmentManager().popBackStack();
 									return null;
 								}
 							} catch (FamiliarDbException e) {
 								mDbHelper.showDbErrorToast(anchor.getActivity());
-								anchor.getMainActivity().getFragmentManager().popBackStack();
+								anchor.getMainActivity().getSupportFragmentManager().popBackStack();
 								return null;
 							}
 							return dlg;

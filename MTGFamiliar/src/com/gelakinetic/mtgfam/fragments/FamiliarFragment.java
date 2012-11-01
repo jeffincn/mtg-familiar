@@ -2,13 +2,16 @@ package com.gelakinetic.mtgfam.fragments;
 
 import java.io.IOException;
 
+import android.app.Dialog;
 import android.app.Instrumentation;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -32,9 +35,11 @@ public class FamiliarFragment extends SherlockFragment {
 
 	public CardDbAdapter								mDbHelper;
 	protected FamiliarFragment	anchor;
+	private ProgressDialog progDialog;
 	public static final String	DIALOG_TAG	= "dialog";
 
 	public static final int 	ACTIVITY_CAMERA_GOGGLES		= 1;
+	protected static final int GOGGLES_ANALYSIS = 1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -46,7 +51,7 @@ public class FamiliarFragment extends SherlockFragment {
 			mDbHelper.openReadable();
 		} catch (FamiliarDbException e) {
 			mDbHelper.showDbErrorToast(this.getActivity());
-			this.getMainActivity().getFragmentManager().popBackStack();
+			this.getMainActivity().getSupportFragmentManager().popBackStack();
 		}
 		this.setHasOptionsMenu(true);
 	}
@@ -54,6 +59,12 @@ public class FamiliarFragment extends SherlockFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		anchor = this;
+		
+		progDialog = new ProgressDialog(this.getMainActivity());
+		progDialog.setTitle("");
+		progDialog.setMessage(getString(R.string.goggles_photo_analysis));
+		progDialog.setIndeterminate(true);
+		progDialog.setCancelable(true);
 		return super.onCreateView(inflater, container, savedInstanceState);
 	}
 
@@ -154,7 +165,7 @@ public class FamiliarFragment extends SherlockFragment {
 	void removeDialog() {
 		try {
 			FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-			Fragment prev = getFragmentManager().findFragmentByTag(DIALOG_TAG);
+			Fragment prev = getSupportFragmentManager().findFragmentByTag(DIALOG_TAG);
 			if (prev != null) {
 				ft.remove(prev);
 			}
@@ -165,7 +176,12 @@ public class FamiliarFragment extends SherlockFragment {
 		}
 	}
 	
-    protected void takePictureAndSearchGoogleGogglesIntent() {
+    public FragmentManager getSupportFragmentManager() {
+		// TODO Auto-generated method stub
+		return this.getFragmentManager();
+	}
+
+	protected void takePictureAndSearchGoogleGogglesIntent() {
     	Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(takePictureIntent, ACTIVITY_CAMERA_GOGGLES);
 
@@ -192,8 +208,7 @@ public class FamiliarFragment extends SherlockFragment {
 		@Override
 		protected void onPreExecute() {
 			try {
-				Toast.makeText(anchor.getActivity(),R.string.goggles_photo_analysis,
-						Toast.LENGTH_LONG).show();
+				progDialog.show();
 			} catch (RuntimeException re) {
 			}
 		}
@@ -205,7 +220,7 @@ public class FamiliarFragment extends SherlockFragment {
 					
 			    cardName = "";
 			    try {
-			    	cardName = GoogleGoggles.StartCardSearch(mImageBitmap, anchor.getActivity());
+			    	cardName = GoogleGoggles.StartCardSearch(mImageBitmap, anchor.getActivity(), mDbHelper);
 
 				} catch (IOException e) {
 					// Auto-generated catch block
@@ -219,6 +234,8 @@ public class FamiliarFragment extends SherlockFragment {
 
 		@Override
 		protected void onPostExecute(Void param) {
+			progDialog.dismiss();
+			
 			if(cardName != null && cardName.length() > 0) {
 				onGoogleGogglesSuccess(cardName);
 			}

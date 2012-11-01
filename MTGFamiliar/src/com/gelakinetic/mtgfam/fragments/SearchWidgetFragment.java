@@ -128,7 +128,7 @@ public class SearchWidgetFragment extends FamiliarFragment {
 			}
 			else {
 				mDbHelper.showDbErrorToast(anchor.getActivity());
-				anchor.getMainActivity().getFragmentManager().popBackStack();
+				anchor.getMainActivity().getSupportFragmentManager().popBackStack();
 			}
 		}
 	}

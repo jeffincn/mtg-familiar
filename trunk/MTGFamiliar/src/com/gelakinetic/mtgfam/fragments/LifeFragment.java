@@ -474,8 +474,8 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		// DialogFragment.show() will take care of adding the fragment
 		// in a transaction. We also want to remove any currently showing
 		// dialog, so make our own transaction and take care of that here.
-		FragmentTransaction ft = getFragmentManager().beginTransaction();
-		Fragment prev = getFragmentManager().findFragmentByTag(DIALOG_TAG);
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		Fragment prev = getSupportFragmentManager().findFragmentByTag(DIALOG_TAG);
 		if (prev != null) {
 			ft.remove(prev);
 		}
@@ -1291,10 +1291,6 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			}
 		}
 
-		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context) {
-			this(n, l, p, lhist, phist, context, -1, null);
-		}
-		
 		public void setLayoutSize(int listSizeWidth, int listSizeHeight) {
 			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(listSizeWidth, listSizeHeight);
 			layout.setLayoutParams(layoutParams);
@@ -1650,9 +1646,6 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			case R.id.display_mode:
 				showDialog(DIALOG_CHANGE_DISPLAY);
 				return true;
-			case R.id.search_from_camera:
-				takePictureAndSearchGoogleGogglesIntent();
-				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
@@ -1668,20 +1661,6 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.life_counter_menu, menu);
-	}
-
-	@Override
-    protected void onGoogleGogglesSuccess(String cardName) {
-    	// this method must be overridden by each class calling takePictureAndSearchGoogleGogglesIntent
-		SearchCriteria searchCriteria = new SearchCriteria();
-		searchCriteria.Name = cardName;
-
-		// add a fragment
-		Bundle args = new Bundle();
-		args.putBoolean(SearchViewFragment.RANDOM, false);
-		args.putSerializable(SearchViewFragment.CRITERIA, searchCriteria);
-		ResultListFragment rlFrag = new ResultListFragment();
-		anchor.startNewFragment(rlFrag, args);
 	}
 
 	@Override

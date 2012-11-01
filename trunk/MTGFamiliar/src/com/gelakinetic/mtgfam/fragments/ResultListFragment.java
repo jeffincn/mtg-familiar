@@ -76,7 +76,7 @@ public class ResultListFragment extends FamiliarFragment {
 		}
 		catch (FamiliarDbException e) {
 			mDbHelper.showDbErrorToast(this.getActivity());
-			this.getMainActivity().getFragmentManager().popBackStack();
+			this.getMainActivity().getSupportFragmentManager().popBackStack();
 			return;
 		}
 		

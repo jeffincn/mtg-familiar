@@ -44,10 +44,5 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:showAsAction="always"
         android:icon="@drawable/menu_plus"
         android:title="@string/life_counter_add_player"/>
-    <item
-        android:id="@+id/search_from_camera"
-        android:title="@string/life_counter_search_from_photo"
-        android:icon="@drawable/menu_camera"
-        android:showAsAction="always"/>
 
 </menu>

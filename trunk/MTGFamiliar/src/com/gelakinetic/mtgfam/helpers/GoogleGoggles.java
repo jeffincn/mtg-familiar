@@ -10,11 +10,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Random;
 
-import com.gelakinetic.mtgfam.R;
-
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.widget.Toast;
 
 public class GoogleGoggles {
     // Image should be less than 140Kb !!
@@ -42,17 +39,17 @@ public class GoogleGoggles {
 
 	private static String URL_WEBSERVICE_GOGGLES = "http://www.google.com/goggles/container_proto?cssid=";
 	
-	private static void ShowGogglesToast(Context ctx, String error) {
-		try {
-			Toast.makeText(ctx, error,
-					Toast.LENGTH_LONG).show();
-		} catch (RuntimeException re) {
-			// Eat it; this will happen if we try to toast in a non-UI thread.
-			System.out.println("ShowGogglesErrorToast - exception");
-		}
-	}
+//	private static void ShowGogglesToast(Context ctx, String error) {
+//		try {
+//			Toast.makeText(ctx, error,
+//					Toast.LENGTH_LONG).show();
+//		} catch (RuntimeException re) {
+//			// Eat it; this will happen if we try to toast in a non-UI thread.
+//			System.out.println("ShowGogglesErrorToast - exception");
+//		}
+//	}
 	
-    public static String StartCardSearch(Bitmap mImageBitmap, Context ctx) throws IOException {
+    public static String StartCardSearch(Bitmap mImageBitmap, Context ctx, CardDbAdapter mDbHelper) throws IOException {
  
         int i = 0;
  
@@ -70,16 +67,16 @@ public class GoogleGoggles {
             if (cssidIsValid) {
                 break;
             } else {
-            	ShowGogglesToast(ctx, ctx.getString(R.string.goggles_cssid_expired));
+            	//ShowGogglesToast(ctx, ctx.getString(R.string.goggles_cssid_expired));
             	sCssid = generateCSSID();
             }
             i++;
         }
  
         if (cssidIsValid) {
-            return getCardName(sCssid, mImageBitmap);
+            return getCardName(sCssid, mImageBitmap, mDbHelper);
         } else {
-        	ShowGogglesToast(ctx, ctx.getString(R.string.goggles_3_attempts));
+        	//ShowGogglesToast(ctx, ctx.getString(R.string.goggles_3_attempts));
             return "";
         }
     }
@@ -107,7 +104,7 @@ public class GoogleGoggles {
 
     }
      
-    private static String getCardName(String cssid, Bitmap mBitmap) throws IOException
+    private static String getCardName(String cssid, Bitmap mBitmap, CardDbAdapter mDbHelper) throws IOException
     {
         URL url = new URL(URL_WEBSERVICE_GOGGLES + cssid);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -170,7 +167,7 @@ public class GoogleGoggles {
 					// Sometimes the name found comes with the extension, sometimes not ... Goggles power. (the user can still clean the name found)
 					if ((int)cardName.charAt(i) < 32 || (int)cardName.charAt(i) > 128) {
 						cardName = cardName.substring(0,i);
-						return cardName.trim();
+						return checkForCardName(cardName.trim(), mDbHelper);
 					}
 				}
 			}
@@ -178,7 +175,22 @@ public class GoogleGoggles {
         return "";
     }
  
-    // Encodes an int32 into varint32.
+    private static String checkForCardName(String goggleResult, CardDbAdapter mDbHelper) {
+    	String save = goggleResult;
+    	while(goggleResult.length() != 0) {
+    		try {
+				if(mDbHelper.isValidCardName(goggleResult)) {
+					return goggleResult;
+				}
+			} catch (FamiliarDbException e) {
+				return save;
+			}
+    		goggleResult = goggleResult.substring(0, goggleResult.lastIndexOf(" ")).trim();
+    	}
+		return goggleResult;
+	}
+
+	// Encodes an int32 into varint32.
     private static byte[] toVarint32(int value)
     {
         int index = 0;

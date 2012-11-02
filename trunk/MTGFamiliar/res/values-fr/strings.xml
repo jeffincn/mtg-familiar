@@ -221,7 +221,7 @@
     <string name="gathering_add_player">Ajouter un joueur</string>
     <string name="gathering_toast_no_gatherings">Aucun Type de Match existe.</string>
     <string name="gathering_toast_no_name">Veuillez saisir un nom pour ce type de match.</string>
-    
+    <string name="gathering_empty_field">Les champs ne peut pas être vide. S\'il vous plaît vérifier tous les champs.</string>
     
     <!-- Dice activity -->
     <string name="dice_heads">pile</string>

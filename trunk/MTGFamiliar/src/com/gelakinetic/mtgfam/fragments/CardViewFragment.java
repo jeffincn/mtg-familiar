@@ -819,10 +819,10 @@ public class CardViewFragment extends FamiliarFragment {
 
 				String date = null, ruling;
 				while ((line = br.readLine()) != null) {
-					if (line.contains("rulingDate") && line.contains("</td>")) {
+					if (line.contains("rulingDate") && line.contains("<td")) {
 						date = (line.replace("<autocard>", "").replace("</autocard>", "")).split(">")[1].split("<")[0];
 					}
-					if (line.contains("rulingText") && line.contains("</td>")) {
+					if (line.contains("rulingText") && line.contains("<td")) {
 						ruling = (line.replace("<autocard>", "").replace("</autocard>", "")).split(">")[1].split("<")[0];
 						Ruling r = new Ruling(date, ruling);
 						rulingsArrayList.add(r);

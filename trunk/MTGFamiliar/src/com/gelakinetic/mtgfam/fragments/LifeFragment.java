@@ -25,7 +25,6 @@ import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.TextToSpeech.OnUtteranceCompletedListener;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +48,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.fragments.SearchViewFragment.SearchCriteria;
 import com.gelakinetic.mtgfam.helpers.GatheringsIO;
 import com.gelakinetic.mtgfam.helpers.GatheringsPlayerData;
 
@@ -1688,7 +1686,6 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			tts.setOnUtteranceCompletedListener(new OnUtteranceCompletedListener() {
 				public void onUtteranceCompleted(String utteranceId) {
 					// If the utterance ID is correct, shout that it's OVER NINE THOUSAAAAAAAAND
-					Log.i("LifeCounter", "Utterance completed, id=" + utteranceId);
 					if(utteranceId != null && utteranceId.equals("9000")) {
 						try {
 							mediaPlayer.stop();
@@ -1696,7 +1693,6 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 							mediaPlayer.start();
 						} 
 						catch (Exception e) {
-							Log.w("LifeCounter", "Exception while preparing media file: " + e.getMessage());
 						}
 					}
 				}

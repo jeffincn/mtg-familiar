@@ -47,7 +47,7 @@ public class ResultListFragment extends FamiliarFragment {
 
 		String[] returnTypes = new String[] { CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_SET,
 				CardDbAdapter.KEY_RARITY, CardDbAdapter.KEY_MANACOST, CardDbAdapter.KEY_TYPE, CardDbAdapter.KEY_ABILITY,
-				CardDbAdapter.KEY_POWER, CardDbAdapter.KEY_TOUGHNESS, CardDbAdapter.KEY_LOYALTY };
+				CardDbAdapter.KEY_POWER, CardDbAdapter.KEY_TOUGHNESS, CardDbAdapter.KEY_LOYALTY , CardDbAdapter.KEY_NUMBER };
 
 		Bundle args = this.getArguments();
 		try {
@@ -93,6 +93,23 @@ public class ResultListFragment extends FamiliarFragment {
 				startCardViewFrag(id, isRandom, isSingle);
 			}
 		}
+		
+		/* Uncomment this to add the result of a search directly into the wishlist */
+		/*
+		ArrayList<CardData> cards = new ArrayList<CardData>();
+		c.moveToFirst();
+		while(!c.isAfterLast()) {
+			CardData cd = (new TradeListHelpers()).new CardData(
+					c.getString(c.getColumnIndex(CardDbAdapter.KEY_NAME)),
+					c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)),
+					1,
+					c.getString(c.getColumnIndex(CardDbAdapter.KEY_NUMBER)),
+					c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY)));
+			cards.add(cd);
+			c.moveToNext();
+		}
+		WishlistHelpers.WriteWishlist(this.getActivity(), cards);
+		*/
 	}
 
 	@Override

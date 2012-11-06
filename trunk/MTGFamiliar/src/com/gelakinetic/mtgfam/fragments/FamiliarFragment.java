@@ -2,7 +2,6 @@ package com.gelakinetic.mtgfam.fragments;
 
 import java.io.IOException;
 
-import android.app.Dialog;
 import android.app.Instrumentation;
 import android.app.ProgressDialog;
 import android.content.Intent;

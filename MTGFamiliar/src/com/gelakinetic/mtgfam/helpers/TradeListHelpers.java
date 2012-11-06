@@ -19,7 +19,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 
@@ -98,7 +97,6 @@ public class TradeListHelpers {
 			FetchPriceTask toExecute = pendingTasks.poll();
 			if(toExecute != null){
 				currentExecutingTasks.add(toExecute);
-				Log.e("execute task!!!", toExecute.data.name);
 				
 
 				boolean API_LEVEL_11 = android.os.Build.VERSION.SDK_INT > 11;
@@ -109,9 +107,6 @@ public class TradeListHelpers {
 				else {
 					toExecute.execute((Void[])null);
 				}
-				//TODO total hack, but onPostExecute isn't called without this pause
-				long start = System.currentTimeMillis();
-				while(start + 333 > System.currentTimeMillis()){;}
 			}
 		}
 	}
@@ -156,8 +151,6 @@ public class TradeListHelpers {
 				String setCode = data.setCode == null ? "" : data.setCode;
 				String tcgName = data.tcgName == null ? "" : data.tcgName;
 				
-				Log.e("doInBackground", cardName);
-				
 				if (cardNumber == "" || setCode == "" || tcgName == "") {
 					if(wf != null) {
 						data = FetchCardData(data, wf.mDbHelper);
@@ -167,7 +160,6 @@ public class TradeListHelpers {
 					}
 					if (data.message == card_not_found || data.message == database_busy) {
 						price = data.message;
-						Log.e("doInBackground", price);
 						return null;
 					}
 				}
@@ -187,28 +179,23 @@ public class TradeListHelpers {
 			catch (MalformedURLException e) {
 				priceurl = null;
 				price = mangled_url;
-				Log.e("doInBackground", price);
 				return null;
 			} catch (FamiliarDbException e) {
 				priceurl = null;
 				price = familiarDbException;
-				Log.e("doInBackground", price);
 				return null;
 			}
 
 			price = fetchPrice(priceurl);
 
 			if (price.equals(fetch_failed)) {
-				Log.e("doInBackground", price);
 				return null;
 			}
-			Log.e("doInBackground", price);
 			return null;
 		}
 
 		@Override
 		protected void onPostExecute(Void result) {
-			Log.e("onPostExecute", data.name);
 			double dPrice;
 			try {
 				dPrice = Double.parseDouble(price);

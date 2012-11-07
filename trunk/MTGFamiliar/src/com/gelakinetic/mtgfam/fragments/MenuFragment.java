@@ -18,8 +18,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,12 +44,14 @@ public class MenuFragment extends ListFragment {
 	public void onResume() {
 		super.onResume();
 		// TODO just to be safe?
-		if (!(getActivity() instanceof MainActivity))
+		if (!(getActivity() instanceof MainActivity)) {			
 			throw new IllegalStateException(
 					"MenuFragment must be attached to an instance of MainActivity");
-		if (getActivity().findViewById(R.id.frag_view) == null)
+		}
+		if (getActivity().findViewById(R.id.frag_view) == null) {
 			throw new IllegalStateException(
 					"MenuFragment must be attached to an Activity with R.id.frag_view");
+		}
 		mActivity = (MainActivity) getActivity();
 		// add everything
 		mAdapter = new SlidingMenuAdapter(mActivity);
@@ -163,8 +165,9 @@ public class MenuFragment extends ListFragment {
 			break;
 		}
 		}
-		if (fragment != null)
-			replaceFragment(fragment);
+		if (fragment != null) {
+			switchContent(fragment);
+		}
 	}
 	
 	ArrayList<File> findAllFiles(File dir) {
@@ -246,14 +249,19 @@ public class MenuFragment extends ListFragment {
 		zos.close();
 	}
 
-	protected void replaceFragment(Fragment frag) {
-		FragmentTransaction fragmentTransaction = mActivity
-				.getSupportFragmentManager().beginTransaction();
-		fragmentTransaction.replace(R.id.frag_view, frag);
-		fragmentTransaction.commit();
-		mActivity.hideKeyboard();
-		mActivity.showAbove();
-	}
+	public void switchContent(final Fragment fragment) {
+		//mContent = fragment;
+		mActivity.getSupportFragmentManager()
+		.beginTransaction()
+		.replace(R.id.frag_view, fragment)
+		.commit();
+		Handler h = new Handler();
+		h.postDelayed(new Runnable() {
+			public void run() {
+				mActivity.getSlidingMenu().showAbove();
+			}
+		}, 50);
+	}	
 
 	private class SlidingMenuItem {
 		public int title;

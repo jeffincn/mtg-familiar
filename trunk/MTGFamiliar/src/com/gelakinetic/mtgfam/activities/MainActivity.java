@@ -125,15 +125,18 @@ public class MainActivity extends SlidingFragmentActivity {
 
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-		actionBar.setDisplayHomeAsUpEnabled(true);
+		actionBar.setDisplayHomeAsUpEnabled(false);
+		actionBar.setHomeButtonEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(false);
+		actionBar.setIcon(R.drawable.sliding_menu_icon);
 
-		// getSlidingMenu().setBehindOffsetRes(R.dimen.actionbar_home_width);
-		getSlidingMenu().setBehindWidthRes(R.dimen.sliding_menu_width);
-		getSlidingMenu().setBehindScrollScale(0.0f);
-		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
-		getSlidingMenu().setShadowWidthRes(R.dimen.shadow_width);
-		getSlidingMenu().setShadowDrawable(R.drawable.sliding_menu_shadow);
+		SlidingMenu slidingMenu = getSlidingMenu();
+		slidingMenu.setBehindWidthRes(R.dimen.sliding_menu_width);
+		slidingMenu.setBehindScrollScale(0.0f);
+		slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+		slidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_MARGIN);
+		slidingMenu.setShadowWidthRes(R.dimen.shadow_width);
+		slidingMenu.setShadowDrawable(R.drawable.sliding_menu_shadow);
 		setBehindContentView(R.layout.fragment_menu);
 		getSupportFragmentManager().beginTransaction().add(R.id.frag_menu, new MenuFragment()).commit();
 

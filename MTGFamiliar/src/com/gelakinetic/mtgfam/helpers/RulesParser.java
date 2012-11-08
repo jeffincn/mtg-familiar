@@ -1,16 +1,12 @@
 package com.gelakinetic.mtgfam.helpers;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteException;
@@ -20,52 +16,47 @@ import com.gelakinetic.mtgfam.R;
 public class RulesParser {
 
 	// Instance variables
-	private Date										lastUpdated;
-	private String									rulesUrl;
-	private CardDbAdapter						mDbHelper;
+	private Date lastUpdated;
+	private CardDbAdapter mDbHelper;
 	private Context context;
-	private ProgressReporter									progReport;
-	private ArrayList<RuleItem>			rules;
-	private ArrayList<GlossaryItem>	glossary;
+	private InputStream is;
+	private BufferedReader reader;
+	private ProgressReporter progReport;
+	private ArrayList<RuleItem> rules;
+	private ArrayList<GlossaryItem> glossary;
 
-	// URLs and the regex
-	private final String						source								= "http://www.wizards.com/Magic/TCG/Article.aspx?x=magic/rules";
-	private final String						prefix								= "http://media.wizards.com/images/magic/tcg/resources/rules/";
-	private final String						regex									= "(MagicCompRules_[0-9]{8}\\.txt)";
-
-	// Delimiting tokens
-	// NOTE: If WotC changes their rules file format drastically, these may need
-	// to be changed as well
-	private final String						preRules							= "Customer Service Information";
-	private final String						postRulesPreGlossary	= "Glossary";
-	private final String						postGlossary					= "Credits";
+	// URL and delimiting tokens
+	private static final String SOURCE = "https://sites.google.com/site/mtgfamiliar/rules/MagicCompRules.txt";
+	private static final String RULES_TOKEN = "RULES_VERYLONGSTRINGOFLETTERSUNLIKELYTOBEFOUNDINTHEACTUALRULES";
+	private static final String GLOSSARY_TOKEN = "GLOSSARY_VERYLONGSTRINGOFLETTERSUNLIKELYTOBEFOUNDINTHEACTUALRULES";
+	private static final String EOF_TOKEN = "EOF_VERYLONGSTRINGOFLETTERSUNLIKELYTOBEFOUNDINTHEACTUALRULES";
 
 	// Result codes
 	/**
 	 * Returned from fetchAndLoad() if everything works correctly.
 	 **/
-	public static int								SUCCESS								= 0;
+	public static int SUCCESS = 0;
 
 	/**
-	 * Returned from fetchAndLoad() if some of the rules/terms failed, but some
-	 * succeeded.
+	 * Returned from fetchAndLoad() if some of the rules/terms failed, but some succeeded.
 	 **/
-	public static int								ERRORS								= 1;
+	public static int ERRORS = 1;
 
 	/**
 	 * Returned from fetchAndLoad() if a catastrophic failure occurs.
 	 **/
-	public static int								FAILURE								= 2;
+	public static int FAILURE = 2;
 
-    public interface ProgressReporter {
-        void reportRulesProgress(String... args);
-    }
+	public interface ProgressReporter {
+		void reportRulesProgress(String... args);
+	}
 
 	public RulesParser(Date lastUpdated, CardDbAdapter mDbHelper, Context context, ProgressReporter progReport) {
 		this.lastUpdated = lastUpdated;
-		this.rulesUrl = null;
 		this.mDbHelper = mDbHelper;
 		this.context = context;
+		this.is = null;
+		this.reader = null;
 		this.progReport = progReport;
 
 		this.rules = new ArrayList<RuleItem>();
@@ -73,93 +64,53 @@ public class RulesParser {
 	}
 
 	/**
-	 * Attempts to get the URL for the latest version of the rules and determine
-	 * if an update is necessary. If it finds the file and its date is newer than
-	 * this.lastUpdated, true will be returned. Otherwise, it will return false.
-	 * If true is returned, this.rulesUrl will be populated.
+	 * Attempts to get the URL for the latest version of the rules and determine if an update is necessary. If it finds
+	 * the file and its date is newer than this.lastUpdated, true will be returned. Otherwise, it will return false. If
+	 * true is returned, this.rulesUrl will be populated.
 	 * 
 	 * @return Whether or this the rules need updating.
 	 */
 	public boolean needsToUpdate() {
 		URL url;
-		InputStream is = null;
-		BufferedReader reader = null;
 
 		try {
-			url = new URL(source);
-			is = url.openStream();
-			reader = new BufferedReader(new InputStreamReader(is));
-			Pattern p = Pattern.compile(regex);
-			Matcher m;
+			url = new URL(SOURCE);
+			this.is = url.openStream();
+			this.reader = new BufferedReader(new InputStreamReader(is));
 
-			String line;
-			while ((line = reader.readLine()) != null) {
-				m = p.matcher(line);
-				if (m.find()) {
-					this.rulesUrl = prefix + line.substring(m.start(), m.end());
-					break;
-				}
-			}
-		}
-		catch (MalformedURLException mue) {
-			this.rulesUrl = null;
-		}
-		catch (IOException ioe) {
-			this.rulesUrl = null;
-		}
-		finally {
-			try {
-				is.close();
-				reader.close();
-			}
-			catch (IOException ioe) {
-				// Eat it
-			}
-			catch (NullPointerException npe) {
-				// Eat it
-			}
-		}
-
-		if (this.rulesUrl == null) {
-			return false;
-		}
-		else {
-			int txtIndex = this.rulesUrl.indexOf(".txt");
-			if (txtIndex < 0) {
-				// Shouldn't happen; something obviously went wrong here
+			//First line will be the date formatted as YYYY-MM-DD
+			String line = this.reader.readLine();
+			String[] parts = line.split("-");
+			Calendar c = Calendar.getInstance();
+			c.set(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+			
+			if (c.getTime().after(this.lastUpdated)) {
+				return true;	
+			} 
+			else {
+				closeReader();
 				return false;
 			}
-			String date = this.rulesUrl.substring(txtIndex - 8, txtIndex);
-			Calendar c = Calendar.getInstance();
-			c.set(Integer.parseInt(date.substring(0, 4)), // yyyy
-					Integer.parseInt(date.substring(4, 6)) - 1, // mm (months are
-																											// 0-indexed for some
-																											// inane reason)
-					Integer.parseInt(date.substring(6, 8)), // dd
-					0, // hh
-					0, // mm
-					0); // ss
-			Date rulesDate = c.getTime();
-			return rulesDate.after(this.lastUpdated);
+		}
+		catch (Exception e) {
+			closeReader();
+			return false;
 		}
 	}
 
 	/**
-	 * Attempts to fetch the latest version of the rules and load it into the
-	 * database. If the process is successful, true will be returned. Otherwise,
-	 * false will be returned. This method should only be called if
-	 * needsToUpdate() returns true.
+	 * Attempts to fetch the latest version of the rules and load it into the database. If the process is successful,
+	 * true will be returned. Otherwise, false will be returned. This method should only be called if needsToUpdate()
+	 * returns true.
 	 * 
 	 * @return Whether or not the parsing is successful
 	 */
 	public boolean parseRules() {
-		if (this.rulesUrl == null) {
+		if (this.reader == null) {
+			//This should only be the case if we called parseRules() before needsToUpdate()
+			//or if needsToUpdate() returned false
 			return false;
 		}
-
-		URL url;
-		InputStream is = null;
-		BufferedReader reader = null;
 
 		try {
 			RuleItem currentRule = null;
@@ -168,21 +119,15 @@ public class RulesParser {
 			this.rules.clear();
 			this.glossary.clear();
 
-			// Init the reader
-			url = new URL(this.rulesUrl);
-			is = url.openStream();
-			reader = new BufferedReader(new InputStreamReader(is));
-
-			// Then populate
-			String line = reader.readLine().trim();
-			while (!line.equals(preRules)) {
-				// Burn through lines until we hit the pre-rules token
+			String line = this.reader.readLine().trim();
+			while (!line.equals(RULES_TOKEN)) {
+				// Burn through lines until we hit the rules token
 				line = reader.readLine().trim();
 			}
 
 			line = reader.readLine(); // Step past the token
 
-			while (!line.equals(postRulesPreGlossary)) {
+			while (!line.equals(GLOSSARY_TOKEN)) {
 				// Parse the line
 				if (line.length() == 0) {
 					if (currentRule != null) {
@@ -231,7 +176,8 @@ public class RulesParser {
 					}
 					else {
 						if (currentRule != null) {
-							currentRule.addExample(line.replace("{PW}", "{PWK}").replace("{P/W}", "{PW}").replace("{W/P}", "{WP}"));
+							currentRule.addExample(line.replace("{PW}", "{PWK}").replace("{P/W}", "{PW}")
+									.replace("{W/P}", "{WP}"));
 						}
 					}
 				}
@@ -242,7 +188,7 @@ public class RulesParser {
 
 			line = reader.readLine().trim(); // Step past the token
 
-			while (!line.equals(postGlossary)) {
+			while (!line.equals(EOF_TOKEN)) {
 				// Parse the line
 				if (line.length() == 0) {
 					if (currentTerm != null) {
@@ -272,28 +218,17 @@ public class RulesParser {
 			return false;
 		}
 		finally {
-			try {
-				is.close();
-				reader.close();
-			}
-			catch (IOException ioe) {
-				// Eat it
-			}
-			catch (NullPointerException npe) {
-				// Eat it
-			}
+			closeReader();
 		}
 	}
 
 	/**
-	 * Loads in the rules and glossary to the database, updating the count as it
-	 * goes. The expected usage is that the main activity will have a progress
-	 * dialog that gets updated as the count does.
+	 * Loads in the rules and glossary to the database, updating the count as it goes. The expected usage is that the
+	 * main activity will have a progress dialog that gets updated as the count does.
 	 * 
-	 * @return SUCCESS if nothing goes wrong, ERRORS if some errors occur but some
-	 *         data is loaded, and FAILURE if everything fails and no data is
-	 *         loaded.
-	 * @throws FamiliarDbException 
+	 * @return SUCCESS if nothing goes wrong, ERRORS if some errors occur but some data is loaded, and FAILURE if
+	 *         everything fails and no data is loaded.
+	 * @throws FamiliarDbException
 	 */
 	public int loadRulesAndGlossary() throws FamiliarDbException {
 		try {
@@ -306,7 +241,7 @@ public class RulesParser {
 			String dialogText = context.getString(R.string.update_parse_rules);
 			progReport.reportRulesProgress("determinate", "");
 			progReport.reportRulesProgress(new String[] { dialogText, dialogText,
-					"" + (int) Math.round(100 * elementsParsed / (double) numTotalElements) });
+					"" + (int)Math.round(100 * elementsParsed / (double)numTotalElements) });
 			// main.setNumCards(rules.size() + glossary.size());
 
 			for (RuleItem rule : rules) {
@@ -319,7 +254,7 @@ public class RulesParser {
 				finally {
 					elementsParsed++;
 					progReport.reportRulesProgress(new String[] { dialogText, dialogText,
-							"" + (int) Math.round(100 * elementsParsed / (double) numTotalElements) });
+							"" + (int)Math.round(100 * elementsParsed / (double)numTotalElements) });
 				}
 			}
 
@@ -334,27 +269,41 @@ public class RulesParser {
 				finally {
 					elementsParsed++;
 					progReport.reportRulesProgress(new String[] { dialogText, dialogText,
-							"" + (int) Math.round(100 * elementsParsed / (double) numTotalElements) });
+							"" + (int)Math.round(100 * elementsParsed / (double)numTotalElements) });
 				}
 			}
 
-//			progReport.reportRulesProgress(new String[] { "Done Parsing Comprehensive Rules", "Done Parsing Comprehensive Rules",
-//					"0" });
+			// progReport.reportRulesProgress(new String[] { "Done Parsing Comprehensive Rules",
+			// "Done Parsing Comprehensive Rules",
+			// "0" });
 			return statusCode;
 		}
 		catch (SQLiteException sqe) {
-//			progReport.reportRulesProgress(new String[] { "Done Parsing Comprehensive Rules", "Done Parsing Comprehensive Rules",
-//					"0" });
+			// progReport.reportRulesProgress(new String[] { "Done Parsing Comprehensive Rules",
+			// "Done Parsing Comprehensive Rules",
+			// "0" });
 			return FAILURE;
 		}
 	}
+	
+	private void closeReader() {
+		try {
+			this.is.close();
+			this.reader.close();
+		}
+		catch (Exception e) {
+		}
+		
+		this.is = null;
+		this.reader = null;
+	}
 
 	private class RuleItem {
-		public int		category;
-		public int		subcategory;
-		public String	entry;
-		public String	text;
-		public int		position;
+		public int category;
+		public int subcategory;
+		public String entry;
+		public String text;
+		public int position;
 
 		public RuleItem(int category, int subcategory, String entry, String text, int position) {
 			this.category = category;
@@ -370,8 +319,8 @@ public class RulesParser {
 	}
 
 	private class GlossaryItem {
-		public String	term;
-		public String	definition;
+		public String term;
+		public String definition;
 
 		public GlossaryItem(String term) {
 			this.term = term;

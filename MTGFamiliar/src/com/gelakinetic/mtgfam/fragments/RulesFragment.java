@@ -229,7 +229,7 @@ public class RulesFragment extends FamiliarFragment {
 		 * make some sense of the regex so I'm not just waving my hands and shouting
 		 * "WIZAAAAAARDS!". I still reserve the right to do that, though. - Alex
 		 */
-		linkPattern = Pattern.compile("([1-9]{1}[0-9]{2}(\\.([a-z0-9]{1,3}(-[a-z]{1})?)?\\.?)?)");
+		linkPattern = Pattern.compile("([1-9]{1}[0-9]{2}(\\.([a-z0-9]{1,4}(-[a-z]{1})?)?\\.?)?)");
 
 		// setResult(RESULT_NORMAL);
 		return myFragmentView;

@@ -39,7 +39,11 @@ public class JsonParser {
         void reportJsonCardProgress(String... args);
     }
 
-	public static void readCardJsonStream(InputStream in, CardProgressReporter progReport, String setName, CardDbAdapter mDbHelper, Context context)
+		private String	currentTCGNamePatchDate = null;
+		private String	currentPatchDate = null;
+		private String	currentRulesDate = null;
+
+	public void readCardJsonStream(InputStream in, CardProgressReporter progReport, String setName, CardDbAdapter mDbHelper, Context context)
 			throws IOException {
 		String dialogText = String.format(context.getString(R.string.update_parse_cards), setName);
 		
@@ -52,6 +56,8 @@ public class JsonParser {
 		reader.beginObject();
 		s = reader.nextName();
 
+		ArrayList<MtgSet> setsAdded = new ArrayList<MtgSet>();
+		
 		progReport.reportJsonCardProgress("determinate", "");
 		reader.beginObject();
 		while (reader.hasNext()) {
@@ -89,7 +95,7 @@ public class JsonParser {
 									set.date = reader.nextLong();
 								}
 							}
-							mDbHelper.createSet(set);
+							setsAdded.add(set);
 							reader.endObject();
 						}
 						else if (jt.equals(JsonToken.BEGIN_ARRAY)) {
@@ -112,7 +118,7 @@ public class JsonParser {
 										set.date = reader.nextLong();
 									}
 								}
-								mDbHelper.createSet(set);
+								setsAdded.add(set);
 								reader.endObject();
 							}
 							reader.endArray();
@@ -288,14 +294,20 @@ public class JsonParser {
 		}
 		reader.endObject();
 		reader.close();
+		
+		// Add the set information to the database AFTER adding the cards.
+		// This way if the update fails while parsing cards, the database won't think it has the set already, when it doesnt.
+		for(MtgSet set : setsAdded) {
+			mDbHelper.createSet(set);
+		}
+		
 		return;
 	}
 
-	public static ArrayList<String[]> readUpdateJsonStream(PreferencesAdapter prefAdapter) throws MalformedURLException, IOException {
+	public ArrayList<String[]> readUpdateJsonStream(PreferencesAdapter prefAdapter) throws MalformedURLException, IOException {
 		ArrayList<String[]> patchInfo = new ArrayList<String[]>();
 		URL update;
 		String label;
-		String date = null;
 		String label2;
 
 		update = new URL("https://sites.google.com/site/mtgfamiliar/manifests/patches.json");
@@ -308,8 +320,8 @@ public class JsonParser {
 
 			if (label.equals("Date")) {
 				String lastUpdate = prefAdapter.getLastUpdate();
-				date = reader.nextString();
-				if (lastUpdate.equals(date)) {
+				currentPatchDate = reader.nextString();
+				if (lastUpdate.equals(currentPatchDate)) {
 					reader.close();
 					return null;
 				}
@@ -340,16 +352,13 @@ public class JsonParser {
 		reader.endObject();
 		reader.close();
 
-		prefAdapter.setLastUpdate(date);
-
 		return patchInfo;
 	}
 
-	public static void readLegalityJsonStream(CardDbAdapter cda, PreferencesAdapter prefAdapter, boolean reparseDatabase)
+	public void readLegalityJsonStream(CardDbAdapter cda, PreferencesAdapter prefAdapter, boolean reparseDatabase)
 			throws IOException, FamiliarDbException {
 
 		CardDbAdapter mDbHelper;
-		String date = null;
 		String legalSet;
 		String bannedCard;
 		String restrictedCard;
@@ -369,11 +378,11 @@ public class JsonParser {
 
 			jsonTopLevelName = reader.nextName();
 			if (jsonTopLevelName.equalsIgnoreCase("Date")) {
-				date = reader.nextString();
+				currentRulesDate  = reader.nextString();
 
 				// compare date, maybe return, update sharedprefs
-				String spDate = prefAdapter.getDate();
-				if (spDate != null && spDate.equals(date)) {
+				String spDate = prefAdapter.getLegalityDate();
+				if (spDate != null && spDate.equals(currentRulesDate)) {
 					if(!reparseDatabase){ // if we're reparsing, screw the date
 						reader.close();
 						return; // dates match, nothing new here.
@@ -427,15 +436,13 @@ public class JsonParser {
 		}
 		reader.endObject();
 
-		prefAdapter.setDate(date);
 		reader.close();
 		return;
 	}
 
-	public static void readTCGNameJsonStream(PreferencesAdapter prefAdapter, CardDbAdapter mDbHelper, boolean reparseDatabase) throws MalformedURLException, IOException, FamiliarDbException{
+	public void readTCGNameJsonStream(PreferencesAdapter prefAdapter, CardDbAdapter mDbHelper, boolean reparseDatabase) throws MalformedURLException, IOException, FamiliarDbException{
 		URL update;
 		String label;
-		String date = null;
 		String label2;
 		String name = null, code = null;
 
@@ -449,8 +456,8 @@ public class JsonParser {
 
 			if (label.equals("Date")) {
 				String lastUpdate = prefAdapter.getLastTCGNameUpdate();
-				date = reader.nextString();
-				if (lastUpdate.equals(date) && !reparseDatabase) {
+				currentTCGNamePatchDate = reader.nextString();
+				if (lastUpdate.equals(currentTCGNamePatchDate) && !reparseDatabase) {
 					reader.close();
 					return;
 				}
@@ -477,6 +484,16 @@ public class JsonParser {
 		reader.endObject();
 		reader.close();
 
-		prefAdapter.setLastTCGNameUpdate(date);
+		
+	}
+
+	public void commitDates(PreferencesAdapter prefAdapter) {
+		prefAdapter.setLastUpdate(currentTCGNamePatchDate);
+		prefAdapter.setLastTCGNameUpdate(currentPatchDate);
+		prefAdapter.setLegalityDate(currentRulesDate);
+
+		currentTCGNamePatchDate = null;
+		currentPatchDate = null;
+		currentRulesDate = null;
 	}
 }

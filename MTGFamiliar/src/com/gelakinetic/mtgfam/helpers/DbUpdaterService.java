@@ -86,25 +86,26 @@ public class DbUpdaterService extends IntentService {
 
 		ProgressReporter reporter = new ProgressReporter();
 		ArrayList<String> updatedStuff = new ArrayList<String>();
-		
+		JsonParser parser = new JsonParser();
+		boolean commitDates = true;
+
 		try {
 
 			mDbHelper.openTransactional();
 
 			showStatusNotification();
 
-
 			if(reparseDatabase) {
 				mDbHelper.dropCreateDB();
-				JsonParser.readLegalityJsonStream(mDbHelper, mPrefAdapter, reparseDatabase);
+				parser.readLegalityJsonStream(mDbHelper, mPrefAdapter, reparseDatabase);
 				GZIPInputStream upToGIS = new GZIPInputStream(new URL("https://sites.google.com/site/mtgfamiliar/patches/UpToRTR.json.gzip").openStream());
 				switchToUpdating(String.format(getString(R.string.update_updating_set), "EVERYTHING!!"));
-				JsonParser.readCardJsonStream(upToGIS, reporter, "upToRTR", mDbHelper, this);
-				JsonParser.readTCGNameJsonStream(mPrefAdapter, mDbHelper, reparseDatabase);
+				parser.readCardJsonStream(upToGIS, reporter, "upToRTR", mDbHelper, this);
+				parser.readTCGNameJsonStream(mPrefAdapter, mDbHelper, reparseDatabase);
 			}
 			else {
-				JsonParser.readLegalityJsonStream(mDbHelper, mPrefAdapter, reparseDatabase);
-				ArrayList<String[]> patchInfo = JsonParser.readUpdateJsonStream(mPrefAdapter);
+				parser.readLegalityJsonStream(mDbHelper, mPrefAdapter, reparseDatabase);
+				ArrayList<String[]> patchInfo = parser.readUpdateJsonStream(mPrefAdapter);
 				if (patchInfo != null) {
 
 					for (int i = 0; i < patchInfo.size(); i++) {
@@ -113,7 +114,7 @@ public class DbUpdaterService extends IntentService {
 							try {
 								switchToUpdating(String.format(getString(R.string.update_updating_set), set[0]));
 								GZIPInputStream gis = new GZIPInputStream(new URL(set[1]).openStream());
-								JsonParser.readCardJsonStream(gis, reporter, set[0], mDbHelper, this);
+								parser.readCardJsonStream(gis, reporter, set[0], mDbHelper, this);
 								updatedStuff.add(set[0]);
 							}
 							catch (MalformedURLException e) {
@@ -124,31 +125,31 @@ public class DbUpdaterService extends IntentService {
 							switchToChecking();
 						}
 					}
-					JsonParser.readTCGNameJsonStream(mPrefAdapter, mDbHelper, reparseDatabase);
+					parser.readTCGNameJsonStream(mPrefAdapter, mDbHelper, reparseDatabase);
 				}
 			}
 		}
 		catch (MalformedURLException e1) {
-			// eat it, maybe we can still update rules
+			commitDates = false; // dont commit the dates
 		}
 		catch (IOException e) {
-			// eat it, maybe we can still update rules
+			commitDates = false; // dont commit the dates
 		}
 		catch (FamiliarDbException e) {
-			// eat it, maybe we can still update rules
+			commitDates = false; // dont commit the dates
 		}
-
+		
 		// Instead of using a hardcoded string, the default lastRulesUpdate is the
 		// timestamp of when the APK was built.
 		// This is a safe assumption to make, since any market release will have the
 		// latest database baked in.
+		boolean newRulesParsed = false;
 		try{
 			long lastRulesUpdate = mPrefAdapter.getLastRulesUpdate();
 			if(reparseDatabase) {
 				lastRulesUpdate = 0; //1979 anybody?
 			}
 			RulesParser rp = new RulesParser(new Date(lastRulesUpdate), mDbHelper, this, reporter);
-			boolean newRulesParsed = false;
 			if (rp.needsToUpdate()) {
 				if (rp.parseRules()) {
 					switchToUpdating(getString(R.string.update_updating_rules));
@@ -169,12 +170,6 @@ public class DbUpdaterService extends IntentService {
 					switchToChecking();
 				}
 			}
-
-			long curTime = new Date().getTime();
-			mPrefAdapter.setLastLegalityUpdate((int)(curTime / 1000));
-			if (newRulesParsed) {
-				mPrefAdapter.setLastRulesUpdate(curTime);
-			}
 	
 			mDbHelper.closeTransactional();
 	
@@ -182,9 +177,18 @@ public class DbUpdaterService extends IntentService {
 			showUpdatedNotification(updatedStuff);
 		}
 		catch(FamiliarDbException e) {
-			// TODO
+			commitDates = false; // dont commit the dates
 		}
 		
+		if(commitDates) {
+			parser.commitDates(mPrefAdapter);
+
+			long curTime = new Date().getTime();
+			mPrefAdapter.setLastLegalityUpdate((int)(curTime / 1000));
+			if (newRulesParsed) {
+				mPrefAdapter.setLastRulesUpdate(curTime);
+			}
+		}
 		return;
 	}
 

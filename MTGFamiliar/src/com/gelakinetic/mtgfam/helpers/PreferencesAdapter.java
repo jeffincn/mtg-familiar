@@ -63,7 +63,7 @@ public class PreferencesAdapter {
 	private static final String ROUND_LENGTH = "roundLength"; //String, default "50"
 	private static final String TIMER_SOUND = "timerSound"; //String, default RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION).toString()
 	private static final String TRADE_PRICE = "tradePrice"; //String, default "1"
-	private static final String DATE = "date"; //String, default null
+	private static final String LEGALITY_DATE = "date"; //String, default null
 	private static final String LAST_UPDATE = "lastUpdate"; //String, default ""
 	private static final String LAST_TCGNAME_UPDATE = "lastTCGNameUpdate"; //String, default ""
 	
@@ -820,22 +820,22 @@ public class PreferencesAdapter {
 	}
 	
 	//Date
-	private boolean dateLoaded = false;
-	private String date;
+	private boolean legalityDateLoaded = false;
+	private String legalityDate;
 	
-	public synchronized String getDate() {
-		if(!this.dateLoaded) {
-			this.date = this.prefs.getString(DATE, null);
-			this.dateLoaded = true;
+	public synchronized String getLegalityDate() {
+		if(!this.legalityDateLoaded) {
+			this.legalityDate = this.prefs.getString(LEGALITY_DATE, null);
+			this.legalityDateLoaded = true;
 		}
-		return this.date;
+		return this.legalityDate;
 	}
 	
-	public synchronized void setDate(String date) {
-		this.date = date;
-		this.dateLoaded = true;
+	public synchronized void setLegalityDate(String date) {
+		this.legalityDate = date;
+		this.legalityDateLoaded = true;
 		
-		this.edit.putString(DATE, date);
+		this.edit.putString(LEGALITY_DATE, date);
 		this.edit.commit();
 	}
 	

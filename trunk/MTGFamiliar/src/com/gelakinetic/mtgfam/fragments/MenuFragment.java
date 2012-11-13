@@ -250,7 +250,13 @@ public class MenuFragment extends ListFragment {
 	}
 
 	public void switchContent(final Fragment fragment) {
-		//mContent = fragment;
+		
+		// Clear the backstack, otherwise replacing a cardview after a search
+		// messes up the hierarchy
+		for(int i=0; i < mActivity.getSupportFragmentManager().getBackStackEntryCount(); i++) {
+			mActivity.getSupportFragmentManager().popBackStack();
+		}
+		
 		mActivity.getSupportFragmentManager()
 		.beginTransaction()
 		.replace(R.id.frag_view, fragment)

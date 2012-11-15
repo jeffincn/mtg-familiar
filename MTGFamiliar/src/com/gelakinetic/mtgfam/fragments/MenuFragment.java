@@ -135,7 +135,7 @@ public class MenuFragment extends ListFragment {
 			break;
 		case R.string.main_import_data_title: {
 			File sdCard = Environment.getExternalStorageDirectory();
-			File zipIn = new File(sdCard, "MTGFamiliarBackip.zip");
+			File zipIn = new File(sdCard, "MTGFamiliarBackup.zip");
 			try {
 				unZipIt(new ZipFile(zipIn));
 				Toast.makeText(mActivity, getString(R.string.main_import_success), Toast.LENGTH_SHORT).show();
@@ -151,7 +151,7 @@ public class MenuFragment extends ListFragment {
 			ArrayList<File> files = findAllFiles(mActivity.getFilesDir());
 
 			File sdCard = Environment.getExternalStorageDirectory();
-			File zipOut = new File(sdCard, "MTGFamiliarBackip.zip");
+			File zipOut = new File(sdCard, "MTGFamiliarBackup.zip");
 			if(zipOut.exists()) {
 				zipOut.delete();
 			}

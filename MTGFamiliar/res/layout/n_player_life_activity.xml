@@ -26,7 +26,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <LinearLayout
         android:id="@+id/info_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="vertical" >
 
@@ -89,7 +89,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
             android:src="@drawable/commander_button" />
 
         <ImageView
-            android:id="@+id/life_button"
+            android:id="@+id/null_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

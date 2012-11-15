@@ -199,14 +199,14 @@ public class GatheringCreateFragment extends FamiliarFragment {
 
 			EditText customName = (EditText) player.findViewById(R.id.custom_name);
 			String name = customName.getText().toString().trim();
-			if (name.trim().isEmpty()){
+			if (name.trim().length()==0){
 				return true;
 			}
 				
 
 			EditText startingLife = (EditText) player.findViewById(R.id.starting_life);
 			
-			if(startingLife.getText().toString().trim().isEmpty()){
+			if(startingLife.getText().toString().trim().length()==0){
 				return true;
 			}
 		}

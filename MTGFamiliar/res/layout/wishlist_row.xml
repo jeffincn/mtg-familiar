@@ -11,12 +11,13 @@
         android:layout_height="wrap_content"
         android:baselineAligned="false"
         android:orientation="horizontal" >
+        <ImageButton android:id="@+id/cardview_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="5dp" android:src="@drawable/wishlist_card_image" android:background="@null"/>
 
         <TextView
             android:id="@+id/wishlistRowName"
             style="@style/text"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center_vertical"
             android:text="@string/wishlist_name" />
@@ -26,7 +27,9 @@
             style="@style/text"
             android:layout_width="wrap_content"
             android:gravity="right|center_vertical"
-            android:text="@string/ph_cost" />
+            android:text="@string/ph_cost" 
+            
+            android:layout_height="match_parent"/>
     </LinearLayout>
 
     <TextView

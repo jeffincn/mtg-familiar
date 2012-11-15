@@ -500,12 +500,14 @@ public class CardDbAdapter {
 
 	public long fetchIdByName(String name) throws FamiliarDbException {
 		name = name.replace("'", "''").replace("æ", "Æ");
-		String statement = "(" + KEY_NAME + " = '" + name + "')";
+		
+		String sql = "SELECT " + DATABASE_TABLE_CARDS + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_SET + ", " + DATABASE_TABLE_SETS + "." + KEY_DATE +
+				" FROM (" + DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_CARDS + "." + KEY_SET + "=" + DATABASE_TABLE_SETS + "." + KEY_CODE + ")" +
+				" WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + name + "' ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC";
+		
 		Cursor mCursor = null;
 		try {
-			mCursor = mDb.query(true, DATABASE_TABLE_CARDS,
-					new String[] { KEY_ID }, statement, null, null, null,
-					KEY_NAME, null);
+			mCursor = mDb.rawQuery(sql, null);
 		} catch (SQLiteException e) {
 			throw new FamiliarDbException(e);
 		} catch (IllegalStateException e) {

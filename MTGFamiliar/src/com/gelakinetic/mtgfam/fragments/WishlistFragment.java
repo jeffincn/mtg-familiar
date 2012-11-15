@@ -526,6 +526,7 @@ public class WishlistFragment extends FamiliarFragment {
 			}
 			CardData data = WishlistFragment.cardSetWishlists.get(groupPosition).get(0);
 			if (data != null) {
+				final CardData finalData = data;
 				final int pos = groupPosition;
 				View.OnClickListener onClick = new View.OnClickListener() {
 					public void onClick(View v) {
@@ -542,11 +543,30 @@ public class WishlistFragment extends FamiliarFragment {
 				TextView pField = (TextView) v.findViewById(R.id.cardp);
 				TextView slashField = (TextView) v.findViewById(R.id.cardslash);
 				TextView tField = (TextView) v.findViewById(R.id.cardt);
-
+				ImageButton cardviewButton = (ImageButton) v.findViewById(R.id.cardview_button);
+				
 				if (nameField == null) {
 					return v;
 				}
 
+				cardviewButton.setOnClickListener(new View.OnClickListener(){
+
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+						Bundle args = new Bundle();
+						try {
+							args.putLong("id", mDbHelper.fetchIdByName(finalData.name));
+							args.putBoolean(SearchViewFragment.RANDOM, false);
+							args.putBoolean("isSingle", true);
+							CardViewFragment cvFrag = new CardViewFragment();
+							anchor.startNewFragment(cvFrag, args);
+						} catch (FamiliarDbException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}});
+				
 				nameField.setText(data.name);
 				nameField.setOnClickListener(onClick);
 

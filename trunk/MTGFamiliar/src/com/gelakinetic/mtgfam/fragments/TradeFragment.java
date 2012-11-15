@@ -297,6 +297,7 @@ public class TradeFragment extends FamiliarFragment {
 		
 						View view = LayoutInflater.from(getActivity()).inflate(R.layout.trader_card_click_dialog, null);
 						Button removeAll = (Button) view.findViewById(R.id.traderDialogRemove);
+						Button info = (Button) view.findViewById(R.id.traderDialogInfo);
 						Button changeSet = (Button) view.findViewById(R.id.traderDialogChangeSet);
 						Button cancelbtn = (Button) view.findViewById(R.id.traderDialogCancel);
 						Button donebtn = (Button) view.findViewById(R.id.traderDialogDone);
@@ -322,6 +323,27 @@ public class TradeFragment extends FamiliarFragment {
 								aaSide.notifyDataSetChanged();
 								UpdateTotalPrices(side);
 								removeDialog();
+							}
+						});
+						
+						info.setOnClickListener(new OnClickListener() {
+							
+							@Override
+							public void onClick(View v) {
+								// TODO Auto-generated method stub
+								try {
+									Bundle args = new Bundle();
+									Cursor c = mDbHelper.fetchCardByNameAndSet(lSide.get(position).name, lSide.get(position).setCode);
+									args.putLong("id", c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID)));
+									args.putBoolean(SearchViewFragment.RANDOM, false);
+									args.putBoolean("isSingle", true);
+									c.close();
+									CardViewFragment cvFrag = new CardViewFragment();
+									anchor.startNewFragment(cvFrag, args);
+								} catch (FamiliarDbException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 							}
 						});
 		

@@ -30,6 +30,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager.LayoutParams;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -134,7 +135,7 @@ public class GatheringCreateFragment extends FamiliarFragment {
 									public void onClick(DialogInterface dialog, int whichButton) {
 									}
 								}).create();
-
+						dialog.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 						return dialog;
 					}
 					case DIALOG_GATHERING_EXIST: {

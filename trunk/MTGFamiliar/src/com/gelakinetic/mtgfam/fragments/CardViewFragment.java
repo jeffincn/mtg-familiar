@@ -98,6 +98,7 @@ public class CardViewFragment extends FamiliarFragment {
 	public static final int						QUITTOSEARCH		= 4;
 	public static final int						SWIPELEFT				= 5;
 	public static final int						SWIPERIGHT			= 6;
+	public static final int						ISCLOSING			= 7;
 
 	// Dialogs
 	private static final int					GETPRICE				= 1;
@@ -110,6 +111,7 @@ public class CardViewFragment extends FamiliarFragment {
 	// Where the card image is loaded to
 	private static final int					MAINPAGE				= 0;
 	private static final int					DIALOG					= 1;
+	private static final String IS_CARDVIEW_CLOSING = "cardview_closing";
 
 	// Random useful things
 	private ImageGetter								imgGetter;
@@ -235,6 +237,16 @@ public class CardViewFragment extends FamiliarFragment {
 		if (asyncTask != null) {
 			asyncTask.cancel(true);
 		}
+		
+		// Notify the ResultListFragment that the CardView is closing, if there is no other resultCode
+		Bundle res = this.getMainActivity().getFragmentResults();
+		if(res == null){
+			res = new Bundle();
+		}
+		if(res.getInt("resultCode") == 0) {
+			res.putInt("resultCode", ISCLOSING);
+		}
+		this.getMainActivity().setFragmentResult(res);
 	}
 
 	private void setInfoFromID(long id) throws FamiliarDbException {
@@ -1192,4 +1204,6 @@ public class CardViewFragment extends FamiliarFragment {
 		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.card_menu, menu);
 	}
+	
+	
 }

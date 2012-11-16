@@ -27,6 +27,7 @@
     <string name="dialog_thanks_anyway">Thanks Anyway!</string>
     <string name="dialog_enjoy">Enjoy!</string>
     <string name="dialog_play">Let\'s Play!</string>
+    <string name="dialog_save">Save</string>
     <string name="update_notification">Checking for database updates</string>
     <string name="update_updating_set">Adding %s…</string>
     <string name="update_updating_rules">Updating comprehensive rules…</string>
@@ -251,7 +252,14 @@
     <string name="trader_edit_dialog_remove">Remove</string>
     <string name="trader_clear_dialog_title">Clear Trade</string>
     <string name="trader_clear_dialog_text">Are you sure you want to clear the current trade?</string>
+    <string name="trader_save_dialog_title">Save Trade</string>
+    <string name="trader_save_dialog_text">Enter the trade\'s name</string>
+    <string name="trader_select_dialog_title">Select a Trade</string>
+    <string name="trader_delete_dialog_title">Delete a Trade</string>
     <string name="trader_edit_dialog_info">Card Info</string>
+    <string name="trader_toast_no_trades">You have no saved trades.</string>
+    <string name="trader_toast_save_error">The trade could not be saved; please try again.</string>
+    <string name="trader_toast_invalid_chars">Trade names may not contain the path separator character (\'/\').</string>
         
     <!-- Wishlist activity -->
     <string name="wishlist_name">Name</string>

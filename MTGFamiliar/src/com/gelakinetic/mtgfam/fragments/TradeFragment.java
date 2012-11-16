@@ -22,6 +22,7 @@ import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager.LayoutParams;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -286,6 +287,7 @@ public class TradeFragment extends FamiliarFragment {
 			
 			@Override
 			public Dialog onCreateDialog(Bundle savedInstanceState) {
+				setShowsDialog(true); // We're setting this to false if we return null, so we should reset it every time to be safe
 				switch (id) {
 					case DIALOG_UPDATE_CARD: {
 						final int position = positionForDialog;
@@ -330,7 +332,6 @@ public class TradeFragment extends FamiliarFragment {
 							
 							@Override
 							public void onClick(View v) {
-								// TODO Auto-generated method stub
 								try {
 									Bundle args = new Bundle();
 									Cursor c = mDbHelper.fetchCardByNameAndSet(lSide.get(position).name, lSide.get(position).setCode);
@@ -341,7 +342,6 @@ public class TradeFragment extends FamiliarFragment {
 									CardViewFragment cvFrag = new CardViewFragment();
 									anchor.startNewFragment(cvFrag, args);
 								} catch (FamiliarDbException e) {
-									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
 							}
@@ -438,8 +438,8 @@ public class TradeFragment extends FamiliarFragment {
 					case DIALOG_SAVE_TRADE: {
 						AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
 		
-						builder.setTitle("Save Trade");
-						builder.setMessage("Enter the trade's name");
+						builder.setTitle(R.string.trader_save_dialog_title);
+						builder.setMessage(R.string.trader_save_dialog_text);
 		
 						// Set an EditText view to get user input
 						final EditText input = new EditText(this.getActivity());
@@ -447,7 +447,7 @@ public class TradeFragment extends FamiliarFragment {
 						input.setSingleLine(true);
 						builder.setView(input);
 		
-						builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+						builder.setPositiveButton(R.string.dialog_save, new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
 								String tradeName = input.getText().toString();
 		
@@ -458,13 +458,14 @@ public class TradeFragment extends FamiliarFragment {
 							}
 						});
 		
-						builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+						builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
 								// Canceled.
 							}
 						});
 		
 						Dialog dialog = builder.create();
+						dialog.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 						return dialog;
 					}
 					case DIALOG_LOAD_TRADE: {
@@ -478,16 +479,17 @@ public class TradeFragment extends FamiliarFragment {
 		
 						Dialog dialog;
 						if (validFiles.size() == 0) {
-							Toast.makeText(this.getActivity(), "No Saved Trades", Toast.LENGTH_LONG).show();
+							Toast.makeText(this.getActivity(), R.string.trader_toast_no_trades, Toast.LENGTH_LONG).show();
+							setShowsDialog(false);
 							return null;
 						}
-		
+						
 						final String[] tradeNames = new String[validFiles.size()];
 						validFiles.toArray(tradeNames);
 		
 						AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
-						builder.setTitle("Select A Trade");
-						builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+						builder.setTitle(R.string.trader_select_dialog_title);
+						builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
 								// Canceled.
 							}
@@ -518,7 +520,8 @@ public class TradeFragment extends FamiliarFragment {
 		
 						Dialog dialog;
 						if (validFiles.size() == 0) {
-							Toast.makeText(this.getActivity(), "No Saved Trades", Toast.LENGTH_LONG).show();
+							Toast.makeText(this.getActivity(), R.string.trader_toast_no_trades, Toast.LENGTH_LONG).show();
+							setShowsDialog(false);
 							return null;
 						}
 		
@@ -526,8 +529,8 @@ public class TradeFragment extends FamiliarFragment {
 						validFiles.toArray(tradeNamesD);
 		
 						AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
-						builder.setTitle("Delete A Trade");
-						builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+						builder.setTitle(R.string.trader_delete_dialog_title);
+						builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
 								// Canceled.
 							}
@@ -597,13 +600,13 @@ public class TradeFragment extends FamiliarFragment {
 			fos.close();
 		}
 		catch (FileNotFoundException e) {
-			Toast.makeText(this.getActivity(), "The trade could not be saved; please try again.", Toast.LENGTH_LONG).show();
+			Toast.makeText(this.getActivity(), R.string.trader_toast_save_error, Toast.LENGTH_LONG).show();
 		}
 		catch (IOException e) {
-			Toast.makeText(this.getActivity(), "The trade could not be saved; please try again.", Toast.LENGTH_LONG).show();
+			Toast.makeText(this.getActivity(), R.string.trader_toast_save_error, Toast.LENGTH_LONG).show();
 		}
 		catch (IllegalArgumentException e) {
-			Toast.makeText(this.getActivity(), "Trade names may not contain the path separator character ('/').", Toast.LENGTH_LONG).show();
+			Toast.makeText(this.getActivity(), R.string.trader_toast_invalid_chars, Toast.LENGTH_LONG).show();
 		}
 	}
 

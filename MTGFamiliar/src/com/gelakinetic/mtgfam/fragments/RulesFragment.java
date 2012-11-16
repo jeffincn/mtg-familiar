@@ -23,6 +23,7 @@ import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -303,7 +304,9 @@ public class RulesFragment extends FamiliarFragment {
 								// Do nothing
 							}
 						});
-						return builder.create();
+						Dialog d = builder.create();
+						d.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+						return d;
 					}
 					case CORRUPTION: {
 						View dialogLayout = this.getActivity().getLayoutInflater().inflate(R.layout.simple_message_layout, null);

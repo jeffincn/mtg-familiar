@@ -149,8 +149,11 @@ public class ResultListFragment extends FamiliarFragment {
 
 		lv = (ListView) myFragmentView.findViewById(R.id.resultList);// getListView();
 		registerForContextMenu(lv);
-
-		if (args.getBoolean(SearchViewFragment.RANDOM)) {
+		Bundle res = anchor.getMainActivity().getFragmentResults();
+		if (res != null) {
+			onFragmentResult(res);
+		}
+		else if (args.getBoolean(SearchViewFragment.RANDOM)) {
 			startRandom();
 		}
 		else {
@@ -161,10 +164,6 @@ public class ResultListFragment extends FamiliarFragment {
 			});
 		}
 
-		Bundle res = anchor.getMainActivity().getFragmentResults();
-		if (res != null) {
-			onFragmentResult(res);
-		}
 		return myFragmentView;
 	}
 
@@ -275,6 +274,7 @@ public class ResultListFragment extends FamiliarFragment {
 				id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
 				startCardViewFrag(id, isRandom, isSingle);
 				break;
+			case CardViewFragment.ISCLOSING:
 			default:
 				if (bundleIsSingle || (isRandom && !randomFromMenu)) {
 					// TODO check on rotation
@@ -298,7 +298,16 @@ public class ResultListFragment extends FamiliarFragment {
 	}
 
 	private void startRandom() {
-		isRandom = true;
+		if (c == null || c.getCount() == 0) {
+			return;
+		}
+		
+		if(c.getCount() == 1) {
+			isRandom = false;
+		}
+		else {
+			isRandom = true;
+		}
 
 		// implements http://en.wikipedia.org/wiki/Fisher-Yates_shuffle
 		numChoices = c.getCount();

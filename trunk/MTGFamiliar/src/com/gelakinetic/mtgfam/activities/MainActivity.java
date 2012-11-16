@@ -43,6 +43,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -665,6 +666,16 @@ public class MainActivity extends SlidingFragmentActivity {
 				return super.onKeyDown(keyCode, event);
 			}
 			else {
+				return true;
+			}
+		}
+		else if (keyCode == KeyEvent.KEYCODE_BACK) {
+			if(getSupportFragmentManager().getBackStackEntryCount() > 0) {
+				this.getSupportFragmentManager().popBackStack();
+				return true;
+			}
+			else if(!this.getSlidingMenu().isBehindShowing()) {
+				this.getSlidingMenu().showBehind();
 				return true;
 			}
 		}

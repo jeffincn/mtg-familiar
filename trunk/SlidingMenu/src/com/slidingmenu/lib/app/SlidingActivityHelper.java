@@ -206,12 +206,12 @@ public class SlidingActivityHelper {
 	 * @param event the event
 	 * @return true, if successful
 	 */
-	public boolean onKeyUp(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK && mSlidingMenu.isBehindShowing()) {
-			showAbove();
-			return true;
-		}
-		return false;
-	}
+//	public boolean onKeyUp(int keyCode, KeyEvent event) {
+//		if (keyCode == KeyEvent.KEYCODE_BACK && mSlidingMenu.isBehindShowing()) {
+//			showAbove();
+//			return true;
+//		}
+//		return false;
+//	}
 
 }

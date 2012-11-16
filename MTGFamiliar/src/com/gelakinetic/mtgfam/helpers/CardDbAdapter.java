@@ -945,7 +945,7 @@ public class CardDbAdapter {
 						+ DATABASE_TABLE_LEGAL_SETS + "." + KEY_FORMAT + "='"
 						+ format + "')";
 			} else {
-				statement += "AND NOT " + KEY_SET + "= 'UNH' AND NOT "
+				statement += " AND NOT " + KEY_SET + "= 'UNH' AND NOT "
 						+ KEY_SET + "= 'UG'";
 			}
 			statement += " AND NOT EXISTS (SELECT * FROM "

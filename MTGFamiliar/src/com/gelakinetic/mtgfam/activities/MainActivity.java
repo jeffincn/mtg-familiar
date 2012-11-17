@@ -47,6 +47,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -311,6 +312,7 @@ public class MainActivity extends SlidingFragmentActivity {
 			public void onDismiss(DialogInterface mDialog) {
 				super.onDismiss(mDialog);
 				if (firstRun) {
+					getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 					firstRun = false;
 					Runnable r = new Runnable() {
 
@@ -326,6 +328,13 @@ public class MainActivity extends SlidingFragmentActivity {
 							msg = Message.obtain();
 							msg.arg1 = CLOSE;
 							bounceHandler.sendMessage(msg);
+							runOnUiThread(new Runnable() {
+								
+								@Override
+								public void run() {
+									getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_UNSPECIFIED);									
+								}
+							});
 						}
 					};
 

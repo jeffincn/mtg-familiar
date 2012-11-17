@@ -851,6 +851,7 @@ public class WishlistFragment extends FamiliarFragment {
 
 			@Override
 			public Dialog onCreateDialog(Bundle savedInstanceState) {
+				setShowsDialog(true);
 				switch (id) {
 					case DIALOG_UPDATE_CARD: {
 						if (doneLoading) {
@@ -869,11 +870,13 @@ public class WishlistFragment extends FamiliarFragment {
 							} catch (FamiliarDbException e) {
 								mDbHelper.showDbErrorToast(anchor.getActivity());
 								anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+								setShowsDialog(false);
 								return null;
 							}
 							return dlg;
 						}
 						else {
+							setShowsDialog(false);
 							return null;
 						}
 					}
@@ -923,6 +926,7 @@ public class WishlistFragment extends FamiliarFragment {
 							return dialog;
 						}
 						else {
+							setShowsDialog(false);
 							return null;
 						}
 					}
@@ -951,6 +955,7 @@ public class WishlistFragment extends FamiliarFragment {
 									}).setCancelable(true).create();
 						}
 						else {
+							setShowsDialog(false);
 							return null;
 						}
 					}
@@ -975,6 +980,7 @@ public class WishlistFragment extends FamiliarFragment {
 									}).setCancelable(true).create();
 						}
 						else {
+							setShowsDialog(false);
 							return null;
 						}
 					}

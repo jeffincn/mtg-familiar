@@ -240,10 +240,8 @@ public class CardViewFragment extends FamiliarFragment {
 		
 		// Notify the ResultListFragment that the CardView is closing, if there is no other resultCode
 		Bundle res = this.getMainActivity().getFragmentResults();
-		if(res == null){
+		if(res == null && isRandom){
 			res = new Bundle();
-		}
-		if(res.getInt("resultCode") == 0) {
 			res.putInt("resultCode", ISCLOSING);
 		}
 		this.getMainActivity().setFragmentResult(res);
@@ -731,8 +729,8 @@ public class CardViewFragment extends FamiliarFragment {
 				else {
 					tcgCardName = cardName;
 				}
-				priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p="
-						+ tcgCardName).replace(" ", "%20").replace("Æ", "Ae"));
+				priceurl = new URL(CardDbAdapter.removeAccentMarks(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p="
+						+ tcgCardName).replace(" ", "%20").replace("Æ", "Ae")));
 
 				// Get a SAXParser from the SAXPArserFactory.
 				SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -924,6 +922,7 @@ public class CardViewFragment extends FamiliarFragment {
 			
 			@Override
 			public Dialog onCreateDialog(Bundle savedInstanceState) {
+				setShowsDialog(true);
 				switch (id) {
 					case GETIMAGE: {
 
@@ -943,11 +942,13 @@ public class CardViewFragment extends FamiliarFragment {
 					}
 					case GETLEGALITY: {
 						if (formats == null) {
+							setShowsDialog(false);
 							return null;
 						}
 						if(legalities == null) {
 							mDbHelper.showDbErrorToast(anchor.getActivity());
 							anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+							setShowsDialog(false);
 							return null;
 						}
 
@@ -978,6 +979,7 @@ public class CardViewFragment extends FamiliarFragment {
 					case GETPRICE: { // price
 
 						if (XMLhandler == null) {
+							setShowsDialog(false);
 							return null;
 						}
 
@@ -1040,6 +1042,7 @@ public class CardViewFragment extends FamiliarFragment {
 					case CARDRULINGS: {
 
 						if (rulingsArrayList == null) {
+							setShowsDialog(false);
 							return null;
 						}
 
@@ -1079,6 +1082,7 @@ public class CardViewFragment extends FamiliarFragment {
 						} catch (FamiliarDbException e) {
 							mDbHelper.showDbErrorToast(anchor.getActivity());
 							anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+							setShowsDialog(false);
 							return null;
 						}
 					}

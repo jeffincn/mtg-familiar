@@ -167,13 +167,13 @@ public class TradeListHelpers {
 				if (cardNumber.contains("b") && CardViewFragment.isTransformable(cardNumber, data.setCode)) {
 					CardDbAdapter mDbHelper = new CardDbAdapter(mCtx);
 					mDbHelper.openReadable();
-					priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p="
-							+ mDbHelper.getTransformName(setCode, cardNumber.replace("b", "a"))).replace(" ", "%20").replace("Æ", "Ae"));
+					priceurl = new URL(CardDbAdapter.removeAccentMarks(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p="
+							+ mDbHelper.getTransformName(setCode, cardNumber.replace("b", "a"))).replace(" ", "%20").replace("Æ", "Ae")));
 					mDbHelper.close();
 				}
 				else {
-					priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p=" + cardName).replace(" ", "%20")
-							.replace("Æ", "Ae"));
+					priceurl = new URL(CardDbAdapter.removeAccentMarks(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p=" + cardName).replace(" ", "%20")
+							.replace("Æ", "Ae")));
 				}
 			}
 			catch (MalformedURLException e) {

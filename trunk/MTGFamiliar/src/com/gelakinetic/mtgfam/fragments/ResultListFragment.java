@@ -41,6 +41,10 @@ public class ResultListFragment extends FamiliarFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		//reset variables
+		isSingle = false;
+		isRandom = false;
+		
 		// After a search, make sure the position is on top
 		cursorPosition = 0;
 		cursorPositionOffset = 0;
@@ -156,14 +160,13 @@ public class ResultListFragment extends FamiliarFragment {
 		else if (args.getBoolean(SearchViewFragment.RANDOM)) {
 			startRandom();
 		}
-		else {
-			lv.setOnItemClickListener(new OnItemClickListener() {
-				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					startCardViewFrag(id, isRandom, isSingle);
-				}
-			});
-		}
 
+		lv.setOnItemClickListener(new OnItemClickListener() {
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				startCardViewFrag(id, isRandom, isSingle);
+			}
+		});
+		
 		return myFragmentView;
 	}
 
@@ -282,6 +285,7 @@ public class ResultListFragment extends FamiliarFragment {
 				}
 				if (randomFromMenu) {
 					randomFromMenu = false;
+					isRandom = false;
 				}
 				break;
 		}

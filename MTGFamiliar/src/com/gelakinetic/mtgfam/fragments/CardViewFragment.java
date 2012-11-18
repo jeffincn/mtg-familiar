@@ -86,7 +86,6 @@ import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
-import com.gelakinetic.mtgfam.helpers.MyApp;
 import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler;
 import com.gelakinetic.mtgfam.helpers.WishlistHelpers;
 
@@ -111,7 +110,6 @@ public class CardViewFragment extends FamiliarFragment {
 	// Where the card image is loaded to
 	private static final int					MAINPAGE				= 0;
 	private static final int					DIALOG					= 1;
-	private static final String IS_CARDVIEW_CLOSING = "cardview_closing";
 
 	// Random useful things
 	private ImageGetter								imgGetter;
@@ -1176,16 +1174,6 @@ public class CardViewFragment extends FamiliarFragment {
 				return true;
 			case R.id.addtowishlist:
 				showDialog(WISHLIST_COUNTS);
-				return true;
-			case R.id.quittosearch:
-				MyApp appState = ((MyApp) this.getMainActivity().getApplicationContext());
-				appState.setState(QUITTOSEARCH);
-				if (anchor.getMainActivity().mFragmentManager.getBackStackEntryCount() == 0) {
-					anchor.getMainActivity().finish();
-				}
-				else {
-					anchor.getMainActivity().mFragmentManager.popBackStack();
-				}
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

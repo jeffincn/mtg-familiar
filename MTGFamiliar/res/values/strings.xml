@@ -166,7 +166,6 @@
     <string name="card_view_legality">Legality</string>
     <string name="card_view_rulings">Card Rulings</string>
     <string name="card_view_wishlist">Wishlist</string>
-    <string name="card_view_exit">Exit Results</string>
     <string name="card_view_legal">Legal</string>
     <string name="card_view_restricted">Restricted</string>
     <string name="card_view_banned">Banned</string>

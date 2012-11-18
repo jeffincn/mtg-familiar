@@ -34,7 +34,6 @@
         android:xlargeScreens="true" />
 
     <application
-        android:name="com.gelakinetic.mtgfam.helpers.MyApp"
         android:allowClearUserData="true"
         android:icon="@drawable/icon"
         android:label="@string/app_name"

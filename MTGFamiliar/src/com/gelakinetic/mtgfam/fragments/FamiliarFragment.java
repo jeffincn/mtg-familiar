@@ -28,7 +28,6 @@ import com.gelakinetic.mtgfam.activities.MainActivity;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 import com.gelakinetic.mtgfam.helpers.GoogleGoggles;
-import com.gelakinetic.mtgfam.helpers.MyApp;
 
 public class FamiliarFragment extends SherlockFragment {
 
@@ -76,22 +75,6 @@ public class FamiliarFragment extends SherlockFragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-		MyApp appState = ((MyApp) getActivity().getApplicationContext());
-		String classname = this.getClass().getCanonicalName();
-		if (classname.equalsIgnoreCase("com.gelakinetic.mtgfam.fragments.CardViewFragment")) {
-			if (appState.getState() == CardViewFragment.QUITTOSEARCH) {
-				if (this.getMainActivity().mFragmentManager.getBackStackEntryCount() == 0) {
-					getActivity().finish();
-				}
-				else {
-					getMainActivity().mFragmentManager.popBackStack();
-				}
-				return;
-			}
-		}
-		else {
-			appState.setState(0);
-		}
 
 		// Clear any results. We don't want them persisting past this fragment, and
 		// they should have been looked at by now anyway

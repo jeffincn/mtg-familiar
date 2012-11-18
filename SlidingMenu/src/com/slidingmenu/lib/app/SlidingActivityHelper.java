@@ -3,7 +3,6 @@ package com.slidingmenu.lib.app;
 import android.app.Activity;
 import android.content.res.TypedArray;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

@@ -663,14 +663,16 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 								int currentDamage = ((HistoryAdapter)(cDamage.getAdapter())).list.get(0).get(0);
 								int currentDelta = ((HistoryAdapter)(cDamage.getAdapter())).list.get(0).get(1);
 								
-								currentDamage -= 1;
-								currentDelta -= 1;
+								if(currentDamage > 0) {
+									currentDamage -= 1;
+									currentDelta -= 1;
 								
-								((HistoryAdapter)(cDamage.getAdapter())).list.get(0).set(0, currentDamage);
-								((HistoryAdapter)(cDamage.getAdapter())).list.get(0).set(1, currentDelta);
 								
-								((HistoryAdapter)(cDamage.getAdapter())).notifyDataSetChanged();
-
+									((HistoryAdapter)(cDamage.getAdapter())).list.get(0).set(0, currentDamage);
+									((HistoryAdapter)(cDamage.getAdapter())).list.get(0).set(1, currentDelta);
+								
+									((HistoryAdapter)(cDamage.getAdapter())).notifyDataSetChanged();
+								}
 							}
 						});
 						
@@ -721,7 +723,9 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	}
 	
 	private void updateViews() {
-		commanderPlayersAdapter.notifyDataSetChanged();
+		if (displayMode == commanderDisplay){
+			commanderPlayersAdapter.notifyDataSetChanged();
+		}
 		for (Player p : players) {
 			p.commanderAdapter.notifyDataSetChanged();
 		}

@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Random;
 
 import android.content.Context;
@@ -38,16 +39,6 @@ public class GoogleGoggles {
 	private static String sCssid = null;
 
 	private static String URL_WEBSERVICE_GOGGLES = "http://www.google.com/goggles/container_proto?cssid=";
-	
-//	private static void ShowGogglesToast(Context ctx, String error) {
-//		try {
-//			Toast.makeText(ctx, error,
-//					Toast.LENGTH_LONG).show();
-//		} catch (RuntimeException re) {
-//			// Eat it; this will happen if we try to toast in a non-UI thread.
-//			System.out.println("ShowGogglesErrorToast - exception");
-//		}
-//	}
 	
     public static String StartCardSearch(Bitmap mImageBitmap, Context ctx, CardDbAdapter mDbHelper) throws IOException {
  
@@ -152,42 +143,99 @@ public class GoogleGoggles {
         out.write(trailingBytes);
         out.close();
 
-        String lineHeaderToSearch = "magic the gathering";
-        BufferedReader buffRead = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        String line;
-    	while ((line = buffRead.readLine()) != null) {
-			int pos = line.toLowerCase().indexOf(lineHeaderToSearch);
-			if (pos != -1) {
-				String cardName = line.substring(pos + lineHeaderToSearch.length());
-				cardName = cardName.trim();
-				
-				for (int i = 0; i < cardName.length(); i++) {
-					
-					// I keep the card name found after the lineHeaderToSearch keyword, by stopping a the first "strange char"
-					// Sometimes the name found comes with the extension, sometimes not ... Goggles power. (the user can still clean the name found)
-					if ((int)cardName.charAt(i) < 32 || (int)cardName.charAt(i) > 128) {
-						cardName = cardName.substring(0,i);
-						return checkForCardName(cardName.trim(), mDbHelper);
+		BufferedReader buffRead = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		String line;
+		ArrayList<String> names = new ArrayList<String>();
+		while ((line = buffRead.readLine()) != null) {
+			// Split on all characters not in a card name. This could use more punctuation (maybe) and accent marks.
+			// We cant split on whitespace because the goggles return has random junk characters
+			String words[] = line.split("[^A-Za-z\\-\\'\\,.]+");
+
+			ArrayList<String> range = new ArrayList<String>();
+			try {
+				for (String word : words) {
+					if (word.length() > 0 && mDbHelper.isPartOfACardName(word)) {
+						range.add(word);
+					} else {
+						if (range.size() > 0) {
+							String name = checkForCardName(range, mDbHelper);
+							if (name != null) {
+								names.add(name);
+							}
+						}
+						range.clear();
 					}
 				}
-			}
-        }
-        return "";
-    }
- 
-    private static String checkForCardName(String goggleResult, CardDbAdapter mDbHelper) {
-    	String save = goggleResult;
-    	while(goggleResult.length() != 0) {
-    		try {
-				if(mDbHelper.isValidCardName(goggleResult)) {
-					return goggleResult;
+				// If the last word gets added to the range, check outside the
+				// loop
+				if (range.size() > 0) {
+					String name = checkForCardName(range, mDbHelper);
+					if (name != null) {
+						names.add(name);
+					}
 				}
 			} catch (FamiliarDbException e) {
-				return save;
+				return null;
 			}
-    		goggleResult = goggleResult.substring(0, goggleResult.lastIndexOf(" ")).trim();
-    	}
-		return goggleResult;
+			if (names.size() > 0) {
+				break;
+			}
+		}
+		if (names.size() > 0) {
+			String retval = null;
+			int numSpaces = -1;
+			for (String s : names) {
+				if (countSpaces(s) > numSpaces) {
+					retval = s;
+					numSpaces = countSpaces(s);
+				}
+			}
+			return retval;
+		}
+		return null;
+	}
+ 
+	private static String checkForCardName(ArrayList<String> range,
+			CardDbAdapter mDbHelper) {
+		ArrayList<String> names = new ArrayList<String>();
+		for (int start = 0; start < range.size(); start++) {
+			for (int finish = range.size(); finish > start; finish--) {
+				String toSearch = "";
+				for (int i = start; i < finish; i++) {
+					toSearch += range.get(i) + " ";
+				}
+				toSearch = toSearch.trim();
+				try {
+					if (mDbHelper.isValidCardName(toSearch)) {
+						names.add(toSearch);
+					}
+				} catch (FamiliarDbException e) {
+					return null;
+				}
+			}
+		}
+		if (names.size() == 0) {
+			return null;
+		}
+		String retval = "";
+		int numSpaces = -1;
+		for (String s : names) {
+			if (countSpaces(s) > numSpaces) {
+				retval = s;
+				numSpaces = countSpaces(s);
+			}
+		}
+		return retval;
+	}
+	
+	static int countSpaces(String s) {
+		int count = 0;
+		for (int i = 0; i < s.length(); i++) {
+			if (s.charAt(i) == ' ') {
+				count++;
+			}
+		}
+		return count;
 	}
 
 	// Encodes an int32 into varint32.

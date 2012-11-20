@@ -1709,6 +1709,22 @@ public class CardDbAdapter {
 		}
 		return false;
 	}
+
+	public boolean isPartOfACardName(String word) throws FamiliarDbException {
+		word = word.replace("'", "''"); // Sanitization
+		String sql = "SELECT " + KEY_ID + " FROM " + DATABASE_TABLE_CARDS + " WHERE " + KEY_NAME + " LIKE '%" + word + "%'";
+		try {
+			Cursor mCursor = mDb.rawQuery(sql, null);
+			if(mCursor.getCount() > 0) {
+				return true;
+			}
+		} catch (SQLiteException e) {
+			throw new FamiliarDbException(e);
+		} catch (IllegalStateException e) {
+			throw new FamiliarDbException(e);
+		}
+		return false;
+	}
 	
 	public static String removeAccentMarks(String s) {
 		return s.replace("À", "A")

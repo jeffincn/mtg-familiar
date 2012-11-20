@@ -148,8 +148,9 @@ public class GoogleGoggles {
 		ArrayList<String> names = new ArrayList<String>();
 		while ((line = buffRead.readLine()) != null) {
 			// Split on all characters not in a card name. This could use more punctuation (maybe) and accent marks.
-			// We cant split on whitespace because the goggles return has random junk characters
-			String words[] = line.split("[^A-Za-z\\-\\'\\,.]+");
+			// We can't split on whitespace because the goggles return has random junk characters
+			// Updated with more punctuation, etc. based on a full list of every character found in names in our db - Alex
+			String words[] = line.split("[^A-Za-z104\\-\"',._/&?!:()]+"); // Note: only '-' needs escaping inside the range
 
 			ArrayList<String> range = new ArrayList<String>();
 			try {

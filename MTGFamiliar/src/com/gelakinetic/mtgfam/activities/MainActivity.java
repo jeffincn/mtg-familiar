@@ -679,7 +679,7 @@ public class MainActivity extends SlidingFragmentActivity {
 		}
 		else if (keyCode == KeyEvent.KEYCODE_BACK) {
 			// If we're not at the root of a hierarchy, the back button should do as it pleases
-			if(getSupportFragmentManager().getBackStackEntryCount() > 0) {
+			if(getSupportFragmentManager().getBackStackEntryCount() > 0 || !this.isTaskRoot()) {
 				return super.onKeyDown(keyCode, event);
 			}
 			// Else if were at the root, and the SlidingMenu is closed, it should open the menu

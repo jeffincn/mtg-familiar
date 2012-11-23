@@ -139,7 +139,6 @@ public class MainActivity extends SlidingFragmentActivity {
 		slidingMenu.setShadowWidthRes(R.dimen.shadow_width);
 		slidingMenu.setShadowDrawable(R.drawable.sliding_menu_shadow);
 		setBehindContentView(R.layout.fragment_menu);
-		getSupportFragmentManager().beginTransaction().add(R.id.frag_menu, new MenuFragment()).commit();
 
 		me = this;
 
@@ -173,6 +172,16 @@ public class MainActivity extends SlidingFragmentActivity {
 		});
 		
 		setContentView(R.layout.fragment_activity);
+		int menuId;
+		if (findViewById(R.id.large_menu) != null) {
+			actionBar.setHomeButtonEnabled(false);
+			slidingMenu.setSlidingEnabled(false);
+			actionBar.setIcon(R.drawable.icon);
+			menuId = R.id.large_menu;
+		} else {
+			menuId = R.id.frag_menu;
+		}
+		getSupportFragmentManager().beginTransaction().replace(menuId, new MenuFragment()).commit();
 
 		Intent intent = getIntent();
 

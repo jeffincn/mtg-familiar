@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -531,6 +532,8 @@ public class CardViewFragment extends FamiliarFragment {
 
 		private String	error;
 
+		@SuppressWarnings("deprecation") // getHeight() / getWidth() deprecated as of API13, in favor of getSize()
+
 		@Override
 		protected Long doInBackground(String... params) {
 			error = null;
@@ -577,7 +580,7 @@ public class CardViewFragment extends FamiliarFragment {
 					else {
 						picurl = "http://magiccards.info/scans/" + lang + "/" + mtgi_code + "/" + number + ".jpg";
 					}
-					picurl = picurl.toLowerCase();
+					picurl = picurl.toLowerCase(Locale.ENGLISH);
 	
 					URL u = new URL(picurl);
 					cardPicture = new BitmapDrawable(anchor.getMainActivity().getResources(), u.openStream());
@@ -1108,6 +1111,8 @@ public class CardViewFragment extends FamiliarFragment {
 	private static final boolean	useOldClipboard	= (android.os.Build.VERSION.SDK_INT < 11);
 
 	@SuppressLint({ "NewApi" })
+	@SuppressWarnings("deprecation") // android.text.ClipboardManager is deprecated as of API11
+
 	@Override
 	public boolean onContextItemSelected(android.view.MenuItem item) {
 		// use a final static boolean for JIT compile-time culling of deprecated

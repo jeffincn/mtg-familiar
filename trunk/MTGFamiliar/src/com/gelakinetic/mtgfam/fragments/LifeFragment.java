@@ -259,6 +259,9 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		if (tts != null) {
 			tts.shutdown();
 		}
+		if (mediaPlayer != null) {
+			mediaPlayer.release();
+		}
 	}
 
 	@Override
@@ -1687,25 +1690,27 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	//				mediaPlayer.start();
 	//			}
 	//		});
-			tts.setOnUtteranceCompletedListener(new OnUtteranceCompletedListener() {
-				public void onUtteranceCompleted(String utteranceId) {
-					// If the utterance ID is correct, shout that it's OVER NINE THOUSAAAAAAAAND
-					if(utteranceId != null && utteranceId.equals("9000")) {
-						try {
-							mediaPlayer.stop();
-							mediaPlayer.prepare();
-							mediaPlayer.start();
-						} 
-						catch (Exception e) {
+			if (mediaPlayer != null) {
+				tts.setOnUtteranceCompletedListener(new OnUtteranceCompletedListener() {
+					public void onUtteranceCompleted(String utteranceId) {
+						// If the utterance ID is correct, shout that it's OVER NINE THOUSAAAAAAAAND
+						if(utteranceId != null && utteranceId.equals("9000")) {
+							try {
+								mediaPlayer.stop();
+								mediaPlayer.prepare();
+								mediaPlayer.start();
+							} 
+							catch (Exception e) {
+							}
 						}
 					}
-				}
-			});
-			mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
-				public void onCompletion(MediaPlayer mp) {
-					speakFromList();
-				}
-			});
+				});
+				mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
+					public void onCompletion(MediaPlayer mp) {
+						speakFromList();
+					}
+				});
+			}
 		}
 		else {
 			ttsInitialized = false;

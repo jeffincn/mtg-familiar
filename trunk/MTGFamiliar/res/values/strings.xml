@@ -81,13 +81,13 @@
     <string name="main_whats_new_in_title">What\'s New in Version</string>
     <string name="main_whats_new_text">
 	- New Sliding Menu navigation! Touch the button in the top left to open the menu, and change your default page in General Settings&lt;br />&lt;br />
- 	- Export and Import data to an SD card&lt;br />&lt;br />
+ 	- Card search using the camera&lt;br />&lt;br />
  	- New EDH mode for the Life Counter&lt;br />&lt;br />
+ 	- Export and Import data to an SD card&lt;br />&lt;br />
  	- Save and load default search parameters&lt;br />&lt;br />
  	- Various and sundry bugfixes&lt;br />&lt;br />
- 	- French interface&lt;br />&lt;br />
- 	- Choice for card image between 7 languages&lt;br />&lt;br />
- 	- Card search using the camera&lt;br />&lt;br />
+ 	- French translation&lt;br />&lt;br />
+ 	- Card images from seven languages. Choose your favorite in the Settings.
     </string>
     
     <string name="main_tts_warning_title">Text-to-Speech</string>
@@ -113,12 +113,12 @@
 		Thanks to Reuben for being the best kind of user. You know, the kind that becomes a developer!&lt;br />&lt;br />
 		Thanks to Lotier from Reddit for coming out of nowhere with a great card trader activity!&lt;br />&lt;br />
 		Thanks to Daniel for first learning Android, then making a wishlist!&lt;br />&lt;br />
+		Thanks to Aethys for his French Translation and his API for searching a card name using the device camera.&lt;br /&gt;&lt;br /&gt;
 		Thanks to chaudakh for the wonderful Gatherer Extractor program.&lt;br />&lt;br />
 		Thanks to reddit\'s &lt;a href="http://www.reddit.com/r/magicTCG/">/r/magictcg&lt;/a> for testing and feedback.&lt;br />&lt;br />
 		Thanks to my brother for the icon.&lt;br />&lt;br />
 		Thanks to Chedy @ &lt;a href="http://tcgplayer.com">TCGPlayer.com&lt;/a> for the price API.&lt;br />&lt;br />
 		Thanks to Jake Wharton for the magnificent &lt;a href="http://actionbarsherlock.com/">ActionBarSherlock&lt;/a>.&lt;br />&lt;br />
-		Thanks to Aethys for his French Translation and his API for searching a card name using the device camera.&lt;br /&gt;&lt;br /&gt;
 		Special thanks to Richard Garfield and the rest of the folks at &lt;a href="http://www.wizards.com/magic">Wizards of the Coast&lt;/a>.&lt;br />&lt;br />
 		-gelakinetic&lt;br />&lt;br />&lt;br />
 		Magic the Gathering and Magic the Gathering cards are ™ &amp; © Wizards of the Coast LLC.&lt;br />&lt;br />

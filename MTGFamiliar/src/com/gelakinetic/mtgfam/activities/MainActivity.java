@@ -380,7 +380,7 @@ public class MainActivity extends SlidingFragmentActivity {
 
 							public void onClick(View v) {
 								Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri
-										.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ALR4TSXWPPHUL"));
+										.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=SZK4TAH2XBZNC&lc=US&item_name=MTG%20Familiar&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted"));
 
 								startActivity(myIntent);
 							}

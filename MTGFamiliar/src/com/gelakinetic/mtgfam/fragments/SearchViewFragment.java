@@ -131,11 +131,6 @@ public class SearchViewFragment extends FamiliarFragment {
 			this.getMainActivity().getSupportFragmentManager().popBackStack();
 			return;
 		}
-		catch (SQLiteDatabaseCorruptException e) {
-			mDbHelper.showDbErrorToast(this.getActivity());
-			this.getMainActivity().getSupportFragmentManager().popBackStack();
-			return;
-		}
 
 		setNames = new String[setCursor.getCount()];
 		setSymbols = new String[setCursor.getCount()];
@@ -175,20 +170,6 @@ public class SearchViewFragment extends FamiliarFragment {
 		rarityChecked = new boolean[rarityNames.length];
 
 		selectedFormat = -1;
-
-		setDialog = new AlertDialog.Builder(this.getActivity()).setTitle(R.string.search_sets)
-				.setMultiChoiceItems(setNames, setChecked, new DialogSelectionClickHandler())
-				.setPositiveButton(R.string.dialog_ok, new DialogButtonClickHandler()).create();
-		formatDialog = new AlertDialog.Builder(this.getActivity()).setTitle(R.string.search_formats)
-				.setSingleChoiceItems(formatNames, selectedFormat, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						selectedFormat = which;
-					}
-				}).setPositiveButton(R.string.dialog_ok, new DialogButtonClickHandler()).create();
-		rarityDialog = new AlertDialog.Builder(this.getActivity()).setTitle(R.string.search_rarities)
-				.setMultiChoiceItems(rarityNames, rarityChecked, new DialogSelectionClickHandler())
-				.setPositiveButton(R.string.dialog_ok, new DialogButtonClickHandler()).create();
-
 	}
 
 	@Override
@@ -204,6 +185,19 @@ public class SearchViewFragment extends FamiliarFragment {
 		flavorfield = (EditText) myFragmentView.findViewById(R.id.flavorsearch);
 		artistfield = (EditText) myFragmentView.findViewById(R.id.artistsearch);
 
+		setDialog = new AlertDialog.Builder(this.getActivity()).setTitle(R.string.search_sets)
+				.setMultiChoiceItems(setNames, setChecked, new DialogSelectionClickHandler())
+				.setPositiveButton(R.string.dialog_ok, new DialogButtonClickHandler()).create();
+		formatDialog = new AlertDialog.Builder(this.getActivity()).setTitle(R.string.search_formats)
+				.setSingleChoiceItems(formatNames, selectedFormat, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						selectedFormat = which;
+					}
+				}).setPositiveButton(R.string.dialog_ok, new DialogButtonClickHandler()).create();
+		rarityDialog = new AlertDialog.Builder(this.getActivity()).setTitle(R.string.search_rarities)
+				.setMultiChoiceItems(rarityNames, rarityChecked, new DialogSelectionClickHandler())
+				.setPositiveButton(R.string.dialog_ok, new DialogButtonClickHandler()).create();
+		
 		// So pressing enter does the search
 		namefield.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
 		namefield.setOnEditorActionListener(new TextView.OnEditorActionListener() {

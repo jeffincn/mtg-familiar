@@ -209,17 +209,20 @@ public class CardDbAdapter {
 		this.mCtx = ctx;
 	}
 
-	public CardDbAdapter openReadable() throws FamiliarDbException {
+	public void openReadable() throws FamiliarDbException {
+		if(mDb != null && mDb.isOpen()) {
+			// its already open, silly!
+			return;
+		}
 		try {
 			mDbHelper = new DatabaseHelper(mCtx);
 			mDb = mDbHelper.getReadableDatabase();
 		} catch (SQLException e) {
 			throw new FamiliarDbException(e);
 		}
-		return this;
 	}
 
-	public CardDbAdapter openTransactional() throws FamiliarDbException {
+	public void openTransactional() throws FamiliarDbException {
 		try {
 			mDbHelper = new DatabaseHelper(mCtx);
 			mDb = mDbHelper.getWritableDatabase();
@@ -227,7 +230,6 @@ public class CardDbAdapter {
 		} catch (SQLException e) {
 			throw new FamiliarDbException(e);
 		}
-		return this;
 	}
 
 	public void closeTransactional() throws FamiliarDbException {
@@ -316,12 +318,17 @@ public class CardDbAdapter {
 
 		Cursor c = null;
 		try {
+			if(mDb == null) {
+				this.openReadable();
+			}
 			c = mDb.query(DATABASE_TABLE_SETS, new String[] { KEY_ID, KEY_NAME,
 					KEY_CODE, KEY_CODE_MTGI }, null, null, null, null, KEY_DATE
 					+ " DESC");
 		} catch (SQLiteException e) {
 			throw new FamiliarDbException(e);
 		} catch (IllegalStateException e) {
+			throw new FamiliarDbException(e);
+		} catch (NullPointerException e) {
 			throw new FamiliarDbException(e);
 		}
 

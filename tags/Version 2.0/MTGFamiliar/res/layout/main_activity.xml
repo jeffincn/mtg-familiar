@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+     Copyright 2011 Adam Feinstein, Michael Shick This file is part of MTG 
+	Familiar. MTG Familiar is free software: you can redistribute it and/or modify 
+	it under the terms of the GNU General Public License as published by the 
+	Free Software Foundation, either version 3 of the License, or (at your option) 
+	any later version. MTG Familiar is distributed in the hope that it will be 
+	useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+	or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for 
+	more details. You should have received a copy of the GNU General Public License 
+	along with MTG Familiar. If not, see <http://www.gnu.org/licenses/>.
+-->
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/cardsearch"
+                style="@style/text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/card_search_icon"
+                android:drawablePadding="15dp"
+                android:gravity="center_vertical"
+                android:text="@string/main_card_search"
+                android:textSize="30dip" />
+
+            <TextView
+                android:id="@+id/Nplayerlifecounter"
+                style="@style/text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/life_counter_icon"
+                android:drawablePadding="15dp"
+                android:gravity="center_vertical"
+                android:text="@string/main_life_counter"
+                android:textSize="30dip" >
+            </TextView>
+
+            <TextView
+                android:id="@+id/manapool"
+                style="@style/text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/mana_pool_icon"
+                android:drawablePadding="15dp"
+                android:gravity="center_vertical"
+                android:text="@string/main_mana_pool"
+                android:textSize="30dip" />
+
+            <TextView
+                android:id="@+id/rng"
+                style="@style/text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/dice_icon"
+                android:drawablePadding="15dp"
+                android:gravity="center_vertical"
+                android:text="@string/main_dice"
+                android:textSize="30dip" />
+
+            <TextView
+                android:id="@+id/trade"
+                style="@style/text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/trade_icon"
+                android:drawablePadding="15dp"
+                android:gravity="center_vertical"
+                android:text="@string/main_trade"
+                android:textSize="30dip" />
+
+            <TextView
+                android:id="@+id/wishlist"
+                style="@style/text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/wishlist_icon"
+                android:drawablePadding="15dp"
+                android:gravity="center_vertical"
+                android:text="@string/main_wishlist"
+                android:textSize="30dip" />
+
+            <TextView
+                android:id="@+id/roundTimer"
+                style="@style/text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/round_timer_icon"
+                android:drawablePadding="15dp"
+                android:gravity="center_vertical"
+                android:text="@string/main_timer"
+                android:textSize="30dip" />
+            
+            <TextView
+                android:id="@+id/rules"
+                style="@style/text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/rules_icon"
+                android:drawablePadding="15dp"
+                android:gravity="center_vertical"
+                android:text="@string/main_rules"
+                android:textSize="30dip" />
+
+            <TextView
+                android:id="@+id/randomCard"
+                style="@style/text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/mojhosto_icon"
+                android:drawablePadding="15dp"
+                android:gravity="center_vertical"
+                android:text="@string/main_mojhosto"
+                android:textSize="30dip" />
+        </LinearLayout>
+    </ScrollView>

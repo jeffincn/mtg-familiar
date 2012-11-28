@@ -172,16 +172,7 @@ public class MainActivity extends SlidingFragmentActivity {
 		});
 		
 		setContentView(R.layout.fragment_activity);
-		int menuId;
-		if (findViewById(R.id.large_menu) != null) {
-			actionBar.setHomeButtonEnabled(false);
-			slidingMenu.setSlidingEnabled(false);
-			actionBar.setIcon(R.drawable.icon);
-			menuId = R.id.large_menu;
-		} else {
-			menuId = R.id.frag_menu;
-		}
-		getSupportFragmentManager().beginTransaction().replace(menuId, new MenuFragment()).commit();
+		getSupportFragmentManager().beginTransaction().replace(R.id.frag_menu, new MenuFragment()).commit();
 
 		Intent intent = getIntent();
 

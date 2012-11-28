@@ -216,8 +216,12 @@ public class FamiliarFragment extends SherlockFragment {
 
 		@Override
 		protected void onPostExecute(Void param) {
-			progDialog.dismiss();
-			
+			try {
+				progDialog.dismiss();
+			}
+			catch (IllegalArgumentException e) {
+			}
+
 			if(cardName != null && cardName.length() > 0) {
 				onGoogleGogglesSuccess(cardName);
 			}

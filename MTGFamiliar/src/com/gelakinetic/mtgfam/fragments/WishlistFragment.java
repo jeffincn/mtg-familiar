@@ -79,6 +79,13 @@ public class WishlistFragment extends FamiliarFragment {
 	private boolean																doneLoading						= false;
 
 	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		// This is necessary to keep the goggles task running through rotation
+		this.setRetainInstance(true);
+	}
+	
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 		View myFragmentView = inflater.inflate(R.layout.wishlist_activity, container, false);
@@ -163,6 +170,7 @@ public class WishlistFragment extends FamiliarFragment {
 	@Override
     protected void onGoogleGogglesSuccess(String cardName) {
     	// this method must be overridden by each class calling takePictureAndSearchGoogleGogglesIntent
+		super.onGoogleGogglesSuccess(cardName);
 		namefield.setText(cardName);
 		bAdd.performClick();
 	}
@@ -464,6 +472,13 @@ public class WishlistFragment extends FamiliarFragment {
 			// v = inf.inflate(R.layout.wishlist_cardset_row, null);
 			TextView setField = (TextView) v.findViewById(R.id.wishlistRowSet);
 			TextView priceField = (TextView) v.findViewById(R.id.wishlistRowPrice);
+			
+			if(setField == null || priceField == null) {
+				LayoutInflater inf = getActivity().getLayoutInflater();
+				v = inf.inflate(R.layout.wishlist_cardset_row, null);
+				setField = (TextView) v.findViewById(R.id.wishlistRowSet);
+				priceField = (TextView) v.findViewById(R.id.wishlistRowPrice);
+			}
 
 			setField.setText(data.tcgName);
 			char r = (char) data.rarity;
@@ -562,8 +577,6 @@ public class WishlistFragment extends FamiliarFragment {
 							CardViewFragment cvFrag = new CardViewFragment();
 							anchor.startNewFragment(cvFrag, args);
 						} catch (FamiliarDbException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
 						}
 					}});
 				

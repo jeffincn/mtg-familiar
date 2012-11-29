@@ -137,7 +137,6 @@ public class CardViewFragment extends FamiliarFragment {
 	private String[]									formats;
 	private TCGPlayerXMLHandler				XMLhandler;
 	public ArrayList<Ruling>					rulingsArrayList;
-	private ProgressDialog						progDialog;
 	AsyncTask<String, Integer, Long>	asyncTask;
 
 	// Card info
@@ -156,7 +155,7 @@ public class CardViewFragment extends FamiliarFragment {
 	private View											myFragmentView;
 	private String cardLanguage;
 
-	@SuppressLint("NewApi")
+//	@SuppressLint("NewApi")
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
@@ -841,7 +840,6 @@ public class CardViewFragment extends FamiliarFragment {
 				}
 			}
 			catch (MalformedURLException mue) {
-				// mue.printStackTrace();
 				error = true;
 			}
 			catch (IOException ioe) {

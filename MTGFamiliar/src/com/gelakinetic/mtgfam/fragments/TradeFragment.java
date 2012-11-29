@@ -91,6 +91,13 @@ public class TradeFragment extends FamiliarFragment {
 	private boolean					doneLoading				= false;
 
 	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		// This is necessary to keep the goggles task running through rotation
+		this.setRetainInstance(true);
+	}
+	
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 		View myFragmentView = inflater.inflate(R.layout.trader_activity, container, false);
@@ -239,6 +246,7 @@ public class TradeFragment extends FamiliarFragment {
 	@Override
     protected void onGoogleGogglesSuccess(String cardName) {
     	// this method must be overridden by each class calling takePictureAndSearchGoogleGogglesIntent
+		super.onGoogleGogglesSuccess(cardName);
 		namefield.setText(cardName);
 	}
 	
@@ -342,7 +350,6 @@ public class TradeFragment extends FamiliarFragment {
 									CardViewFragment cvFrag = new CardViewFragment();
 									anchor.startNewFragment(cvFrag, args);
 								} catch (FamiliarDbException e) {
-									e.printStackTrace();
 								}
 							}
 						});

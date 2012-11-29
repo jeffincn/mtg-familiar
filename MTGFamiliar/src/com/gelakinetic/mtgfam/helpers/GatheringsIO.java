@@ -165,10 +165,8 @@ public class GatheringsIO {
 			out.close();
 		}
 		catch (FileNotFoundException e) {
-			e.printStackTrace();
 		}
 		catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 	
@@ -191,15 +189,12 @@ public class GatheringsIO {
 			dom = db.parse(_gatheringFile);
 		}
 		catch (ParserConfigurationException pce) {
-			// pce.printStackTrace();
 			return returnList;
 		}
 		catch (SAXException se) {
-			// se.printStackTrace();
 			return returnList;
 		}
 		catch (IOException ioe) {
-			// .printStackTrace();
 			return returnList;
 		}
 
@@ -255,15 +250,12 @@ public class GatheringsIO {
 			dom = db.parse(_gatheringFile);
 		}
 		catch (ParserConfigurationException pce) {
-			// pce.printStackTrace();
 			return returnString;
 		}
 		catch (SAXException se) {
-			// se.printStackTrace();
 			return returnString;
 		}
 		catch (IOException ioe) {
-			// .printStackTrace();
 			return returnString;
 		}
 

@@ -33,20 +33,29 @@ public class FamiliarFragment extends SherlockFragment {
 
 	public CardDbAdapter								mDbHelper;
 	protected FamiliarFragment	anchor;
-	private ProgressDialog progDialog;
+	protected ProgressDialog progDialog;
+	private GoogleGogglesTask	mGogglesTask;
 	public static final String	DIALOG_TAG	= "dialog";
 
 	public static final int 	ACTIVITY_CAMERA_GOGGLES		= 1;
 	protected static final int GOGGLES_ANALYSIS = 1;
 
+	public FamiliarFragment() {
+		/* All subclasses of Fragment must include a public empty constructor.
+		 * The framework will often re-instantiate a fragment class when needed,
+		 * in particular during state restore, and needs to be able to find this constructor
+		 * to instantiate it. If the empty constructor is not available, a runtime exception
+		 * will occur in some cases during state restore. 
+		 */
+	}
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		anchor = this;
-		mDbHelper = new CardDbAdapter(this.getMainActivity());
 		try {
-			mDbHelper.openReadable();
+			mDbHelper = new CardDbAdapter(this.getMainActivity());
 		} catch (FamiliarDbException e) {
 			mDbHelper.showDbErrorToast(this.getActivity());
 			this.getMainActivity().getSupportFragmentManager().popBackStack();
@@ -63,7 +72,20 @@ public class FamiliarFragment extends SherlockFragment {
 		progDialog.setMessage(getString(R.string.goggles_photo_analysis));
 		progDialog.setIndeterminate(true);
 		progDialog.setCancelable(true);
+		
+		if(mGogglesTask != null) {
+			progDialog.show();
+		}
 		return super.onCreateView(inflater, container, savedInstanceState);
+	}
+
+	@Override
+	public void onDestroyView() {
+		// TODO Auto-generated method stub
+		if(progDialog.isShowing()) {
+			progDialog.cancel();
+		}
+		super.onDestroyView();
 	}
 
 	@Override
@@ -182,7 +204,8 @@ public class FamiliarFragment extends SherlockFragment {
 			case ACTIVITY_CAMERA_GOGGLES:
 				switch (resultCode) {
 				case android.app.Activity.RESULT_OK:
-					new GoogleGogglesTask().execute(data);
+					mGogglesTask = new GoogleGogglesTask();
+					mGogglesTask.execute(data);
 					return;
 				}
 				return;
@@ -191,7 +214,7 @@ public class FamiliarFragment extends SherlockFragment {
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 	
-	private class GoogleGogglesTask extends AsyncTask<Intent, Void, Void> {
+	public class GoogleGogglesTask extends AsyncTask<Intent, Void, Void> {
 
 		private String	cardName;
 
@@ -213,8 +236,6 @@ public class FamiliarFragment extends SherlockFragment {
 			    	cardName = GoogleGoggles.StartCardSearch(mImageBitmap, anchor.getActivity(), mDbHelper);
 
 				} catch (IOException e) {
-					// Auto-generated catch block
-					e.printStackTrace();
 				}
 			} catch (Exception e) {
 				cardName = null;
@@ -245,5 +266,6 @@ public class FamiliarFragment extends SherlockFragment {
 
     protected void onGoogleGogglesSuccess(String cardName) {
     	// this method must be overridden by each class calling takePictureAndSearchGoogleGogglesIntent
+    	mGogglesTask = null;
 	}
 }

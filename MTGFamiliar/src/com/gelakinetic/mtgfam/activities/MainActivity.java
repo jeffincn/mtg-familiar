@@ -115,7 +115,9 @@ public class MainActivity extends SlidingFragmentActivity {
 			pInfo = null;
 		}
 		
-		prefAdapter = new PreferencesAdapter(this);
+		if(prefAdapter == null) {
+			prefAdapter = new PreferencesAdapter(this);
+		}
 
 		int lastVersion = prefAdapter.getLastVersion();
 		if (pInfo.versionCode != lastVersion) {
@@ -696,6 +698,10 @@ public class MainActivity extends SlidingFragmentActivity {
 	}
 	
 	public PreferencesAdapter getPreferencesAdapter() {
+		// On rotations, this could get called from a fragment's onCreateView before the activity's onCreate. Weird
+		if(this.prefAdapter == null) {
+			this.prefAdapter = new PreferencesAdapter(this);
+		}
 		return this.prefAdapter;
 	}
 }

@@ -8,6 +8,15 @@ import com.gelakinetic.mtgfam.activities.MainActivity;
 
 public class FamiliarDialogFragment extends SherlockDialogFragment {
 
+	public FamiliarDialogFragment() {
+		/* All subclasses of Fragment must include a public empty constructor.
+		 * The framework will often re-instantiate a fragment class when needed,
+		 * in particular during state restore, and needs to be able to find this constructor
+		 * to instantiate it. If the empty constructor is not available, a runtime exception
+		 * will occur in some cases during state restore. 
+		 */
+	}
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

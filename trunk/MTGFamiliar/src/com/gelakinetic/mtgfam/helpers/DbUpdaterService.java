@@ -62,7 +62,14 @@ public class DbUpdaterService extends IntentService {
 	public void onCreate() {
 		super.onCreate();
 		mPrefAdapter = new PreferencesAdapter(this);
-		mDbHelper = new CardDbAdapter(this);
+		try {
+			mDbHelper = new CardDbAdapter(this);
+		}
+		catch(FamiliarDbException e) {
+			mDbHelper = null;
+			return; // couldnt open the db, might as well return
+		}
+		mDbHelper.close(); // close the newly opened db so we can transact it later
 		mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
 		Intent intent = new Intent(this, MainActivity.class);
@@ -84,6 +91,9 @@ public class DbUpdaterService extends IntentService {
 	@Override
 	public void onHandleIntent(Intent intent) {
 
+		if(mDbHelper == null) {
+			return; // couldnt open db before
+		}
 		ProgressReporter reporter = new ProgressReporter();
 		ArrayList<String> updatedStuff = new ArrayList<String>();
 		JsonParser parser = new JsonParser();

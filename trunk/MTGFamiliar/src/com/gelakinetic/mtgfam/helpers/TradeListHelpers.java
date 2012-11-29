@@ -48,6 +48,7 @@ public class TradeListHelpers {
 				mDbHelper.openReadable();
 				opened = true;
 			}
+
 			if (data.setCode == null || data.setCode.equals(""))
 				card = mDbHelper.fetchCardByName(data.name, CardDbAdapter.allData);
 			else
@@ -166,7 +167,6 @@ public class TradeListHelpers {
 
 				if (cardNumber.contains("b") && CardViewFragment.isTransformable(cardNumber, data.setCode)) {
 					CardDbAdapter mDbHelper = new CardDbAdapter(mCtx);
-					mDbHelper.openReadable();
 					priceurl = new URL(CardDbAdapter.removeAccentMarks(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p="
 							+ mDbHelper.getTransformName(setCode, cardNumber.replace("b", "a"))).replace(" ", "%20").replace("Æ", "Ae")));
 					mDbHelper.close();
@@ -357,8 +357,6 @@ public class TradeListHelpers {
 	        try {
 				return super.clone();
 			} catch (CloneNotSupportedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 				return null;
 			} 
 		} 

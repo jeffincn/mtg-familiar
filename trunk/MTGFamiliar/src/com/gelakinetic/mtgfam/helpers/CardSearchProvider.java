@@ -87,9 +87,8 @@ public class CardSearchProvider extends ContentProvider {
 
 	@Override
 	public boolean onCreate() {
-		mDbHelper = new CardDbAdapter(getContext());
 		try {
-			mDbHelper.openReadable();
+			mDbHelper = new CardDbAdapter(getContext());
 		} catch (FamiliarDbException e) {
 			return false;
 		} // TODO this is never closed. could be a problem

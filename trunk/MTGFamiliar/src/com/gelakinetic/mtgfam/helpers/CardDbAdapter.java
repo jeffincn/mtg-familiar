@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
+import com.gelakinetic.mtgfam.R;
+
 import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
@@ -39,8 +41,6 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.widget.Toast;
-
-import com.gelakinetic.mtgfam.R;
 
 /**
  * Simple Cards database access helper class. Defines the basic CRUD operations
@@ -200,19 +200,27 @@ public class CardDbAdapter {
 		}
 	}
 
-	public CardDbAdapter(Context ctx) {
+	public CardDbAdapter(Context ctx) throws FamiliarDbException {
 
 		if (CardDbAdapter.isDbOutOfDate(ctx)) {
 			CardDbAdapter.copyDB(ctx);
 		}
-
+		
 		this.mCtx = ctx;
+
+		// Always open the database
+		try {
+			this.mDbHelper = new DatabaseHelper(ctx);
+			this.mDb = this.mDbHelper.getReadableDatabase();
+		} catch (SQLException e) {
+			throw new FamiliarDbException(e);
+		}
 	}
 
 	public void openReadable() throws FamiliarDbException {
 		if(mDb != null && mDb.isOpen()) {
 			// its already open, silly!
-			return;
+			mDb.close();
 		}
 		try {
 			mDbHelper = new DatabaseHelper(mCtx);

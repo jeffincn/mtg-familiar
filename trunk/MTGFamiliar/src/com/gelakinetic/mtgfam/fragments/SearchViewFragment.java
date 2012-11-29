@@ -15,7 +15,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.graphics.PorterDuff.Mode;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -120,6 +119,9 @@ public class SearchViewFragment extends FamiliarFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// This is necessary to persist the goggles task through rotation
+		this.setRetainInstance(true);
 
 		Cursor setCursor;
 		try {
@@ -387,9 +389,10 @@ public class SearchViewFragment extends FamiliarFragment {
 	}
 	
 	@Override
-    protected void onGoogleGogglesSuccess(String cardName) {
-    	// this method must be overridden by each class calling takePictureAndSearchGoogleGogglesIntent
-		namefield.setText(cardName);
+  protected void onGoogleGogglesSuccess(String cardName) {
+	// this method must be overridden by each class calling takePictureAndSearchGoogleGogglesIntent
+		super.onGoogleGogglesSuccess(cardName);
+    namefield.setText(cardName);
 		doSearch(false);
 	}
     
@@ -480,7 +483,7 @@ public class SearchViewFragment extends FamiliarFragment {
 		}
 
 		searchCriteria.Rarity = null;
-		for (int i = 0; i < rarityChecked.length; i++) {
+		for (int i = 0; i < rarityChecked.length; i++) { 
 			if (rarityChecked[i]) {
 				if (searchCriteria.Rarity == null) {
 					searchCriteria.Rarity = rarityNames[i].charAt(0) + "";

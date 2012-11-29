@@ -72,6 +72,10 @@ public class ResultListFragment extends FamiliarFragment {
 				int setLogic = criteria.Set_Logic;
 				boolean consolidate = (setLogic == CardDbAdapter.MOSTRECENTPRINTING || setLogic == CardDbAdapter.FIRSTPRINTING) ? true
 						: false;
+				if(mDbHelper == null) {
+					// Just in case. it happened to a user once...
+					mDbHelper = new CardDbAdapter(this.getActivity());
+				}
 				c = mDbHelper.Search(criteria.Name, criteria.Text, criteria.Type, criteria.Color, criteria.Color_Logic,
 						criteria.Set, criteria.Pow_Choice, criteria.Pow_Logic, criteria.Tou_Choice, criteria.Tou_Logic, criteria.Cmc,
 						criteria.Cmc_Logic, criteria.Format, criteria.Rarity, criteria.Flavor, criteria.Artist, criteria.Type_Logic,

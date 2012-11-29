@@ -416,9 +416,16 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		listSizeHeight = playerScrollView.getHeight();
 
 		if(displayMode == commanderDisplay){
-			LinearLayout info = (LinearLayout) this.getActivity().findViewById(R.id.info_layout);
-			listSizeWidth = info.getWidth();
-			listSizeHeight = info.getHeight();
+			try{
+				LinearLayout info = (LinearLayout) this.getActivity().findViewById(R.id.info_layout);
+				listSizeWidth = info.getWidth();
+				listSizeHeight = info.getHeight();
+			}
+			catch(NullPointerException e) {
+				// this gets called when this fragment is on the backstack (gatherings) and the fragment is swapped.
+				// we can just return
+				return;
+			}
 		}
 		
 		if (orientation == LANDSCAPE) {

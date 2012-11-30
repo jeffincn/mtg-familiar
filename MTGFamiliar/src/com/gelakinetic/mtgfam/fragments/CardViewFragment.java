@@ -212,8 +212,8 @@ public class CardViewFragment extends FamiliarFragment {
 		try {
 			setInfoFromID(cardID);
 		} catch (FamiliarDbException e) {
-			mDbHelper.showDbErrorToast(anchor.getActivity());
-			anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+			getMainActivity().showDbErrorToast();
+			getMainActivity().getSupportFragmentManager().popBackStack();
 		}
 
 		return myFragmentView;
@@ -375,8 +375,8 @@ public class CardViewFragment extends FamiliarFragment {
 						long id = mDbHelper.getTransform(setCode, number);
 						setInfoFromID(id);
 					} catch (FamiliarDbException e) {
-						mDbHelper.showDbErrorToast(anchor.getActivity());
-						anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+						getMainActivity().showDbErrorToast();
+						getMainActivity().getSupportFragmentManager().popBackStack();
 					}
 					
 				}
@@ -392,16 +392,16 @@ public class CardViewFragment extends FamiliarFragment {
 				public void onClick(View v) {
 					Bundle res = new Bundle();
 					res.putInt("resultCode", RANDOMLEFT);
-					anchor.getMainActivity().setFragmentResult(res);
-					anchor.getMainActivity().mFragmentManager.popBackStack();
+					getMainActivity().setFragmentResult(res);
+					getMainActivity().mFragmentManager.popBackStack();
 				}
 			});
 			rightRandom.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					Bundle res = new Bundle();
 					res.putInt("resultCode", RANDOMRIGHT);
-					anchor.getMainActivity().setFragmentResult(res);
-					anchor.getMainActivity().mFragmentManager.popBackStack();
+					getMainActivity().setFragmentResult(res);
+					getMainActivity().mFragmentManager.popBackStack();
 				}
 			});
 			leftRandom.setVisibility(View.VISIBLE);
@@ -439,8 +439,8 @@ public class CardViewFragment extends FamiliarFragment {
 					Bundle res = new Bundle();
 					res.putInt("resultCode", SWIPELEFT);
 					res.putLong("lastID", cardID);
-					anchor.getMainActivity().setFragmentResult(res);
-					anchor.getMainActivity().mFragmentManager.popBackStack();
+					getMainActivity().setFragmentResult(res);
+					getMainActivity().mFragmentManager.popBackStack();
 				}
 			});
 			rightRandom.setOnClickListener(new View.OnClickListener() {
@@ -448,8 +448,8 @@ public class CardViewFragment extends FamiliarFragment {
 					Bundle res = new Bundle();
 					res.putInt("resultCode", SWIPERIGHT);
 					res.putLong("lastID", cardID);
-					anchor.getMainActivity().setFragmentResult(res);
-					anchor.getMainActivity().mFragmentManager.popBackStack();
+					getMainActivity().setFragmentResult(res);
+					getMainActivity().mFragmentManager.popBackStack();
 				}
 			});
 			leftRandom.setVisibility(View.VISIBLE);
@@ -582,21 +582,21 @@ public class CardViewFragment extends FamiliarFragment {
 					picurl = picurl.toLowerCase(Locale.ENGLISH);
 	
 					URL u = new URL(picurl);
-					cardPicture = new BitmapDrawable(anchor.getMainActivity().getResources(), u.openStream());
+					cardPicture = new BitmapDrawable(getMainActivity().getResources(), u.openStream());
 	
 					int height = 0, width = 0;
 					float scale = 0;
 					int border = 16;
-					Display display = ((WindowManager) anchor.getMainActivity().getSystemService(Context.WINDOW_SERVICE))
+					Display display = ((WindowManager) getMainActivity().getSystemService(Context.WINDOW_SERVICE))
 							.getDefaultDisplay();
 					if (loadTo == MAINPAGE) {
 						Rect rectgle = new Rect();
-						Window window = anchor.getMainActivity().getWindow();
+						Window window = getMainActivity().getWindow();
 						window.getDecorView().getWindowVisibleDisplayFrame(rectgle);
 	
 						LinearLayout scrollButtons = (LinearLayout) myFragmentView.findViewById(R.id.scrollButtons);
 	
-						height = (display.getHeight() - rectgle.top - anchor.getMainActivity().getSupportActionBar().getHeight() - scrollButtons
+						height = (display.getHeight() - rectgle.top - getMainActivity().getSupportActionBar().getHeight() - scrollButtons
 								.getHeight()) - border;
 						width = display.getWidth() - border;
 					}
@@ -654,7 +654,7 @@ public class CardViewFragment extends FamiliarFragment {
 		private BitmapDrawable resize(BitmapDrawable image, int newWidth, int newHeight) {
 			Bitmap d = ((BitmapDrawable) image).getBitmap();
 			Bitmap bitmapOrig = Bitmap.createScaledBitmap(d, newWidth, newHeight, true);
-			return new BitmapDrawable(anchor.getMainActivity().getResources(), bitmapOrig);
+			return new BitmapDrawable(getMainActivity().getResources(), bitmapOrig);
 		}
 
 		@Override
@@ -785,20 +785,20 @@ public class CardViewFragment extends FamiliarFragment {
 			}
 
 			if (XMLhandler != null && XMLhandler.hiprice == null && error == null) {
-				Toast.makeText(anchor.getMainActivity(), "Card Price Not Found", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getMainActivity(), "Card Price Not Found", Toast.LENGTH_SHORT).show();
 				return;
 			}
 			if (error == null) {
-				anchor.removeDialog();
+				removeDialog();
 				showDialog(GETPRICE);
 			}
 			else {
 				if(error.equals("FamiliarDbException")) {
-					mDbHelper.showDbErrorToast(anchor.getActivity());
-					anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+					getMainActivity().showDbErrorToast();
+					getMainActivity().getSupportFragmentManager().popBackStack();
 					return;
 				}
-				Toast.makeText(anchor.getMainActivity(), error, Toast.LENGTH_SHORT).show();
+				Toast.makeText(getMainActivity(), error, Toast.LENGTH_SHORT).show();
 			}
 		}
 
@@ -871,7 +871,7 @@ public class CardViewFragment extends FamiliarFragment {
 				showDialog(CARDRULINGS);
 			}
 			else {
-				Toast.makeText(anchor.getMainActivity(), "No Internet Connection", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getMainActivity(), "No Internet Connection", Toast.LENGTH_SHORT).show();
 			}
 		}
 
@@ -945,8 +945,8 @@ public class CardViewFragment extends FamiliarFragment {
 							return null;
 						}
 						if(legalities == null) {
-							mDbHelper.showDbErrorToast(anchor.getActivity());
-							anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+							getMainActivity().showDbErrorToast();
+							getMainActivity().getSupportFragmentManager().popBackStack();
 							setShowsDialog(false);
 							return null;
 						}
@@ -1023,19 +1023,19 @@ public class CardViewFragment extends FamiliarFragment {
 									try {
 										setInfoFromID(aIds[item]);
 									} catch (FamiliarDbException e) {
-										mDbHelper.showDbErrorToast(anchor.getActivity());
-										anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+										getMainActivity().showDbErrorToast();
+										getMainActivity().getSupportFragmentManager().popBackStack();
 									}
 								}
 							});
 							return builder.create();
 						}
 						catch (SQLException e) {
-							mDbHelper.showDbErrorToast(anchor.getActivity());
-							anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+							getMainActivity().showDbErrorToast();
+							getMainActivity().getSupportFragmentManager().popBackStack();
 						} catch (FamiliarDbException e) {
-							mDbHelper.showDbErrorToast(anchor.getActivity());
-							anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+							getMainActivity().showDbErrorToast();
+							getMainActivity().getSupportFragmentManager().popBackStack();
 						}
 					}
 					case CARDRULINGS: {
@@ -1077,10 +1077,10 @@ public class CardViewFragment extends FamiliarFragment {
 					}
 					case WISHLIST_COUNTS: {
 						try {
-							return wh.getDialog(cardName, anchor, this.getMainActivity());
+							return wh.getDialog(cardName, CardViewFragment.this, this.getMainActivity());
 						} catch (FamiliarDbException e) {
-							mDbHelper.showDbErrorToast(anchor.getActivity());
-							anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+							getMainActivity().showDbErrorToast();
+							getMainActivity().getSupportFragmentManager().popBackStack();
 							setShowsDialog(false);
 							return null;
 						}

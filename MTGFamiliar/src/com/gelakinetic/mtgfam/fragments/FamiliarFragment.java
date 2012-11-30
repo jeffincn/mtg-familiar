@@ -32,7 +32,6 @@ import com.gelakinetic.mtgfam.helpers.GoogleGoggles;
 public class FamiliarFragment extends SherlockFragment {
 
 	public CardDbAdapter								mDbHelper;
-	protected FamiliarFragment	anchor;
 	protected ProgressDialog progDialog;
 	private GoogleGogglesTask	mGogglesTask;
 	public static final String	DIALOG_TAG	= "dialog";
@@ -53,20 +52,17 @@ public class FamiliarFragment extends SherlockFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		anchor = this;
 		try {
 			mDbHelper = new CardDbAdapter(this.getMainActivity());
 		} catch (FamiliarDbException e) {
-			mDbHelper.showDbErrorToast(this.getActivity());
-			this.getMainActivity().getSupportFragmentManager().popBackStack();
+			getMainActivity().showDbErrorToast();
+			getMainActivity().getSupportFragmentManager().popBackStack();
 		}
 		this.setHasOptionsMenu(true);
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		anchor = this;
-		
 		progDialog = new ProgressDialog(this.getMainActivity());
 		progDialog.setTitle("");
 		progDialog.setMessage(getString(R.string.goggles_photo_analysis));
@@ -233,7 +229,7 @@ public class FamiliarFragment extends SherlockFragment {
 					
 			    cardName = "";
 			    try {
-			    	cardName = GoogleGoggles.StartCardSearch(mImageBitmap, anchor.getActivity(), mDbHelper);
+			    	cardName = GoogleGoggles.StartCardSearch(mImageBitmap, getActivity(), mDbHelper);
 
 				} catch (IOException e) {
 				}
@@ -256,7 +252,7 @@ public class FamiliarFragment extends SherlockFragment {
 			}
 			else {
 				try {
-					Toast.makeText(anchor.getActivity(), R.string.goggles_no_card_on_photo,
+					Toast.makeText(getActivity(), R.string.goggles_no_card_on_photo,
 							Toast.LENGTH_LONG).show();
 				} catch (RuntimeException re) {
 				}

@@ -129,8 +129,8 @@ public class SearchViewFragment extends FamiliarFragment {
 			setCursor.moveToFirst();
 		}
 		catch (FamiliarDbException e) {
-			mDbHelper.showDbErrorToast(this.getActivity());
-			this.getMainActivity().getSupportFragmentManager().popBackStack();
+			getMainActivity().showDbErrorToast();
+			getMainActivity().getSupportFragmentManager().popBackStack();
 			return;
 		}
 
@@ -151,8 +151,8 @@ public class SearchViewFragment extends FamiliarFragment {
 		try {
 			c = mDbHelper.fetchAllFormats();
 		} catch (FamiliarDbException e) {
-			mDbHelper.showDbErrorToast(this.getActivity());
-			this.getMainActivity().getSupportFragmentManager().popBackStack();
+			getMainActivity().showDbErrorToast();
+			getMainActivity().getSupportFragmentManager().popBackStack();
 			return;
 		}
 		if (c != null) {
@@ -573,7 +573,7 @@ public class SearchViewFragment extends FamiliarFragment {
 		args.putBoolean(RANDOM, isRandom);
 		args.putSerializable(CRITERIA, searchCriteria);
 		ResultListFragment rlFrag = new ResultListFragment();
-		anchor.startNewFragment(rlFrag, args);
+		startNewFragment(rlFrag, args);
 	}
 
 	public void clear() {

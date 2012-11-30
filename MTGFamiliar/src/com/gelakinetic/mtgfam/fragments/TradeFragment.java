@@ -348,7 +348,7 @@ public class TradeFragment extends FamiliarFragment {
 									args.putBoolean("isSingle", true);
 									c.close();
 									CardViewFragment cvFrag = new CardViewFragment();
-									anchor.startNewFragment(cvFrag, args);
+									startNewFragment(cvFrag, args);
 								} catch (FamiliarDbException e) {
 								}
 							}
@@ -360,8 +360,8 @@ public class TradeFragment extends FamiliarFragment {
 								try {
 									ChangeSet(side, position);
 								} catch (FamiliarDbException e) {
-									mDbHelper.showDbErrorToast(anchor.getActivity());
-									anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+									getMainActivity().showDbErrorToast();
+									getMainActivity().getSupportFragmentManager().popBackStack();
 									return;
 								}
 							}

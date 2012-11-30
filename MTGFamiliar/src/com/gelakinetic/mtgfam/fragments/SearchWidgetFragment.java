@@ -56,7 +56,7 @@ public class SearchWidgetFragment extends FamiliarFragment {
 				args.putBoolean(SearchViewFragment.RANDOM, false);
 				args.putSerializable("id", id);
 				CardViewFragment cvFrag = new CardViewFragment();
-				anchor.startNewFragment(cvFrag, args);
+				startNewFragment(cvFrag, args);
 			}
 		});
 
@@ -104,7 +104,7 @@ public class SearchWidgetFragment extends FamiliarFragment {
 		args.putBoolean(SearchViewFragment.RANDOM, false);
 		args.putSerializable(SearchViewFragment.CRITERIA, criteria);
 		ResultListFragment rlFrag = new ResultListFragment();
-		anchor.startNewFragment(rlFrag, args);
+		startNewFragment(rlFrag, args);
 	}
 
 	private class AutocompleteQueryTask extends AsyncTask<String, Void, Void> {
@@ -127,8 +127,8 @@ public class SearchWidgetFragment extends FamiliarFragment {
 				fillData(c);
 			}
 			else {
-				mDbHelper.showDbErrorToast(anchor.getActivity());
-				anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+				getMainActivity().showDbErrorToast();
+				getMainActivity().getSupportFragmentManager().popBackStack();
 			}
 		}
 	}

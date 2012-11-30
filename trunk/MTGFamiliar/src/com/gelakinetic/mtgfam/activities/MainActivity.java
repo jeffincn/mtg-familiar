@@ -51,6 +51,7 @@ import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
@@ -703,5 +704,15 @@ public class MainActivity extends SlidingFragmentActivity {
 			this.prefAdapter = new PreferencesAdapter(this);
 		}
 		return this.prefAdapter;
+	}
+
+	public void showDbErrorToast() {
+		try {
+			Toast.makeText(this, getString(R.string.error_database), Toast.LENGTH_LONG).show();
+		} 
+		catch (RuntimeException re) {
+			// Eat it; this will happen if we try to toast in a non-UI thread.
+			// It can happen when we get an error in autocomplete.
+		}
 	}
 }

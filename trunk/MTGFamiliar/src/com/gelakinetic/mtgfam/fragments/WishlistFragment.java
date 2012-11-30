@@ -127,8 +127,8 @@ public class WishlistFragment extends FamiliarFragment {
 					try {
 						AddCardOrUpdateSetCounts(data);
 					} catch (FamiliarDbException e) {
-						mDbHelper.showDbErrorToast(anchor.getActivity());
-						anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+						getMainActivity().showDbErrorToast();
+						getMainActivity().getSupportFragmentManager().popBackStack();
 						return;
 					}
 					aaExpWishlist.notifyDataSetChanged();
@@ -213,8 +213,8 @@ public class WishlistFragment extends FamiliarFragment {
 		try {
 			WishlistHelpers.ReadWishlist(getActivity(), mDbHelper, lWishlist);
 		} catch (FamiliarDbException e1) {
-			mDbHelper.showDbErrorToast(anchor.getActivity());
-			anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+			getMainActivity().showDbErrorToast();
+			getMainActivity().getSupportFragmentManager().popBackStack();
 			return;
 		}
 
@@ -224,8 +224,8 @@ public class WishlistFragment extends FamiliarFragment {
 				AddCardOrUpdateSetCounts(card);
 			}
 		} catch (FamiliarDbException e) {
-			mDbHelper.showDbErrorToast(anchor.getActivity());
-			anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+			getMainActivity().showDbErrorToast();
+			getMainActivity().getSupportFragmentManager().popBackStack();
 			return;
 		}
 		aaExpWishlist.notifyDataSetChanged();
@@ -334,8 +334,7 @@ public class WishlistFragment extends FamiliarFragment {
 		}
 
 		if (showTotalPrice || showIndividualPrices) {
-			FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(card, aaExpWishlist, priceSetting, null,
-					(WishlistFragment) anchor);
+			FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(card, aaExpWishlist, priceSetting, null, WishlistFragment.this);
 			TradeListHelpers.addTaskAndExecute(loadPrice);
 		}
 	}
@@ -358,7 +357,7 @@ public class WishlistFragment extends FamiliarFragment {
 		if (doneLoading) {
 			int totalPrice = GetPricesFromCardLists(cardSetWishlists);
 			if (showTotalPrice) {
-				Resources resources = anchor.getActivity().getResources();
+				Resources resources = getActivity().getResources();
 				int color = PriceListsHaveBadValues(cardSetWishlists) ? resources.getColor(R.color.red) : resources
 						.getColor(R.color.white);
 				String sTotal = "$" + (totalPrice / 100) + "." + String.format("%02d", (totalPrice % 100));
@@ -466,7 +465,7 @@ public class WishlistFragment extends FamiliarFragment {
 
 			// // empty view for 0-count rows
 			// if (data == null || data.numberOf == 0)
-			// v = new View(anchor.getActivity());
+			// v = new View(getActivity());
 			// else {
 			// LayoutInflater inf = getLayoutInflater();
 			// v = inf.inflate(R.layout.wishlist_cardset_row, null);
@@ -575,7 +574,7 @@ public class WishlistFragment extends FamiliarFragment {
 							args.putBoolean(SearchViewFragment.RANDOM, false);
 							args.putBoolean("isSingle", true);
 							CardViewFragment cvFrag = new CardViewFragment();
-							anchor.startNewFragment(cvFrag, args);
+							startNewFragment(cvFrag, args);
 						} catch (FamiliarDbException e) {
 						}
 					}});
@@ -594,10 +593,10 @@ public class WishlistFragment extends FamiliarFragment {
 				else {
 					if (data.ability == null || data.ability == "") {
 						try {
-							data = TradeListHelpers.FetchCardData(data, anchor.mDbHelper);
+							data = TradeListHelpers.FetchCardData(data, mDbHelper);
 						} catch (FamiliarDbException e) {
-							mDbHelper.showDbErrorToast(anchor.getActivity());
-							anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+							getMainActivity().showDbErrorToast();
+							getMainActivity().getSupportFragmentManager().popBackStack();
 							return v;
 						}
 					}
@@ -820,8 +819,8 @@ public class WishlistFragment extends FamiliarFragment {
 									try {
 										setCode = mDbHelper.getSetCode(setName);
 									} catch (FamiliarDbException e) {
-										mDbHelper.showDbErrorToast(anchor.getActivity());
-										anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+										getMainActivity().showDbErrorToast();
+										getMainActivity().getSupportFragmentManager().popBackStack();
 										return;
 									}
 									totalCards += numberField;
@@ -830,20 +829,19 @@ public class WishlistFragment extends FamiliarFragment {
 
 									try {
 										if (showTotalPrice || showIndividualPrices) {
-											cd = TradeListHelpers.FetchCardData(cd, anchor.mDbHelper);
+											cd = TradeListHelpers.FetchCardData(cd, mDbHelper);
 											cd.message = ("loading");
-											FetchPriceTask task = mTradeListHelper.new FetchPriceTask(cd, aaExpWishlist, priceSetting, null,
-													(WishlistFragment) anchor);
+											FetchPriceTask task = mTradeListHelper.new FetchPriceTask(cd, aaExpWishlist, priceSetting, null, WishlistFragment.this);
 											TradeListHelpers.addTaskAndExecute(task);
 										}
 										else
-											cd = TradeListHelpers.FetchCardData(cd, anchor.mDbHelper);
+											cd = TradeListHelpers.FetchCardData(cd, mDbHelper);
 										setNames.add(setName);
 										cardlist.add(cd);
 									}
 									catch (FamiliarDbException e) {
-										mDbHelper.showDbErrorToast(anchor.getActivity());
-										anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+										getMainActivity().showDbErrorToast();
+										getMainActivity().getSupportFragmentManager().popBackStack();
 										return;
 									}
 								}
@@ -869,20 +867,20 @@ public class WishlistFragment extends FamiliarFragment {
 					case DIALOG_UPDATE_CARD: {
 						if (doneLoading) {
 							try{
-								dlg = (wh).getDialog(cardNames.get(positionForDialog), anchor, this.getMainActivity(), 
+								dlg = (wh).getDialog(cardNames.get(positionForDialog), WishlistFragment.this, getMainActivity(), 
 										cardSetWishlists.get(positionForDialog));
 							}
 							catch(IndexOutOfBoundsException ex){
 								try {
-									dlg = (wh).getDialog(cardNames.get(positionForDialog), anchor, this.getMainActivity());
+									dlg = (wh).getDialog(cardNames.get(positionForDialog), WishlistFragment.this, getMainActivity());
 								} catch (FamiliarDbException e) {
-									mDbHelper.showDbErrorToast(anchor.getActivity());
-									anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+									getMainActivity().showDbErrorToast();
+									getMainActivity().getSupportFragmentManager().popBackStack();
 									return null;
 								}
 							} catch (FamiliarDbException e) {
-								mDbHelper.showDbErrorToast(anchor.getActivity());
-								anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+								getMainActivity().showDbErrorToast();
+								getMainActivity().getSupportFragmentManager().popBackStack();
 								setShowsDialog(false);
 								return null;
 							}
@@ -911,7 +909,7 @@ public class WishlistFragment extends FamiliarFragment {
 														if (data.numberOf > 0) {
 															data.message = ("loading");
 															FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaExpWishlist,
-																	priceSetting, null, (WishlistFragment) anchor);
+																	priceSetting, null, WishlistFragment.this);
 															TradeListHelpers.addTaskAndExecute(task);
 														}
 													}

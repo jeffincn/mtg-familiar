@@ -83,15 +83,15 @@ public class ResultListFragment extends FamiliarFragment {
 			}
 		}
 		catch (FamiliarDbException e) {
-			mDbHelper.showDbErrorToast(this.getActivity());
-			this.getMainActivity().getSupportFragmentManager().popBackStack();
+			getMainActivity().showDbErrorToast();
+			getMainActivity().getSupportFragmentManager().popBackStack();
 			return;
 		}
 		
 		if (this.isAdded()) {
 			if (c == null || c.getCount() == 0) {
 				Toast.makeText(this.getActivity(), getString(R.string.search_toast_no_results), Toast.LENGTH_SHORT).show();
-				anchor.getMainActivity().mFragmentManager.popBackStack();
+				getMainActivity().mFragmentManager.popBackStack();
 				return;
 			}
 			else if (c.getCount() == 1) {
@@ -157,7 +157,7 @@ public class ResultListFragment extends FamiliarFragment {
 
 		lv = (ListView) myFragmentView.findViewById(R.id.resultList);// getListView();
 		registerForContextMenu(lv);
-		Bundle res = anchor.getMainActivity().getFragmentResults();
+		Bundle res = getMainActivity().getFragmentResults();
 		if (res != null) {
 			onFragmentResult(res);
 		}
@@ -212,7 +212,7 @@ public class ResultListFragment extends FamiliarFragment {
 				to[i] = toList.get(i);
 			}
 
-			ResultListAdapter rla = new ResultListAdapter(anchor.getMainActivity(), R.layout.card_row, c, from, to,
+			ResultListAdapter rla = new ResultListAdapter(getMainActivity(), R.layout.card_row, c, from, to,
 					this.getResources());
 			lv.setAdapter(rla);
 		}
@@ -285,7 +285,7 @@ public class ResultListFragment extends FamiliarFragment {
 			default:
 				if (bundleIsSingle || (isRandom && !randomFromMenu)) {
 					// TODO check on rotation
-					anchor.getMainActivity().mFragmentManager.popBackStack();
+					getMainActivity().mFragmentManager.popBackStack();
 				}
 				if (randomFromMenu) {
 					randomFromMenu = false;
@@ -302,7 +302,7 @@ public class ResultListFragment extends FamiliarFragment {
 		args.putBoolean(SearchViewFragment.RANDOM, isRandom);
 		args.putBoolean("isSingle", isSingle);
 		CardViewFragment cvFrag = new CardViewFragment();
-		anchor.startNewFragment(cvFrag, args);
+		startNewFragment(cvFrag, args);
 	}
 
 	private void startRandom() {

@@ -73,7 +73,7 @@ public class RulesFragment extends FamiliarFragment {
 		super.onCreateView(inflater, container, savedInstanceState);
 		View myFragmentView = inflater.inflate(R.layout.rules_activity, container, false);
 
-		Bundle res = anchor.getMainActivity().getFragmentResults();
+		Bundle res = getMainActivity().getFragmentResults();
 		if (res != null) {
 			int resultCode = res.getInt("resultCode");
 			if (resultCode == RESULT_QUIT_TO_MAIN) {
@@ -124,8 +124,8 @@ public class RulesFragment extends FamiliarFragment {
 			}
 		}
 		catch (FamiliarDbException e) {
-			mDbHelper.showDbErrorToast(this.getActivity());
-			this.getMainActivity().getSupportFragmentManager().popBackStack();
+			getMainActivity().showDbErrorToast();
+			getMainActivity().getSupportFragmentManager().popBackStack();
 			return myFragmentView;
 		}
 		
@@ -182,7 +182,7 @@ public class RulesFragment extends FamiliarFragment {
 									args.putBoolean(GLOSSARY_KEY, true);
 								}
 								RulesFragment frag = new RulesFragment();
-								anchor.startNewFragment(frag, args);
+								startNewFragment(frag, args);
 							}
 						});
 					}
@@ -256,7 +256,7 @@ public class RulesFragment extends FamiliarFragment {
 				super.onDestroy();
 				if (searchArgs != null) {
 					RulesFragment frag = new RulesFragment();
-					anchor.startNewFragment(frag, searchArgs);
+					startNewFragment(frag, searchArgs);
 				}
 			}
 
@@ -268,7 +268,7 @@ public class RulesFragment extends FamiliarFragment {
 						AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 						builder.setTitle(R.string.rules_search_title);
 						String header;
-						if (((RulesFragment) anchor).category == -1) {
+						if (category == -1) {
 							header = getString(R.string.rules_search_all);
 						}
 						else {
@@ -289,7 +289,7 @@ public class RulesFragment extends FamiliarFragment {
 							public void onClick(DialogInterface dialog, int which) {
 								String keyword = input.getText().toString().trim();
 								if (keyword.length() < 3) {
-									Toast.makeText(anchor.getActivity(), R.string.rules_short_key_toast, Toast.LENGTH_LONG).show();
+									Toast.makeText(getActivity(), R.string.rules_short_key_toast, Toast.LENGTH_LONG).show();
 								}
 								else {
 									searchArgs = new Bundle();
@@ -317,7 +317,7 @@ public class RulesFragment extends FamiliarFragment {
 						return new AlertDialog.Builder(this.getActivity()).setTitle(R.string.error).setView(dialogLayout)
 								.setPositiveButton(R.string.dialog_ok, new OnClickListener() {
 									public void onClick(DialogInterface dialog, int which) {
-										anchor.getMainActivity().mFragmentManager.popBackStack();
+										getMainActivity().mFragmentManager.popBackStack();
 									}
 								}).setCancelable(false).create();
 					}
@@ -392,7 +392,7 @@ public class RulesFragment extends FamiliarFragment {
 							args.putInt(SUBCATEGORY_KEY, linkSub);
 							args.putInt(POSITION_KEY, linkPosition);
 							RulesFragment frag = new RulesFragment();
-							anchor.startNewFragment(frag, args);
+							startNewFragment(frag, args);
 						}
 					}, m.start(), m.end(), 0);
 				}
@@ -531,7 +531,7 @@ public class RulesFragment extends FamiliarFragment {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View v = convertView;
 			if (v == null) {
-				LayoutInflater inf = anchor.getActivity().getLayoutInflater();
+				LayoutInflater inf = getActivity().getLayoutInflater();
 				v = inf.inflate(layoutResourceId, null);
 			}
 			DisplayItem data = items.get(position);

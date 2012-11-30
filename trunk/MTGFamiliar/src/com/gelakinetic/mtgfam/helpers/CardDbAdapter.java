@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
-import com.gelakinetic.mtgfam.R;
-
 import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
@@ -40,7 +38,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
-import android.widget.Toast;
+
+import com.gelakinetic.mtgfam.R;
 
 /**
  * Simple Cards database access helper class. Defines the basic CRUD operations
@@ -1693,16 +1692,6 @@ public class CardDbAdapter {
 			throw new FamiliarDbException(e);
 		} catch (IllegalStateException e) {
 			throw new FamiliarDbException(e);
-		}
-	}
-
-	public void showDbErrorToast(Context ctx) {
-		try {
-			Toast.makeText(ctx, ctx.getString(R.string.error_database),
-					Toast.LENGTH_LONG).show();
-		} catch (RuntimeException re) {
-			// Eat it; this will happen if we try to toast in a non-UI thread.
-			// It can happen when we get an error in autocomplete.
 		}
 	}
 

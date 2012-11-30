@@ -88,15 +88,15 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					Bundle args = new Bundle();
 					args.putLong("id", mDbHelper.fetchIdByName(name));
 					ResultListFragment rlFrag = new ResultListFragment();
-					anchor.startNewFragment(rlFrag, args);
+					startNewFragment(rlFrag, args);
 				}
 				catch (FamiliarDbException e) {
-					mDbHelper.showDbErrorToast(anchor.getActivity());
-					anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+					getMainActivity().showDbErrorToast();
+					getMainActivity().getSupportFragmentManager().popBackStack();
 				}
 				catch (SQLiteDatabaseCorruptException e) {
-					mDbHelper.showDbErrorToast(anchor.getActivity());
-					anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+					getMainActivity().showDbErrorToast();
+					getMainActivity().getSupportFragmentManager().popBackStack();
 					return;
 				}
 			}
@@ -128,15 +128,15 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					Bundle args = new Bundle();
 					args.putLong("id", mDbHelper.fetchIdByName(name));
 					ResultListFragment rlFrag = new ResultListFragment();
-					anchor.startNewFragment(rlFrag, args);
+					startNewFragment(rlFrag, args);
 				}
 				catch (FamiliarDbException e) {
-					mDbHelper.showDbErrorToast(anchor.getActivity());
-					anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+					getMainActivity().showDbErrorToast();
+					getMainActivity().getSupportFragmentManager().popBackStack();
 				}
 				catch (SQLiteDatabaseCorruptException e) {
-					mDbHelper.showDbErrorToast(anchor.getActivity());
-					anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+					getMainActivity().showDbErrorToast();
+					getMainActivity().getSupportFragmentManager().popBackStack();
 					return;
 				}
 			}
@@ -173,15 +173,15 @@ public class MoJhoStoFragment extends FamiliarFragment {
 
 					// add a fragment
 					ResultListFragment rlFrag = new ResultListFragment();
-					anchor.startNewFragment(rlFrag, args);
+					startNewFragment(rlFrag, args);
 				}
 				catch (FamiliarDbException e) {
-					mDbHelper.showDbErrorToast(anchor.getActivity());
-					anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+					getMainActivity().showDbErrorToast();
+					getMainActivity().getSupportFragmentManager().popBackStack();
 				}
 				catch (SQLiteDatabaseCorruptException e) {
-					mDbHelper.showDbErrorToast(anchor.getActivity());
-					anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+					getMainActivity().showDbErrorToast();
+					getMainActivity().getSupportFragmentManager().popBackStack();
 					return;
 				}
 			}
@@ -220,15 +220,15 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					// add a fragment
 					ResultListFragment rlFrag = new ResultListFragment();
 					rlFrag.setArguments(args);
-					anchor.startNewFragment(rlFrag, args);
+					startNewFragment(rlFrag, args);
 				}
 				catch (FamiliarDbException e) {
-					mDbHelper.showDbErrorToast(anchor.getActivity());
-					anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+					getMainActivity().showDbErrorToast();
+					getMainActivity().getSupportFragmentManager().popBackStack();
 				}
 				catch (SQLiteDatabaseCorruptException e) {
-					mDbHelper.showDbErrorToast(anchor.getActivity());
-					anchor.getMainActivity().getSupportFragmentManager().popBackStack();
+					getMainActivity().showDbErrorToast();
+					getMainActivity().getSupportFragmentManager().popBackStack();
 					return;
 				}
 			}

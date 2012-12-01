@@ -22,31 +22,21 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" 
     android:orientation="horizontal">
-    
-    <LinearLayout
-        android:id="@+id/info_layout"
+
+    <HorizontalScrollView
+        android:id="@+id/playerScrollView"
         android:layout_width="0dp"
         android:layout_height="fill_parent"
-        android:layout_weight="1"
-        android:orientation="vertical" >
+        android:layout_weight="1" >
 
-	    <HorizontalScrollView
-	        android:id="@+id/playerScrollView"
-	        android:layout_width="fill_parent"
-	        android:layout_height="0dp"
-	        android:layout_weight="1">
-	
-	        <LinearLayout
-		        android:id="@+id/playerList"
-	            android:layout_width="wrap_content"
-	            android:layout_height="fill_parent" 
-	            android:orientation="horizontal" >
-	            
-	        </LinearLayout>
-	
-	    </HorizontalScrollView>
-	    
-    </LinearLayout>
+        <LinearLayout
+	        android:id="@+id/playerList"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent" 
+            android:orientation="horizontal" >
+        </LinearLayout>
+
+    </HorizontalScrollView>
 
     <View
         android:id="@+id/divider"
@@ -59,9 +49,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="wrap_content"
-        android:background="#000000"
         android:layout_height="fill_parent"
-        android:gravity="center"
         android:orientation="vertical" >
 
         <ImageView
@@ -70,7 +58,6 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
             android:layout_height="0dp"
             android:layout_weight="1"
             android:scaleType="center"
-            android:padding="15dp"
             android:src="@drawable/poison_button" />
 
         <ImageView
@@ -79,17 +66,23 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
             android:layout_height="0dp"
             android:layout_weight="1"
             android:scaleType="center"
-            android:padding="15dp"
             android:src="@drawable/life_button" />
 
         <ImageView
-            android:id="@+id/commander_button"
+            android:id="@+id/die_button"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:padding="15dp"
             android:scaleType="center"
-            android:src="@drawable/commander_button" />
+            android:src="@xml/die_button_xml" />
+
+        <ImageView
+            android:id="@+id/pool_button"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scaleType="center"
+            android:src="@xml/pool_button_xml" />
 
         <ImageView
             android:id="@+id/reset_button"
@@ -97,9 +90,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
             android:layout_height="0dp"
             android:layout_weight="1"
             android:scaleType="center"
-            android:padding="15dp"
             android:src="@xml/reset_button_xml" />
-        
     </LinearLayout>
 
 </LinearLayout>

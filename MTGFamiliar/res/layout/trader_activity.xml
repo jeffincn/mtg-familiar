@@ -20,24 +20,16 @@
             android:maxLength="2"
             android:selectAllOnFocus="true" >
 
-        </EditText>
+        </EditText>
+
         <AutoCompleteTextView
             android:id="@+id/namesearch"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="@string/search_name"
-            android:inputType="text" >
+            android:hint="@string/name" >
 
             <requestFocus />
         </AutoCompleteTextView>
-
-        <ImageButton
-            android:id="@+id/cameraButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_menu_camera" />
-
     </LinearLayout>
 
     <LinearLayout
@@ -56,7 +48,7 @@
                 android:id="@+id/addCardLeft"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/trader_add_card" />
+                android:text="@string/addCardDown" />
 
             <TextView
                 android:id="@+id/priceTextLeft"
@@ -94,7 +86,7 @@
                 android:id="@+id/addCardRight"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/trader_add_card" />
+                android:text="@string/addCardDown" />
 
             <TextView
                 android:id="@+id/priceTextRight"

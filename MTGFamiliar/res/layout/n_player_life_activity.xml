@@ -1,50 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright 2011 Adam Feinstein
-
-This file is part of MTG Familiar.
-
-MTG Familiar is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-MTG Familiar is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
--->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/linearLayout1"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <LinearLayout
-        android:id="@+id/info_layout"
+    <ListView
+        android:id="@+id/v_list"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical" >
-
-        <ScrollView
-            android:id="@+id/playerScrollView"
-            android:layout_width="fill_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" >
-
-            <LinearLayout
-                android:id="@+id/playerList"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" >
-            </LinearLayout>
-        </ScrollView>
-
-    </LinearLayout>
+        android:layout_height="fill_parent"
+        android:layout_weight="1"/>
 
     <View
         android:id="@+id/divider"
@@ -56,10 +21,8 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
     <LinearLayout
         android:id="@+id/linearLayout2"
-        android:layout_width="fill_parent"
-        android:background="#000000"
-        android:gravity="center"
-        android:layout_height="wrap_content" >
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <ImageView
             android:id="@+id/poison_button"
@@ -67,7 +30,6 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:scaleType="center"
-            android:padding="15dp"
             android:src="@drawable/poison_button" />
 
         <ImageView
@@ -76,26 +38,23 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:scaleType="center"
-            android:padding="15dp"
             android:src="@drawable/life_button" />
 
         <ImageView
-            android:id="@+id/commander_button"
+            android:id="@+id/die_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="15dp"
             android:scaleType="center"
-            android:src="@drawable/commander_button" />
+            android:src="@drawable/die_button" />
 
         <ImageView
-            android:id="@+id/null_button"
+            android:id="@+id/pool_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:scaleType="center"
-            android:padding="15dp"
-            android:src="@drawable/blank_button" />
+            android:src="@drawable/pool_button" />
 
         <ImageView
             android:id="@+id/reset_button"
@@ -103,8 +62,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:scaleType="center"
-            android:padding="15dp"
-            android:src="@xml/reset_button_xml" />
+            android:src="@drawable/reset_button" />
     </LinearLayout>
 
 </LinearLayout>

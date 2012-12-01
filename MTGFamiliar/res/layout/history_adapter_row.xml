@@ -13,20 +13,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:weightSum="1" >
+    android:orientation="horizontal" android:weightSum="1">
 
     <TextView
         android:id="@+id/relative"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight=".5"
         android:gravity="center"
-        android:maxLines="1"
         android:singleLine="true"
         android:text="+0"
         android:textColor="#4fa5d5"
-        android:textSize="25sp" />
+        android:textSize="25sp" android:layout_weight=".5" android:maxLines="1"/>
 
     <View
         android:layout_width="1dp"
@@ -37,12 +34,10 @@
         android:id="@+id/absolute"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight=".5"
         android:gravity="center"
-        android:maxLines="1"
         android:singleLine="true"
-        android:text="@string/life_counter_twenty"
+        android:text="20"
         android:textColor="#4fa5d5"
-        android:textSize="25sp" />
+        android:textSize="25sp" android:layout_weight=".5" android:maxLines="1"/>
 
 </LinearLayout>

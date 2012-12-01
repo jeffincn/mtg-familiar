@@ -10,8 +10,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.Calendar;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 
 import javax.swing.JButton;
@@ -19,7 +17,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -182,25 +179,13 @@ public class Main implements ActionListener {
 			JSONObject cdb = jo.getJSONObject("mtg_carddatabase");
 			
 			JSONObject sets = cdb.getJSONObject("sets");
+			JSONArray set = sets.getJSONArray("set");
+			//System.out.println("sets: " + set.length());
 			
-			JSONArray set = null;
-			int setLen;
-			try{
-				set= sets.getJSONArray("set");
-				setLen = set.length();
-			}
-			catch(Exception e){
-				setLen = 1;
-			}
-			
+			int setLen = set.length();
 			for(int i=0; i < setLen; i++){
-				JSONObject s;
-				if(set != null){
-					s = (JSONObject)set.remove(0);
-				}
-				else{
-					s = (JSONObject) sets.remove("set");
-				}
+				JSONObject s = (JSONObject)set.remove(0);
+							
 				System.out.print(s.getString("name")+"\t"+s.getString("date")+"\t");
 				
 				String date = s.getString("date");
@@ -212,12 +197,8 @@ public class Main implements ActionListener {
 				long epochTime = cal.getTimeInMillis();
 				s.put("date", epochTime);
 				System.out.println(epochTime);
-				if(set != null){
-					set.put(s);
-				}
-				else{
-					sets.put("set", s);
-				}
+//				set.remove(i);
+				set.put(s);
 			}
 			
 			JSONObject cards = cdb.getJSONObject("cards");
@@ -269,8 +250,8 @@ public class Main implements ActionListener {
 					card2.put("flavor", "");
 					card1.put("artist", artists[0]);
 					card2.put("artist", artists[1]);
-					card1.put("number", c.getString("number") + "a");
-					card2.put("number", c.getString("number") + "b");
+					card1.put("number", c.getString("number"));
+					card2.put("number", c.getString("number"));
 					card1.put("color", colors[0]);
 					card2.put("color", colors[1]);
 					card1.put("id", mID);
@@ -289,16 +270,6 @@ public class Main implements ActionListener {
 			}
 
 			s = new StringBuffer(s).insert(6, "\"w\":" + card_cnt + ",").toString();
-			
-			//REGEX ALL THE THINGS
-			//...By which I mean validate the JSON to make sure all the identifiers are one character long
-			Pattern p = Pattern.compile("(\"[a-zA-Z0-9]{2,}\":)");
-			Matcher m = p.matcher(s);
-			if(m.find()) {
-				//If we find a match, that's a bad thing
-				statusLabel.setText("Validation error; check fields");
-				return;
-			}
 
 			String name = f.getName().substring(0, f.getName().length() - 4);
 			
@@ -316,8 +287,10 @@ public class Main implements ActionListener {
 						
 			byte[] buffer = new byte[1024];
 			int length;
-			while ((length = fis.read(buffer)) > 0) {
+			int totalwritten=0;
+			while ((length = fis.read(buffer))>0){
 				gos.write(buffer, 0, length);
+				totalwritten+=length;
 			}
 
 			//Close the streams

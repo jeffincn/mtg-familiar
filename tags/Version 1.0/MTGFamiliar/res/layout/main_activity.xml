@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2011 Adam Feinstein, Michael Shick This file is part of MTG 
+	Familiar. MTG Familiar is free software: you can redistribute it and/or modify 
+	it under the terms of the GNU General Public License as published by the 
+	Free Software Foundation, either version 3 of the License, or (at your option) 
+	any later version. MTG Familiar is distributed in the hope that it will be 
+	useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+	or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for 
+	more details. You should have received a copy of the GNU General Public License 
+	along with MTG Familiar. If not, see <http://www.gnu.org/licenses/>. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="fill_parent" android:id="@+id/linearLayout1"
+	android:layout_width="fill_parent" android:orientation="vertical">
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/linearLayout2" android:layout_width="fill_parent"
+		android:orientation="horizontal" android:layout_height="wrap_content"
+		android:layout_marginLeft="5dip" android:layout_marginRight="5dip"
+		android:layout_marginTop="5dip" android:layout_marginBottom="15dip">
+		<ImageView android:id="@+id/imageView1" android:src="@drawable/iconbig"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:layout_gravity="center" />
+		<TextView android:textAppearance="?android:attr/textAppearanceLarge"
+			android:layout_width="fill_parent" android:layout_height="fill_parent"
+			android:layout_gravity="bottom" android:text="@string/app_name"
+			android:gravity="center" android:textSize="45dip" android:id="@+id/title" />
+	</LinearLayout>
+	<ScrollView android:layout_width="fill_parent"
+		android:layout_height="0dp" android:layout_weight="5">
+		<LinearLayout android:layout_width="fill_parent"
+			android:layout_height="fill_parent" android:orientation="vertical"
+			android:gravity="center">
+			<LinearLayout android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:id="@+id/cardsearch"
+				android:gravity="center" android:orientation="horizontal">
+				<ImageView android:layout_width="0dp"
+					android:layout_height="wrap_content" android:src="@drawable/card_search_icon"
+					android:scaleType="center" android:layout_weight="1"
+					android:layout_marginTop="8dip" android:layout_marginBottom="8dip" />
+				<TextView android:layout_width="0dp" android:text="@string/cardsearch"
+					android:layout_height="wrap_content" android:textSize="30dip"
+					android:layout_weight="3" style="@style/text"
+					android:layout_marginLeft="12dip" />
+			</LinearLayout>
+			<LinearLayout android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:id="@+id/lifecounter"
+				android:gravity="center" android:orientation="horizontal">
+				<ImageView android:layout_width="0dp"
+					android:layout_height="wrap_content" android:src="@drawable/life_counter_icon"
+					android:scaleType="center" android:layout_weight="1"
+					android:layout_marginTop="8dip" android:layout_marginBottom="8dip" />
+				<TextView android:layout_width="0dp" android:text="@string/lifecounter"
+					android:layout_height="wrap_content" android:textSize="30dip"
+					android:layout_weight="3" style="@style/text"
+					android:layout_marginLeft="12dip" />
+			</LinearLayout>
+			<LinearLayout android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:id="@+id/manapool"
+				android:gravity="center" android:orientation="horizontal">
+				<ImageView android:layout_width="0dp"
+					android:layout_height="wrap_content" android:src="@drawable/mana_pool_icon"
+					android:scaleType="center" android:layout_weight="1"
+					android:layout_marginTop="8dip" android:layout_marginBottom="8dip" />
+				<TextView android:layout_width="0dp" android:text="@string/manapool"
+					android:layout_height="wrap_content" android:textSize="30dip"
+					android:layout_weight="3" style="@style/text"
+					android:layout_marginLeft="12dip" />
+			</LinearLayout>
+			<LinearLayout android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:id="@+id/rng"
+				android:gravity="center" android:orientation="horizontal">
+				<ImageView android:layout_width="0dp"
+					android:layout_height="wrap_content" android:src="@drawable/dice_icon"
+					android:scaleType="center" android:layout_weight="1"
+					android:layout_marginTop="8dip" android:layout_marginBottom="8dip" />
+				<TextView android:layout_width="0dp" android:text="@string/random"
+					android:layout_height="wrap_content" android:textSize="30dip"
+					android:layout_weight="3" style="@style/text"
+					android:layout_marginLeft="12dip" />
+			</LinearLayout>
+			<Button android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:textSize="30dip"
+				android:layout_weight="1" android:id="@+id/deckmanager"
+				android:text="@string/deckmanagement" />
+		</LinearLayout>
+	</ScrollView>
+</LinearLayout>

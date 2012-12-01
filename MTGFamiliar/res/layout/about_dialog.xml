@@ -18,7 +18,7 @@
     <LinearLayout
         android:id="@+id/linearLayout1"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:orientation="vertical" >
 
         <TextView
@@ -31,14 +31,12 @@
             android:textSize="20sp" />
 
         <ImageView
-            android:id="@+id/imageview1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
             android:src="@drawable/gpl" />
 
         <ImageView
-            android:id="@+id/imageview2"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"

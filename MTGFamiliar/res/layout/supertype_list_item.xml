@@ -21,6 +21,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:padding="10dp"
+    android:textColor="#000"
     android:textSize="16sp" >
 
 </TextView>

@@ -12,14 +12,13 @@
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="match_parent" 
-    android:id="@+id/parentLayout">
+    android:layout_height="match_parent" >
 
     <ScrollView
         android:id="@+id/ScrollView1"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_above="@+id/scrollButtons"
+        android:layout_above="@+id/linearLayout10"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:fillViewport="true" >
@@ -181,7 +180,7 @@
     </ScrollView>
 
     <LinearLayout
-        android:id="@+id/scrollButtons"
+        android:id="@+id/linearLayout10"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -192,7 +191,7 @@
             android:id="@+id/transformbutton"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/card_view_transform"
+            android:text="@string/transform"
             android:textSize="22dip" />
 
         <LinearLayout
@@ -207,7 +206,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/card_view_left"
+                android:text="@string/randomleft"
                 android:textSize="22dip" />
 
             <Button
@@ -215,7 +214,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/card_view_right"
+                android:text="@string/randomright"
                 android:textSize="22dip" />
         </LinearLayout>
     </LinearLayout>

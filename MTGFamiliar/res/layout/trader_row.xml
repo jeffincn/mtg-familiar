@@ -9,7 +9,7 @@
         android:id="@+id/traderRowName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/search_name"
+        android:text="@string/name"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <LinearLayout
@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="left"
             android:layout_weight="1"
-            android:text="@string/search_set"
+            android:text="@string/setsearch"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView

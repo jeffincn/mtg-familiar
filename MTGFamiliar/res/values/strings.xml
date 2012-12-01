@@ -12,397 +12,30 @@
 -->
 <resources>
 
-    <!-- General-purpose strings -->
-	<string name="app_name">MTG Familiar</string>
-    <string name="name_search_hint">Search Names</string>
-    <string name="slash">/</string>
-    <string name="dialog_ok">OK</string>
-    <string name="dialog_cancel">Cancel</string>
-    <string name="dialog_yes">Yes</string>
-    <string name="dialog_no">No</string>
-    <string name="dialog_done">Done</string>
-    <string name="dialog_both">Both</string>
-    <string name="dialog_life">Life</string>
-    <string name="dialog_thanks">Thanks!</string>
-    <string name="dialog_thanks_anyway">Thanks Anyway!</string>
-    <string name="dialog_enjoy">Enjoy!</string>
-    <string name="dialog_play">Let\'s Play!</string>
-    <string name="dialog_save">Save</string>
-    <string name="update_notification">Checking for database updates</string>
-    <string name="update_updating_set">Adding %s…</string>
-    <string name="update_updating_rules">Updating comprehensive rules…</string>
-    <string name="update_added">Added</string>
-    <string name="update_added_rules">new comprehensive rules</string>
-    <string name="update_parse_cards">Parsing %s</string>
-    <string name="update_parse_rules">Parsing comprehensive rules</string>
-    <string name="error">Error</string>
-    <string name="error_database">A database error occurred. If it persists, try clearing the app data from the Android settings menu.</string>
-    <string name="error_corruption">Whoops! It looks like an important part of this app has been corrupted and doesn\'t work anymore.
+    <string name="dberror">Database Error. Try clearing app data in Android\'s settings</string>
+    <string name="corruption_error_title">Error</string>
+    <string name="corruption_error">Whoops! It looks like an important part of this app has been corrupted and doesn\'t work anymore.
         We\'re trying to figure out exactly what\'s causing this to happen, so please send us an email at 
         &lt;a href="mailto:mtg.familiar@gmail.com">mtg.familiar@gmail.com&lt;/a> so we can track this bug and fix it.
         In the meantime, if it doesn\'t manage to fix itself, please try clearing the app data in your device\'s settings,
         and if that doesn\'t work reinstall the app from the Play Store.</string>
-    <string name="error_couldnt_open_db_toast">: Please try again.</string>
-    <string name="error_no_email_client">It does not appear that you have an active email client installed. Please configure an email application.</string>
     
-    <!-- Placeholder text -->
-    <string name="ph_type">Type</string>
-    <string name="ph_cost">Cost</string>
-    <string name="ph_ability">Ability</string>
-    <string name="ph_power">P</string>
-    <string name="ph_toughness">T</string>
+    <string name="brokenImageString">Congratulations, you found a NullPointerException! This should never happen, and we\'re not sure how, or why,
+		you found it. Please send us an email at &lt;a href="mailto:mtg.familiar@gmail.com">mtg.familiar@gmail.com&lt;/a> so we can track this bug
+		and fix it. Thanks!</string>
     
+    <string name="plus_str">+</string>
+    <string name="minus_str">-</string>
+    <string name="zero_str">0</string>
+    <string name="twenty_str">20</string>
     
-    <!-- Main menu activity -->
-    <string name="main_pages">PAGES</string>
-    <string name="main_extras">EXTRAS</string>
-    <string name="main_card_search">Card Search</string>
-    <string name="main_life_counter">Life Counter</string>
-    <string name="main_mana_pool">Mana Pool</string>
-    <string name="main_dice">Dice</string>
-    <string name="main_trade">Trade Cards</string>
-	<string name="main_wishlist">Wishlist</string>
-    <string name="main_timer">Round Timer</string>
-    <string name="main_rules">Rules</string>
-    <string name="main_mojhosto">MoJhoSto Basic</string>
-    <string name="main_force_update_title">Force Update</string>
-    <string name="main_settings_title">Settings</string>
-    <string name="main_donate_title">Donate</string>
-    <string name="main_donate_dialog_title">Donate to the Devs</string>
-    <string name="main_donate_text">
-        For a premium M:TG app like this, how much would you pay? $1,000? $10,000?&lt;br />&lt;br />
-        Well, if you\'re reading this, you already know we\'re giving it away for free!&lt;br />&lt;br />
-        Coding is hard work though, and us devs appreciate the extra dollar here or there.&lt;br />&lt;br />
-        We\'ve got a drafting habit to fuel, ok?&lt;br />&lt;br />
-        You can click the button below to donate via PayPal. $1 is cool. $5 is cooler. You get the drift.&lt;br />&lt;br />
-        So, how generous are you feeling today?
-    </string>
-    <string name="main_whats_new_title">What\'s New</string>
-    <string name="main_whats_new_in_title">What\'s New in Version</string>
-    <string name="main_whats_new_text">
-	- New Sliding Menu navigation! Touch the button in the top left to open the menu, and change your default page in General Settings&lt;br />&lt;br />
- 	- Card search using the camera&lt;br />&lt;br />
- 	- New EDH mode for the Life Counter&lt;br />&lt;br />
- 	- Export and Import data to an SD card&lt;br />&lt;br />
- 	- Save and load default search parameters&lt;br />&lt;br />
- 	- Various and sundry bugfixes&lt;br />&lt;br />
- 	- French translation&lt;br />&lt;br />
- 	- Card images from seven languages. Choose your favorite in the Settings.
-    </string>
-    
-    <string name="main_tts_warning_title">Text-to-Speech</string>
-    <string name="main_tts_warning_text">This application has text-to-speech capability for some of its features, but you don\'t seem to have it installed. 
-        If you want to install it, use the "Install Text-to-Speech" link in the settings menu.</string>
-    
-    <string name="main_export_data_title">Export Data to SD</string>
-    <string name="main_export_success">Successfully exported data to </string>
-    <string name="main_export_fail">Failed to export data to SD card</string>
-    
-    <string name="main_import_data_title">Import Data from SD</string>
-    <string name="main_import_success">Import succeeded</string>
-    <string name="main_import_fail">Import failed. Please put MTGFamiliarBackup.zip in the root of your SD card</string>
-    
-    <string name="main_about">About</string>
-    <string name="main_about_title">About App</string>
-    <string name="main_about_text">This app is my gift to the MTG community.&lt;br />&lt;br />
-		Please send questions, comments, concerns, and praise to &lt;a href="mailto:mtg.familiar@gmail.com">mtg.familiar@gmail.com&lt;/a>.&lt;br />&lt;br />
-		Join the &lt;a href="http://code.google.com/p/mtg-familiar">open source project&lt;/a> on Google Code.&lt;br />&lt;br />
-		Thanks to zagaberoo for beautiful graphics and even more beautiful code.&lt;br />&lt;br />
-		Thanks to April King for the massive QA effort, and learning Java. Shh, don\'t tell anyone about that.&lt;br />&lt;br />
-		Thanks to Toastdeib for being my SQL guru sitting on top of the mountain.&lt;br />&lt;br />
-		Thanks to Reuben for being the best kind of user. You know, the kind that becomes a developer!&lt;br />&lt;br />
-		Thanks to Lotier from Reddit for coming out of nowhere with a great card trader activity!&lt;br />&lt;br />
-		Thanks to Daniel for first learning Android, then making a wishlist!&lt;br />&lt;br />
-		Thanks to Aethys for his French Translation and his API for searching a card name using the device camera.&lt;br /&gt;&lt;br /&gt;
-		Thanks to chaudakh for the wonderful Gatherer Extractor program.&lt;br />&lt;br />
-		Thanks to reddit\'s &lt;a href="http://www.reddit.com/r/magicTCG/">/r/magictcg&lt;/a> for testing and feedback.&lt;br />&lt;br />
-		Thanks to my brother for the icon.&lt;br />&lt;br />
-		Thanks to Chedy @ &lt;a href="http://tcgplayer.com">TCGPlayer.com&lt;/a> for the price API.&lt;br />&lt;br />
-		Thanks to Jake Wharton for the magnificent &lt;a href="http://actionbarsherlock.com/">ActionBarSherlock&lt;/a>.&lt;br />&lt;br />
-		Special thanks to Richard Garfield and the rest of the folks at &lt;a href="http://www.wizards.com/magic">Wizards of the Coast&lt;/a>.&lt;br />&lt;br />
-		-gelakinetic&lt;br />&lt;br />&lt;br />
-		Magic the Gathering and Magic the Gathering cards are ™ &amp; © Wizards of the Coast LLC.&lt;br />&lt;br />
-		The Android robot is © Google &lt;br />&lt;br />
-		Program licenced under the &lt;a href="http://www.gnu.org/licenses/gpl.html">GNU General Public License v3+&lt;/a>.&lt;br />&lt;br />
-		Media licenced under the &lt;a href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License&lt;a>.
-	</string>
-    
-    
-    <!-- Search activity -->
-    <string name="search_name">Name</string>
-    <string name="search_supertype">Supertype</string>
-    <string name="search_subtype">Subtype</string>
-    <string name="search_text">Text</string>
-    <string name="search_power">Power</string>
-    <string name="search_toughness">Toughness</string>
-    <string name="search_cmc">CMC</string>
-    <string name="search_set">Set</string>
-    <string name="search_sets">Sets</string>
-    <string name="search_format">Format</string>
-    <string name="search_formats">Formats</string>
-    <string name="search_rarity">Rarity</string>
-    <string name="search_rarities">Rarities</string>
-    <string name="search_flavor_text">Flavor Text</string>
-    <string name="search_artist">Artist</string>
-    <string name="search_search">Search!</string>
-    <string name="search_randomize">Randomize!</string>
-    <string name="search_clear_fields">Clear Fields</string>
-    <string name="search_save_defaults">Save Defaults</string>
-    <string name="search_load_defaults">Load Defaults</string>
-    <string name="search_toast_no_results">No search results found.</string>
-    <string name="search_toast_cannot_save">Could not save search options.</string>
-    <string name="search_toast_cannot_load">Could not load search options.</string>
-    
-    
-    <!-- Card view activity -->
-    <string name="card_view_transform">Transform</string>
-    <string name="card_view_left">&lt;</string>
-    <string name="card_view_right">></string>
-    <string name="card_view_copy">Copy Section To Clipboard</string>
-    <string name="card_view_copy_all">Copy Card To Clipboard</string>
-    <string name="card_view_image">Card Image</string>
-    <string name="card_view_price">Card Price</string>
-    <string name="card_view_change_set">Change Set</string>
-    <string name="card_view_legality">Legality</string>
-    <string name="card_view_rulings">Card Rulings</string>
-    <string name="card_view_wishlist">Wishlist</string>
-    <string name="card_view_legal">Legal</string>
-    <string name="card_view_restricted">Restricted</string>
-    <string name="card_view_banned">Banned</string>
-    <string name="card_view_error">Error</string>
-    <string name="card_view_price_dialog_title">TCGPlayer.com Prices</string>
-    <string name="card_view_price_dialog_low">Low:</string>
-    <string name="card_view_price_dialog_medium">Average:</string>
-    <string name="card_view_price_dialog_high">High:</string>
-    <string name="card_view_price_dialog_link">Click here for all prices and trend info</string>
-    <string name="card_view_rulings_dialog_title">Card Rulings</string>
-    <string name="card_view_no_rulings">No rulings for this card</string>
-    <string name="card_view_gatherer_page">Gatherer Page</string>
-    <string name="card_view_set_dialog_title">Pick a Set</string>
-    <string name="card_view_loading_dialog">Loading. Please wait…</string>
-    
-    
-    <!-- Life counter activity -->
-    <string name="life_counter_twenty">20</string>
-    <string name="life_counter_plus_one">+1</string>
-    <string name="life_counter_plus_five">+5</string>
-    <string name="life_counter_minus_one">-1</string>
-    <string name="life_counter_minus_five">-5</string>
-    <string name="life_counter_announce_life">Announce Life Totals</string>
-    <string name="life_counter_change_default_gathering">Edit Gatherings</string>
-    <string name="life_counter_set_gathering">Set Current Gathering</string>
-    <string name="life_counter_change_display">Change Display Mode</string>
-    <string name="life_counter_remove_player">Remove a Player</string>
-    <string name="life_counter_add_player">Add a Player</string>
-    <string name="life_counter_gathering_dialog_title">Load a Gathering</string>
-    <string name="life_counter_clear_dialog_text">Clear life totals or players?\nMana pool will also be cleared.</string>
-    <string name="life_counter_edit_name_dialog_title">Enter Name</string>
-	<string name="life_counter_search_from_photo">Search card from photo</string>
-	<string name="life_counter_tts_has"> has </string>
-	<string name="life_counter_tts_life">life</string>
-	<string name="life_counter_tts_lifes">life</string>	
-	<string name="life_counter_tts_poison_counter">poison counter</string>	
-	<string name="life_counter_tts_poison_counters">poison counters</string>	
-    
-    
-    <!-- Default gathering activity -->
-    <string name="gathering_custom_name">Name</string>
-    <string name="gathering_player">Player</string>
-    <string name="gathering_starting_life">Starting life:</string>
-    <string name="gathering_starting_life_default">20</string>
-    <string name="gathering_save">Save Gathering</string>
-    <string name="gathering_enter_name">Enter Gathering\'s Name</string>
-    <string name="gathering_dialog_overwrite_title">Confirm Overwrite</string>
-    <string name="gathering_dialog_overwrite_text">This Gathering already exists. Do you want to overwrite the existing file?</string>
-    <string name="gathering_load">Load Gathering</string>
-    <string name="gathering_delete">Delete Gathering</string>
-    <string name="gathering_remove_player">Remove a Player</string>
-    <string name="gathering_add_player">Add a Player</string>
-    <string name="gathering_toast_no_gatherings">No Gatherings exist.</string>
-    <string name="gathering_toast_no_name">Please include a name for the Gathering.</string>
-    <string name="gathering_empty_field">Fields cannot be empty. Please check all fields.</string>
-    
-    
-    <!-- Dice activity -->
-    <string name="dice_heads">heads</string>
-    <string name="dice_tails">tails</string>
-    
-    
-    <!-- Mana pool activity -->
-    <string name="mana_pool_plus">+</string>
-    <string name="mana_pool_minus">-</string>
-    <string name="mana_pool_zero">0</string>
-    <string name="mana_pool_clear_all">Clear All</string>
-    <string name="mana_pool_error_toast">Mana pool failed to load!</string>
-    
-    
-    <!-- Card trading activity -->
-    <string name="trader_add_card">Add Card</string>
-   	<string name="trader_default_price">$0.00</string>
-    <string name="trader_default_number_of">1x</string>
-    <string name="trader_save">Save Trade</string>
-    <string name="trader_load">Load Trade</string>
-    <string name="trader_delete">Delete Trade</string>
-    <string name="trader_clear_fields">Clear Fields</string>
-    <string name="trader_set_pricing">Set Pricing Option</string>
-    <string name="trader_toast_select_card">Please enter a card first.</string>
-    <string name="trader_edit_dialog_x">x</string>
-    <string name="trader_edit_dialog_change_set">Change Set</string>
-    <string name="trader_edit_dialog_remove">Remove</string>
-    <string name="trader_clear_dialog_title">Clear Trade</string>
-    <string name="trader_clear_dialog_text">Are you sure you want to clear the current trade?</string>
-    <string name="trader_save_dialog_title">Save Trade</string>
-    <string name="trader_save_dialog_text">Enter the trade\'s name</string>
-    <string name="trader_select_dialog_title">Select a Trade</string>
-    <string name="trader_delete_dialog_title">Delete a Trade</string>
-    <string name="trader_edit_dialog_info">Card Info</string>
-    <string name="trader_toast_no_trades">You have no saved trades.</string>
-    <string name="trader_toast_save_error">The trade could not be saved; please try again.</string>
-    <string name="trader_toast_invalid_chars">Trade names may not contain the path separator character (\'/\').</string>
-        
-    <!-- Wishlist activity -->
-    <string name="wishlist_name">Name</string>
-    <string name="wishlist_add_card">Add</string>
-   	<string name="wishlist_default_price">$0.00</string>
-    <string name="wishlist_clear_fields">Clear Fields</string>
-    <string name="wishlist_set_pricing">Set Pricing Option</string>
-    <string name="wishlist_toast_select_card">Please enter a card first.</string>
-    <string name="wishlist_toast_no_card">No card found with that name.</string>
-    <string name="wishlist_share">Share Wishlist</string>
-    <string name="wishlist_share_include_set">Include Set Names?</string>
-    <string name="wishlist_empty_dialog_title">Empty Wishlist</string>
-    <string name="wishlist_empty_dialog_text">Are you sure you want to empty your wishlist?</string>
-    
-    
-    <!-- Round timer activity -->
-    <string name="timer_how_long">How long is the round?\n(HH:MM)</string>
-    <string name="timer_how_long_landscape">How long is the round? (HH:MM)</string>
-    <string name="timer_start">Start Timer</string>
-    <string name="timer_cancel">Cancel Timer</string>
-    <string name="timer_set_ringtone">Set Timer Ringtone</string>
-    <string name="timer_set_warnings">Set Warnings</string>
-    <string name="timer_warning_dialog_title">Spoken Warnings</string>
-    <string name="timer_tone_dialog_title">Select Alert Tone</string>
-    
-    
-    <!-- Rules activity -->
-    <string name="rules_exit">Exit Rules</string>
-    <string name="rules_glossary">Glossary</string>
-    <string name="rules_no_results_toast">No results found.</string>
-    <string name="rules_short_key_toast">Your search term must be at least 3 characters long.</string>
-    <string name="rules_search_title">Keyword Search</string>
-    <string name="rules_search_all">Search all rules for:</string>
-    <string name="rules_search_cat">Search within %s for:</string>
-    <string name="rules_this_cat">this category:</string>
-    
-    
-    <!-- MoJhoSto activity -->
-    <string name="mojhosto_rules_title">MoJhoSto Basic Rules</string>
-    <string name="mojhosto_rules_text">
-    MoJhoSto is a casual Vanguard format from Magic Online.&lt;br />&lt;br />
-    To play, each player must have a deck which consists of only 60 basic lands.&lt;br />&lt;br />
-    Each player starts the game with three Vanguards: Momir Vig, Jhoira, and Stonehewer Giant.&lt;br />&lt;br />
-    These Vanguards adjust each player\'s starting and maximum hand size (9) and starting life total (19).&lt;br />&lt;br />
-    Any abilities printed on a Vanguard card are played exactly like those of an in-play Magic card.&lt;br />&lt;br />
-    However, these abilities have no color and damage from them isn\'t damage from a permanent of any type or a source of any color.&lt;br />&lt;br />
-    A Vanguard card isn\'t a Magic card, so it can\'t be affected by spells or abilities.&lt;br />&lt;br />
-    You can tap each picture to see the full Vanguard card.&lt;br />&lt;br />
-    You can read the rules at any time from the menu.&lt;br />&lt;br />
-    Pen and paper might be useful for tracking the game state. Sadly, MTG Familiar cannot spawn actual cards.&lt;br />&lt;br />
-    Good luck, and have fun!</string>
-    <string name="mojhosto_momir_label">CMC =</string>
-    <string name="mojhosto_random_creature">Random Creature</string>
-    <string name="mojhosto_stonehewer_label">CMC ≤</string>
-    <string name="mojhosto_random_equipment">Random Equipment</string>
-    <string name="mojhosto_random_instants">Three Random Instants</string>
-    <string name="mojhosto_random_sorceries">Three Random Sorceries</string>
-    
-    
-    <!-- Preferences -->
-    <string name="pref_screen_general">General Settings</string>
-    <string name="pref_screen_search">Search &amp; Results</string>
-    <string name="pref_screen_counter">Life Counter</string>
-    <string name="pref_screen_timer">Round Timer</string>
-    <string name="pref_screen_trade_wishlist">Trade &amp; Wishlist</string>
-    
-    <string name="pref_cat_default_fragment">Default Page</string>
-	<string name="pref_default_fragment_mode_title">Default Page</string>
-	<string name="pref_default_fragment_mode_summary">The first thing you see when you open the app</string>
-    <string name="pref_cat_updates">Database Updates</string>
-    <string name="pref_auto_updates_title">Automatic Updates</string>
-    <string name="pref_auto_updates_summary">Check for new sets and bannings when the app opens</string>
-    <string name="pref_update_frequency_title">Update Frequency</string>
-    <string name="pref_update_frequency_summary">Number of days to go between checking for new sets and bannings</string>
-    
-    <string name="pref_cat_card_view">Card View</string>
-    <string name="pref_show_art_title">Always Show Art</string>
-    <string name="pref_show_art_summary">When viewing a card, load official card image instead of rules text</string>
-    <string name="pref_scroll_title">Scroll Results</string>
-    <string name="pref_scroll_summary">Show buttons to scroll between search results</string>
-    <string name="pref_card_language_title">Card image language</string>
-    <string name="pref_card_language_summary">Choose the language used to retrieve the card image</string>
-    
-    <string name="pref_cat_dice">Dice</string>
-    <string name="pref_d2_as_coin_title">Treat D2 As Coin</string>
-    
-    <string name="pref_cat_life_counter">Life Counter</string>
-    <string name="pref_wake_lock_title">Wake Lock</string>
-    <string name="pref_wake_lock_summary">Force the life counter screen to never go to sleep</string>
-    <string name="pref_display_mode_title">Display Mode</string>
-    <string name="pref_display_mode_summary">Choose how to display the Life Counter</string>
-    
-    <string name="pref_cat_timer">Round Timer</string>
-    <string name="pref_default_time_title">Default Round Length</string>
-    <string name="pref_default_time_summary">Set the default length for the round timer</string>
-    <string name="pref_ringtone_title">Timer Ringtone</string>
-    <string name="pref_ringtone_summary">Select a notification ringtone to play when the round timer ends</string>
-	<string name="pref_fifteen_minutes_title">15-Minute Warning</string>
-    <string name="pref_ten_minutes_title">10-Minute Warning</string>
-    <string name="pref_five_minutes_title">5-Minute Warning</string>
-    
-    <string name="pref_cat_trade_window">Trade Window</string>
-    <string name="pref_trade_price_title">Price Setting</string>
-    <string name="pref_trade_price_summary">TCGplayer price to use when trading cards</string>
-    
-    <string name="pref_cat_result_list">Result List</string>
-    <string name="pref_consolidate_title">Consolidate Results</string>
-    <string name="pref_consolidate_summary">Only show the most recent printing of a card</string>
-    <string name="pref_show_set_title">Show Set</string>
-    <string name="pref_show_mana_title">Show Mana Cost</string>
-    <string name="pref_show_type_title">Show Type/Subtype</string>
-    <string name="pref_show_ability_title">Show Rules Text</string>
-    <string name="pref_show_pt_title">Show Power/Toughness</string>
-    
-    <string name="pref_cat_tts">Text-to-Speech</string>
-    <string name="pref_install_tts_title">Install Text-to-Speech</string>
-    <string name="pref_install_tts_summary">Clicking here will take you to the text-to-speech install page in the Google Play Store</string>
-    
-    <string name="pref_cat_wishlist">Wishlist</string>
-    <string name="pref_wishlist_details_title">Show Details</string>
-    <string name="pref_wishlist_details_summary">Display full card details in the wishlist</string>
-    <string name="pref_wishlist_totals_title">Show Total Price</string>
-    <string name="pref_wishlist_totals_summary">Display total price summary in the wishlist</string>
-    <string name="pref_wishlist_prices_title">Show Card Prices</string>
-    <string name="pref_wishlist_prices_summary">Display each card price in the wishlist</string>
-    
-    
-    <!-- Debug -->
-    <string name="main_refresh_db">Refresh DB from APK</string>
-    <string name="main_build_db">Build DB from Web</string>
-    
-    
-    <!-- Default language -->
-    <string name="main_card_language">en</string>
-    
-    
-    <!-- Goggles -->
-    <string name="goggles_cssid_expired">CSSID expired!</string>
-    <string name="goggles_3_attempts">Three attempts were broken!</string>
-    <string name="goggles_photo_analysis">Photo analysis…</string>
-    <string name="goggles_no_card_on_photo">No card found on the photo</string>
-    
-    
-    <!-- Arrays -->
+    <string name="plus_one">+1</string>
+    <string name="plus_five">+5</string>
+    <string name="minus_one">-1</string>
+    <string name="minus_five">-5</string>
+        	
+	<string name="app_name">MTG Familiar</string>
+
     <string-array name="supertypes">
         <item>Artifact</item>
         <item>Basic</item>
@@ -502,27 +135,243 @@
         <item>16</item>
     </string-array>
     <string-array name="color_spinner">
-        <item>May include any color(s)</item>
-        <item>Must include all colors</item>
-        <item>No other colors</item>
+        <item>May Include Any Color(s)</item>
+        <item>Must Include All Colors</item>
+        <item>No Other Colors</item>
         <item>Exact (all selected and no others)</item>
     </string-array>
-    <string-array name="trade_option_entries">
-        <item>Low</item>
-        <item>Average</item>
-        <item>High</item>
+
+    <string name="pow">Power</string>
+    <string name="tou">Toughness</string>
+    <string name="formatsearch">Format</string>
+    <string name="setsearch">Set</string>
+    <string name="cmc">CMC</string>
+    <string name="image">Card Image</string>
+    <string name="price">Card Price</string>
+    <string name="changeset">Change Set</string>
+    <string name="cardsearch">Card Search</string>
+    <string name="rules">Rules</string>
+    <string name="lifecounter">Life Counter</string>
+    <string name="manapool">Mana Pool</string>
+    <string name="random">Dice</string>
+    <string name="searchrarity">Rarity</string>
+    <string name="clear">Clear Fields</string>
+    <string name="clear_all">Clear All</string>
+    <string name="legality">Legality</string>
+    <string name="about">About App</string>
+    <string name="high">High:</string>
+    <string name="med">Average:</string>
+    <string name="low">Low:</string>
+    <string name="pricetitle">TCGPlayer.com Prices</string>
+    <string name="chkupd">Force Update</string>
+    <string name="preferences">Settings</string>
+    <string name="transform">Transform</string>
+    <string name="d2title">Treat D2 As Coin</string>
+    <string name="webDB">Build DB from Web</string>
+    <string name="refreshDB">Refresh DB from APK</string>
+    <string name="searchButton">Search!</string>
+    <string name="randomButton">Randomize!</string>
+    <string name="tcgplayerlink">Click here for all prices and trend info</string>
+    <string name="toast_no_result">No Results Found</string>
+    <string name="name">Name</string>
+    <string name="subtype">Subtype</string>
+    <string name="supertype">Supertype</string>
+    <string name="text">Text</string>
+    <string name="flavor_text">Flavor Text</string>
+    <string name="artist">Artist</string>
+    <string name="change_default_gathering">Change Default Gathering</string>
+    <string name="about_this_app">This app is my gift to the MTG community.&lt;br />&lt;br />
+Please send questions, comments, concerns, and praise to &lt;a href="mailto:mtg.familiar@gmail.com">mtg.familiar@gmail.com&lt;/a>.&lt;br />&lt;br />
+Join the &lt;a href="http://code.google.com/p/mtg-familiar">open source project&lt;/a> on Google Code.&lt;br />&lt;br />
+Thanks to zagaberoo for beautiful graphics and even more beautiful code.&lt;br />&lt;br />
+Thanks to April King for the massive QA effort, and learning Java. Shh, don\'t tell anyone about that.&lt;br />&lt;br />
+Thanks to Toastdeib for being my SQL guru sitting on top of the mountain.&lt;br />&lt;br />
+Thanks to Reuben for being the best kind of user. You know, the kind that becomes a developer!&lt;br />&lt;br />
+Thanks to Lotier from Reddit for coming out of nowhere with a great card trader activity!&lt;br />&lt;br />
+Thanks to chaudakh for the wonderful Gatherer Extractor program.&lt;br />&lt;br />
+Thanks to reddit\'s &lt;a href="http://www.reddit.com/r/magicTCG/">/r/magictcg&lt;/a> for testing and feedback.&lt;br />&lt;br />
+Thanks to my brother for the icon.&lt;br />&lt;br />
+Thanks to Chedy @ &lt;a href="http://tcgplayer.com">TCGPlayer.com&lt;/a> for the price API.&lt;br />&lt;br />
+Special thanks to Richard Garfield and the rest of the folks at &lt;a href="http://www.wizards.com/magic">Wizards of the Coast&lt;/a>.&lt;br />&lt;br />
+-gelakinetic&lt;br />&lt;br />&lt;br />
+Magic the Gathering and Magic the Gathering cards are ™ &amp; © Wizards of the Coast LLC.&lt;br />&lt;br />
+The Android robot is © Google &lt;br />&lt;br />
+Program licenced under the &lt;a href="http://www.gnu.org/licenses/gpl.html">GNU General Public License v3+&lt;/a>.&lt;br />&lt;br />
+Media licenced under under the &lt;a href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License&lt;a>.</string>
+    <string name="whatsnew">
+        <!--
+1.1
+- App supports "Move to SD"&lt;br /&gt;
+- App supports landscape orientation&lt;br /&gt;
+- Added global search button for simple card search&lt;br /&gt;
+- Reduced frequency of set &amp; legality update checks&lt;br /&gt;
+- Added preference to control frequency of set &amp; legality update checks&lt;br /&gt;
+- Search results support enhanced scrollbar&lt;br /&gt;
+- Search results can now display type/subtype, rules text, and power/toughness in addition to cost/set/rarity&lt;br /&gt;
+- Added preferences to control information display on results page&lt;br /&gt;
+- Added preference to view art instead of rules text in card view&lt;br /&gt;
+- Text is copyable in card view&lt;br /&gt;
+- Can determine between lack of internet connectivity and lack of pricing data&lt;br /&gt;
+- UI tweaks all over the place&lt;br /&gt;
+- General bugfixes
+        -->
+        <!--
+ 1.1.1
+ - Fixed issue where result list would reset position
+        -->
+        <!--
+ 1.2
+
+ - Added random card feature in Card Search. Access it through the menu on the search page or results page&lt;br />
+ - Added MoJhoSto Basic randomizer
+        -->
+        <!--
+ 1.3
+ - Added donation button in the main menu. Check it out!&lt;br />&lt;br />
+ - You can now search MTG Familiar from Android\'s global search.&lt;br />&lt;br />
+ - Added autocomplete functionality in both the quick and advanced search.&lt;br />&lt;br />
+ - Added preference to only return most recent printing of a card during search.&lt;br />&lt;br />
+ - Rewrote internal card legality code. It works for reprints now.&lt;br />&lt;br />
+ - UI improvements for artists with long names
+        -->
+        <!-- 1.4 
+   - Added the ability to add, remove, and rename players from the life counter&lt;br />&lt;br />
+   - Made more life counter data persistent&lt;br />&lt;br />
+   - Added new logic options for searching by color and ability text&lt;br />&lt;br />
+   - Split type search into super and subtype search&lt;br />&lt;br />
+   - Fixed searching for pre-Android 2.1 devices. Sorry for breaking that!
+   -->
+   <!--  1.5 
+   - Improved compatability for Honeycomb and Ice Cream Sandwitch devices.&lt;br />&lt;br />
+   - Various database bugfixes.&lt;br />&lt;br />
+   - Various UI optimizations. 
+   -->
+   <!-- 1.6 
+   - Added a new homescreen widget. Go put it in your launcher for super fast searching.&lt;br />&lt;br />
+   - Added a round timer. Now you\'ll know if you\'re about to go to time.&lt;br />&lt;br />
+   - Added card trader screen. Compare prices on the fly!&lt;br />&lt;br />
+   - Added a preference to page through search results without going back to the list.&lt;br />&lt;br />
+   - Added "Timeshifted" rarity.&lt;br />&lt;br />
+   - UI fixes for small screens.&lt;br />&lt;br />
+   - Bugfixes.
+   -->
+   <!--  1.7    -->
+   - Searchable, linked comprehensive rules are now included.&lt;br />&lt;br />
+   - Card rulings can now be pulled up for each card.&lt;br />&lt;br />
+   - You can now save and load trades.&lt;br />&lt;br />
+   - The life counter can announce life totals.&lt;br />&lt;br />
+   - Round timer now has 5/10/15 minute warnings, accessible in the preferences.&lt;br />&lt;br />
+   - Fancy new menu icons.&lt;br />&lt;br />
+   - Fixed images for 2012 Planes and split cards.&lt;br />&lt;br />
+   - Bugfixes and optimizations.&lt;br />&lt;br />
+<!--  1.7.1 -->
+   - 1.7.1: Fixed price lookup.&lt;br />&lt;br />
+<!--  1.7.2 -->
+   - 1.7.2: New Comprehensive Rules parser.&lt;br />&lt;br />
+<!--  1.7.3 -->
+   - 1.7.3: Price, image, rules, and legality loading dialogs are cancellable now.&lt;br />&lt;br />
+  <!-- 1.8
+ 	- Create a gathering
+  -->
+     </string>
+ 
+    <string name="lifetitle">Life Counter</string>
+    <string name="wakelocksummary">Force the life counter screen to never go to sleep</string>
+    <string name="wakelocktitle">Wake Lock</string>
+    <string name="copy">Copy Section To Clipboard</string>
+    <string name="copyall">Copy Card To Clipboard</string>
+
+    <string-array name="updatefrequencydays">
+        <item>1 day</item>
+        <item>2 days</item>
+        <item>3 days</item>
+        <item>5 days</item>
+        <item>1 week</item>
+        <item>2 weeks</item>
     </string-array>
-    <string-array name="trade_option_values">
-        <item>0</item>
+    <string-array name="updatefrequencydaysvalues">
         <item>1</item>
         <item>2</item>
+        <item>3</item>
+        <item>5</item>
+        <item>7</item>
+        <item>14</item>
     </string-array>
-    <string-array name="set_spinner">
-        <item >Most recent printing</item>
-        <item >Original printing</item>
-        <item >All printings</item>
-        <item >Reprints only</item>
-    </string-array>
+
+    <string name="search_hint">Search Names</string>
+    <string name="cardviewtitle">Card View</string>
+    <string name="picfirsttitle">Always Show Art</string>
+    <string name="picfirstsummary">When viewing a card, load official card image instead of rules text</string>
+    <string name="resultlisttitle">Result List</string>
+    <string name="setPreftitle">Show Set</string>
+    <string name="manacostPreftitle">Show Mana Cost</string>
+    <string name="typePreftitle">Show Type/Subtype</string>
+    <string name="abilityPreftitle">Show Rules Text</string>
+    <string name="ptPreftitle">Show Power/Toughness</string>
+    <string name="automaticupdatetitle">Automatic Updates</string>
+    <string name="automaticupdatesummary">Check for new sets and bannings when the app opens</string>
+    <string name="updatefrequencytitle">Update Frequency</string>
+    <string name="updatefrequencysummary">Number of days to go between checking for new sets and bannings</string>
+    <string name="random_creature">Random Creature</string>
+    <string name="random_eqipment">Random Equipment</string>
+    <string name="random_instant">Three Random Instants</string>
+    <string name="random_sorcery">Three Random Sorceries</string>
+    <string name="momirlabel">CMC =</string>
+    <string name="stonehewer_label">CMC ≤</string>
+    <string name="mojhosto_label">MoJhoSto Basic</string>
+    <string name="randomleft">&lt;</string>
+    <string name="randomright">></string>
+    <string name="random_rules">MoJhoSto Basic Rules</string>
+    <string name="mojhostorules">
+    MoJhoSto is a casual Vanguard format from Magic Online.&lt;br />&lt;br />
+    To play, each player must have a deck which consists of only 60 basic lands.&lt;br />&lt;br />
+    Each player starts the game with three Vanguards: Momir Vig, Jhoira, and Stonehewer Giant.&lt;br />&lt;br />
+    These Vanguards adjust each player\'s starting and maximum hand size (9) and starting life total (19).&lt;br />&lt;br />
+    Any abilities printed on a Vanguard card are played exactly like those of an in-play Magic card.&lt;br />&lt;br />
+    However, these abilities have no color and damage from them isn\'t damage from a permanent of any type or a source of any color.&lt;br />&lt;br />
+    A Vanguard card isn\'t a Magic card, so it can\'t be affected by spells or abilities.&lt;br />&lt;br />
+    You can tap each picture to see the full Vanguard card.&lt;br />&lt;br />
+    You can read the rules at any time from the menu.&lt;br />&lt;br />
+    Pen and paper might be useful for tracking the game state. Sadly, MTG Familiar cannot spawn actual cards.&lt;br />&lt;br />
+    Good luck, and have fun!</string>
+    <string name="addplayer">Add a Player</string>
+    <string name="removeplayer">Remove a Player</string>
+    <string name="announcelife">Announce Life Totals</string>
+    <string name="quittosearch">Exit Results</string>
+    <string name="consolidate">Consolidate Search Results</string>
+    <string name="consolidatetext">Only show the most recent printing of a card</string>
+    <string name="whatsnewtitle">What\'s New</string>
+    <string name="donate">Donate</string>
+    <string name="donate_to_devs">
+        For a premium M:TG app like this, how much would you pay? $1,000? $10,000?&lt;br />&lt;br />
+        Well, if you\'re reading this, you already know we\'re giving it away for free!&lt;br />&lt;br />
+        Coding is hard work though, and us devs appreciate the extra dollar here or there.&lt;br />&lt;br />
+        We\'ve got a drafting habit to fuel, ok?&lt;br />&lt;br />
+        You can click the button below to donate via PayPal. $1 is cool. $5 is cooler. You get the drift.&lt;br />&lt;br />
+        So, how generous are you feeling today?</string>
+
+    <string name="start_timer">Start Timer</string>
+    <string name="cancel_timer">Cancel Timer</string>
+    <string name="timertitle">Round Timer</string>
+    <string name="ringtonetitle">Timer Ringtone</string>
+    <string name="ringtonesummary">Select a notification ringtone to play when the round timer ends</string>
+    <string name="roundtimer">Round Timer</string>
+    <string name="roundend_text">The round will end in:</string>
+    <!-- 
+    <string name="hours">HH</string>
+    <string name="minutes">MM</string>
+     -->
+    <string name="roundtimer_default_time">00:00:00</string>
+    <string name="life_clear_dialog_message">Clear life totals or players?\nMana pool will also be cleared.</string>
+    <string name="life_clear_dialog_players_life_button">Both</string>
+    <string name="life_clear_dialog_life_button">Life</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="rt_defaulttime_title">Default Round Length</string>
+    <string name="rt_defaulttime_desc">Set the default length for the round timer</string>
+    <string name="rt_set_timer_ringtone">Set Timer Ringtone</string>
+    <string name="rt_set_warnings">Set Warnings</string>
+    <string name="rt_warning_dialog_title">Spoken Warnings</string>
     <string-array name="rt_defaulttimes">
     	<item>30 minutes</item>
         <item>35 minutes</item>
@@ -541,70 +390,74 @@
         <item>55</item>
         <item>60</item>
     </string-array>
-    <string-array name="type_spinner">
+
+            <string-array name="type_spinner">
 	    <item>All types</item>
 	    <item>Any type(s)</item>
 	    <item>NOT any selected type(s)</item>
     </string-array>
+    
     <string-array name="text_spinner">
 	    <item>All words</item>
 	    <item>Any word(s)</item>
 	    <item>Exact phrase</item>
     </string-array>
-    <string-array name="update_frequency_days">
-        <item>1 day</item>
-        <item>2 days</item>
-        <item>3 days</item>
-        <item>5 days</item>
-        <item>1 week</item>
-        <item>2 weeks</item>
+	    <string name="howlongistheround">How long is the round?\n(HH:MM)</string>
+	    <string name="Trade">Trade Cards</string>
+	    <string name="addCardDown">Add Card</string>
+    	<string name="trader_default_price">$0.00</string>
+	    <string name="trader_done">Done</string>
+	    <string name="trader_change_set">Change Set</string>
+	    <string name="trader_remove">Remove</string>
+	    <string name="trader_default_number_of">1x</string>
+    <string name="type_card_first">Type in a card above first</string>
+    
+    <string name="trade_window_title">Trade Window</string>
+    <string name="trade_option_title">Price Setting</string>
+    <string name="trade_option_desc">TCGplayer price to use when trading cards</string>
+    <string-array name="trade_option_entries">
+        <item>Low</item>
+        <item>Average</item>
+        <item>High</item>
     </string-array>
-    <string-array name="update_frequency_days_values">
+    <string-array name="trade_option_values">
+        <item>0</item>
         <item>1</item>
         <item>2</item>
-        <item>3</item>
-        <item>5</item>
-        <item>7</item>
-        <item>14</item>
     </string-array>
-    <string-array name="display_array_entries">
-        <item >Normal</item>
-        <item >Compact</item>
-        <item >Commander</item>
-    </string-array>
-    <string-array name="display_array_values">
-        <item >0</item>
-        <item >1</item>
-        <item >2</item>
-    </string-array>
-	<string-array name="default_fragment_array_entries">
-		<item>@string/main_card_search</item>
-		<item>@string/main_life_counter</item>
-		<item>@string/main_mana_pool</item>
-		<item>@string/main_dice</item>
-		<item>@string/main_trade</item>
-		<item>@string/main_wishlist</item>
-		<item>@string/main_timer</item>
-		<item>@string/main_rules</item>
-		<item>@string/main_mojhosto</item>
-	</string-array>
-	<string-array name="card_language">
-		<item>English</item>
-		<item>French</item>
-		<item>Italian</item>
-		<item>Spanish</item>
-		<item>Japanese</item>
-		<item>Russian</item>
-		<item>German</item>
-	</string-array>
-	<string-array name="card_language_values">
-		<item>en</item>
-		<item>fr</item>
-		<item>it</item>
-		<item>es</item>
-		<item>jp</item>
-		<item>ru</item>
-		<item>de</item>
-	</string-array>
-		
+    <string name="trade_price_setting">Set Pricing Option</string>
+    <string name="trader_by">x</string>
+    <string name="card_view_scroll">Scroll Results</string>
+    <string name="card_view_scroll_desc">Show buttons to scroll between search results.</string>
+
+    <string name="save_trade">Save Trade</string>
+    <string name="load_trade">Load Trade</string>
+    <string name="delete_trade">Delete Trade</string>
+    
+    <string name="rules_search">Keyword Search</string>
+    <string name="rules_exit">Exit Rules</string>
+    <string name="rules_search_title">Keyword Search</string>
+    <string name="rules_search_all">Search all rules for:</string>
+    <string name="rules_search_cat">Search within %s for:</string>
+    <string name="card_rulings">Card Rulings</string>
+    
+    <string name="install_tts_title">Text-to-Speech</string>
+    <string name="install_tts">Do you want to install text-to-speech?</string>
+    <string name="install_tts_checkbox">Do not ask me again</string>
+    
+    <string name="tts_pref_section">Text-to-Speech</string>
+    <string name="tts_pref_install_title">Install Text-to-Speech</string>
+    <string name="tts_pref_install_desc">Clicking here will take you to the text-to-speech install page in the Google Play Store</string>
+    
+    <string name="tts_pref_fifteen_minutes">15-Minute Warning</string>
+    <string name="tts_pref_ten_minutes">10-Minute Warning</string>
+    <string name="tts_pref_five_minutes">5-Minute Warning</string>
+    <string name="rulestitle">Card Rulings</string>
+    <string name="gathering_name_hint">Gathering\'s Name</string>
+    <string name="gathering_default_name">Default Name</string>
+    <string name="gathering_custom_name">Custom Name</string>
+    <string name="gathering_default_life">Starting Life</string>
+    <string name="gathering_default_life_num">20</string>
+    <string name="gathering_menu_save">Set and Save Gathering</string>
+    <string name="gathering_menu_load">Load Gathering</string>
 </resources>

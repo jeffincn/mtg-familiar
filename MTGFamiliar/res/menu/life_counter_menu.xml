@@ -18,31 +18,28 @@ You should have received a copy of the GNU General Public License
 along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/action_search"
+        android:actionViewClass="android.widget.SearchView"
+        android:icon="@drawable/menu_search"/>
     <item
         android:id="@+id/announce_life"
-        android:showAsAction="never"
-        android:title="@string/life_counter_announce_life"/>
+        android:icon="@drawable/menu_speech"
+        android:title="@string/announcelife"/>
+    <!-- 
     <item 
         android:id="@+id/change_gathering" 
-        android:showAsAction="never"
-        android:title="@string/life_counter_change_default_gathering"/>
-    <item
-        android:id="@+id/set_gathering"
-        android:showAsAction="never"
-        android:title="@string/life_counter_set_gathering"/>
-    <item
-        android:id="@+id/display_mode"
-        android:title="@string/life_counter_change_display"
-        android:showAsAction="never"/>
-    <item
+        android:title="@string/change_default_gathering"
+        android:icon="@drawable/menu_wizard"/>
+         -->
+     <item
         android:id="@+id/remove_player"
-        android:showAsAction="ifRoom"
         android:icon="@drawable/menu_minus"
-        android:title="@string/life_counter_remove_player"/>
+        android:title="@string/removeplayer"/>
     <item
         android:id="@+id/add_player"
-        android:showAsAction="always"
         android:icon="@drawable/menu_plus"
-        android:title="@string/life_counter_add_player"/>
+        android:title="@string/addplayer"/>
 
 </menu>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright 2011 Adam Feinstein and April King.
+Copyright 2011 Adam Feinstein
 
 This file is part of MTG Familiar.
 
@@ -17,29 +17,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    <item
-        android:id="@+id/search_menu_random_search"
-        android:icon="@drawable/menu_random"
-        android:showAsAction="ifRoom"
-        android:title="@string/search_randomize"></item>
-
-    <item
-        android:id="@+id/search_menu_clear"
-        android:icon="@drawable/menu_cancel"
-        android:showAsAction="always"
-        android:title="@string/search_clear_fields"/>
-
-    <item
-        android:id="@+id/search_menu_save_defaults"
-        android:icon="@drawable/menu_settings"
-        android:showAsAction="ifRoom"
-        android:title="@string/search_save_defaults"/>
-    
-    <item
-        android:id="@+id/search_menu_load_defaults"
-        android:icon="@drawable/menu_load"
-        android:showAsAction="ifRoom"
-        android:title="@string/search_load_defaults"/>
-
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="@string/clear" android:id="@+id/clear"/>
 </menu>

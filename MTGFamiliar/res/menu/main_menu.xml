@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright 2011 Adam Feinstein and April King.
+Copyright 2011 Adam Feinstein
 
 This file is part of MTG Familiar.
 
@@ -17,37 +17,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
-
-    <!--         android:actionViewClass="android.widget.SearchView"
-    
-        android:onClick="emulateSearchKey"
-     -->
-    <item
-        android:id="@+id/checkUpdate"
-        android:title="@string/main_force_update_title"
-        android:showAsAction="never"/>
-    <item
-        android:id="@+id/preferences"
-        android:icon="@drawable/menu_settings"
-        android:title="@string/main_settings_title"
-        android:showAsAction="always"/>
-    <item
-        android:id="@+id/donate"
-        android:title="@string/main_donate_title"
-        android:showAsAction="never" />
-    <item
-        android:id="@+id/whatsnew"
-        android:title="@string/main_whats_new_title"
-        android:showAsAction="never"/>
-    <item
-        android:id="@+id/aboutapp"
-        android:icon="@drawable/menu_about"
-        android:title="@string/main_about_title"
-        android:showAsAction="ifRoom"/>
-    <!--
-    <item android:title="@string/main_refresh_db" android:id="@+id/refreshDB" />
-    <item android:title="@string/main_build_db" android:id="@+id/buildWebDB" />
-    -->
-
-</menu>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="@string/chkupd" android:id="@+id/checkUpdate"/>
+    <item android:title="@string/preferences" android:id="@+id/preferences"/>
+    <item android:title="@string/about" android:id="@+id/aboutapp"/>
+<!-- 
+    <item android:title="@string/refreshDB" android:id="@+id/refreshDB"/>
+    <item android:title="@string/webDB" android:id="@+id/buildWebDB"></item>
+ -->
+ </menu>

@@ -10,16 +10,50 @@
 	more details. You should have received a copy of the GNU General Public License 
 	along with MTG Familiar. If not, see <http://www.gnu.org/licenses/>.
 -->
-    <ScrollView
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <!-- fake actionbar -->
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left|center_vertical"
         >
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/icon"
+            android:scaleType="fitCenter"
+            android:padding="4dp"
+            />
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="22dip" />
+    </LinearLayout>
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="#33B5E5"
+        />
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
+            android:padding="4dp"
             android:orientation="vertical" >
 
             <TextView
@@ -33,7 +67,7 @@
                 android:drawableLeft="@drawable/card_search_icon"
                 android:drawablePadding="15dp"
                 android:gravity="center_vertical"
-                android:text="@string/main_card_search"
+                android:text="@string/cardsearch"
                 android:textSize="30dip" />
 
             <TextView
@@ -47,7 +81,7 @@
                 android:drawableLeft="@drawable/life_counter_icon"
                 android:drawablePadding="15dp"
                 android:gravity="center_vertical"
-                android:text="@string/main_life_counter"
+                android:text="@string/lifecounter"
                 android:textSize="30dip" >
             </TextView>
 
@@ -61,7 +95,7 @@
                 android:drawableLeft="@drawable/mana_pool_icon"
                 android:drawablePadding="15dp"
                 android:gravity="center_vertical"
-                android:text="@string/main_mana_pool"
+                android:text="@string/manapool"
                 android:textSize="30dip" />
 
             <TextView
@@ -74,35 +108,20 @@
                 android:drawableLeft="@drawable/dice_icon"
                 android:drawablePadding="15dp"
                 android:gravity="center_vertical"
-                android:text="@string/main_dice"
+                android:text="@string/random"
                 android:textSize="30dip" />
 
-            <TextView
+           <TextView
                 android:id="@+id/trade"
                 style="@style/text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
                 android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:drawableLeft="@drawable/trade_icon"
                 android:drawablePadding="15dp"
                 android:gravity="center_vertical"
-                android:text="@string/main_trade"
-                android:textSize="30dip" />
-
-            <TextView
-                android:id="@+id/wishlist"
-                style="@style/text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:drawableLeft="@drawable/wishlist_icon"
-                android:drawablePadding="15dp"
-                android:gravity="center_vertical"
-                android:text="@string/main_wishlist"
+                android:text="@string/Trade"
                 android:textSize="30dip" />
 
             <TextView
@@ -116,7 +135,7 @@
                 android:drawableLeft="@drawable/round_timer_icon"
                 android:drawablePadding="15dp"
                 android:gravity="center_vertical"
-                android:text="@string/main_timer"
+                android:text="@string/roundtimer"
                 android:textSize="30dip" />
             
             <TextView
@@ -130,7 +149,7 @@
                 android:drawableLeft="@drawable/rules_icon"
                 android:drawablePadding="15dp"
                 android:gravity="center_vertical"
-                android:text="@string/main_rules"
+                android:text="@string/rules"
                 android:textSize="30dip" />
 
             <TextView
@@ -144,7 +163,9 @@
                 android:drawableLeft="@drawable/mojhosto_icon"
                 android:drawablePadding="15dp"
                 android:gravity="center_vertical"
-                android:text="@string/main_mojhosto"
+                android:text="@string/mojhosto_label"
                 android:textSize="30dip" />
         </LinearLayout>
     </ScrollView>
+
+</LinearLayout>

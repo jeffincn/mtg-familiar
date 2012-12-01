@@ -31,7 +31,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="@string/search_name"
+                android:hint="@string/name"
                 android:imeOptions="actionSearch"
                 android:inputType="text"
                 android:singleLine="true" >
@@ -55,7 +55,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
-                    android:hint="@string/search_supertype"
+                    android:hint="@string/supertype"
                     android:imeOptions="actionSearch"
                     android:inputType="text"
                     android:singleLine="true" />
@@ -65,7 +65,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
-                    android:hint="@string/search_subtype"
+                    android:hint="@string/subtype"
                     android:imeOptions="actionSearch"
                     android:inputType="text"
                     android:singleLine="true" />
@@ -88,7 +88,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="@string/search_text"
+                android:hint="@string/text"
                 android:imeOptions="actionSearch"
                 android:inputType="text"
                 android:singleLine="true" />
@@ -215,7 +215,7 @@
                     android:layout_width="125dip"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="@string/search_power" />
+                    android:text="@string/pow" />
 
                 <Spinner
                     android:id="@+id/powLogic"
@@ -242,7 +242,7 @@
                     android:layout_width="125dip"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="@string/search_toughness" />
+                    android:text="@string/tou" />
 
                 <Spinner
                     android:id="@+id/touLogic"
@@ -269,7 +269,7 @@
                     android:layout_width="125dip"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="@string/search_cmc" />
+                    android:text="@string/cmc" />
 
                 <Spinner
                     android:id="@+id/cmcLogic"
@@ -297,7 +297,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/search_set"
+                    android:text="@string/setsearch"
                     android:textSize="18dp" />
 
                 <Button
@@ -305,7 +305,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/search_format"
+                    android:text="@string/formatsearch"
                     android:textSize="18dp" />
 
                 <Button
@@ -313,16 +313,10 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/search_rarity"
+                    android:text="@string/searchrarity"
                     android:textSize="18dp" />
             </LinearLayout>
 
-            <Spinner
-                android:id="@+id/setlogic"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_weight="1" />
-            
             <LinearLayout
                 android:id="@+id/linearLayout1"
                 android:layout_width="fill_parent"
@@ -334,7 +328,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="@string/search_flavor_text"
+                    android:hint="@string/flavor_text"
                     android:imeOptions="actionSearch"
                     android:inputType="text"
                     android:maxLines="1" />
@@ -344,7 +338,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="@string/search_artist"
+                    android:hint="@string/artist"
                     android:imeOptions="actionSearch"
                     android:inputType="text"
                     android:maxLines="1" />
@@ -357,7 +351,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0"
-        android:text="@string/search_search"
+        android:text="@string/searchButton"
         android:textSize="18dp" />
 
 </LinearLayout>

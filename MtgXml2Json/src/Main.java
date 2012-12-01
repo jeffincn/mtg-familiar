@@ -10,8 +10,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.Calendar;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 
 import javax.swing.JButton;
@@ -19,7 +17,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -289,16 +286,6 @@ public class Main implements ActionListener {
 			}
 
 			s = new StringBuffer(s).insert(6, "\"w\":" + card_cnt + ",").toString();
-			
-			//REGEX ALL THE THINGS
-			//...By which I mean validate the JSON to make sure all the identifiers are one character long
-			Pattern p = Pattern.compile("(\"[a-zA-Z0-9]{2,}\":)");
-			Matcher m = p.matcher(s);
-			if(m.find()) {
-				//If we find a match, that's a bad thing
-				statusLabel.setText("Validation error; check fields");
-				return;
-			}
 
 			String name = f.getName().substring(0, f.getName().length() - 4);
 			
@@ -316,8 +303,10 @@ public class Main implements ActionListener {
 						
 			byte[] buffer = new byte[1024];
 			int length;
-			while ((length = fis.read(buffer)) > 0) {
+			int totalwritten=0;
+			while ((length = fis.read(buffer))>0){
 				gos.write(buffer, 0, length);
+				totalwritten+=length;
 			}
 
 			//Close the streams

@@ -17,14 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
-
-    <item
-        android:id="@+id/copy"
-        android:title="@string/card_view_copy"/>
-
-    <item
-        android:id="@+id/copyall"
-        android:title="@string/card_view_copy_all"/>
-
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="@string/copy" android:id="@+id/copy"/>
+    <item android:title="@string/copyall" android:id="@+id/copyall"/>
 </menu>

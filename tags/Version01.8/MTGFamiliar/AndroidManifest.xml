@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+     Copyright 2011 Adam Feinstein This file is part of MTG Familiar. MTG 
+	Familiar is free software: you can redistribute it and/or modify it under 
+	the terms of the GNU General Public License as published by the Free Software 
+	Foundation, either version 3 of the License, or (at your option) any later 
+	version. MTG Familiar is distributed in the hope that it will be useful, 
+	but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+	or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for 
+	more details. You should have received a copy of the GNU General Public License 
+	along with MTG Familiar. If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.gelakinetic.mtgfam"
+    android:installLocation="auto"
+    android:versionCode="14"
+    android:versionName="1.8" >
+
+    <uses-sdk
+        android:minSdkVersion="7"
+        android:targetSdkVersion="15" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:resizeable="true"
+        android:smallScreens="true"
+        android:xlargeScreens="true" />
+
+    <application
+        android:name="com.gelakinetic.mtgfam.helpers.MyApp"
+        android:allowClearUserData="true"
+        android:icon="@drawable/icon"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.ForceOverflowBlack" >
+        <service android:name="com.gelakinetic.mtgfam.helpers.DbUpdaterService"/>
+        <activity
+            android:name="com.gelakinetic.mtgfam.activities.SearchActivity"
+            android:label="@string/app_name" />
+        <activity
+            android:name="com.gelakinetic.mtgfam.activities.ResultListActivity"
+            android:label="@string/app_name" >
+
+            <!--
+                 This next intent-filter, meta-data is so the global search leads 
+				here
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+            <!-- enable the search dialog to send searches to SearchableActivity -->
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value="com.gelakinetic.mtgfam.activities.ResultListActivity" />
+        </activity>
+        <activity
+            android:name="com.gelakinetic.mtgfam.activities.CardViewActivity"
+            android:label="@string/app_name" >
+
+            <!-- enable the search dialog to send searches to SearchableActivity -->
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value="com.gelakinetic.mtgfam.activities.ResultListActivity" />
+        </activity>
+        <activity
+            android:name="com.gelakinetic.mtgfam.activities.MainActivity"
+            android:configChanges="keyboardHidden"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- enable the search dialog to send searches to SearchableActivity -->
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value="com.gelakinetic.mtgfam.activities.ResultListActivity" />
+        </activity>
+        <activity
+            android:name="com.gelakinetic.mtgfam.activities.DiceActivity"
+            android:label="@string/app_name" >
+
+            <!-- enable the search dialog to send searches to SearchableActivity -->
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value="com.gelakinetic.mtgfam.activities.ResultListActivity" />
+        </activity>
+        <activity
+            android:name="com.gelakinetic.mtgfam.activities.PreferencesActivity"
+            android:label="@string/app_name" >
+
+            <!-- enable the search dialog to send searches to SearchableActivity -->
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value="com.gelakinetic.mtgfam.activities.ResultListActivity" />
+        </activity>
+        <activity
+            android:name="com.gelakinetic.mtgfam.activities.ManaPoolActivity"
+            android:label="@string/app_name" >
+
+            <!-- enable the search dialog to send searches to SearchableActivity -->
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value="com.gelakinetic.mtgfam.activities.ResultListActivity" />
+        </activity>
+        <activity
+            android:name="com.gelakinetic.mtgfam.activities.RandomCardActivity"
+            android:label="@string/app_name" >
+
+            <!-- enable the search dialog to send searches to SearchableActivity -->
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value="com.gelakinetic.mtgfam.activities.ResultListActivity" />
+        </activity>
+        <activity
+            android:name="com.gelakinetic.mtgfam.activities.NPlayerLifeActivity"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustPan" >
+
+            <!-- enable the search dialog to send searches to SearchableActivity -->
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value="com.gelakinetic.mtgfam.activities.ResultListActivity" />
+        </activity>
+        <activity
+            android:name="com.gelakinetic.mtgfam.activities.RoundTimerActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTop" >
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value="com.gelakinetic.mtgfam.activities.ResultListActivity" />
+        </activity>
+        <activity
+            android:name="com.gelakinetic.mtgfam.activities.WidgetSearchActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTop" >
+
+            <!-- enable the search dialog to send searches to SearchableActivity -->
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value="com.gelakinetic.mtgfam.activities.ResultListActivity" />
+        </activity>
+        <activity
+            android:name="com.gelakinetic.mtgfam.activities.CardTradingActivity"
+            android:label="@string/app_name" >
+
+            <!-- enable the search dialog to send searches to SearchableActivity -->
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value="com.gelakinetic.mtgfam.activities.ResultListActivity" />
+        </activity>
+        <activity
+            android:name="com.gelakinetic.mtgfam.activities.WishlistActivity"
+            android:label="@string/app_name" >
+
+            <!-- enable the search dialog to send searches to SearchableActivity -->
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value="com.gelakinetic.mtgfam.activities.ResultListActivity" />
+        </activity>
+        <activity
+            android:name="com.gelakinetic.mtgfam.activities.RulesActivity"
+            android:label="@string/app_name" >
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value="com.gelakinetic.mtgfam.activities.ResultListActivity" />
+        </activity>
+
+        <service android:name="com.gelakinetic.mtgfam.helpers.RoundTimerService" />
+
+        <!-- Provides search suggestions for words and their definitions. -->
+        <provider
+            android:name="com.gelakinetic.mtgfam.helpers.CardSearchProvider"
+            android:authorities="com.gelakinetic.mtgfam.helpers.CardSearchProvider" />
+
+        <receiver android:name="com.gelakinetic.mtgfam.helpers.MTGFamiliarAppWidgetProvider" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/mtgfamiliar_appwidget_info" />
+        </receiver>
+
+        <activity
+            android:name="com.gelakinetic.mtgfam.activities.GatheringCreateActivity"
+            android:label="@string/app_name" android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value="com.gelakinetic.mtgfam.activities.ResultListActivity" />
+        </activity>
+    </application>
+
+</manifest>

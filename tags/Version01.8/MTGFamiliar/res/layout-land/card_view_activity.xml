@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+     Copyright 2011 Adam Feinstein and April King. This file is part of MTG 
+	Familiar. MTG Familiar is free software: you can redistribute it and/or modify 
+	it under the terms of the GNU General Public License as published by the 
+	Free Software Foundation, either version 3 of the License, or (at your option) 
+	any later version. MTG Familiar is distributed in the hope that it will be 
+	useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+	or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for 
+	more details. You should have received a copy of the GNU General Public License 
+	along with MTG Familiar. If not, see <http://www.gnu.org/licenses/>.
+-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent" >
+
+    <ScrollView
+        android:id="@+id/ScrollView1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/linearLayout10"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:fillViewport="true" >
+
+        <LinearLayout
+            android:id="@+id/linearLayout7"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:baselineAligned="false"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:id="@+id/linearLayout1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:id="@+id/linearLayout2"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/name"
+                        style="@style/text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="3dip"
+                        android:layout_weight="1"
+                        android:text="Vorinclex, Voice of Hunger" />
+
+                    <TextView
+                        android:id="@+id/cost"
+                        style="@style/text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="3dip"
+                        android:layout_marginRight="3dip"
+                        android:gravity="right"
+                        android:text="6GG" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/linearLayout3"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-14sp" >
+
+                    <TextView
+                        android:id="@+id/type"
+                        style="@style/text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="3dip"
+                        android:layout_weight="1"
+                        android:text="Legendary Creature — Human Soldier"
+                        android:textSize="20sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/set"
+                    style="@style/text"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="3dip"
+                    android:layout_marginTop="-3sp"
+                    android:gravity="right"
+                    android:text="MOR"
+                    android:textColor="@color/mythic" />
+
+                <LinearLayout
+                    android:id="@+id/linearLayout4"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="10sp"
+                    android:saveEnabled="true" >
+
+                    <TextView
+                        android:id="@+id/ability"
+                        style="@style/text"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="3dip"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:text="{T}: Search your library for a legendary card, reveal that card, and put it into your hand. Then shuffle your library." />
+
+                    <TextView
+                        android:id="@+id/flavor"
+                        style="@style/text"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="3dip"
+                        android:layout_weight="1"
+                        android:paddingLeft="10sp"
+                        android:paddingRight="10sp"
+                        android:paddingTop="5sp"
+                        android:text="Neque porro quisquam est qui dolorem ipsum quia dolor sit amet flavor text."
+                        android:textSize="20sp"
+                        android:textStyle="italic"
+                        android:typeface="serif" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/frameLayout1"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:id="@+id/linearLayout5"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:id="@+id/linearLayout6"
+                    android:layout_width="fill_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:id="@+id/artist"
+                        style="@style/text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="0dip"
+                        android:layout_marginLeft="3dip"
+                        android:layout_marginRight="3dip"
+                        android:layout_marginTop="3dip"
+                        android:layout_weight="1"
+                        android:text="Zoltan Boros &amp; Gabor Szikzsai &amp; Blah Blah &amp; Foo Foo &amp; Sneef Sneef" />
+
+                    <TextView
+                        android:id="@+id/pt"
+                        style="@style/text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="fill_parent"
+                        android:layout_marginBottom="0dip"
+                        android:layout_marginLeft="3dip"
+                        android:layout_marginRight="3dip"
+                        android:layout_marginTop="3dip"
+                        android:gravity="bottom|right"
+                        android:text="*/1+*" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/cardpic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|center" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/linearLayout10"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/transformbutton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/card_view_transform"
+            android:textSize="22dip" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout8"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/randomLeft"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/card_view_left"
+                android:textSize="22dip" />
+
+            <Button
+                android:id="@+id/randomRight"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/card_view_right"
+                android:textSize="22dip" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

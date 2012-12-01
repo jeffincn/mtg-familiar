@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/nplayer_col"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="horizontal"
+    android:paddingBottom="0dp"
+    android:paddingLeft="5px"
+    android:paddingRight="5px"
+    android:paddingTop="5px" >
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="1px"
+        android:layout_height="fill_parent"
+        android:background="#FFAAAAAA" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/player_name"
+            style="@style/text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="Player 1" />
+
+        <LinearLayout
+            android:id="@+id/middle_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:weightSum="1" >
+
+            <LinearLayout
+                android:id="@+id/linearLayout1"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/player_readout"
+                    style="@style/text"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:paddingBottom="10dp"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="0dp"
+                    android:paddingTop="10dp"
+                    android:text="20"
+                    android:textSize="72dp" >
+                </TextView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:background="@drawable/textview_backdrop"
+                android:orientation="vertical"
+                android:visibility="gone" >
+
+                <ListView
+                    android:id="@+id/player_history"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="1dp"
+                    android:paddingLeft="36dp"
+                    android:visibility="gone" >
+                </ListView>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/buttonLayout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="5px" >
+
+            <Button
+                android:id="@+id/player_minus5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="-5"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/player_minus1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="-1"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/player_plus1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="+1"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/player_plus5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="+5"
+                android:textSize="20sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" 
+    android:orientation="horizontal">
+
+    <HorizontalScrollView
+        android:id="@+id/playerScrollView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1" >
+
+        <LinearLayout
+	        android:id="@+id/playerList"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" 
+            android:orientation="horizontal" >
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="1dip"
+        android:layout_height="fill_parent"
+        android:background="#FFAAAAAA" />
+
+    <!-- Command bar: reset, poison, etc. -->
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+
+        <ImageView
+            android:id="@+id/poison_button"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scaleType="center"
+            android:src="@drawable/poison_button" />
+
+        <ImageView
+            android:id="@+id/life_button"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scaleType="center"
+            android:src="@drawable/life_button" />
+
+        <ImageView
+            android:id="@+id/die_button"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scaleType="center"
+            android:src="@drawable/die_button_xml" />
+
+        <ImageView
+            android:id="@+id/pool_button"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scaleType="center"
+            android:src="@drawable/pool_button_xml" />
+
+        <ImageView
+            android:id="@+id/reset_button"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scaleType="center"
+            android:src="@drawable/reset_button_xml" />
+    </LinearLayout>
+
+</LinearLayout>

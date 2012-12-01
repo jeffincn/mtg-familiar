@@ -9,16 +9,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
-import java.util.Calendar;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,13 +42,11 @@ public class Main implements ActionListener {
 		{"\"number\"",							"\"m\""},
 		{"\"color\"",								"\"n\""},
 		{"\"id\"",									"\"x\""},
-//	{"\"RULINGS\"",							"\"z\""},
 
 		{"\"card\"",								"\"o\""},
 		{"\"cards\"",								"\"p\""},
 		{"\"code\"",								"\"q\""},
 		{"\"code_magiccards\"",			"\"r\""},
-		{"\"date\"",								"\"y\""},
 		{"\"sets\"",								"\"s\""},
 		{"\"mtg_carddatabase\"",		"\"t\""},
 		{"\"bdd_version\"",					"\"u\""},
@@ -66,7 +63,9 @@ public class Main implements ActionListener {
 	private static JFrame			UIFrame;
 	private static JPanel			UIPanel;
 	private JFileChooser			fileChooser;
+	private JTextField				numCardsField;
 	private JButton						openButton;
+	private JLabel						numCardsLabel;
 	private JButton						convertButton;
 	private File							XMLfile	= null;
 	private JLabel						chooserLabel;
@@ -76,7 +75,7 @@ public class Main implements ActionListener {
 		// Create the frame and container.
 		UIFrame = new JFrame("Convert XML to JSON for mtg-familiar");
 		UIPanel = new JPanel();
-		UIPanel.setLayout(new GridLayout(2, 2));
+		UIPanel.setLayout(new GridLayout(3, 2));
 
 		// Add the widgets.
 		@SuppressWarnings("unused")
@@ -115,17 +114,24 @@ public class Main implements ActionListener {
 	private void addWidgets() {
 		// Create widgets.
 
+		numCardsLabel = new JLabel("Enter num_cards:");
+		numCardsField = new JTextField("num_cards");
 		openButton = new JButton("Select the XML File");
 		convertButton = new JButton("Barf the JSON");
 		fileChooser = new JFileChooser(new File("./"));
 		chooserLabel = new JLabel("");
 		statusLabel = new JLabel("");
 
+		numCardsField.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		numCardsLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
 		// Listen to events from Convert button.
 		openButton.addActionListener(this);
 		convertButton.addActionListener(this);
 
 		// Add widgets to container.
+		UIPanel.add(numCardsLabel);
+		UIPanel.add(numCardsField);
 		UIPanel.add(openButton);
 		UIPanel.add(chooserLabel);
 		UIPanel.add(convertButton);
@@ -147,7 +153,15 @@ public class Main implements ActionListener {
 		else if (event.getSource() == convertButton) {
 			if (XMLfile != null) {
 				if (XMLfile.getName().endsWith("xml")) {
-					convertXMLtoJSON(XMLfile);
+					int num_cards;
+					try {
+						num_cards = Integer.parseInt(numCardsField.getText());
+					}
+					catch (NumberFormatException e) {
+						statusLabel.setText("Invalid num_cards");
+						return;
+					}
+					convertXMLtoJSON(XMLfile, num_cards);
 				}
 				else {
 					statusLabel.setText("Non-XML file selected");
@@ -169,69 +183,24 @@ public class Main implements ActionListener {
 		boolean retval = asciiEncoder.canEncode(v);
 
 		if(retval == false){
-			//System.out.println(v);
+			System.out.println(v);
 		}
 
 		return retval;
 	}
 
-	private void convertXMLtoJSON(File f) {
+	private void convertXMLtoJSON(File f, int num_cards) {
 		try {
 			JSONObject jo = XML.toJSONObject(readFileAsString(f.getAbsolutePath()));
 
 			JSONObject cdb = jo.getJSONObject("mtg_carddatabase");
-			
-			JSONObject sets = cdb.getJSONObject("sets");
-			
-			JSONArray set = null;
-			int setLen;
-			try{
-				set= sets.getJSONArray("set");
-				setLen = set.length();
-			}
-			catch(Exception e){
-				setLen = 1;
-			}
-			
-			for(int i=0; i < setLen; i++){
-				JSONObject s;
-				if(set != null){
-					s = (JSONObject)set.remove(0);
-				}
-				else{
-					s = (JSONObject) sets.remove("set");
-				}
-				System.out.print(s.getString("name")+"\t"+s.getString("date")+"\t");
-				
-				String date = s.getString("date");
-				s.remove("date");
-				String parts[] = date.split("/");
-				
-				Calendar cal = Calendar.getInstance();
-				cal.set(Integer.parseInt(parts[1]), Integer.parseInt(parts[0])-1, 1);
-				long epochTime = cal.getTimeInMillis();
-				s.put("date", epochTime);
-				System.out.println(epochTime);
-				if(set != null){
-					set.put(s);
-				}
-				else{
-					sets.put("set", s);
-				}
-			}
-			
 			JSONObject cards = cdb.getJSONObject("cards");
 			JSONArray card = cards.getJSONArray("card");
-			//System.out.println("cards: " + card.length());
-
-			int card_cnt=card.length();
 			for (int i = 0; i < card.length(); i++) {
 				JSONObject c = card.getJSONObject(i);
 
 				if (c.getString("name").contains("//")) {
 
-					card_cnt++;
-					
 					String names[] = c.getString("name").split(" // ");
 					String types[] = c.getString("type").split(" // ");
 					String rarities[] = c.getString("rarity").split(" // ");
@@ -269,8 +238,8 @@ public class Main implements ActionListener {
 					card2.put("flavor", "");
 					card1.put("artist", artists[0]);
 					card2.put("artist", artists[1]);
-					card1.put("number", c.getString("number") + "a");
-					card2.put("number", c.getString("number") + "b");
+					card1.put("number", c.getString("number"));
+					card2.put("number", c.getString("number"));
 					card1.put("color", colors[0]);
 					card2.put("color", colors[1]);
 					card1.put("id", mID);
@@ -288,17 +257,7 @@ public class Main implements ActionListener {
 				s = s.replace(subs[i][0], subs[i][1]);
 			}
 
-			s = new StringBuffer(s).insert(6, "\"w\":" + card_cnt + ",").toString();
-			
-			//REGEX ALL THE THINGS
-			//...By which I mean validate the JSON to make sure all the identifiers are one character long
-			Pattern p = Pattern.compile("(\"[a-zA-Z0-9]{2,}\":)");
-			Matcher m = p.matcher(s);
-			if(m.find()) {
-				//If we find a match, that's a bad thing
-				statusLabel.setText("Validation error; check fields");
-				return;
-			}
+			s = new StringBuffer(s).insert(6, "\"w\":" + num_cards + ",").toString();
 
 			String name = f.getName().substring(0, f.getName().length() - 4);
 			
@@ -316,8 +275,10 @@ public class Main implements ActionListener {
 						
 			byte[] buffer = new byte[1024];
 			int length;
-			while ((length = fis.read(buffer)) > 0) {
+			int totalwritten=0;
+			while ((length = fis.read(buffer))>0){
 				gos.write(buffer, 0, length);
+				totalwritten+=length;
 			}
 
 			//Close the streams

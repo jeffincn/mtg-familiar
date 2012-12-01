@@ -4,11 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
+
+    <EditText
+        android:id="@+id/gathering_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/gathering_name_hint" />
 
     <ScrollView
-        android:id="@+id/gathering_scroll"
+        android:id="@+id/Gathering_ScrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="wrap_content" >
 
         <LinearLayout
             android:id="@+id/gathering_player_list"
@@ -17,7 +23,6 @@
             android:orientation="vertical" >
 
         </LinearLayout>
-
     </ScrollView>
 
 </LinearLayout>

@@ -18,30 +18,34 @@ You should have received a copy of the GNU General Public License
 along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/action_search"
+        android:actionViewClass="android.widget.SearchView"
+        android:icon="@drawable/menu_search"/>
     <item
         android:id="@+id/image"
-        android:showAsAction="always"
         android:icon="@drawable/menu_card_image"
-        android:title="@string/card_view_image"/>
+        android:title="@string/image"/>
     <item
         android:id="@+id/price"
         android:icon="@drawable/menu_price"
-        android:showAsAction="ifRoom"
-        android:title="@string/card_view_price"/>
+        android:title="@string/price"/>
     <item
         android:id="@+id/changeset"
-        android:showAsAction="never"
-        android:title="@string/card_view_change_set"/>
+        android:icon="@drawable/menu_change_set"
+        android:title="@string/changeset"/>
     <item
         android:id="@+id/legality"
-        android:showAsAction="never"
-        android:title="@string/card_view_legality"/>
+        android:icon="@drawable/menu_rules"
+        android:title="@string/legality"/>
     <item
         android:id="@+id/cardrulings"
-        android:showAsAction="never"
-        android:title="@string/card_view_rulings" />
+        android:icon="@drawable/menu_rulings"
+        android:title="@string/card_rulings" />
     <item
-        android:id="@+id/addtowishlist"
-        android:showAsAction="never"
-        android:title="@string/card_view_wishlist" />
+        android:id="@+id/quittosearch"
+        android:icon="@drawable/menu_cancel"
+        android:title="@string/quittosearch"/>
+
 </menu>

@@ -11,13 +11,12 @@
         android:layout_height="wrap_content"
         android:baselineAligned="false"
         android:orientation="horizontal" >
-        <ImageButton android:id="@+id/cardview_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="5dp" android:src="@drawable/wishlist_card_image" android:background="@null"/>
 
         <TextView
             android:id="@+id/wishlistRowName"
             style="@style/text"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center_vertical"
             android:text="@string/wishlist_name" />
@@ -26,16 +25,17 @@
             android:id="@+id/cardcost"
             style="@style/text"
             android:layout_width="wrap_content"
+            android:layout_marginBottom="-3sp"
             android:gravity="right|center_vertical"
-            android:text="@string/ph_cost" 
-            
-            android:layout_height="match_parent"/>
+            android:paddingTop="4.5sp"
+            android:text="@string/ph_cost" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/cardtype"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="-5sp"
         android:text="@string/ph_type"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -44,6 +44,7 @@
         style="@style/text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="3sp"
         android:text="@string/ph_ability"
         android:textSize="18sp" >
     </TextView>

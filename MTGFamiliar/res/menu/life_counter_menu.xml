@@ -26,15 +26,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:id="@+id/change_gathering" 
         android:showAsAction="never"
         android:title="@string/life_counter_change_default_gathering"/>
-    <item
-        android:id="@+id/set_gathering"
-        android:showAsAction="never"
-        android:title="@string/life_counter_set_gathering"/>
-    <item
-        android:id="@+id/display_mode"
-        android:title="@string/life_counter_change_display"
-        android:showAsAction="never"/>
-    <item
+     <item android:id="@+id/set_gathering" android:showAsAction="never" android:title="@string/life_counter_set_gathering"></item><item android:id="@+id/display_mode" android:title="@string/life_counter_change_display" android:showAsAction="never"></item><item
         android:id="@+id/remove_player"
         android:showAsAction="ifRoom"
         android:icon="@drawable/menu_minus"
@@ -44,5 +36,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:showAsAction="always"
         android:icon="@drawable/menu_plus"
         android:title="@string/life_counter_add_player"/>
+    
+    
 
 </menu>

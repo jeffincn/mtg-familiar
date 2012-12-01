@@ -17,18 +17,6 @@
     <PreferenceScreen 
         android:title="@string/pref_screen_general">
         
-        <PreferenceCategory 
-             android:title="@string/pref_cat_default_fragment">
-
-            <ListPreference 
-	            android:entries="@array/default_fragment_array_entries"
-	            android:entryValues="@array/default_fragment_array_entries"
-	            android:title="@string/pref_default_fragment_mode_title"
-	            android:summary="@string/pref_default_fragment_mode_summary"
-	            android:key="defaultFragment"
-				android:defaultValue="@string/main_card_search"/>
-		</PreferenceCategory>
-        	        
 	    <PreferenceCategory 
 	        android:title="@string/pref_cat_updates">
 	
@@ -126,13 +114,6 @@
 	            android:defaultValue="false"
 	            android:title="@string/pref_scroll_title"
 	            android:summary="@string/pref_scroll_summary" />
-	        
-	        <ListPreference android:entries="@array/card_language"
-	            android:entryValues="@array/card_language_values"
-	            android:key="cardlanguage"
-	            android:summary="@string/pref_card_language_summary"
-	            android:title="@string/pref_card_language_title"
-	            android:defaultValue="@string/main_card_language" />
 	
 	   	</PreferenceCategory>
         	    
@@ -229,13 +210,7 @@
 	            android:defaultValue="false"
 	            android:title="@string/pref_wishlist_totals_title"
 	            android:summary="@string/pref_wishlist_totals_summary" />
-
-	        <CheckBoxPreference
-	            android:key="showIndividualPricesWishlistPref"
-	            android:defaultValue="true"
-	            android:title="@string/pref_wishlist_prices_title"
-	            android:summary="@string/pref_wishlist_prices_summary" />
-	        	        
+	        
 	        <CheckBoxPreference
 	            android:key="verboseWishlistPref"
 	            android:defaultValue="false"

@@ -87,11 +87,8 @@ public class CardSearchProvider extends ContentProvider {
 
 	@Override
 	public boolean onCreate() {
-		try {
-			mDbHelper = new CardDbAdapter(getContext());
-		} catch (FamiliarDbException e) {
-			return false;
-		} // TODO this is never closed. could be a problem
+		mDbHelper = new CardDbAdapter(getContext());
+		mDbHelper.openReadable(); // TODO this is never closed. could be a problem
 		return true;
 	}
 
@@ -107,32 +104,27 @@ public class CardSearchProvider extends ContentProvider {
 
 		// Use the UriMatcher to see what kind of query we have and format the db
 		// query accordingly
-		try {
-			switch (sURIMatcher.match(uri)) {
-				case SEARCH_SUGGEST:
-					if (selectionArgs == null) {
-						throw new IllegalArgumentException("selectionArgs must be provided for the Uri: " + uri);
-					}
-					return getSuggestions(selectionArgs[0]);
-				case SEARCH_WORDS:
-					if (selectionArgs == null) {
-						throw new IllegalArgumentException("selectionArgs must be provided for the Uri: " + uri);
-					}
-					return search(selectionArgs[0]);
-				case GET_WORD:
-					return getWord(uri);
-				case REFRESH_SHORTCUT:
-					return refreshShortcut(uri);
-				default:
-					throw new IllegalArgumentException("Unknown Uri: " + uri);
-			}
-		}
-		catch (FamiliarDbException e) {
-			throw new IllegalArgumentException(e.toString());
+		switch (sURIMatcher.match(uri)) {
+			case SEARCH_SUGGEST:
+				if (selectionArgs == null) {
+					throw new IllegalArgumentException("selectionArgs must be provided for the Uri: " + uri);
+				}
+				return getSuggestions(selectionArgs[0]);
+			case SEARCH_WORDS:
+				if (selectionArgs == null) {
+					throw new IllegalArgumentException("selectionArgs must be provided for the Uri: " + uri);
+				}
+				return search(selectionArgs[0]);
+			case GET_WORD:
+				return getWord(uri);
+			case REFRESH_SHORTCUT:
+				return refreshShortcut(uri);
+			default:
+				throw new IllegalArgumentException("Unknown Uri: " + uri);
 		}
 	}
 
-	private Cursor getSuggestions(String query) throws FamiliarDbException {
+	private Cursor getSuggestions(String query) {
 		query = query.toLowerCase();
 		String[] columns = new String[] { BaseColumns._ID, CardDbAdapter.KEY_NAME,
 				SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID };
@@ -140,21 +132,21 @@ public class CardSearchProvider extends ContentProvider {
 		return mDbHelper.getWordMatches(query, columns);
 	}
 
-	private Cursor search(String query) throws FamiliarDbException {
+	private Cursor search(String query) {
 		query = query.toLowerCase();
 		String[] columns = new String[] { BaseColumns._ID, CardDbAdapter.KEY_NAME };
 
 		return mDbHelper.getWordMatches(query, columns);
 	}
 
-	private Cursor getWord(Uri uri) throws FamiliarDbException {
+	private Cursor getWord(Uri uri) {
 		String rowId = uri.getLastPathSegment();
 		String[] columns = new String[] { CardDbAdapter.KEY_NAME };
 
 		return mDbHelper.getWord(rowId, columns);
 	}
 
-	private Cursor refreshShortcut(Uri uri) throws FamiliarDbException {
+	private Cursor refreshShortcut(Uri uri) {
 		/*
 		 * This won't be called with the current implementation, but if we include
 		 * {@link SearchManager#SUGGEST_COLUMN_SHORTCUT_ID} as a column in our

@@ -27,12 +27,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <item
         android:id="@+id/wishlist_menu_settings"
         android:icon="@drawable/menu_hi_med_low"
-        android:showAsAction="ifRoom"
+        android:showAsAction="always"
         android:title="@string/wishlist_set_pricing" />
-    <item
-        android:id="@+id/wishlist_menu_share"
-        android:icon="@drawable/menu_share"
-        android:showAsAction="ifRoom"
-        android:title="@string/wishlist_share" />
 
 </menu>

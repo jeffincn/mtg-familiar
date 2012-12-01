@@ -23,28 +23,19 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <LinearLayout
-        android:id="@+id/info_layout"
-        android:layout_width="match_parent"
+    <ScrollView
+        android:id="@+id/playerScrollView"
+        android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical" >
+        android:layout_weight="1" >
 
-        <ScrollView
-            android:id="@+id/playerScrollView"
+        <LinearLayout
+            android:id="@+id/playerList"
             android:layout_width="fill_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" >
-
-            <LinearLayout
-                android:id="@+id/playerList"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" >
-            </LinearLayout>
-        </ScrollView>
-
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+        </LinearLayout>
+    </ScrollView>
 
     <View
         android:id="@+id/divider"
@@ -80,22 +71,22 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
             android:src="@drawable/life_button" />
 
         <ImageView
-            android:id="@+id/commander_button"
+            android:id="@+id/die_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="15dp"
             android:scaleType="center"
-            android:src="@drawable/commander_button" />
+            android:padding="15dp"
+            android:src="@xml/die_button_xml" />
 
         <ImageView
-            android:id="@+id/null_button"
+            android:id="@+id/pool_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:scaleType="center"
             android:padding="15dp"
-            android:src="@drawable/blank_button" />
+            android:src="@xml/pool_button_xml" />
 
         <ImageView
             android:id="@+id/reset_button"

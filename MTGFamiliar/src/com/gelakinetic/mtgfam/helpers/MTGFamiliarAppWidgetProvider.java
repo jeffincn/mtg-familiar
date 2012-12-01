@@ -9,6 +9,8 @@ import android.widget.RemoteViews;
 
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.activities.MainActivity;
+import com.gelakinetic.mtgfam.activities.SearchActivity;
+import com.gelakinetic.mtgfam.activities.WidgetSearchActivity;
 
 public class MTGFamiliarAppWidgetProvider extends AppWidgetProvider {
 
@@ -21,16 +23,13 @@ public class MTGFamiliarAppWidgetProvider extends AppWidgetProvider {
 			int appWidgetId = appWidgetIds[i];
 
 			// Create an Intent to launch ExampleActivity
-			Intent intentQuick = new Intent(context, MainActivity.class);
-			intentQuick.setAction(MainActivity.ACTION_WIDGET_SEARCH);
+			Intent intentQuick = new Intent(context, WidgetSearchActivity.class);
 			PendingIntent pendingIntentQuick = PendingIntent.getActivity(context, 0, intentQuick, 0);
 
 			Intent intentMain = new Intent(context, MainActivity.class);
-			intentMain.setAction(MainActivity.ACTION_MAIN);
 			PendingIntent pendingIntentMain = PendingIntent.getActivity(context, 0, intentMain, 0);
 
-			Intent intentFullSearch = new Intent(context, MainActivity.class);
-			intentFullSearch.setAction(MainActivity.ACTION_FULL_SEARCH);
+			Intent intentFullSearch = new Intent(context, SearchActivity.class);
 			PendingIntent pendingIntentFullSearch = PendingIntent.getActivity(context, 0, intentFullSearch, 0);
 
 			// Get the layout for the App Widget and attach an on-click listener

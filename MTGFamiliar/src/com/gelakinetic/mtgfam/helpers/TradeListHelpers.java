@@ -3,8 +3,6 @@ package com.gelakinetic.mtgfam.helpers;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -14,7 +12,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
@@ -22,180 +19,145 @@ import android.os.AsyncTask;
 import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 
-import com.gelakinetic.mtgfam.fragments.CardViewFragment;
-import com.gelakinetic.mtgfam.fragments.TradeFragment;
-import com.gelakinetic.mtgfam.fragments.WishlistFragment;
+import com.gelakinetic.mtgfam.activities.CardTradingActivity;
+import com.gelakinetic.mtgfam.activities.CardViewActivity;
+import com.gelakinetic.mtgfam.activities.WishlistActivity;
 
 public class TradeListHelpers {
 
-	public static final String	card_not_found		= "Card Not Found";
-	public static final String	mangled_url				= "Mangled URL";
-	public static final String	database_busy			= "Database Busy";
-	public static final String	fetch_failed			= "Fetch Failed";
-	public static final String	familiarDbException		= "FamiliarDbException";
-	
+	public static final String		card_not_found				= "Card Not Found";
+	public static final String		mangled_url						= "Mangled URL";
+	public static final String		database_busy					= "Database Busy";
+	public static final String		card_dne							= "Card Does Not Exist";
+	public static final String		fetch_failed					= "Fetch Failed";
+	public static final String		number_of_invalid			= "Number of Cards Invalid";
+	public static final String		price_invalid					= "Price Invalid";
 
-	private static final int		LOW_PRICE					= 0;
-	// private static final int AVG_PRICE = 1;
-	private static final int		HIGH_PRICE				= 2;
+	private static final int			LOW_PRICE							= 0;
+//private static final int			AVG_PRICE							= 1;
+	private static final int			HIGH_PRICE						= 2;
 
-	public static CardData FetchCardData(CardData _data, CardDbAdapter mDbHelper) throws FamiliarDbException {
-		CardData data = _data;
-		try {
-			Cursor card;
-			boolean opened = false;
-			if(!mDbHelper.mDb.isOpen()) {
-				mDbHelper.openReadable();
-				opened = true;
-			}
-
-			if (data.setCode == null || data.setCode.equals(""))
-				card = mDbHelper.fetchCardByName(data.name, CardDbAdapter.allData);
-			else
-				card = mDbHelper.fetchCardByNameAndSet(data.name, data.setCode);
-
-			if(opened){
-				mDbHelper.close();
-			}
-			if (card.moveToFirst()) {
-				data.name = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NAME));
-				data.setCode = card.getString(card.getColumnIndex(CardDbAdapter.KEY_SET));
-				data.tcgName = mDbHelper.getTCGname(data.setCode);
-				data.type = card.getString(card.getColumnIndex(CardDbAdapter.KEY_TYPE));
-				data.cost = card.getString(card.getColumnIndex(CardDbAdapter.KEY_MANACOST));
-				data.ability = card.getString(card.getColumnIndex(CardDbAdapter.KEY_ABILITY));
-				data.power = card.getString(card.getColumnIndex(CardDbAdapter.KEY_POWER));
-				data.toughness = card.getString(card.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS));
-				data.loyalty = card.getInt(card.getColumnIndex(CardDbAdapter.KEY_LOYALTY));
-				data.rarity = card.getInt(card.getColumnIndex(CardDbAdapter.KEY_RARITY));
-				data.cardNumber = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NUMBER));
-			}
-			card.close();
-		}
-		catch (SQLiteException e) {
-			data.message = card_not_found;
-		}
-		catch (IllegalStateException e) {
-			data.message = database_busy;
-		}
-		return data;
-	}
-
-	public static final int MAX_SIMULTANEOUS_THREADS = 9; // could be 10, but leaves space for when one is winding down while the next is starting
-	public static LinkedBlockingQueue<FetchPriceTask> pendingTasks = new LinkedBlockingQueue<FetchPriceTask>();
-	public static ArrayBlockingQueue<FetchPriceTask> currentExecutingTasks = new ArrayBlockingQueue<FetchPriceTask>(MAX_SIMULTANEOUS_THREADS);
-	
-	public static void addTaskAndExecute(FetchPriceTask fpt){
-		pendingTasks.add(fpt);
-		executeIfAvailableSpace();
-	}
-	
-	@SuppressLint("NewApi")
-	public static void executeIfAvailableSpace()
-	{
-		if(currentExecutingTasks.size() < MAX_SIMULTANEOUS_THREADS)
-		{
-			FetchPriceTask toExecute = pendingTasks.poll();
-			if(toExecute != null){
-				currentExecutingTasks.add(toExecute);
-				
-
-				boolean API_LEVEL_11 = android.os.Build.VERSION.SDK_INT > 11;
-
-				if(API_LEVEL_11) {
-					toExecute.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void[])null);
-				}
-				else {
-					toExecute.execute((Void[])null);
-				}
-			}
-		}
-	}
-	
-	public static void cancelAllTasks(){
-		pendingTasks.clear();
-		for(FetchPriceTask fpa : currentExecutingTasks){
-			fpa.cancel(true);
-		}
-	}
-	
-	public class FetchPriceTask extends AsyncTask<Void, Void, Void> {
-		CardData										data;
-		Object											toNotify;
-		String											price	= "";
-		Context											mCtx;
-		private int									priceSetting;
-		private WishlistFragment		wf;
-		private TradeFragment	cta;
-
-		public FetchPriceTask(CardData _data, Object _toNotify, int ps, TradeFragment cta, WishlistFragment wf) {
+	public class FetchPriceTask extends AsyncTask<Void, Void, Integer> {
+		CardData					data;
+		Object	toNotify;
+		String						price		= "";
+		CardDbAdapter mDbHelper;
+		Context mCtx;
+		private int priceSetting;
+		private WishlistActivity wa;
+		private CardTradingActivity cta;
+		
+		public FetchPriceTask(CardData _data, Object _toNotify, int ps, CardTradingActivity cta, WishlistActivity wa) {
 			data = _data;
 			toNotify = _toNotify;
-			if (wf != null) {
-				mCtx = wf.getActivity();
+			if(wa != null){
+				mCtx = (Context)wa;
 			}
-			if (cta != null) {
-				mCtx = (Context) cta.getActivity();
+			if(cta != null){
+				mCtx = (Context)cta;
 			}
 			priceSetting = ps;
 			this.cta = cta;
-			this.wf = wf;
+			this.wa = wa;
 		}
-    
+
 		@Override
-		protected Void doInBackground(Void... params) {
+		protected void onPreExecute()
+		{
+			mDbHelper = new CardDbAdapter(mCtx);
+			mDbHelper.openReadable();
+		}
+		
+		@Override
+		protected Integer doInBackground(Void... params) {
+			String cardName;
+			String cardNumber;
+			String setCode;
+			String tcgName;
+			try {
+				cardName = data.name;
+				cardNumber = data.cardNumber == null ? "" : data.cardNumber;
+				setCode = data.setCode == null ? "" : data.setCode;
+				tcgName = data.tcgName == null ? "" : data.tcgName;
+				if (cardNumber.equals("") || setCode.equals("") || tcgName.equals("")) {
+					Cursor card;
+					if(setCode.equals(""))
+						card = mDbHelper.fetchCardByName(data.name);
+					else
+						card = mDbHelper.fetchCardByNameAndSet(data.name, setCode);
+					if (card.moveToFirst()) {
+						cardName = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NAME));
+//						if (data.setCode.equals("")) {
+						if (data.ability == null) {
+
+							data.setCode = card.getString(card.getColumnIndex(CardDbAdapter.KEY_SET));
+							data.tcgName = mDbHelper.getTCGname(data.setCode);
+							data.type = card.getString(card.getColumnIndex(CardDbAdapter.KEY_TYPE));
+							data.cost = card.getString(card.getColumnIndex(CardDbAdapter.KEY_MANACOST));
+							data.ability = card.getString(card.getColumnIndex(CardDbAdapter.KEY_ABILITY));
+							data.power = card.getString(card.getColumnIndex(CardDbAdapter.KEY_POWER));
+							data.toughness = card.getString(card.getColumnIndex(CardDbAdapter.KEY_TOUGHNESS));
+							data.loyalty = card.getInt(card.getColumnIndex(CardDbAdapter.KEY_LOYALTY));
+							data.rarity = card.getInt(card.getColumnIndex(CardDbAdapter.KEY_RARITY));
+							data.cardNumber = card.getString(card.getColumnIndex(CardDbAdapter.KEY_NUMBER));
+							
+							cardName = data.name;
+							cardNumber = data.cardNumber;
+							setCode = data.setCode;
+							tcgName = data.tcgName;
+						}
+
+						card.deactivate();
+						card.close();
+					}
+					else {
+						price = card_dne;
+						card.deactivate();
+						card.close();
+						return 1;
+					}
+				}
+			}
+			catch (SQLiteException e) {
+				price = card_not_found;
+				return 1;
+			}
+			catch (IllegalStateException e) {
+				price = database_busy;
+				return 1;
+			}
+
 			URL priceurl = null;
 
 			try {
-				String cardName = data.name;
-				String cardNumber = data.cardNumber == null ? "" : data.cardNumber;
-				String setCode = data.setCode == null ? "" : data.setCode;
-				String tcgName = data.tcgName == null ? "" : data.tcgName;
-				
-				if (cardNumber == "" || setCode == "" || tcgName == "") {
-					if(wf != null) {
-						data = FetchCardData(data, wf.mDbHelper);
-					}
-					else if (cta != null) {
-						data = FetchCardData(data, cta.mDbHelper);
-					}
-					if (data.message == card_not_found || data.message == database_busy) {
-						price = data.message;
-						return null;
-					}
-				}
-
-				if (cardNumber.contains("b") && CardViewFragment.isTransformable(cardNumber, data.setCode)) {
-					CardDbAdapter mDbHelper = new CardDbAdapter(mCtx);
-					priceurl = new URL(CardDbAdapter.removeAccentMarks(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p="
-							+ mDbHelper.getTransformName(setCode, cardNumber.replace("b", "a"))).replace(" ", "%20").replace("Æ", "Ae")));
-					mDbHelper.close();
+				if (cardNumber.contains("b") && CardViewActivity.isTransformable(cardNumber, data.setCode)) {
+					priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p="
+							+ mDbHelper.getTransformName(setCode, cardNumber.replace("b", "a"))).replace(" ", "%20").replace("Æ", "Ae"));
 				}
 				else {
-					priceurl = new URL(CardDbAdapter.removeAccentMarks(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p=" + cardName).replace(" ", "%20")
-							.replace("Æ", "Ae")));
+					priceurl = new URL(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p="
+							+ cardName).replace(" ", "%20").replace("Æ", "Ae"));
 				}
 			}
 			catch (MalformedURLException e) {
 				priceurl = null;
 				price = mangled_url;
-				return null;
-			} catch (FamiliarDbException e) {
-				priceurl = null;
-				price = familiarDbException;
-				return null;
+				return 1;
 			}
 
 			price = fetchPrice(priceurl);
 
 			if (price.equals(fetch_failed)) {
-				return null;
+				return 1;
 			}
-			return null;
+			return 0;
 		}
 
+		// Look into progress bar "loading..." style updating
+
 		@Override
-		protected void onPostExecute(Void result) {
+		protected void onPostExecute(Integer result) {
+
 			double dPrice;
 			try {
 				dPrice = Double.parseDouble(price);
@@ -208,26 +170,18 @@ public class TradeListHelpers {
 			}
 			data.price = (int) (dPrice * 100);
 
-			if (wf != null) {
-				wf.UpdateTotalPrices();
+			if(wa != null){
+				wa.UpdateTotalPrices();
 			}
-			else if (cta != null) {
+			else if(cta != null){
 				cta.UpdateTotalPrices();
 			}
 			try {
 				if (toNotify instanceof ArrayAdapter<?>)
-					((ArrayAdapter<?>) toNotify).notifyDataSetChanged();
+					((ArrayAdapter<CardData>) toNotify).notifyDataSetChanged();
 				else
 					((BaseExpandableListAdapter) toNotify).notifyDataSetChanged();
-			}
-			catch (Exception e) {
-			}
-			
-			if(!this.isCancelled()){
-				// execute the next task
-				executeIfAvailableSpace();
-			}
-			currentExecutingTasks.remove(this);
+			}catch (Exception e){}
 		}
 
 		String fetchPrice(URL _priceURL) {
@@ -276,26 +230,26 @@ public class TradeListHelpers {
 			}
 		}
 	}
+	
+	public class CardData {
 
-	public class CardData implements Cloneable {
+		public String name;
+		public String cardNumber;
+		public String tcgName;
+		public String setCode;
+		public int numberOf;
+		public int price;		// In cents
+		public String message;
+		public String type;
+		public String cost;
+		public String ability;
+		public String power;
+		public String toughness;
+		public int loyalty;
+		public int rarity;
 
-		public String	name;
-		public String	cardNumber;
-		public String	tcgName;
-		public String	setCode;
-		public int		numberOf;
-		public int		price;			// In cents
-		public String	message;
-		public String	type;
-		public String	cost;
-		public String	ability;
-		public String	power;
-		public String	toughness;
-		public int		loyalty;
-		public int		rarity;
-
-		public CardData(String name, String tcgName, String setCode, int numberOf, int price, String message, String number, String type, String cost,
-				String ability, String p, String t, int loyalty, int rarity) {
+		public CardData(String name, String tcgName, String setCode, int numberOf, int price, String message, String number, 
+				String type, String cost, String ability, String p, String t, int loyalty, int rarity) {
 			this.name = name;
 			this.cardNumber = number;
 			this.setCode = setCode;
@@ -311,8 +265,8 @@ public class TradeListHelpers {
 			this.loyalty = loyalty;
 			this.rarity = rarity;
 		}
-
-		public CardData(String name, String tcgName, String setCode, int numberOf, int price, String message, String number, int rarity) {
+		
+		public CardData(String name, String tcgName, String setCode, int numberOf, int price, String message, String number) {
 			this.name = name;
 			this.cardNumber = number;
 			this.setCode = setCode;
@@ -320,15 +274,12 @@ public class TradeListHelpers {
 			this.numberOf = numberOf;
 			this.price = price;
 			this.message = message;
-			this.rarity = rarity;
 		}
 
-		public CardData(String cardName, String cardSet, int numberOf, String number, int rarity) {
+		public CardData(String cardName, String cardSet, int numberOf) {
 			this.name = cardName;
 			this.numberOf = numberOf;
 			this.setCode = cardSet;
-			this.cardNumber = number;
-			this.rarity = rarity;
 		}
 
 		public String getPriceString() {
@@ -342,23 +293,11 @@ public class TradeListHelpers {
 		public static final String	delimiter	= "%";
 
 		public String toString() {
-			return this.name + delimiter + this.setCode + delimiter + this.numberOf + delimiter + this.cardNumber + delimiter + this.rarity + '\n';
+			return this.name + delimiter + this.setCode + delimiter + this.numberOf + '\n';
 		}
 
 		public String toString(int side) {
 			return side + delimiter + this.name + delimiter + this.setCode + delimiter + this.numberOf + '\n';
 		}
-
-		public String toReadableString(boolean includeTcgName) {
-			return String.valueOf(this.numberOf) + ' ' + this.name + (includeTcgName?" (" + this.tcgName + ')':"") + '\n';
-		}
-
-		public Object clone() { 
-	        try {
-				return super.clone();
-			} catch (CloneNotSupportedException e) {
-				return null;
-			} 
-		} 
 	}
 }

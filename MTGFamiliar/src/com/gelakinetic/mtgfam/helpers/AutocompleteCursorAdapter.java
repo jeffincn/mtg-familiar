@@ -35,13 +35,7 @@ public class AutocompleteCursorAdapter extends CursorAdapter {
 
 	public AutocompleteCursorAdapter(Context context, Cursor c) {
 		super(context, c);
-		try {
-			mDbHelper = new CardDbAdapter(context);
-			mDbHelper.close(); // close the immediately opened db
-		}
-		catch(FamiliarDbException e) {
-			// uhoh
-		}
+		mDbHelper = new CardDbAdapter(context);
 	}
 
 	@Override
@@ -75,13 +69,11 @@ public class AutocompleteCursorAdapter extends CursorAdapter {
 
 		Cursor cursor = null;
 		try {
-			if(mDbHelper != null) {
-				mDbHelper.openReadable();
-				cursor = mDbHelper.autoComplete(filter);
-				mDbHelper.close();
-			}
+			mDbHelper.openReadable();
+			cursor = mDbHelper.autoComplete(filter);
+			mDbHelper.close();
 		}
-		catch (FamiliarDbException e) {
+		catch (Exception e) {
 			return null;
 		}
 		return cursor;

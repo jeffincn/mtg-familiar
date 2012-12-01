@@ -19,7 +19,6 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam.helpers;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -28,6 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.gelakinetic.mtgfam.R;
 import com.google.gson.stream.JsonReader;
@@ -39,11 +39,7 @@ public class JsonParser {
         void reportJsonCardProgress(String... args);
     }
 
-		private String	currentTCGNamePatchDate = null;
-		private String	currentPatchDate = null;
-		private String	currentRulesDate = null;
-
-	public void readCardJsonStream(InputStream in, CardProgressReporter progReport, String setName, CardDbAdapter mDbHelper, Context context)
+	public static void readCardJsonStream(InputStream in, CardProgressReporter progReport, String setName, CardDbAdapter mDbHelper, Context context)
 			throws IOException {
 		String dialogText = String.format(context.getString(R.string.update_parse_cards), setName);
 		
@@ -56,8 +52,6 @@ public class JsonParser {
 		reader.beginObject();
 		s = reader.nextName();
 
-		ArrayList<MtgSet> setsAdded = new ArrayList<MtgSet>();
-		
 		progReport.reportJsonCardProgress("determinate", "");
 		reader.beginObject();
 		while (reader.hasNext()) {
@@ -95,7 +89,7 @@ public class JsonParser {
 									set.date = reader.nextLong();
 								}
 							}
-							setsAdded.add(set);
+							mDbHelper.createSet(set);
 							reader.endObject();
 						}
 						else if (jt.equals(JsonToken.BEGIN_ARRAY)) {
@@ -118,7 +112,7 @@ public class JsonParser {
 										set.date = reader.nextLong();
 									}
 								}
-								setsAdded.add(set);
+								mDbHelper.createSet(set);
 								reader.endObject();
 							}
 							reader.endArray();
@@ -278,6 +272,7 @@ public class JsonParser {
 								}
 							}
 							mDbHelper.createCard(c);
+							// mMain.cardAdded();
 							elementsParsed++;
 							progReport.reportJsonCardProgress(new String[] { dialogText, dialogText,
 									"" + (int) Math.round(100 * elementsParsed / (double) numTotalElements) });
@@ -290,24 +285,20 @@ public class JsonParser {
 			}
 			if (s.equalsIgnoreCase("w")) { // num_cards
 				numTotalElements = reader.nextInt();
+				// mMain.setNumCards(reader.nextInt());
 			}
 		}
 		reader.endObject();
+		//task.publicPublishProgress(new String[] { "Done Parsing " + setName, "Done Parsing " + setName, "0" });
 		reader.close();
-		
-		// Add the set information to the database AFTER adding the cards.
-		// This way if the update fails while parsing cards, the database won't think it has the set already, when it doesnt.
-		for(MtgSet set : setsAdded) {
-			mDbHelper.createSet(set);
-		}
-		
 		return;
 	}
 
-	public ArrayList<String[]> readUpdateJsonStream(PreferencesAdapter prefAdapter) throws MalformedURLException, IOException {
+	public static ArrayList<String[]> readUpdateJsonStream(SharedPreferences settings) throws MalformedURLException, IOException {
 		ArrayList<String[]> patchInfo = new ArrayList<String[]>();
 		URL update;
 		String label;
+		String date = null;
 		String label2;
 
 		update = new URL("https://sites.google.com/site/mtgfamiliar/manifests/patches.json");
@@ -319,9 +310,9 @@ public class JsonParser {
 			label = reader.nextName();
 
 			if (label.equals("Date")) {
-				String lastUpdate = prefAdapter.getLastUpdate();
-				currentPatchDate = reader.nextString();
-				if (lastUpdate.equals(currentPatchDate)) {
+				String lastUpdate = settings.getString("lastUpdate", "");
+				date = reader.nextString();
+				if (lastUpdate.equals(date)) {
 					reader.close();
 					return null;
 				}
@@ -352,13 +343,18 @@ public class JsonParser {
 		reader.endObject();
 		reader.close();
 
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString("lastUpdate", date);
+		editor.commit();
+
 		return patchInfo;
 	}
 
-	public void readLegalityJsonStream(CardDbAdapter cda, PreferencesAdapter prefAdapter, boolean reparseDatabase)
-			throws IOException, FamiliarDbException {
+	public static void readLegalityJsonStream(InputStream in, CardDbAdapter cda, SharedPreferences settings)
+			throws IOException {
 
 		CardDbAdapter mDbHelper;
+		String date = null;
 		String legalSet;
 		String bannedCard;
 		String restrictedCard;
@@ -366,9 +362,6 @@ public class JsonParser {
 		String jsonArrayName;
 		String jsonTopLevelName;
 
-		URL legal = new URL("https://sites.google.com/site/mtgfamiliar/manifests/legality.json");
-		InputStream in = new BufferedInputStream(legal.openStream());
-		
 		JsonReader reader = new JsonReader(new InputStreamReader(in, "ISO-8859-1"));
 
 		mDbHelper = cda;
@@ -378,15 +371,13 @@ public class JsonParser {
 
 			jsonTopLevelName = reader.nextName();
 			if (jsonTopLevelName.equalsIgnoreCase("Date")) {
-				currentRulesDate  = reader.nextString();
+				date = reader.nextString();
 
 				// compare date, maybe return, update sharedprefs
-				String spDate = prefAdapter.getLegalityDate();
-				if (spDate != null && spDate.equals(currentRulesDate)) {
-					if(!reparseDatabase){ // if we're reparsing, screw the date
-						reader.close();
-						return; // dates match, nothing new here.
-					}
+				String spDate = settings.getString("date", null);
+				if (spDate != null && spDate.equals(date)) {
+					reader.close();
+					return; // dates match, nothing new here.
 				}
 
 				mDbHelper.dropLegalTables();
@@ -436,13 +427,17 @@ public class JsonParser {
 		}
 		reader.endObject();
 
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString("date", date);
+		editor.commit();
 		reader.close();
 		return;
 	}
 
-	public void readTCGNameJsonStream(PreferencesAdapter prefAdapter, CardDbAdapter mDbHelper, boolean reparseDatabase) throws MalformedURLException, IOException, FamiliarDbException{
+	public static void readTCGNameJsonStream(SharedPreferences settings, CardDbAdapter mDbHelper) throws MalformedURLException, IOException{
 		URL update;
 		String label;
+		String date = null;
 		String label2;
 		String name = null, code = null;
 
@@ -455,9 +450,9 @@ public class JsonParser {
 			label = reader.nextName();
 
 			if (label.equals("Date")) {
-				String lastUpdate = prefAdapter.getLastTCGNameUpdate();
-				currentTCGNamePatchDate = reader.nextString();
-				if (lastUpdate.equals(currentTCGNamePatchDate) && !reparseDatabase) {
+				String lastUpdate = settings.getString("lastTCGNameUpdate", "");
+				date = reader.nextString();
+				if (lastUpdate.equals(date)) {
 					reader.close();
 					return;
 				}
@@ -484,16 +479,8 @@ public class JsonParser {
 		reader.endObject();
 		reader.close();
 
-		
-	}
-
-	public void commitDates(PreferencesAdapter prefAdapter) {
-		prefAdapter.setLastUpdate(currentTCGNamePatchDate);
-		prefAdapter.setLastTCGNameUpdate(currentPatchDate);
-		prefAdapter.setLegalityDate(currentRulesDate);
-
-		currentTCGNamePatchDate = null;
-		currentPatchDate = null;
-		currentRulesDate = null;
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString("lastTCGNameUpdate", date);
+		editor.commit();
 	}
 }

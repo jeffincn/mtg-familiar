@@ -18,7 +18,9 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.gelakinetic.mtgfam.helpers;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -31,8 +33,9 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
-import android.support.v4.app.NotificationCompat;
+import android.preference.PreferenceManager;
 import android.widget.RemoteViews;
 
 import com.gelakinetic.mtgfam.R;
@@ -40,20 +43,20 @@ import com.gelakinetic.mtgfam.activities.MainActivity;
 
 public class DbUpdaterService extends IntentService {
 
-	public static final int				STATUS_NOTIFICATION		= 31;
-	public static final int				UPDATED_NOTIFICATION	= 32;
+	public static final int STATUS_NOTIFICATION = 31;
+	public static final int UPDATED_NOTIFICATION = 32;
 
-	protected PreferencesAdapter mPrefAdapter;
-	protected CardDbAdapter				mDbHelper;
-	protected NotificationManager	mNotificationManager;
-	protected PendingIntent				mNotificationIntent;
+	protected SharedPreferences mPreferences;
+	protected CardDbAdapter mDbHelper;
+	protected NotificationManager mNotificationManager;
+	protected PendingIntent mNotificationIntent;
 
-	protected Notification				mUpdateNotification;
-	protected Handler							mHandler							= new Handler();
-	protected Runnable						mProgressUpdater;
+	protected Notification mUpdateNotification;
+	protected Handler mHandler = new Handler();
+	protected Runnable mProgressUpdater;
 
-	protected int									mProgress;
-	
+	protected int mProgress;
+
 	public DbUpdaterService() {
 		super("com.gelakinetic.mtgfam.helpers.DbUpdaterService");
 	}
@@ -61,144 +64,109 @@ public class DbUpdaterService extends IntentService {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		mPrefAdapter = new PreferencesAdapter(this);
-		try {
-			mDbHelper = new CardDbAdapter(this);
-		}
-		catch(FamiliarDbException e) {
-			mDbHelper = null;
-			return; // couldnt open the db, might as well return
-		}
-		mDbHelper.close(); // close the newly opened db so we can transact it later
+		mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+		mDbHelper = new CardDbAdapter(this);
 		mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
 		Intent intent = new Intent(this, MainActivity.class);
 		mNotificationIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
-		NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getApplicationContext());
-		mUpdateNotification = builder.setContentTitle(getString(R.string.app_name))
-				.setContentText(getString(R.string.update_notification)).setSmallIcon(R.drawable.rt_notification_icon)
-				.setContentIntent(mNotificationIntent).setWhen(System.currentTimeMillis()).getNotification();
-
+		mUpdateNotification = new Notification(R.drawable.rt_notification_icon, getString(R.string.update_notification), System.currentTimeMillis());
 		mUpdateNotification.flags |= Notification.FLAG_ONGOING_EVENT;
 		mUpdateNotification.flags |= Notification.FLAG_ONLY_ALERT_ONCE;
+		mUpdateNotification.setLatestEventInfo(this, getString(R.string.app_name), getString(R.string.update_notification), mNotificationIntent);
 	}
-
-	// Throw this switch to reparse the entire database from a custom URL (currently UpToRTR.josn.gzip
-	// THIS SHOULD NEVER EVER EVER BE TRUE IN A PLAY STORE RELEASE
-	private static final boolean reparseDatabase = false;
 
 	@Override
 	public void onHandleIntent(Intent intent) {
 
-		if(mDbHelper == null) {
-			return; // couldnt open db before
-		}
-		ProgressReporter reporter = new ProgressReporter();
+		//this.publishProgress(new String[] { "indeterminate", mCtx.getString(R.string.update_legality) });
+
+		showStatusNotification();
+
 		ArrayList<String> updatedStuff = new ArrayList<String>();
-		JsonParser parser = new JsonParser();
-		boolean commitDates = true;
+		ProgressReporter reporter = new ProgressReporter();
+		mDbHelper.openTransactional();
 
-		try {
+		try {				
+			ArrayList<String[]> patchInfo = JsonParser.readUpdateJsonStream(mPreferences);
 
-			mDbHelper.openTransactional();
+			URL legal = new URL("https://sites.google.com/site/mtgfamiliar/manifests/legality.json");
+			InputStream in = new BufferedInputStream(legal.openStream());
+			JsonParser.readLegalityJsonStream(in, mDbHelper, mPreferences);
 
-			showStatusNotification();
+			//this.publishProgress(new String[] { "indeterminate", mCtx.getString(R.string.update_cards) });
 
-			if(reparseDatabase) {
-				mDbHelper.dropCreateDB();
-				parser.readLegalityJsonStream(mDbHelper, mPrefAdapter, reparseDatabase);
-				GZIPInputStream upToGIS = new GZIPInputStream(new URL("https://sites.google.com/site/mtgfamiliar/patches/UpToRTR.json.gzip").openStream());
-				switchToUpdating(String.format(getString(R.string.update_updating_set), "EVERYTHING!!"));
-				parser.readCardJsonStream(upToGIS, reporter, "upToRTR", mDbHelper, this);
-				parser.readTCGNameJsonStream(mPrefAdapter, mDbHelper, reparseDatabase);
-			}
-			else {
-				parser.readLegalityJsonStream(mDbHelper, mPrefAdapter, reparseDatabase);
-				ArrayList<String[]> patchInfo = parser.readUpdateJsonStream(mPrefAdapter);
-				if (patchInfo != null) {
+			if (patchInfo != null) {
 
-					for (int i = 0; i < patchInfo.size(); i++) {
-						String[] set = patchInfo.get(i);
-						if (!mDbHelper.doesSetExist(set[2])) {
-							try {
-								switchToUpdating(String.format(getString(R.string.update_updating_set), set[0]));
-								GZIPInputStream gis = new GZIPInputStream(new URL(set[1]).openStream());
-								parser.readCardJsonStream(gis, reporter, set[0], mDbHelper, this);
-								updatedStuff.add(set[0]);
-							}
-							catch (MalformedURLException e) {
-							}
-							catch (IOException e) {
-							}
-
-							switchToChecking();
+				for (int i = 0; i < patchInfo.size(); i++) {
+					String[] set = patchInfo.get(i);
+					if (!mDbHelper.doesSetExist(set[2])) {
+						try {
+							switchToUpdating(String.format(getString(R.string.update_updating_set), set[0]));
+							GZIPInputStream gis = new GZIPInputStream(new URL(set[1]).openStream());
+							JsonParser.readCardJsonStream(gis, reporter, set[0], mDbHelper, this);
+							updatedStuff.add(set[0]);
 						}
+						catch (MalformedURLException e) {
+							// Log.e("JSON error", e.toString());
+						}
+						catch (IOException e) {
+							// Log.e("JSON error", e.toString());
+						}
+
+						switchToChecking();
 					}
-					parser.readTCGNameJsonStream(mPrefAdapter, mDbHelper, reparseDatabase);
 				}
+				JsonParser.readTCGNameJsonStream(mPreferences, mDbHelper);
 			}
 		}
 		catch (MalformedURLException e1) {
-			commitDates = false; // dont commit the dates
+			// eat it
 		}
 		catch (IOException e) {
-			commitDates = false; // dont commit the dates
+			// eat it
 		}
-		catch (FamiliarDbException e) {
-			commitDates = false; // dont commit the dates
-		}
-		
-		// Instead of using a hardcoded string, the default lastRulesUpdate is the
-		// timestamp of when the APK was built.
-		// This is a safe assumption to make, since any market release will have the
-		// latest database baked in.
-		boolean newRulesParsed = false;
-		try{
-			long lastRulesUpdate = mPrefAdapter.getLastRulesUpdate();
-			if(reparseDatabase) {
-				lastRulesUpdate = 0; //1979 anybody?
-			}
-			RulesParser rp = new RulesParser(new Date(lastRulesUpdate), mDbHelper, this, reporter);
-			if (rp.needsToUpdate()) {
-				if (rp.parseRules()) {
-					switchToUpdating(getString(R.string.update_updating_rules));
-					int code = rp.loadRulesAndGlossary();
-	
-					// Only save the timestamp of this if the update was 100% successful; if
-					// something went screwy, we should let them know and try again next
-					// update.
-					if (code == RulesParser.SUCCESS) {
-						newRulesParsed = true;
-						updatedStuff.add(getString(R.string.update_added_rules));
-					}
-					else {
-						// TODO - We should indicate failure here somehow (toasts don't work
-						// in the async task)
-					}
-	
-					switchToChecking();
-				}
-			}
-	
-			mDbHelper.closeTransactional();
-	
-			cancelStatusNotification();
-			showUpdatedNotification(updatedStuff);
-		}
-		catch(FamiliarDbException e) {
-			commitDates = false; // dont commit the dates
-		}
-		
-		if(commitDates) {
-			parser.commitDates(mPrefAdapter);
 
-			long curTime = new Date().getTime();
-			mPrefAdapter.setLastLegalityUpdate((int)(curTime / 1000));
-			if (newRulesParsed) {
-				mPrefAdapter.setLastRulesUpdate(curTime);
+		//this.publishProgress(new String[] { "indeterminate", mCtx.getString(R.string.update_rules) });
+
+		// Instead of using a hardcoded string, the default lastRulesUpdate is the timestamp of when the APK was built.
+		// This is a safe assumption to make, since any market release will have the latest database baked in.
+		long lastRulesUpdate = mPreferences.getLong("lastRulesUpdate", BuildDate.get(this).getTime());
+		RulesParser rp = new RulesParser(new Date(lastRulesUpdate), mDbHelper, this, reporter);
+		boolean newRulesParsed = false;
+		if (rp.needsToUpdate()) {
+			if (rp.parseRules()) {
+				switchToUpdating(getString(R.string.update_updating_rules));
+				int code = rp.loadRulesAndGlossary();
+
+				//Only save the timestamp of this if the update was 100% successful; if
+				//something went screwy, we should let them know and try again next update.
+				if(code == RulesParser.SUCCESS) {
+					newRulesParsed = true;	
+					updatedStuff.add(getString(R.string.update_added_rules));
+				}
+				else {
+					//TODO - We should indicate failure here somehow (toasts don't work in the async task)
+				}
+
+				switchToChecking();
 			}
 		}
+
+		long curTime = new Date().getTime();
+		SharedPreferences.Editor editor = mPreferences.edit();
+		editor.putInt("lastLegalityUpdate", (int)(curTime / 1000));
+		if(newRulesParsed) {
+			editor.putLong("lastRulesUpdate", curTime);
+		}
+		editor.commit();
+
+		mDbHelper.closeTransactional();
+
+		cancelStatusNotification();
+		showUpdatedNotification(updatedStuff);
+
 		return;
 	}
 
@@ -212,10 +180,7 @@ public class DbUpdaterService extends IntentService {
 
 	protected void switchToChecking() {
 		mHandler.removeCallbacks(mProgressUpdater);
-		NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getApplicationContext());
-		mUpdateNotification = builder.setContentTitle(getString(R.string.app_name))
-				.setContentText(getString(R.string.update_notification)).setContentIntent(mNotificationIntent)
-				.getNotification();
+		mUpdateNotification.setLatestEventInfo(this, getString(R.string.app_name), getString(R.string.update_notification), mNotificationIntent);
 
 		mNotificationManager.notify(STATUS_NOTIFICATION, mUpdateNotification);
 	}
@@ -230,7 +195,7 @@ public class DbUpdaterService extends IntentService {
 
 		mNotificationManager.notify(STATUS_NOTIFICATION, mUpdateNotification);
 
-		mProgressUpdater = new Runnable() {
+		mProgressUpdater = new Runnable() {    		
 			public void run() {
 				contentView.setProgressBar(R.id.progress_notification_bar, 100, mProgress, false);
 				mNotificationManager.notify(STATUS_NOTIFICATION, mUpdateNotification);
@@ -241,40 +206,37 @@ public class DbUpdaterService extends IntentService {
 	}
 
 	protected void showUpdatedNotification(List<String> newStuff) {
-		if (newStuff.size() < 1) {
+		if(newStuff.size() < 1) {
 			return;
 		}
 
 		String title = getString(R.string.app_name);
 		String body = getString(R.string.update_added) + " ";
-		for (int i = 0; i < newStuff.size(); i++) {
+		for(int i = 0; i < newStuff.size(); i++) {
 			body += newStuff.get(i);
-			if (i < newStuff.size() - 1) {
+			if(i < newStuff.size() - 1) {
 				body += ", ";
 			}
 		}
 
-		NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getApplicationContext());
-		Notification notification = builder.setContentTitle(title)
-				.setContentText(body).setSmallIcon(R.drawable.rt_notification_icon)
-				.setContentIntent(mNotificationIntent).setWhen(System.currentTimeMillis()).getNotification();
-
+		Notification notification = new Notification(R.drawable.rt_notification_icon, body, System.currentTimeMillis());
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
+		notification.setLatestEventInfo(this, title, body, mNotificationIntent);
 
 		mNotificationManager.notify(UPDATED_NOTIFICATION, notification);
 	}
 
-	protected class ProgressReporter implements JsonParser.CardProgressReporter, RulesParser.ProgressReporter {
+	protected class ProgressReporter implements JsonParser.CardProgressReporter,
+	RulesParser.ProgressReporter {
 		public void reportJsonCardProgress(String... args) {
-			if (args.length == 3) {
-				// We only care about this; it has a number
+			if(args.length == 3) {
+				//We only care about this; it has a number
 				mProgress = Integer.parseInt(args[2]);
 			}
 		}
-
 		public void reportRulesProgress(String... args) {
-			if (args.length == 3) {
-				// We only care about this; it has a number
+			if(args.length == 3) {
+				//We only care about this; it has a number
 				mProgress = Integer.parseInt(args[2]);
 			}
 		}

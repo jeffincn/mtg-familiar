@@ -11,9 +11,8 @@
 	along with MTG Familiar. If not, see <http://www.gnu.org/licenses/>.
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" 
-    android:id="@+id/parentLayout">
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent" >
 
     <ScrollView
         android:id="@+id/ScrollView1"
@@ -21,7 +20,7 @@
         android:layout_height="fill_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_above="@+id/scrollButtons"
+        android:layout_above="@+id/linearLayout10"
         android:fillViewport="true" >
 
         <LinearLayout
@@ -183,7 +182,7 @@
     <LinearLayout
 		android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
-        android:id="@+id/scrollButtons"
+        android:id="@+id/linearLayout10"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >

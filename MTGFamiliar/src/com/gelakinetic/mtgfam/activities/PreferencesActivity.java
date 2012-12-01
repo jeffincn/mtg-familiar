@@ -33,7 +33,6 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.preferences);
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
 	}
 	
 	/*
@@ -48,12 +47,7 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
 						new Thread(new Runnable() {
 							@Override
 							public void run() {
-								try{
-									new Instrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_SEARCH);
-								}
-								catch(java.lang.SecurityException e){
-									//apparently this can inject an event into another app if the user switches fast enough
-								}
+								new Instrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_SEARCH);
 							}
 						}).start();
 						return true;

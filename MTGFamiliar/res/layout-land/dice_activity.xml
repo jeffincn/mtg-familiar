@@ -16,7 +16,7 @@
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:orientation="vertical" >
 
         <!-- Roll output -->
@@ -36,9 +36,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="8"
-                android:background="@xml/textview_backdrop"
+                android:background="@drawable/textview_backdrop"
                 android:gravity="center"
-                android:text="@string/mana_pool_zero"
+                android:text="0"
                 android:textSize="70sp" />
 
             <View

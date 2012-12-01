@@ -18,28 +18,20 @@ You should have received a copy of the GNU General Public License
 along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
     <item
         android:id="@+id/search_menu_random_search"
-        android:icon="@drawable/menu_random"
-        android:showAsAction="ifRoom"
-        android:title="@string/search_randomize"></item>
+        android:icon="@drawable/ic_menu_chat_dashboard"
+        android:title="@string/randomButton"></item>
+
+    <item
+        android:id="@+id/search_menu_search"
+        android:icon="@drawable/ic_menu_search"
+        android:title="@string/searchButton"/>
 
     <item
         android:id="@+id/search_menu_clear"
-        android:icon="@drawable/menu_cancel"
-        android:showAsAction="always"
-        android:title="@string/search_clear_fields"/>
-
-    <item
-        android:id="@+id/search_menu_save_defaults"
-        android:icon="@drawable/menu_settings"
-        android:showAsAction="ifRoom"
-        android:title="@string/search_save_defaults"/>
-    
-    <item
-        android:id="@+id/search_menu_load_defaults"
-        android:icon="@drawable/menu_load"
-        android:showAsAction="ifRoom"
-        android:title="@string/search_load_defaults"/>
+        android:icon="@drawable/ic_menu_clear_playlist"
+        android:title="@string/clear"/>
 
 </menu>

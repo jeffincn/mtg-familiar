@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright 2011 Adam Feinstein and April King. This file is part of MTG 
+	Familiar. MTG Familiar is free software: you can redistribute it and/or modify 
+	it under the terms of the GNU General Public License as published by the 
+	Free Software Foundation, either version 3 of the License, or (at your option) 
+	any later version. MTG Familiar is distributed in the hope that it will be 
+	useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+	or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for 
+	more details. You should have received a copy of the GNU General Public License 
+	along with MTG Familiar. If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="Automatic Updates" >
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="autoupdate"
+            android:summary="@string/automaticupdatesummary"
+            android:title="@string/automaticupdatetitle" />
+
+        <ListPreference
+            android:entries="@array/updatefrequencydays"
+            android:entryValues="@array/updatefrequencydaysvalues"
+            android:key="updatefrequency"
+            android:summary="@string/updatefrequencysummary"
+            android:title="@string/updatefrequencytitle" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/cardviewtitle" >
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="picFirst"
+            android:summary="@string/picfirstsummary"
+            android:title="@string/picfirsttitle" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Dice" >
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="d2AsCoin"
+            android:title="@string/d2title" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/lifetitle" >
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="wakelock"
+            android:summary="@string/wakelocksummary"
+            android:title="@string/wakelocktitle" />
+    </PreferenceCategory>
+    
+    <PreferenceCategory android:title="@string/timertitle" >
+    
+    	<!-- <EditTextPreference 
+    		android:key="roundLength"
+    		android:title="@string/rt_defaulttime_title"
+    		android:summary="@string/rt_defaulttime_desc"
+    		android:defaultValue="50"
+    		android:dialogTitle="Round Length"
+    		android:dialogMessage="Enter a value in minutes" /> -->
+
+    	<ListPreference 
+    		android:entries="@array/rt_defaulttimes"
+    		android:entryValues="@array/rt_defaulttimesvalues"
+    		android:defaultValue="50"
+    		android:key="roundLength"
+    		android:title="@string/rt_defaulttime_title"
+    		android:summary="@string/rt_defaulttime_desc" />
+
+    	<RingtonePreference
+    		android:ringtoneType="notification"
+    		android:showSilent="false"
+    		android:key="timerSound"
+    		android:summary="@string/ringtonesummary"
+    		android:title="@string/ringtonetitle" />
+    
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/resultlisttitle" >
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="consolidateSearch"
+            android:title="@string/consolidate" android:summary="@string/consolidatetext"/>
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="setPref"
+            android:title="@string/setPreftitle" />
+        
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="manacostPref"
+            android:title="@string/manacostPreftitle" />
+
+        <CheckBoxPreference
+            android:key="typePref"
+            android:title="@string/typePreftitle" android:defaultValue="true"/>
+
+        <CheckBoxPreference
+            android:key="abilityPref"
+            android:title="@string/abilityPreftitle" android:defaultValue="true"/>
+
+        <CheckBoxPreference
+            android:key="ptPref"
+            android:title="@string/ptPreftitle" android:defaultValue="true"/>
+    </PreferenceCategory>
+    <!--
+         <PreferenceCategory android:title="Deck Manager"> <EditTextPreference 
+		android:defaultValue="@string/defaultdeckpath" android:summary="@string/defaultpathsummary" 
+		android:title="@string/defaultpathtitle" android:key="@string/default_deck_path_key" 
+		android:dialogTitle="@string/default_deck_path_dialog_title" /> </PreferenceCategory>
+    -->
+
+</PreferenceScreen>

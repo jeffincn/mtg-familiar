@@ -844,7 +844,8 @@ public class WishlistFragment extends FamiliarFragment {
 										getMainActivity().getSupportFragmentManager().popBackStack();
 										return;
 									}
-								}
+								}else if (showTotalPrice || showIndividualPrices)
+									UpdateTotalPrices();
 							}
 							if (totalCards == 0) {
 								cardSetNames.remove(positionForDialog);

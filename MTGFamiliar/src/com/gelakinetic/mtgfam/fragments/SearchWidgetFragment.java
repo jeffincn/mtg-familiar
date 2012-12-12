@@ -99,6 +99,7 @@ public class SearchWidgetFragment extends FamiliarFragment {
 
 		SearchCriteria criteria = new SearchCriteria();
 		criteria.Name = name;
+		criteria.Set_Logic = CardDbAdapter.MOSTRECENTPRINTING;
 		// add a fragment
 		Bundle args = new Bundle();
 		args.putBoolean(SearchViewFragment.RANDOM, false);

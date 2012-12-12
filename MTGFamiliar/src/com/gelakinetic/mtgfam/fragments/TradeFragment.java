@@ -641,17 +641,15 @@ public class TradeFragment extends FamiliarFragment {
 					
 					CardData cd = mTradeListHelper.new CardData(cardName, tcgName, cardSet, numberOf, 0, "loading", null, '-');
 					if (side == CardDbAdapter.LEFT) {
-						lTradeLeft.add(0, cd);
+						lTradeLeft.add(cd);
 						FetchPriceTask loadPrice = 
-								mTradeListHelper.new FetchPriceTask(lTradeLeft.get(0), 
-										aaTradeLeft, priceSetting, TradeFragment.this, null);
+								mTradeListHelper.new FetchPriceTask(cd, aaTradeLeft, priceSetting, TradeFragment.this, null);
 						TradeListHelpers.addTaskAndExecute(loadPrice);
 					}
 					else if (side == CardDbAdapter.RIGHT) {
-						lTradeRight.add(0, cd);
+						lTradeRight.add(cd);
 						FetchPriceTask loadPrice = 
-								mTradeListHelper.new FetchPriceTask(lTradeRight.get(0), 
-										aaTradeRight, priceSetting, TradeFragment.this, null);
+								mTradeListHelper.new FetchPriceTask(cd, aaTradeRight, priceSetting, TradeFragment.this, null);
 						TradeListHelpers.addTaskAndExecute(loadPrice);
 					}
 				}

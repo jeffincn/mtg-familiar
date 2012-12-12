@@ -70,8 +70,7 @@ public class ResultListFragment extends FamiliarFragment {
 			else {
 				SearchCriteria criteria = (SearchCriteria) args.getSerializable(SearchViewFragment.CRITERIA);
 				int setLogic = criteria.Set_Logic;
-				boolean consolidate = (setLogic == CardDbAdapter.MOSTRECENTPRINTING || setLogic == CardDbAdapter.FIRSTPRINTING) ? true
-						: false;
+				boolean consolidate = (setLogic == CardDbAdapter.MOSTRECENTPRINTING || setLogic == CardDbAdapter.FIRSTPRINTING);
 				if(mDbHelper == null) {
 					// Just in case. it happened to a user once...
 					mDbHelper = new CardDbAdapter(this.getActivity());

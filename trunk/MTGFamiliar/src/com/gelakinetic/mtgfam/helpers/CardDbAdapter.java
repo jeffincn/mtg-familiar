@@ -1783,4 +1783,35 @@ public class CardDbAdapter {
 		.replace("ÿ", "y");
 
 	}
+	
+
+	public static boolean isTransformable(String number, String setCode) {
+		if (number.contains("a") || number.contains("b")) {
+			if (setCode.compareTo("ISD") == 0 || setCode.compareTo("DKA") == 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public int fetchMultiverseId(String name, String setCode) throws FamiliarDbException{
+		name = name.replace("'", "''"); // Sanitization
+		setCode = setCode.replace("'", "''"); // Sanitization
+		String sql = "SELECT " + KEY_MULTIVERSEID + " FROM " + DATABASE_TABLE_CARDS + " WHERE " +
+				KEY_NAME + " = '" + name + "' AND " +
+				KEY_SET +" = '" + setCode + "'";
+		try {
+			Cursor mCursor = mDb.rawQuery(sql, null);
+			if(mCursor.getCount() > 0) {
+				mCursor.moveToFirst();
+				return mCursor.getInt(mCursor.getColumnIndex(KEY_MULTIVERSEID));
+			}
+		} catch (SQLiteException e) {
+			throw new FamiliarDbException(e);
+		} catch (IllegalStateException e) {
+			throw new FamiliarDbException(e);
+		}
+		return -1;
+	}
+
 }

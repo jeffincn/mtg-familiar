@@ -22,8 +22,8 @@ import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.WindowManager.LayoutParams;
 import android.view.ViewGroup;
+import android.view.WindowManager.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -42,9 +42,11 @@ import com.gelakinetic.mtgfam.helpers.AutocompleteCursorAdapter;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
+import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler;
+import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler.FetchPriceTask;
+import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler.onFetchPriceCompleteListener;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
-import com.gelakinetic.mtgfam.helpers.TradeListHelpers.FetchPriceTask;
 
 public class TradeFragment extends FamiliarFragment {
 	private final static int			DIALOG_UPDATE_CARD		= 1;
@@ -81,7 +83,6 @@ public class TradeFragment extends FamiliarFragment {
 	public static final String		card_not_found				= "Card Not Found";
 	public static final String		mangled_url						= "Mangled URL";
 	public static final String		database_busy					= "Database Busy";
-	public static final String		card_dne							= "Card Does Not Exist";
 	public static final String		fetch_failed					= "Fetch Failed";
 	public static final String		number_of_invalid			= "Number of Cards Invalid";
 	public static final String		card_corrupted					= "Card Data corrupted, discarding.";
@@ -90,6 +91,10 @@ public class TradeFragment extends FamiliarFragment {
 	private static final String		tradeExtension				= ".trade";
 	private boolean					doneLoading				= false;
 
+	private static final int	LOW_PRICE	= 0;
+	private static final int	AVG_PRICE	= 1;
+	private static final int	HIGH_PRICE	= 2;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -143,12 +148,14 @@ public class TradeFragment extends FamiliarFragment {
 
 					String cardName = "", 
 							setCode = "", 
-							tcgName = "";
+							tcgName = "",
+							cardNumber="";
 					try {
 						cardName = namefield.getText().toString();
-						Cursor cards = mDbHelper.fetchCardByName(cardName, new String[]{CardDbAdapter.KEY_SET});
+						Cursor cards = mDbHelper.fetchCardByName(cardName, new String[]{CardDbAdapter.KEY_SET, CardDbAdapter.KEY_NUMBER, CardDbAdapter.KEY_RARITY});
 						setCode = cards.getString(cards.getColumnIndex(CardDbAdapter.KEY_SET));
 						tcgName = mDbHelper.getTCGname(setCode);
+						cardNumber = cards.getString(cards.getColumnIndex(CardDbAdapter.KEY_NUMBER));
 						
 						cards.close();
 					}
@@ -158,13 +165,14 @@ public class TradeFragment extends FamiliarFragment {
 						numberfield.setText("1");
 						return;
 					}
-					CardData data = mTradeListHelper.new CardData(cardName, tcgName, setCode, numberOf, 0, "loading", null, '-');
+					final CardData data = mTradeListHelper.new CardData(cardName, tcgName, setCode, numberOf, 0, "loading", cardNumber, '-');
 					
 					lTradeLeft.add(0, data);
 					aaTradeLeft.notifyDataSetChanged();
-					FetchPriceTask loadPrice = 
-							mTradeListHelper.new FetchPriceTask(data, aaTradeLeft, priceSetting, TradeFragment.this, null);
-					TradeListHelpers.addTaskAndExecute(loadPrice);
+					
+					//FetchPriceTask loadPrice = new FetchPriceTask(data, aaTradeLeft, priceSetting, TradeFragment.this, null);
+					loadPrice(data, aaTradeLeft);
+					
 					namefield.setText("");
 					numberfield.setText("1");
 				}
@@ -185,12 +193,14 @@ public class TradeFragment extends FamiliarFragment {
 
 					String cardName = "", 
 							setCode = "", 
-							tcgName = "";
+							tcgName = "",
+							cardNumber = "";
 					try {
 						cardName = namefield.getText().toString();
-						Cursor cards = mDbHelper.fetchCardByName(cardName, new String[]{CardDbAdapter.KEY_SET});
+						Cursor cards = mDbHelper.fetchCardByName(cardName, new String[]{CardDbAdapter.KEY_SET, CardDbAdapter.KEY_NUMBER, CardDbAdapter.KEY_RARITY});
 						setCode = cards.getString(cards.getColumnIndex(CardDbAdapter.KEY_SET));
 						tcgName = mDbHelper.getTCGname(setCode);
+						cardNumber = cards.getString(cards.getColumnIndex(CardDbAdapter.KEY_NUMBER));
 						
 						cards.close();
 					}
@@ -200,14 +210,13 @@ public class TradeFragment extends FamiliarFragment {
 						numberfield.setText("1");
 						return;
 					}
-					CardData data = mTradeListHelper.new CardData(cardName, tcgName, setCode, numberOf, 0, "loading", null, '-');
+					CardData data = mTradeListHelper.new CardData(cardName, tcgName, setCode, numberOf, 0, "loading", cardNumber,'-');
 
 					lTradeRight.add(0, data);
 					aaTradeRight.notifyDataSetChanged();
-					FetchPriceTask loadPrice = 
-							mTradeListHelper.new FetchPriceTask(data, 
-									aaTradeRight, priceSetting, TradeFragment.this, null);
-					TradeListHelpers.addTaskAndExecute(loadPrice);
+					//FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(data, aaTradeRight, priceSetting, TradeFragment.this, null);
+					loadPrice(data, aaTradeRight);
+					//TradeListHelpers.addTaskAndExecute(loadPrice);
 					namefield.setText("");
 					numberfield.setText("1");
 				}
@@ -417,17 +426,17 @@ public class TradeFragment extends FamiliarFragment {
 										// Update ALL the prices!
 										for (CardData data : lTradeLeft) {
 											data.message = "loading";
-											FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaTradeLeft, priceSetting,
-													TradeFragment.this, null);
-											TradeListHelpers.addTaskAndExecute(task);
+											loadPrice(data, aaTradeLeft);
+											//FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaTradeLeft, priceSetting, TradeFragment.this, null);
+											//TradeListHelpers.addTaskAndExecute(task);
 										}
 										aaTradeLeft.notifyDataSetChanged();
 		
 										for (CardData data : lTradeRight) {
 											data.message = "loading";
-											FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaTradeRight, priceSetting,
-													TradeFragment.this, null);
-											TradeListHelpers.addTaskAndExecute(task);
+											loadPrice(data, aaTradeRight);
+											//FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaTradeRight, priceSetting, TradeFragment.this, null);
+											//TradeListHelpers.addTaskAndExecute(task);
 										}
 										aaTradeRight.notifyDataSetChanged();
 		
@@ -642,15 +651,15 @@ public class TradeFragment extends FamiliarFragment {
 					CardData cd = mTradeListHelper.new CardData(cardName, tcgName, cardSet, numberOf, 0, "loading", null, '-');
 					if (side == CardDbAdapter.LEFT) {
 						lTradeLeft.add(cd);
-						FetchPriceTask loadPrice = 
-								mTradeListHelper.new FetchPriceTask(cd, aaTradeLeft, priceSetting, TradeFragment.this, null);
-						TradeListHelpers.addTaskAndExecute(loadPrice);
+						loadPrice(cd, aaTradeLeft);
+						//FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(cd, aaTradeLeft, priceSetting, TradeFragment.this, null);
+						//TradeListHelpers.addTaskAndExecute(loadPrice);
 					}
 					else if (side == CardDbAdapter.RIGHT) {
 						lTradeRight.add(cd);
-						FetchPriceTask loadPrice = 
-								mTradeListHelper.new FetchPriceTask(cd, aaTradeRight, priceSetting, TradeFragment.this, null);
-						TradeListHelpers.addTaskAndExecute(loadPrice);
+						loadPrice(cd, aaTradeRight);
+						//FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(cd, aaTradeRight, priceSetting, TradeFragment.this, null);
+						//TradeListHelpers.addTaskAndExecute(loadPrice);
 					}
 				}
 				catch (Exception e) {
@@ -697,20 +706,18 @@ public class TradeFragment extends FamiliarFragment {
 					lTradeLeft.get(_position).tcgName = (aSets[item]);
 					lTradeLeft.get(_position).message = ("loading");
 					aaTradeLeft.notifyDataSetChanged();
-					FetchPriceTask loadPrice 
-						= mTradeListHelper.new FetchPriceTask(lTradeLeft.get(_position), 
-								aaTradeLeft, priceSetting, TradeFragment.this, null);
-					TradeListHelpers.addTaskAndExecute(loadPrice);
+					loadPrice(lTradeLeft.get(_position), aaTradeRight);
+					//FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(lTradeLeft.get(_position), aaTradeLeft, priceSetting, TradeFragment.this, null);
+					//TradeListHelpers.addTaskAndExecute(loadPrice);
 				}
 				else if (_side.equals("right")) {
 					lTradeRight.get(_position).setCode = (aSetCodes[item]);
 					lTradeRight.get(_position).tcgName = (aSets[item]);
 					lTradeRight.get(_position).message = ("loading");
 					aaTradeRight.notifyDataSetChanged();
-					FetchPriceTask loadPrice 
-						= mTradeListHelper.new FetchPriceTask(lTradeRight.get(_position), 
-								aaTradeRight, priceSetting, TradeFragment.this, null);
-					TradeListHelpers.addTaskAndExecute(loadPrice);
+					loadPrice(lTradeRight.get(_position), aaTradeRight);
+					//FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(lTradeRight.get(_position), aaTradeRight, priceSetting, TradeFragment.this, null);
+					//TradeListHelpers.addTaskAndExecute(loadPrice);
 				}
 				return;
 			}
@@ -784,13 +791,6 @@ public class TradeFragment extends FamiliarFragment {
 					aaTradeRight.notifyDataSetChanged();
 					aaTradeLeft.notifyDataSetChanged();
 					Toast.makeText(this.getActivity(), data.name + ": " + database_busy, Toast.LENGTH_LONG).show();
-				}
-				else if (message.compareTo(card_dne) == 0) {
-					_trade.remove(data);
-					i--;
-					aaTradeRight.notifyDataSetChanged();
-					aaTradeLeft.notifyDataSetChanged();
-					Toast.makeText(this.getActivity(), data.name + ": " + card_dne, Toast.LENGTH_LONG).show();
 				}
 				else if (message.compareTo(fetch_failed) == 0) {
 
@@ -870,5 +870,44 @@ public class TradeFragment extends FamiliarFragment {
 			}
 			return v;
 		}
+	}
+	
+	private void loadPrice(final CardData data, final TradeListAdapter adapter) {
+		final FetchPriceTask loadPrice = new FetchPriceTask(mDbHelper, data, getMainActivity());
+		loadPrice.setOnFetchPriceCompleteListener(new onFetchPriceCompleteListener(){
+
+			@Override
+			public void onFetchPriceSuccess(TCGPlayerXMLHandler XMLhandler) {
+				switch(priceSetting) {
+					case LOW_PRICE:
+					{
+						data.price = (int) (Double.parseDouble(XMLhandler.lowprice) * 100);
+						break;
+					}
+					default:
+					case AVG_PRICE:
+					{
+						data.price = (int) (Double.parseDouble(XMLhandler.avgprice) * 100);
+						break;
+					}
+					case HIGH_PRICE:
+					{
+						data.price = (int) (Double.parseDouble(XMLhandler.highprice) * 100);
+						break;
+					}
+				}
+				data.message = null;
+				UpdateTotalPrices();
+				adapter.notifyDataSetChanged();
+				
+				TradeListHelpers.currentExecutingTasks.remove(loadPrice);
+				TradeListHelpers.executeIfAvailableSpace();
+			}
+
+			@Override
+			public void onFetchPriceFail(String error) {
+				data.message = error;
+			}});
+		TradeListHelpers.addTaskAndExecute(loadPrice);
 	}
 }

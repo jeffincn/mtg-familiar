@@ -36,14 +36,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -88,6 +80,8 @@ import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler;
+import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler.FetchPriceTask;
+import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler.onFetchPriceCompleteListener;
 import com.gelakinetic.mtgfam.helpers.WishlistHelpers;
 
 public class CardViewFragment extends FamiliarFragment {
@@ -135,9 +129,8 @@ public class CardViewFragment extends FamiliarFragment {
 	private BitmapDrawable						cardPicture;
 	private String[]									legalities;
 	private String[]									formats;
-	private TCGPlayerXMLHandler				XMLhandler;
 	public ArrayList<Ruling>					rulingsArrayList;
-	AsyncTask<String, Integer, Long>	asyncTask;
+	AsyncTask<Void, Void, Void>	asyncTask;
 
 	// Card info
 	private long											cardID;
@@ -154,6 +147,11 @@ public class CardViewFragment extends FamiliarFragment {
 	private boolean										scroll_results;
 	private View											myFragmentView;
 	private String cardLanguage;
+
+	private String lowprice;
+	private String avgprice;
+	private String hiprice;
+	private String TCGPlayerLink;
 
 //	@SuppressLint("NewApi")
 	@Override
@@ -361,7 +359,7 @@ public class CardViewFragment extends FamiliarFragment {
 			pt.setText("");
 		}
 
-		if (isTransformable(number, c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)))) {
+		if (CardDbAdapter.isTransformable(number, c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)))) {
 			transform.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					cardPicture = null;
@@ -427,7 +425,7 @@ public class CardViewFragment extends FamiliarFragment {
 
 			progDialog.show();
 			asyncTask = new FetchPictureTask();
-			asyncTask.execute((String[]) null);
+			asyncTask.execute((Void[]) null);
 		}
 		else {
 			((ImageView) myFragmentView.findViewById(R.id.cardpic)).setVisibility(View.GONE);
@@ -461,19 +459,10 @@ public class CardViewFragment extends FamiliarFragment {
 		c.close();
 	}
 
-	public static boolean isTransformable(String number, String setCode) {
-		if (number.contains("a") || number.contains("b")) {
-			if (setCode.compareTo("ISD") == 0 || setCode.compareTo("DKA") == 0) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private class FetchLegalityTask extends AsyncTask<String, Integer, Long> {
+	private class FetchLegalityTask extends AsyncTask<Void, Void, Void> {
 
 		@Override
-		protected Long doInBackground(String... params) {
+		protected Void doInBackground(Void... params) {
 
 			try {
 				Cursor cFormats = mDbHelper.fetchAllFormats();
@@ -510,7 +499,7 @@ public class CardViewFragment extends FamiliarFragment {
 		}
 
 		@Override
-		protected void onPostExecute(Long result) {
+		protected void onPostExecute(Void result) {
 			try {
 				progDialog.dismiss();
 			}
@@ -527,14 +516,14 @@ public class CardViewFragment extends FamiliarFragment {
 
 	}
 
-	private class FetchPictureTask extends AsyncTask<String, Integer, Long> {
+	private class FetchPictureTask extends AsyncTask<Void, Void, Void> {
 
 		private String	error;
 
 		@SuppressWarnings("deprecation") // getHeight() / getWidth() deprecated as of API13, in favor of getSize()
 
 		@Override
-		protected Long doInBackground(String... params) {
+		protected Void doInBackground(Void... params) {
 			error = null;
 			String lang = cardLanguage;
 
@@ -658,7 +647,7 @@ public class CardViewFragment extends FamiliarFragment {
 		}
 
 		@Override
-		protected void onPostExecute(Long result) {
+		protected void onPostExecute(Void result) {
 			try {
 				progDialog.dismiss();
 			}
@@ -707,113 +696,12 @@ public class CardViewFragment extends FamiliarFragment {
 		}
 	}
 
-	private class FetchPriceTask extends AsyncTask<String, Integer, Long> {
-
-		private String	error;
-
-		@Override
-		protected Long doInBackground(String... params) {
-			error = null;
-			URL priceurl;
-			try {
-				XMLhandler = null;
-
-				String tcgname = mDbHelper.getTCGname(setCode);
-				String tcgCardName;
-				if (isTransformable(number, setCode) && number.contains("b")) {
-					tcgCardName = mDbHelper.getTransformName(setCode, number.replace("b", "a"));
-				}
-				else if (mDbHelper.isSplitCard(multiverseId)) {
-					tcgCardName = mDbHelper.getSplitName(multiverseId);
-				}
-				else {
-					tcgCardName = cardName;
-				}
-				priceurl = new URL(CardDbAdapter.removeAccentMarks(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p="
-						+ tcgCardName).replace(" ", "%20").replace("Æ", "Ae")));
-
-				// Get a SAXParser from the SAXPArserFactory.
-				SAXParserFactory spf = SAXParserFactory.newInstance();
-				SAXParser sp = spf.newSAXParser();
-
-				// Get the XMLReader of the SAXParser we created.
-				XMLReader xr = sp.getXMLReader();
-				// Create a new ContentHandler and apply it to the XML-Reader
-				XMLhandler = new TCGPlayerXMLHandler();
-				xr.setContentHandler(XMLhandler);
-
-				// Parse the xml-data from our URL.
-				xr.parse(new InputSource(priceurl.openStream()));
-				// Parsing has finished.
-			}
-			catch (FileNotFoundException e) {
-				// internet works, price not found
-				error = "Card Price Not Found";
-			}
-			catch (ConnectException e) {
-				// no internet
-				error = "No Internet Connection";
-			}
-			catch (MalformedURLException e) {
-				error = "MalformedURLException";
-				XMLhandler = null;
-			}
-			catch (IOException e) {
-				error = "No Internet Connection";
-				XMLhandler = null;
-			}
-			catch (SAXException e) {
-				error = "SAXException";
-				XMLhandler = null;
-			}
-			catch (ParserConfigurationException e) {
-				error = "ParserConfigurationException";
-				XMLhandler = null;
-			} catch (FamiliarDbException e) {
-				error = "FamiliarDbException";
-				XMLhandler = null;
-			}
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Long result) {
-			try {
-				progDialog.dismiss();
-			}
-			catch (IllegalArgumentException e) {
-			}
-
-			if (XMLhandler != null && XMLhandler.hiprice == null && error == null) {
-				Toast.makeText(getMainActivity(), "Card Price Not Found", Toast.LENGTH_SHORT).show();
-				return;
-			}
-			if (error == null) {
-				removeDialog();
-				showDialog(GETPRICE);
-			}
-			else {
-				if(error.equals("FamiliarDbException")) {
-					getMainActivity().showDbErrorToast();
-					getMainActivity().getSupportFragmentManager().popBackStack();
-					return;
-				}
-				Toast.makeText(getMainActivity(), error, Toast.LENGTH_SHORT).show();
-			}
-		}
-
-		@Override
-		protected void onCancelled() {
-			// TODO something when canceled?
-		}
-	}
-
-	private class FetchRulingsTask extends AsyncTask<String, Integer, Long> {
+	private class FetchRulingsTask extends AsyncTask<Void, Void, Void> {
 
 		private boolean	error	= false;
 
 		@Override
-		protected Long doInBackground(String... params) {
+		protected Void doInBackground(Void... params) {
 
 			URL url;
 			InputStream is = null;
@@ -860,7 +748,7 @@ public class CardViewFragment extends FamiliarFragment {
 		}
 
 		@Override
-		protected void onPostExecute(Long result) {
+		protected void onPostExecute(Void result) {
 			try {
 				progDialog.dismiss();
 			}
@@ -977,11 +865,6 @@ public class CardViewFragment extends FamiliarFragment {
 					}
 					case GETPRICE: { // price
 
-						if (XMLhandler == null) {
-							setShowsDialog(false);
-							return null;
-						}
-
 						Dialog dialog = new Dialog(this.getMainActivity());
 						dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
@@ -992,11 +875,11 @@ public class CardViewFragment extends FamiliarFragment {
 						TextView h = (TextView) dialog.findViewById(R.id.high);
 						TextView pricelink = (TextView) dialog.findViewById(R.id.pricelink);
 
-						l.setText("$" + XMLhandler.lowprice);
-						m.setText("$" + XMLhandler.avgprice);
-						h.setText("$" + XMLhandler.hiprice);
+						l.setText("$" + lowprice);
+						m.setText("$" + avgprice);
+						h.setText("$" + hiprice);
 						pricelink.setMovementMethod(LinkMovementMethod.getInstance());
-						pricelink.setText(ImageGetterHelper.jellyBeanHack("<a href=\"" + XMLhandler.link + "\">"
+						pricelink.setText(ImageGetterHelper.jellyBeanHack("<a href=\"" + TCGPlayerLink + "\">"
 								+ getString(R.string.card_view_price_dialog_link) + "</a>"));
 						return dialog;
 					}
@@ -1155,12 +1038,31 @@ public class CardViewFragment extends FamiliarFragment {
 			case R.id.image:
 				progDialog.show();
 				asyncTask = new FetchPictureTask();
-				asyncTask.execute((String[]) null);
+				asyncTask.execute((Void[]) null);
 				return true;
 			case R.id.price:
 				progDialog.show();
-				asyncTask = new FetchPriceTask();
-				asyncTask.execute((String[]) null);
+				asyncTask = new FetchPriceTask(mDbHelper, cardName, setCode, number, multiverseId, this.getMainActivity());
+				((FetchPriceTask)asyncTask).setOnFetchPriceCompleteListener(new onFetchPriceCompleteListener(){
+
+					@Override
+					public void onFetchPriceSuccess( TCGPlayerXMLHandler XMLhandler) {
+						progDialog.dismiss();
+						
+						lowprice = XMLhandler.lowprice;
+						avgprice = XMLhandler.avgprice;
+						hiprice = XMLhandler.highprice;
+						TCGPlayerLink = XMLhandler.link;
+
+						showDialog(GETPRICE);
+					}
+
+					@Override
+					public void onFetchPriceFail(String error) {
+						progDialog.dismiss();
+					}});
+				
+				asyncTask.execute((Void[]) null);
 				return true;
 			case R.id.changeset:
 				showDialog(CHANGESET);
@@ -1168,12 +1070,12 @@ public class CardViewFragment extends FamiliarFragment {
 			case R.id.legality:
 				progDialog.show();
 				asyncTask = new FetchLegalityTask();
-				asyncTask.execute((String[]) null);
+				asyncTask.execute((Void[]) null);
 				return true;
 			case R.id.cardrulings:
 				progDialog.show();
 				asyncTask = new FetchRulingsTask();
-				asyncTask.execute((String[]) null);
+				asyncTask.execute((Void[]) null);
 				return true;
 			case R.id.addtowishlist:
 				showDialog(WISHLIST_COUNTS);

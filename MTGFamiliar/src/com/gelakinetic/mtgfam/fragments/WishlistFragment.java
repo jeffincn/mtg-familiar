@@ -24,8 +24,8 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
-import android.widget.ImageButton;
 import android.widget.ExpandableListView.OnChildClickListener;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,9 +38,11 @@ import com.gelakinetic.mtgfam.helpers.AutocompleteCursorAdapter;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
+import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler;
+import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler.FetchPriceTask;
+import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler.onFetchPriceCompleteListener;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
-import com.gelakinetic.mtgfam.helpers.TradeListHelpers.FetchPriceTask;
 import com.gelakinetic.mtgfam.helpers.WishlistHelpers;
 
 public class WishlistFragment extends FamiliarFragment {
@@ -73,11 +75,15 @@ public class WishlistFragment extends FamiliarFragment {
 	public static final String										card_not_found				= "Card Not Found";
 	public static final String										mangled_url						= "Mangled URL";
 	public static final String										database_busy					= "Database Busy";
-	public static final String										card_dne							= "Card Does Not Exist";
 	public static final String										fetch_failed					= "Fetch Failed";
 
 	private boolean																doneLoading						= false;
 
+	private static final int	LOW_PRICE	= 0;
+	private static final int	AVG_PRICE	= 1;
+	private static final int	HIGH_PRICE	= 2;
+
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -334,8 +340,9 @@ public class WishlistFragment extends FamiliarFragment {
 		}
 
 		if (showTotalPrice || showIndividualPrices) {
-			FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(card, aaExpWishlist, priceSetting, null, WishlistFragment.this);
-			TradeListHelpers.addTaskAndExecute(loadPrice);
+			//FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(card, aaExpWishlist, priceSetting, null, WishlistFragment.this);
+			//TradeListHelpers.addTaskAndExecute(loadPrice);
+			loadPrice(card, aaExpWishlist);
 		}
 	}
 
@@ -417,12 +424,6 @@ public class WishlistFragment extends FamiliarFragment {
 						i--;
 						aaExpWishlist.notifyDataSetChanged();
 						Toast.makeText(getActivity(), data.name + ": " + database_busy, Toast.LENGTH_LONG).show();
-					}
-					else if (message.compareTo(card_dne) == 0) {
-						cardlist.remove(data);
-						i--;
-						aaExpWishlist.notifyDataSetChanged();
-						Toast.makeText(getActivity(), data.name + ": " + card_dne, Toast.LENGTH_LONG).show();
 					}
 					else if (message.compareTo(fetch_failed) == 0) {
 
@@ -831,8 +832,9 @@ public class WishlistFragment extends FamiliarFragment {
 										if (showTotalPrice || showIndividualPrices) {
 											cd = TradeListHelpers.FetchCardData(cd, mDbHelper);
 											cd.message = ("loading");
-											FetchPriceTask task = mTradeListHelper.new FetchPriceTask(cd, aaExpWishlist, priceSetting, null, WishlistFragment.this);
-											TradeListHelpers.addTaskAndExecute(task);
+											//FetchPriceTask task = mTradeListHelper.new FetchPriceTask(cd, aaExpWishlist, priceSetting, null, WishlistFragment.this);
+											//TradeListHelpers.addTaskAndExecute(task);
+											loadPrice(cd, aaExpWishlist);
 										}
 										else
 											cd = TradeListHelpers.FetchCardData(cd, mDbHelper);
@@ -909,9 +911,9 @@ public class WishlistFragment extends FamiliarFragment {
 													for (CardData data : cardSetWishlists.get(i)) {
 														if (data.numberOf > 0) {
 															data.message = ("loading");
-															FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaExpWishlist,
-																	priceSetting, null, WishlistFragment.this);
-															TradeListHelpers.addTaskAndExecute(task);
+															//FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaExpWishlist, priceSetting, null, WishlistFragment.this);
+															//TradeListHelpers.addTaskAndExecute(task);
+															loadPrice(data, aaExpWishlist);
 														}
 													}
 												}
@@ -1004,5 +1006,52 @@ public class WishlistFragment extends FamiliarFragment {
 			}
 		};
 		newFragment.show(ft, DIALOG_TAG);
+	}
+
+	private void loadPrice(final CardData data, final WishlistAdapter adapter) {
+		final FetchPriceTask loadPrice = new FetchPriceTask(mDbHelper, data, getMainActivity());
+		loadPrice.setOnFetchPriceCompleteListener(new onFetchPriceCompleteListener(){
+
+			@Override
+			public void onFetchPriceSuccess(TCGPlayerXMLHandler XMLhandler) {
+
+				switch(priceSetting) {
+					case LOW_PRICE:
+					{
+						data.price = (int) (Double.parseDouble(XMLhandler.lowprice) * 100);
+						break;
+					}
+					default:
+					case AVG_PRICE:
+					{
+						data.price = (int) (Double.parseDouble(XMLhandler.avgprice) * 100);
+						break;
+					}
+					case HIGH_PRICE:
+					{
+						data.price = (int) (Double.parseDouble(XMLhandler.highprice) * 100);
+						break;
+					}
+				}
+				data.message = null;
+				
+				UpdateTotalPrices();
+				adapter.notifyDataSetChanged();
+				
+				TradeListHelpers.currentExecutingTasks.remove(loadPrice);
+				TradeListHelpers.executeIfAvailableSpace();
+			}
+
+			@Override
+			public void onFetchPriceFail(String error) {
+				data.message = error;
+				
+				UpdateTotalPrices();
+				adapter.notifyDataSetChanged();
+				
+				TradeListHelpers.currentExecutingTasks.remove(loadPrice);
+				TradeListHelpers.executeIfAvailableSpace();
+			}});
+		TradeListHelpers.addTaskAndExecute(loadPrice);
 	}
 }

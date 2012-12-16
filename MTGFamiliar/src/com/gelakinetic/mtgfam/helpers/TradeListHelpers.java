@@ -1,30 +1,14 @@
 package com.gelakinetic.mtgfam.helpers;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.os.AsyncTask;
-import android.widget.ArrayAdapter;
-import android.widget.BaseExpandableListAdapter;
 
-import com.gelakinetic.mtgfam.fragments.CardViewFragment;
-import com.gelakinetic.mtgfam.fragments.TradeFragment;
-import com.gelakinetic.mtgfam.fragments.WishlistFragment;
+import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler.FetchPriceTask;
 
 public class TradeListHelpers {
 
@@ -34,11 +18,6 @@ public class TradeListHelpers {
 	public static final String	fetch_failed			= "Fetch Failed";
 	public static final String	familiarDbException		= "FamiliarDbException";
 	
-
-	private static final int		LOW_PRICE					= 0;
-	// private static final int AVG_PRICE = 1;
-	private static final int		HIGH_PRICE				= 2;
-
 	public static CardData FetchCardData(CardData _data, CardDbAdapter mDbHelper) throws FamiliarDbException {
 		CardData data = _data;
 		try {
@@ -119,163 +98,163 @@ public class TradeListHelpers {
 		}
 	}
 	
-	public class FetchPriceTask extends AsyncTask<Void, Void, Void> {
-		CardData										data;
-		Object											toNotify;
-		String											price	= "";
-		Context											mCtx;
-		private int									priceSetting;
-		private WishlistFragment		wf;
-		private TradeFragment	cta;
-
-		public FetchPriceTask(CardData _data, Object _toNotify, int ps, TradeFragment cta, WishlistFragment wf) {
-			data = _data;
-			toNotify = _toNotify;
-			if (wf != null) {
-				mCtx = wf.getActivity();
-			}
-			if (cta != null) {
-				mCtx = (Context) cta.getActivity();
-			}
-			priceSetting = ps;
-			this.cta = cta;
-			this.wf = wf;
-		}
-    
-		@Override
-		protected Void doInBackground(Void... params) {
-			URL priceurl = null;
-
-			try {
-				String cardName = data.name;
-				String cardNumber = data.cardNumber == null ? "" : data.cardNumber;
-				String setCode = data.setCode == null ? "" : data.setCode;
-				String tcgName = data.tcgName == null ? "" : data.tcgName;
-				
-				if (cardNumber == "" || setCode == "" || tcgName == "") {
-					if(wf != null) {
-						data = FetchCardData(data, wf.mDbHelper);
-					}
-					else if (cta != null) {
-						data = FetchCardData(data, cta.mDbHelper);
-					}
-					if (data.message == card_not_found || data.message == database_busy) {
-						price = data.message;
-						return null;
-					}
-				}
-
-				if (cardNumber.contains("b") && CardViewFragment.isTransformable(cardNumber, data.setCode)) {
-					CardDbAdapter mDbHelper = new CardDbAdapter(mCtx);
-					priceurl = new URL(CardDbAdapter.removeAccentMarks(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p="
-							+ mDbHelper.getTransformName(setCode, cardNumber.replace("b", "a"))).replace(" ", "%20").replace("Æ", "Ae")));
-					mDbHelper.close();
-				}
-				else {
-					priceurl = new URL(CardDbAdapter.removeAccentMarks(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p=" + cardName).replace(" ", "%20")
-							.replace("Æ", "Ae")));
-				}
-			}
-			catch (MalformedURLException e) {
-				priceurl = null;
-				price = mangled_url;
-				return null;
-			} catch (FamiliarDbException e) {
-				priceurl = null;
-				price = familiarDbException;
-				return null;
-			}
-
-			price = fetchPrice(priceurl);
-
-			if (price.equals(fetch_failed)) {
-				return null;
-			}
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void result) {
-			double dPrice;
-			try {
-				dPrice = Double.parseDouble(price);
-				data.message = "";
-			}
-			catch (NumberFormatException e) {
-				// If this fails, it means price contains an error string, not a number
-				dPrice = 0;
-				data.message = price;
-			}
-			data.price = (int) (dPrice * 100);
-
-			if (wf != null) {
-				wf.UpdateTotalPrices();
-			}
-			else if (cta != null) {
-				cta.UpdateTotalPrices();
-			}
-			try {
-				if (toNotify instanceof ArrayAdapter<?>)
-					((ArrayAdapter<?>) toNotify).notifyDataSetChanged();
-				else
-					((BaseExpandableListAdapter) toNotify).notifyDataSetChanged();
-			}
-			catch (Exception e) {
-			}
-			
-			if(!this.isCancelled()){
-				// execute the next task
-				executeIfAvailableSpace();
-			}
-			currentExecutingTasks.remove(this);
-		}
-
-		String fetchPrice(URL _priceURL) {
-			TCGPlayerXMLHandler XMLhandler;
-			try {
-				// Get a SAXParser from the SAXPArserFactory.
-				SAXParserFactory spf = SAXParserFactory.newInstance();
-				SAXParser sp = spf.newSAXParser();
-
-				// Get the XMLReader of the SAXParser we created.
-				XMLReader xr = sp.getXMLReader();
-				// Create a new ContentHandler and apply it to the XML-Reader
-				XMLhandler = new TCGPlayerXMLHandler();
-				xr.setContentHandler(XMLhandler);
-
-				// Parse the xml-data from our URL.
-				xr.parse(new InputSource(_priceURL.openStream()));
-				// Parsing has finished.
-			}
-			catch (MalformedURLException e) {
-				XMLhandler = null;
-			}
-			catch (IOException e) {
-				XMLhandler = null;
-			}
-			catch (SAXException e) {
-				XMLhandler = null;
-			}
-			catch (ParserConfigurationException e) {
-				XMLhandler = null;
-			}
-
-			if (XMLhandler == null || XMLhandler.link == null) {
-				return fetch_failed;
-			}
-			else {
-				if (priceSetting == LOW_PRICE) {
-					return XMLhandler.lowprice;
-				}
-				else if (priceSetting == HIGH_PRICE) {
-					return XMLhandler.hiprice;
-				}
-				else {
-					return XMLhandler.avgprice;
-				}
-			}
-		}
-	}
+//	public class FetchPriceTask extends AsyncTask<Void, Void, Void> {
+//		CardData										data;
+//		Object											toNotify;
+//		String											price	= "";
+//		Context											mCtx;
+//		private int									priceSetting;
+//		private WishlistFragment		wf;
+//		private TradeFragment	cta;
+//
+//		public FetchPriceTask(CardData _data, Object _toNotify, int ps, TradeFragment cta, WishlistFragment wf) {
+//			data = _data;
+//			toNotify = _toNotify;
+//			if (wf != null) {
+//				mCtx = wf.getActivity();
+//			}
+//			if (cta != null) {
+//				mCtx = (Context) cta.getActivity();
+//			}
+//			priceSetting = ps;
+//			this.cta = cta;
+//			this.wf = wf;
+//		}
+//    
+//		@Override
+//		protected Void doInBackground(Void... params) {
+//			URL priceurl = null;
+//
+//			try {
+//				String cardName = data.name;
+//				String cardNumber = data.cardNumber == null ? "" : data.cardNumber;
+//				String setCode = data.setCode == null ? "" : data.setCode;
+//				String tcgName = data.tcgName == null ? "" : data.tcgName;
+//				
+//				if (cardNumber == "" || setCode == "" || tcgName == "") {
+//					if(wf != null) {
+//						data = FetchCardData(data, wf.mDbHelper);
+//					}
+//					else if (cta != null) {
+//						data = FetchCardData(data, cta.mDbHelper);
+//					}
+//					if (data.message == card_not_found || data.message == database_busy) {
+//						price = data.message;
+//						return null;
+//					}
+//				}
+//
+//				if (cardNumber.contains("b") && CardDbAdapter.isTransformable(cardNumber, data.setCode)) {
+//					CardDbAdapter mDbHelper = new CardDbAdapter(mCtx);
+//					priceurl = new URL(CardDbAdapter.removeAccentMarks(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p="
+//							+ mDbHelper.getTransformName(setCode, cardNumber.replace("b", "a"))).replace(" ", "%20").replace("Æ", "Ae")));
+//					mDbHelper.close();
+//				}
+//				else {
+//					priceurl = new URL(CardDbAdapter.removeAccentMarks(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgName + "&p=" + cardName).replace(" ", "%20")
+//							.replace("Æ", "Ae")));
+//				}
+//			}
+//			catch (MalformedURLException e) {
+//				priceurl = null;
+//				price = mangled_url;
+//				return null;
+//			} catch (FamiliarDbException e) {
+//				priceurl = null;
+//				price = familiarDbException;
+//				return null;
+//			}
+//
+//			price = fetchPrice(priceurl);
+//
+//			if (price.equals(fetch_failed)) {
+//				return null;
+//			}
+//			return null;
+//		}
+//
+//		@Override
+//		protected void onPostExecute(Void result) {
+//			double dPrice;
+//			try {
+//				dPrice = Double.parseDouble(price);
+//				data.message = "";
+//			}
+//			catch (NumberFormatException e) {
+//				// If this fails, it means price contains an error string, not a number
+//				dPrice = 0;
+//				data.message = price;
+//			}
+//			data.price = (int) (dPrice * 100);
+//
+//			if (wf != null) {
+//				wf.UpdateTotalPrices();
+//			}
+//			else if (cta != null) {
+//				cta.UpdateTotalPrices();
+//			}
+//			try {
+//				if (toNotify instanceof ArrayAdapter<?>)
+//					((ArrayAdapter<?>) toNotify).notifyDataSetChanged();
+//				else
+//					((BaseExpandableListAdapter) toNotify).notifyDataSetChanged();
+//			}
+//			catch (Exception e) {
+//			}
+//			
+//			if(!this.isCancelled()){
+//				// execute the next task
+//				executeIfAvailableSpace();
+//			}
+//			currentExecutingTasks.remove(this);
+//		}
+//
+//		String fetchPrice(URL _priceURL) {
+//			TCGPlayerXMLHandler XMLhandler;
+//			try {
+//				// Get a SAXParser from the SAXPArserFactory.
+//				SAXParserFactory spf = SAXParserFactory.newInstance();
+//				SAXParser sp = spf.newSAXParser();
+//
+//				// Get the XMLReader of the SAXParser we created.
+//				XMLReader xr = sp.getXMLReader();
+//				// Create a new ContentHandler and apply it to the XML-Reader
+//				XMLhandler = new TCGPlayerXMLHandler();
+//				xr.setContentHandler(XMLhandler);
+//
+//				// Parse the xml-data from our URL.
+//				xr.parse(new InputSource(_priceURL.openStream()));
+//				// Parsing has finished.
+//			}
+//			catch (MalformedURLException e) {
+//				XMLhandler = null;
+//			}
+//			catch (IOException e) {
+//				XMLhandler = null;
+//			}
+//			catch (SAXException e) {
+//				XMLhandler = null;
+//			}
+//			catch (ParserConfigurationException e) {
+//				XMLhandler = null;
+//			}
+//
+//			if (XMLhandler == null || XMLhandler.link == null) {
+//				return fetch_failed;
+//			}
+//			else {
+//				if (priceSetting == LOW_PRICE) {
+//					return XMLhandler.lowprice;
+//				}
+//				else if (priceSetting == HIGH_PRICE) {
+//					return XMLhandler.hiprice;
+//				}
+//				else {
+//					return XMLhandler.avgprice;
+//				}
+//			}
+//		}
+//	}
 
 	public class CardData implements Cloneable {
 

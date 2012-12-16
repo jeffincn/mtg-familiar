@@ -40,6 +40,7 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import com.gelakinetic.mtgfam.activities.MainActivity;
+import com.gelakinetic.mtgfam.helpers.CardDbAdapter.priceInfo;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
 
 public class TCGPlayerXMLHandler extends DefaultHandler {
@@ -167,7 +168,6 @@ public class TCGPlayerXMLHandler extends DefaultHandler {
 		private CardDbAdapter mDbHelper;
 		private String setCode;
 		private String number;
-		private int rarity = 0;
 		private int multiverseId;
 		private String cardName;
 		private onFetchPriceCompleteListener listener;
@@ -209,37 +209,53 @@ public class TCGPlayerXMLHandler extends DefaultHandler {
 				if(number == null) {
 					Cursor c = mDbHelper.fetchCardByNameAndSet(cardName, setCode);
 					number = c.getString(c.getColumnIndex(CardDbAdapter.KEY_NUMBER));
-					rarity = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY));
 					c.close();
 				}
 				
-				String tcgname = mDbHelper.getTCGname(setCode);
-				String tcgCardName;
-				if (CardDbAdapter.isTransformable(number, setCode) && number.contains("b")) {
-					tcgCardName = mDbHelper.getTransformName(setCode, number.replace("b", "a"));
-				}
-				else if (multiverseId!= -1 && mDbHelper.isSplitCard(multiverseId)) {
-					tcgCardName = mDbHelper.getSplitName(multiverseId);
+				priceInfo prices = mDbHelper.getCachedPrice(cardName, setCode);
+				if(prices != null) {
+					XMLhandler = new TCGPlayerXMLHandler();
+					XMLhandler.lowprice = String.format("%.2f", prices.price_low / 100.0);
+					XMLhandler.avgprice = String.format("%.2f", prices.price_avg / 100.0);
+					XMLhandler.highprice = String.format("%.2f", prices.price_high / 100.0);
+					XMLhandler.link = prices.url;
 				}
 				else {
-					tcgCardName = cardName;
+				
+					String tcgname = mDbHelper.getTCGname(setCode);
+					String tcgCardName;
+					if (CardDbAdapter.isTransformable(number, setCode) && number.contains("b")) {
+						tcgCardName = mDbHelper.getTransformName(setCode, number.replace("b", "a"));
+					}
+					else if (multiverseId!= -1 && mDbHelper.isSplitCard(multiverseId)) {
+						tcgCardName = mDbHelper.getSplitName(multiverseId);
+					}
+					else {
+						tcgCardName = cardName;
+					}
+					priceurl = new URL(CardDbAdapter.removeAccentMarks(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p="
+							+ tcgCardName).replace(" ", "%20").replace("Æ", "Ae")));
+	
+					// Get a SAXParser from the SAXPArserFactory.
+					SAXParserFactory spf = SAXParserFactory.newInstance();
+					SAXParser sp = spf.newSAXParser();
+	
+					// Get the XMLReader of the SAXParser we created.
+					XMLReader xr = sp.getXMLReader();
+					// Create a new ContentHandler and apply it to the XML-Reader
+					XMLhandler = new TCGPlayerXMLHandler();
+					xr.setContentHandler(XMLhandler);
+	
+					// Parse the xml-data from our URL.
+					xr.parse(new InputSource(priceurl.openStream()));
+					// Parsing has finished.
+					
+					mDbHelper.setCachedPrice(cardName, setCode,
+							(int) (Double.parseDouble(XMLhandler.lowprice) * 100),
+							(int) (Double.parseDouble(XMLhandler.avgprice) * 100),
+							(int) (Double.parseDouble(XMLhandler.highprice) * 100),
+							XMLhandler.link);
 				}
-				priceurl = new URL(CardDbAdapter.removeAccentMarks(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p="
-						+ tcgCardName).replace(" ", "%20").replace("Æ", "Ae")));
-
-				// Get a SAXParser from the SAXPArserFactory.
-				SAXParserFactory spf = SAXParserFactory.newInstance();
-				SAXParser sp = spf.newSAXParser();
-
-				// Get the XMLReader of the SAXParser we created.
-				XMLReader xr = sp.getXMLReader();
-				// Create a new ContentHandler and apply it to the XML-Reader
-				XMLhandler = new TCGPlayerXMLHandler();
-				xr.setContentHandler(XMLhandler);
-
-				// Parse the xml-data from our URL.
-				xr.parse(new InputSource(priceurl.openStream()));
-				// Parsing has finished.
 			}
 			catch (FileNotFoundException e) {
 				// internet works, price not found

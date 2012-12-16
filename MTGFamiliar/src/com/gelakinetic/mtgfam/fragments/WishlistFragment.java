@@ -340,8 +340,6 @@ public class WishlistFragment extends FamiliarFragment {
 		}
 
 		if (showTotalPrice || showIndividualPrices) {
-			//FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(card, aaExpWishlist, priceSetting, null, WishlistFragment.this);
-			//TradeListHelpers.addTaskAndExecute(loadPrice);
 			loadPrice(card, aaExpWishlist);
 		}
 	}
@@ -832,8 +830,6 @@ public class WishlistFragment extends FamiliarFragment {
 										if (showTotalPrice || showIndividualPrices) {
 											cd = TradeListHelpers.FetchCardData(cd, mDbHelper);
 											cd.message = ("loading");
-											//FetchPriceTask task = mTradeListHelper.new FetchPriceTask(cd, aaExpWishlist, priceSetting, null, WishlistFragment.this);
-											//TradeListHelpers.addTaskAndExecute(task);
 											loadPrice(cd, aaExpWishlist);
 										}
 										else
@@ -911,8 +907,6 @@ public class WishlistFragment extends FamiliarFragment {
 													for (CardData data : cardSetWishlists.get(i)) {
 														if (data.numberOf > 0) {
 															data.message = ("loading");
-															//FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaExpWishlist, priceSetting, null, WishlistFragment.this);
-															//TradeListHelpers.addTaskAndExecute(task);
 															loadPrice(data, aaExpWishlist);
 														}
 													}

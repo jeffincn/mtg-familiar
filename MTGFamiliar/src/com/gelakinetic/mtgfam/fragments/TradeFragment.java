@@ -170,7 +170,6 @@ public class TradeFragment extends FamiliarFragment {
 					lTradeLeft.add(0, data);
 					aaTradeLeft.notifyDataSetChanged();
 					
-					//FetchPriceTask loadPrice = new FetchPriceTask(data, aaTradeLeft, priceSetting, TradeFragment.this, null);
 					loadPrice(data, aaTradeLeft);
 					
 					namefield.setText("");
@@ -214,9 +213,7 @@ public class TradeFragment extends FamiliarFragment {
 
 					lTradeRight.add(0, data);
 					aaTradeRight.notifyDataSetChanged();
-					//FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(data, aaTradeRight, priceSetting, TradeFragment.this, null);
 					loadPrice(data, aaTradeRight);
-					//TradeListHelpers.addTaskAndExecute(loadPrice);
 					namefield.setText("");
 					numberfield.setText("1");
 				}
@@ -427,16 +424,12 @@ public class TradeFragment extends FamiliarFragment {
 										for (CardData data : lTradeLeft) {
 											data.message = "loading";
 											loadPrice(data, aaTradeLeft);
-											//FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaTradeLeft, priceSetting, TradeFragment.this, null);
-											//TradeListHelpers.addTaskAndExecute(task);
 										}
 										aaTradeLeft.notifyDataSetChanged();
 		
 										for (CardData data : lTradeRight) {
 											data.message = "loading";
 											loadPrice(data, aaTradeRight);
-											//FetchPriceTask task = mTradeListHelper.new FetchPriceTask(data, aaTradeRight, priceSetting, TradeFragment.this, null);
-											//TradeListHelpers.addTaskAndExecute(task);
 										}
 										aaTradeRight.notifyDataSetChanged();
 		
@@ -652,14 +645,10 @@ public class TradeFragment extends FamiliarFragment {
 					if (side == CardDbAdapter.LEFT) {
 						lTradeLeft.add(cd);
 						loadPrice(cd, aaTradeLeft);
-						//FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(cd, aaTradeLeft, priceSetting, TradeFragment.this, null);
-						//TradeListHelpers.addTaskAndExecute(loadPrice);
 					}
 					else if (side == CardDbAdapter.RIGHT) {
 						lTradeRight.add(cd);
 						loadPrice(cd, aaTradeRight);
-						//FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(cd, aaTradeRight, priceSetting, TradeFragment.this, null);
-						//TradeListHelpers.addTaskAndExecute(loadPrice);
 					}
 				}
 				catch (Exception e) {
@@ -707,8 +696,6 @@ public class TradeFragment extends FamiliarFragment {
 					lTradeLeft.get(_position).message = ("loading");
 					aaTradeLeft.notifyDataSetChanged();
 					loadPrice(lTradeLeft.get(_position), aaTradeRight);
-					//FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(lTradeLeft.get(_position), aaTradeLeft, priceSetting, TradeFragment.this, null);
-					//TradeListHelpers.addTaskAndExecute(loadPrice);
 				}
 				else if (_side.equals("right")) {
 					lTradeRight.get(_position).setCode = (aSetCodes[item]);
@@ -716,8 +703,6 @@ public class TradeFragment extends FamiliarFragment {
 					lTradeRight.get(_position).message = ("loading");
 					aaTradeRight.notifyDataSetChanged();
 					loadPrice(lTradeRight.get(_position), aaTradeRight);
-					//FetchPriceTask loadPrice = mTradeListHelper.new FetchPriceTask(lTradeRight.get(_position), aaTradeRight, priceSetting, TradeFragment.this, null);
-					//TradeListHelpers.addTaskAndExecute(loadPrice);
 				}
 				return;
 			}

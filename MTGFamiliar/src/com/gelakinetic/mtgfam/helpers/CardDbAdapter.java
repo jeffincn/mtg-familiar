@@ -68,7 +68,7 @@ public class CardDbAdapter {
 	private static final String DATABASE_TABLE_RULES = "rules";
 	private static final String DATABASE_TABLE_GLOSSARY = "glossary";
 
-	public static final int DATABASE_VERSION = 29;
+	public static final int DATABASE_VERSION = 30;
 
 	public static final String KEY_ID = "_id";
 	public static final String KEY_NAME = SearchManager.SUGGEST_COLUMN_TEXT_1; // "name";
@@ -87,6 +87,11 @@ public class CardDbAdapter {
 	public static final String KEY_NUMBER = "number";
 	public static final String KEY_MULTIVERSEID = "multiverseID";
 	public static final String KEY_RULINGS = "rulings";
+	public static final String KEY_PRICE_LOW = "price_low";
+	public static final String KEY_PRICE_AVG = "price_avg";
+	public static final String KEY_PRICE_HIGH = "price_high";
+	public static final String KEY_PRICE_TIMESTAMP = "price_timestamp";
+	public static final String KEY_PRICE_URL = "price_url";
 
 	public static final String KEY_CODE = "code";
 	public static final String KEY_CODE_MTGI = "code_mtgi";
@@ -128,7 +133,9 @@ public class CardDbAdapter {
 			+ " integer, " + KEY_ABILITY + " text, " + KEY_FLAVOR + " text, "
 			+ KEY_ARTIST + " text, " + KEY_NUMBER + " text, "
 			+ KEY_MULTIVERSEID + " integer not null, " + KEY_COLOR
-			+ " text not null, " + KEY_RULINGS + " text);";
+			+ " text not null, " + KEY_RULINGS + " text, " + KEY_PRICE_LOW
+			+ " integer, " + KEY_PRICE_AVG +" integer, " + KEY_PRICE_HIGH
+			+ " integer, " + KEY_PRICE_TIMESTAMP +" integer, " + KEY_PRICE_URL + " text);";
 
 	private static final String DATABASE_CREATE_SETS = "create table "
 			+ DATABASE_TABLE_SETS + "(" + KEY_ID
@@ -1814,4 +1821,85 @@ public class CardDbAdapter {
 		return -1;
 	}
 
+	public static class priceInfo {
+		int price_low;
+		int price_avg;
+		int price_high;
+		String url;
+		
+		public priceInfo(int low, int avg, int high, String url) {
+			this.price_low = low;
+			this.price_avg = avg;
+			this.price_high = high;
+			this.url = url;
+		}
+	}
+	/**
+	 * Returns the cached prices if they are recent enough, or null if they are not
+	 * 
+	 * @param cardName the name of the car
+	 * @param setCode the set the card exists in
+	 * @return an array of low/avg/high prices, or null
+	 * @throws FamiliarDbException
+	 */
+	public priceInfo getCachedPrice(String cardName, String setCode) throws FamiliarDbException {
+		
+		cardName = cardName.replace("'", "''").replace("æ", "Æ");
+		String sql = "SELECT "
+				+ DATABASE_TABLE_CARDS + "." + KEY_PRICE_LOW + ", "
+				+ DATABASE_TABLE_CARDS + "." + KEY_PRICE_AVG + ", "
+				+ DATABASE_TABLE_CARDS + "." + KEY_PRICE_HIGH + ", "
+				+ DATABASE_TABLE_CARDS + "." + KEY_PRICE_URL + ", "
+				+ DATABASE_TABLE_CARDS + "." + KEY_PRICE_TIMESTAMP
+				+ " FROM " + DATABASE_TABLE_CARDS +	" WHERE "
+				+ DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + cardName + "' AND "
+				+ DATABASE_TABLE_CARDS + "." + KEY_SET + " = '" + setCode + "'";
+		Cursor mCursor = null;
+
+		try {
+			mCursor = mDb.rawQuery(sql, null);
+			if (mCursor != null) {
+				mCursor.moveToFirst();
+			}
+			else {
+				return null;
+			}
+			if(mCursor.isNull(mCursor.getColumnIndex(KEY_PRICE_TIMESTAMP))) {
+				// a price has never been committed here
+				return null;
+			}
+			else {
+				long timestamp = mCursor.getLong(mCursor.getColumnIndex(KEY_PRICE_TIMESTAMP));
+				// if the timestamp is less than a day old
+				if (System.currentTimeMillis() - timestamp < 24 * 60 * 60 * 1000) {
+					return new priceInfo(
+							mCursor.getInt(mCursor.getColumnIndex(KEY_PRICE_LOW)),
+							mCursor.getInt(mCursor.getColumnIndex(KEY_PRICE_AVG)),
+							mCursor.getInt(mCursor.getColumnIndex(KEY_PRICE_HIGH)),
+							mCursor.getString(mCursor.getColumnIndex(KEY_PRICE_URL)));
+				}
+				else {
+					// timestamp is too old, ignore the prices
+					return null;
+				}
+			}
+		} catch (SQLiteException e) {
+			throw new FamiliarDbException(e);
+		} catch (IllegalStateException e) {
+			throw new FamiliarDbException(e);
+		}
+	}
+	
+	public void setCachedPrice(String cardName, String setCode, int price_low, int price_avg, int price_high, String price_url) {
+        ContentValues args = new ContentValues();
+        args.put(KEY_PRICE_LOW, price_low);
+        args.put(KEY_PRICE_AVG, price_avg);
+        args.put(KEY_PRICE_HIGH, price_high);
+        args.put(KEY_PRICE_URL, price_url);
+        args.put(KEY_PRICE_TIMESTAMP, System.currentTimeMillis());
+
+        String where = DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + cardName + "' AND "
+				+ DATABASE_TABLE_CARDS + "." + KEY_SET + " = '" + setCode + "'";
+        mDb.update(DATABASE_TABLE_CARDS, args, where, null);
+	}
 }

@@ -31,6 +31,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources.NotFoundException;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -113,6 +114,7 @@ public class CardDbAdapter {
 	public static final String KEY_TERM = "term";
 	public static final String KEY_DEFINITION = "definition";
 
+	private DatabaseUtils mDbUtils;
 	private DatabaseHelper mDbHelper;
 	public SQLiteDatabase mDb;
 
@@ -1898,7 +1900,7 @@ public class CardDbAdapter {
         args.put(KEY_PRICE_URL, price_url);
         args.put(KEY_PRICE_TIMESTAMP, System.currentTimeMillis());
 
-        String where = DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + cardName + "' AND "
+        String where = DATABASE_TABLE_CARDS + "." + KEY_NAME + " = " + mDbUtils.sqlEscapeString(cardName) + " AND "
 				+ DATABASE_TABLE_CARDS + "." + KEY_SET + " = '" + setCode + "'";
         mDb.update(DATABASE_TABLE_CARDS, args, where, null);
 	}

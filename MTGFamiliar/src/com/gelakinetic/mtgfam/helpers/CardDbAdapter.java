@@ -114,7 +114,6 @@ public class CardDbAdapter {
 	public static final String KEY_TERM = "term";
 	public static final String KEY_DEFINITION = "definition";
 
-	private DatabaseUtils mDbUtils;
 	private DatabaseHelper mDbHelper;
 	public SQLiteDatabase mDb;
 
@@ -416,7 +415,7 @@ public class CardDbAdapter {
 
 	public Cursor fetchCardByName(String name, String[] fields)
 			throws FamiliarDbException {
-		name = name.replace("'", "''").replace("æ", "Æ");
+		name = name.replace("æ", "Æ");
 		String sql = "SELECT ";
 		boolean first = true;
 		for (String field : fields) {
@@ -430,8 +429,8 @@ public class CardDbAdapter {
 		sql += " FROM " + DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS
 				+ " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = "
 				+ DATABASE_TABLE_CARDS + "." + KEY_SET + " WHERE "
-				+ DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + name
-				+ "' ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE
+				+ DATABASE_TABLE_CARDS + "." + KEY_NAME + " = " + DatabaseUtils.sqlEscapeString(name)
+				+ " ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE
 				+ " DESC";
 		Cursor mCursor = null;
 
@@ -451,7 +450,7 @@ public class CardDbAdapter {
 
 	public Cursor fetchLatestCardByName(String name, String[] fields)
 			throws FamiliarDbException {
-		name = name.replace("'", "''").replace("æ", "Æ");
+		name = name.replace("æ", "Æ");
 		String sql = "SELECT ";
 		boolean first = true;
 		for (String field : fields) {
@@ -465,8 +464,8 @@ public class CardDbAdapter {
 		sql += " FROM " + DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS
 				+ " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = "
 				+ DATABASE_TABLE_CARDS + "." + KEY_SET + " WHERE "
-				+ DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + name
-				+ "' ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE
+				+ DATABASE_TABLE_CARDS + "." + KEY_NAME + " = " + DatabaseUtils.sqlEscapeString(name)
+				+ " ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE
 				+ " DESC LIMIT 1";
 		Cursor mCursor = null;
 
@@ -486,7 +485,7 @@ public class CardDbAdapter {
 
 	public Cursor fetchCardByNameAndSet(String name, String setCode)
 			throws FamiliarDbException {
-		name = name.replace("'", "''").replace("æ", "Æ");
+		name = name.replace("æ", "Æ");
 		String sql = "SELECT " + DATABASE_TABLE_CARDS + "." + KEY_ID + ", "
 				+ DATABASE_TABLE_CARDS + "." + KEY_NAME + ", "
 				+ DATABASE_TABLE_CARDS + "." + KEY_SET + ", "
@@ -501,8 +500,8 @@ public class CardDbAdapter {
 				+ DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS
 				+ " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = "
 				+ DATABASE_TABLE_CARDS + "." + KEY_SET + " WHERE "
-				+ DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + name
-				+ "' AND " + DATABASE_TABLE_CARDS + "." + KEY_SET + " = '"
+				+ DATABASE_TABLE_CARDS + "." + KEY_NAME + " = " + DatabaseUtils.sqlEscapeString(name)
+				+ " AND " + DATABASE_TABLE_CARDS + "." + KEY_SET + " = '"
 				+ setCode + "' ORDER BY " + DATABASE_TABLE_SETS + "."
 				+ KEY_DATE + " DESC";
 		Cursor mCursor = null;
@@ -522,11 +521,11 @@ public class CardDbAdapter {
 	}
 
 	public long fetchIdByName(String name) throws FamiliarDbException {
-		name = name.replace("'", "''").replace("æ", "Æ");
+		name = name.replace("æ", "Æ");
 		
 		String sql = "SELECT " + DATABASE_TABLE_CARDS + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_SET + ", " + DATABASE_TABLE_SETS + "." + KEY_DATE +
 				" FROM (" + DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_CARDS + "." + KEY_SET + "=" + DATABASE_TABLE_SETS + "." + KEY_CODE + ")" +
-				" WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " = '" + name + "' ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC";
+				" WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " = " + DatabaseUtils.sqlEscapeString(name) + " ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE + " DESC";
 		
 		Cursor mCursor = null;
 		try {
@@ -551,11 +550,11 @@ public class CardDbAdapter {
 		Cursor mCursor = null;
 
 		if (cardname != null)
-			cardname = cardname.replace("'", "''").replace("æ", "Æ").trim();
+			cardname = cardname.replace("æ", "Æ").trim();
 
 		String sql = "SELECT MIN(" + KEY_ID + ") AS " + KEY_ID + ", "
 				+ KEY_NAME + " FROM " + DATABASE_TABLE_CARDS + " WHERE "
-				+ KEY_NAME + " LIKE '" + cardname + "%' GROUP BY " + KEY_NAME
+				+ KEY_NAME + " LIKE " + DatabaseUtils.sqlEscapeString(cardname + "%") + " GROUP BY " + KEY_NAME
 				+ " ORDER BY " + KEY_NAME;
 		try {
 			mCursor = mDb.rawQuery(sql, null);
@@ -1050,12 +1049,12 @@ public class CardDbAdapter {
 		Cursor mCursor = null;
 
 		if (cardname != null)
-			cardname = cardname.replace("'", "''").replace("æ", "Æ").trim();
+			cardname = cardname.replace("æ", "Æ").trim();
 
 		String statement = " WHERE 1=1";
 
 		statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_NAME
-				+ " LIKE '" + cardname + "%')";
+				+ " LIKE " + DatabaseUtils.sqlEscapeString(cardname + "%") + ")";
 
 		try {
 			String sel = null;
@@ -1900,7 +1899,7 @@ public class CardDbAdapter {
         args.put(KEY_PRICE_URL, price_url);
         args.put(KEY_PRICE_TIMESTAMP, System.currentTimeMillis());
 
-        String where = DATABASE_TABLE_CARDS + "." + KEY_NAME + " = " + mDbUtils.sqlEscapeString(cardName) + " AND "
+        String where = DATABASE_TABLE_CARDS + "." + KEY_NAME + " = " + DatabaseUtils.sqlEscapeString(cardName) + " AND "
 				+ DATABASE_TABLE_CARDS + "." + KEY_SET + " = '" + setCode + "'";
         mDb.update(DATABASE_TABLE_CARDS, args, where, null);
 	}

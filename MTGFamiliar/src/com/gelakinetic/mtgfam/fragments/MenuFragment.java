@@ -118,7 +118,7 @@ public class MenuFragment extends ListFragment {
 		case R.string.main_force_update_title:
 			mActivity.getPreferencesAdapter().setLastLegalityUpdate(0);
 			mActivity.startService(new Intent(mActivity, DbUpdaterService.class));
-			mActivity.showAbove();
+			mActivity.showContent();
 			break;
 		case R.string.main_settings_title:
 			Intent i = new Intent(mActivity, PreferencesActivity.class);
@@ -144,7 +144,7 @@ public class MenuFragment extends ListFragment {
 			} catch (IOException e) {
 				Toast.makeText(mActivity, getString(R.string.main_import_fail), Toast.LENGTH_SHORT).show();
 			}
-			mActivity.showAbove();
+			mActivity.showContent();
 			break;
 		}
 		case R.string.main_export_data_title: {
@@ -161,7 +161,7 @@ public class MenuFragment extends ListFragment {
 			} catch (IOException e) {
 				Toast.makeText(mActivity, getString(R.string.main_export_fail), Toast.LENGTH_SHORT).show();				
 			}
-			mActivity.showAbove();
+			mActivity.showContent();
 			break;
 		}
 		}
@@ -264,7 +264,7 @@ public class MenuFragment extends ListFragment {
 		Handler h = new Handler();
 		h.postDelayed(new Runnable() {
 			public void run() {
-				mActivity.getSlidingMenu().showAbove();
+				mActivity.getSlidingMenu().showContent();
 			}
 		}, 50);
 	}	

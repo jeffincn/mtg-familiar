@@ -80,14 +80,9 @@
     <string name="main_whats_new_title">What\'s New</string>
     <string name="main_whats_new_in_title">What\'s New in Version</string>
     <string name="main_whats_new_text">
-	- New Sliding Menu navigation! Touch the button in the top left to open the menu, and change your default page in General Settings&lt;br />&lt;br />
- 	- Card search using the camera&lt;br />&lt;br />
- 	- New EDH mode for the Life Counter&lt;br />&lt;br />
- 	- Export and Import data to an SD card&lt;br />&lt;br />
- 	- Save and load default search parameters&lt;br />&lt;br />
- 	- Various and sundry bugfixes&lt;br />&lt;br />
- 	- French translation&lt;br />&lt;br />
- 	- Card images from seven languages. Choose your favorite in the Settings.
+	- Improved Sliding Menu navigation&lt;br />&lt;br />
+ 	- More efficient price lookups.&lt;br />&lt;br />
+ 	- Better error handling, bugfixes
     </string>
     
     <string name="main_tts_warning_title">Text-to-Speech</string>

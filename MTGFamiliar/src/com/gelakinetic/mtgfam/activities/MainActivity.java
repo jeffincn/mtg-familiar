@@ -137,8 +137,7 @@ public class MainActivity extends SlidingFragmentActivity {
 		SlidingMenu slidingMenu = getSlidingMenu();
 		slidingMenu.setBehindWidthRes(R.dimen.sliding_menu_width);
 		slidingMenu.setBehindScrollScale(0.0f);
-		slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
-		slidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_MARGIN);
+		slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
 		slidingMenu.setShadowWidthRes(R.dimen.shadow_width);
 		slidingMenu.setShadowDrawable(R.drawable.sliding_menu_shadow);
 		setBehindContentView(R.layout.fragment_menu);
@@ -288,10 +287,10 @@ public class MainActivity extends SlidingFragmentActivity {
 			super.handleMessage(msg);
 			switch (msg.arg1) {
 				case OPEN:
-					me.showBehind();
+					me.showMenu();
 					break;
 				case CLOSE:
-					me.showAbove();
+					me.showContent();
 					break;
 			}
 		}
@@ -301,7 +300,7 @@ public class MainActivity extends SlidingFragmentActivity {
 		// DialogFragment.show() will take care of adding the fragment
 		// in a transaction. We also want to remove any currently showing
 		// dialog, so make our own transaction and take care of that here.
-		this.showAbove();
+		this.showContent();
 		FragmentTransaction ft = this.getSupportFragmentManager().beginTransaction();
 		Fragment prev = getSupportFragmentManager().findFragmentByTag(FamiliarFragment.DIALOG_TAG);
 		if (prev != null) {
@@ -471,7 +470,7 @@ public class MainActivity extends SlidingFragmentActivity {
 	protected void onResume() {
 		super.onResume();
 		// always close the sliding menu when returning to this activity
-		showAbove();
+		showContent();
 
 		Intent i = new Intent(this, RoundTimerService.class);
 		startService(i);
@@ -686,8 +685,8 @@ public class MainActivity extends SlidingFragmentActivity {
 				return super.onKeyDown(keyCode, event);
 			}
 			// Else if were at the root, and the SlidingMenu is closed, it should open the menu
-			else if(!this.getSlidingMenu().isBehindShowing()) {
-				this.getSlidingMenu().showBehind();
+			else if(!this.getSlidingMenu().isMenuShowing()) {
+				this.getSlidingMenu().showMenu();
 				return true;
 			}
 			// If the SlidingMenu is open, it should close the app

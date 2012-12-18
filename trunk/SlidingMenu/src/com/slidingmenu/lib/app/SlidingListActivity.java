@@ -1,14 +1,14 @@
 package com.slidingmenu.lib.app;
 
+import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockListActivity;
 import com.slidingmenu.lib.SlidingMenu;
 
-public class SlidingListActivity extends SherlockListActivity implements SlidingActivityBase {
+public class SlidingListActivity extends ListActivity implements SlidingActivityBase {
 
 	private SlidingActivityHelper mHelper;
 
@@ -115,17 +115,25 @@ public class SlidingListActivity extends SherlockListActivity implements Sliding
 	}
 
 	/* (non-Javadoc)
-	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showAbove()
+	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showContent()
 	 */
-	public void showAbove() {
-		mHelper.showAbove();
+	public void showContent() {
+		mHelper.showContent();
 	}
 
 	/* (non-Javadoc)
-	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showBehind()
+	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showMenu()
 	 */
-	public void showBehind() {
-		mHelper.showBehind();
+	public void showMenu() {
+		mHelper.showMenu();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showSecondaryMenu()
+	 */
+	public void showSecondaryMenu() {
+		mHelper.showSecondaryMenu();
 	}
 
 	/* (non-Javadoc)

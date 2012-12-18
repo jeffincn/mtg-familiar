@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -50,6 +51,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.GatheringsIO;
 import com.gelakinetic.mtgfam.helpers.GatheringsPlayerData;
+import com.slidingmenu.lib.SlidingMenu;
 
 public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	private static final String							NO_GATHERINGS_EXIST				= "No Gatherings exist.";
@@ -180,6 +182,14 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 
+		int display_mode = getResources().getConfiguration().orientation;
+		if (display_mode == 1) {
+			// Portrait
+		} else {
+			// Landscape
+			this.getMainActivity().getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
+		}      
+
 		View myFragmentView = inflater.inflate(R.layout.n_player_life_activity, container, false);
 
 		gIO = new GatheringsIO(getActivity());
@@ -256,6 +266,9 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
+		
+		this.getMainActivity().getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+		
 		if (tts != null) {
 			tts.shutdown();
 		}

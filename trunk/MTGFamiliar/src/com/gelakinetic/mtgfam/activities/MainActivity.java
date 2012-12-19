@@ -101,7 +101,7 @@ public class MainActivity extends SlidingFragmentActivity {
 	
 	public FragmentManager mFragmentManager;
 	private Bundle mFragResults;
-	private boolean firstRun = false;
+	private boolean bounceMenu = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -124,7 +124,7 @@ public class MainActivity extends SlidingFragmentActivity {
 		if (pInfo.versionCode != lastVersion) {
 			showDialogFragment(CHANGELOGDIALOG);
 			prefAdapter.setLastVersion(pInfo.versionCode);
-			firstRun = true;
+			bounceMenu = lastVersion <= 15; //Only bounce if the last version is 1.8.1 or lower (or a fresh install) 
 		}
 
 		ActionBar actionBar = getSupportActionBar();
@@ -313,9 +313,9 @@ public class MainActivity extends SlidingFragmentActivity {
 			@Override
 			public void onDismiss(DialogInterface mDialog) {
 				super.onDismiss(mDialog);
-				if (firstRun) {
+				if (bounceMenu) {
 					getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-					firstRun = false;
+					bounceMenu = false;
 					Runnable r = new Runnable() {
 
 						@Override

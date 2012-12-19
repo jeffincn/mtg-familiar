@@ -80,14 +80,9 @@
     <string name="main_whats_new_title">Nouveautés</string>
     <string name="main_whats_new_in_title">Nouveautés dans la Version</string>
     <string name="main_whats_new_text">
-	- Nouvelle navigation avec menu glissant! Cliquez en haut à gauche pour ouvrir le menu, et changer votre page par défaut dans les Paramètres Généraux&lt;br />&lt;br />
- 	- Export et import des données depuis la carte SD&lt;br />&lt;br />
- 	- Nouveau mode EDH pour le Compteur de Vie&lt;br />&lt;br />
- 	- Sauver et charger paramètres de recherche par défaut&lt;br />&lt;br />
- 	- Corrections diverses et variées&lt;br />&lt;br />
- 	- Interface en français&lt;br />&lt;br />
- 	- Choix entre 7 langues pour les images de carte&lt;br />&lt;br />
- 	- Recherche de carte par photo
+	- Amélioration de la navigation par menu glissant&lt;br />&lt;br />
+ 	- Recherches de prix plus efficaces.&lt;br />&lt;br />
+ 	- Meilleure gestion des erreurs, corrections de bugs
     </string>
     
     <string name="main_tts_warning_title">Synthèse vocale (TTS)</string>

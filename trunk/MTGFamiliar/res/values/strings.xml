@@ -401,6 +401,12 @@
     <string name="judges_corner_MTR">MTR</string>
 	<string name="judges_corner_IPG">IPG</string>
 	<string name="judges_corner_counter">Counter</string>
+	<string name="deck_counter_1">+1</string>
+	<string name="deck_counter_2">+2</string>
+	<string name="deck_counter_3">+3</string>
+	<string name="deck_counter_4">+4</string>
+	<string name="deck_counter_reset">Reset</string>
+	<string name="deck_counter_undo">Undo</string>
 		
     <!-- Arrays -->
     <string-array name="supertypes">

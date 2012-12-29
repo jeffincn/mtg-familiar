@@ -62,6 +62,7 @@ import com.gelakinetic.mtgfam.fragments.CardViewFragment;
 import com.gelakinetic.mtgfam.fragments.DiceFragment;
 import com.gelakinetic.mtgfam.fragments.FamiliarDialogFragment;
 import com.gelakinetic.mtgfam.fragments.FamiliarFragment;
+import com.gelakinetic.mtgfam.fragments.JudgesCornerFragment;
 import com.gelakinetic.mtgfam.fragments.LifeFragment;
 import com.gelakinetic.mtgfam.fragments.ManaPoolFragment;
 import com.gelakinetic.mtgfam.fragments.MenuFragment;
@@ -244,6 +245,9 @@ public class MainActivity extends SlidingFragmentActivity {
 				}
 				else if (defaultFragment.equals(this.getString(R.string.main_rules))) {
 					frag = new RulesFragment();
+				}
+				else if (defaultFragment.equals(this.getString(R.string.main_judges_corner))) {
+					frag = new JudgesCornerFragment();
 				}
 				else if (defaultFragment.equals(this.getString(R.string.main_mojhosto))) {
 					frag = new MoJhoStoFragment();

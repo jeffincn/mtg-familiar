@@ -64,6 +64,7 @@
 	<string name="main_wishlist">Liste de souhaits</string>
     <string name="main_timer">Minuteur Tour</string>
     <string name="main_rules">Règles</string>
+    <string name="main_judges_corner">Espace Arbitre</string>
     <string name="main_mojhosto">MoJhoSto Basic</string>
     <string name="main_force_update_title">Forcer la mise à jour</string>
     <string name="main_settings_title">Paramètres</string>
@@ -397,6 +398,18 @@
     <string name="goggles_no_card_on_photo">Aucune carte trouvée sur la photo</string>
     
     
+    <!-- Judge's Corner -->
+    <string name="judges_corner_MTR">MTR</string>
+	<string name="judges_corner_IPG">IPG</string>
+	<string name="judges_corner_counter">Compteur</string>
+	<string name="deck_counter_1">+1</string>
+	<string name="deck_counter_2">+2</string>
+	<string name="deck_counter_3">+3</string>
+	<string name="deck_counter_4">+4</string>
+	<string name="deck_counter_reset">Rétablir</string>
+	<string name="deck_counter_undo">Annuler</string>
+    
+    
     <!-- Arrays -->
     <string-array name="supertypes">
         <item>Artefact</item>
@@ -582,6 +595,7 @@
 		<item>@string/main_timer</item>
 		<item>@string/main_rules</item>
 		<item>@string/main_mojhosto</item>
+		<item>@string/main_judges_corner</item>
 	</string-array>
 	<string-array name="card_language">
 		<item>Anglais</item>
@@ -601,5 +615,5 @@
 		<item>ru</item>
 		<item>de</item>
 	</string-array>
-		
+
 </resources>

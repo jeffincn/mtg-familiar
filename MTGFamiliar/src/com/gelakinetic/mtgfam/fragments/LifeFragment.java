@@ -965,7 +965,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 				@Override
 				public void onClick(View v) {
 					Bundle fromBundle = new Bundle();
-					fromBundle.putInt("player", visibleEDHPlayer);
+					fromBundle.putInt("player", players.indexOf(owningPlayer));
 					fromBundle.putInt("fromCommander", pos);
 					showDialog(DIALOG_EDH_DAMAGE, fromBundle);
 				}

@@ -292,7 +292,7 @@ public class RoundTimerService extends Service implements OnInitListener {
 
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getApplication().getApplicationContext());
 		Notification n = builder.setSmallIcon(R.drawable.rt_notification_icon).setWhen(System.currentTimeMillis()).setContentTitle(titleText)
-				.setContentText(messageText).setContentIntent(contentIntent).getNotification();
+				.setContentText(messageText).setContentIntent(contentIntent).build();
 
 		n.flags |= Notification.FLAG_ONGOING_EVENT;
 
@@ -306,7 +306,7 @@ public class RoundTimerService extends Service implements OnInitListener {
 	private void showEndNotification() {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getApplication().getApplicationContext());
 		Notification n = builder.setSmallIcon(R.drawable.rt_notification_icon).setWhen(System.currentTimeMillis()).setContentTitle(titleText)
-				.setContentText(timerEndText).setContentIntent(contentIntent).getNotification();
+				.setContentText(timerEndText).setContentIntent(contentIntent).build();
 		n.flags |= Notification.FLAG_AUTO_CANCEL;
 
 		nm.cancel(NOTIFICATION_ID);

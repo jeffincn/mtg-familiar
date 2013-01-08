@@ -52,6 +52,16 @@ public class MoJhoStoFragment extends FamiliarFragment {
 	protected static final int	STONEHEWER_IMAGE	= 3;
 	protected static final int	JHOIRA_IMAGE			= 4;
 
+	public MoJhoStoFragment() {
+		/* http://developer.android.com/reference/android/app/Fragment.html
+		 * All subclasses of Fragment must include a public empty constructor.
+		 * The framework will often re-instantiate a fragment class when needed,
+		 * in particular during state restore, and needs to be able to find this constructor
+		 * to instantiate it. If the empty constructor is not available, a runtime exception
+		 * will occur in some cases during state restore. 
+		 */
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 

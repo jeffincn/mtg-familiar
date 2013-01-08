@@ -40,7 +40,8 @@ public class FamiliarFragment extends SherlockFragment {
 	protected static final int GOGGLES_ANALYSIS = 1;
 
 	public FamiliarFragment() {
-		/* All subclasses of Fragment must include a public empty constructor.
+		/* http://developer.android.com/reference/android/app/Fragment.html
+		 * All subclasses of Fragment must include a public empty constructor.
 		 * The framework will often re-instantiate a fragment class when needed,
 		 * in particular during state restore, and needs to be able to find this constructor
 		 * to instantiate it. If the empty constructor is not available, a runtime exception

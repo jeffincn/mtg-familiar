@@ -78,7 +78,7 @@ public class DbUpdaterService extends IntentService {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getApplicationContext());
 		mUpdateNotification = builder.setContentTitle(getString(R.string.app_name))
 				.setContentText(getString(R.string.update_notification)).setSmallIcon(R.drawable.rt_notification_icon)
-				.setContentIntent(mNotificationIntent).setWhen(System.currentTimeMillis()).getNotification();
+				.setContentIntent(mNotificationIntent).setWhen(System.currentTimeMillis()).build();
 
 		mUpdateNotification.flags |= Notification.FLAG_ONGOING_EVENT;
 		mUpdateNotification.flags |= Notification.FLAG_ONLY_ALERT_ONCE;
@@ -215,7 +215,7 @@ public class DbUpdaterService extends IntentService {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getApplicationContext());
 		mUpdateNotification = builder.setContentTitle(getString(R.string.app_name))
 				.setContentText(getString(R.string.update_notification)).setContentIntent(mNotificationIntent)
-				.getNotification();
+				.build();
 
 		mNotificationManager.notify(STATUS_NOTIFICATION, mUpdateNotification);
 	}
@@ -257,7 +257,7 @@ public class DbUpdaterService extends IntentService {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getApplicationContext());
 		Notification notification = builder.setContentTitle(title)
 				.setContentText(body).setSmallIcon(R.drawable.rt_notification_icon)
-				.setContentIntent(mNotificationIntent).setWhen(System.currentTimeMillis()).getNotification();
+				.setContentIntent(mNotificationIntent).setWhen(System.currentTimeMillis()).build();
 
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
 

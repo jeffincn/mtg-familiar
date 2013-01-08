@@ -42,6 +42,16 @@ public class JudgesCornerFragment extends FamiliarFragment {
     public static final String TAG_IPG = "IPG";
     public static final String TAG_COUNTER = "COUNTER";
 
+	public JudgesCornerFragment() {
+		/* http://developer.android.com/reference/android/app/Fragment.html
+		 * All subclasses of Fragment must include a public empty constructor.
+		 * The framework will often re-instantiate a fragment class when needed,
+		 * in particular during state restore, and needs to be able to find this constructor
+		 * to instantiate it. If the empty constructor is not available, a runtime exception
+		 * will occur in some cases during state restore. 
+		 */
+	}
+	
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     	super.onCreateView(inflater, container, savedInstanceState);

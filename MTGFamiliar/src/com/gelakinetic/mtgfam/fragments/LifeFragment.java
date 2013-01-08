@@ -31,7 +31,6 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -127,6 +126,16 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	private MenuItem												announceLifeTotals				= null;
 	private FrameLayout											playerScrollView;
 
+	public LifeFragment() {
+		/* http://developer.android.com/reference/android/app/Fragment.html
+		 * All subclasses of Fragment must include a public empty constructor.
+		 * The framework will often re-instantiate a fragment class when needed,
+		 * in particular during state restore, and needs to be able to find this constructor
+		 * to instantiate it. If the empty constructor is not available, a runtime exception
+		 * will occur in some cases during state restore. 
+		 */
+	}
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState){

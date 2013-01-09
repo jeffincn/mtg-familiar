@@ -400,6 +400,16 @@ public class TradeFragment extends FamiliarFragment {
 		
 								// validate the price text
 								String userInputPrice = priceText.getText().toString();
+								if (userInputPrice != priceOfCard){
+									lSide.get(position).SetIsCustomPrice();
+								}
+								
+								//Hack to regrab price, if the set price is blank.
+								if (userInputPrice.length() == 0){
+									lSide.get(position).customPrice = false;
+									loadPrice(lSide.get(position), aaSide);
+								}
+									
 								double uIP;
 								try {
 									uIP = Double.parseDouble(userInputPrice);
@@ -650,15 +660,35 @@ public class TradeFragment extends FamiliarFragment {
 					String tcgName = mDbHelper.getTCGname(cardSet);
 					int side = Integer.parseInt(parts[0]);
 					int numberOf = Integer.parseInt(parts[3]);
+					boolean customPrice = false;
+					int price = 0;
+					String message = "loading";
 					
-					CardData cd = mTradeListHelper.new CardData(cardName, tcgName, cardSet, numberOf, 0, "loading", null, '-');
+					CardData cd = null;
+					
+					try {
+						customPrice = Boolean.parseBoolean(parts[4]);
+						price = Integer.parseInt(parts[5]);
+						message = "";
+					}
+					catch (Exception e)	{
+						customPrice = false;
+						price = 0;
+						message = "loading";
+					}
+					finally {
+						cd = mTradeListHelper.new CardData(cardName, tcgName, cardSet, numberOf, price, message, null, '-', customPrice);
+					}
+					
 					if (side == CardDbAdapter.LEFT) {
 						lTradeLeft.add(cd);
-						loadPrice(cd, aaTradeLeft);
+						if (customPrice == false)
+							loadPrice(cd, aaTradeLeft);
 					}
 					else if (side == CardDbAdapter.RIGHT) {
 						lTradeRight.add(cd);
-						loadPrice(cd, aaTradeRight);
+						if (customPrice == false)
+							loadPrice(cd, aaTradeRight);
 					}
 				}
 				catch (Exception e) {
@@ -705,7 +735,7 @@ public class TradeFragment extends FamiliarFragment {
 					lTradeLeft.get(_position).tcgName = (aSets[item]);
 					lTradeLeft.get(_position).message = ("loading");
 					aaTradeLeft.notifyDataSetChanged();
-					loadPrice(lTradeLeft.get(_position), aaTradeRight);
+					loadPrice(lTradeLeft.get(_position), aaTradeLeft);
 				}
 				else if (_side.equals("right")) {
 					lTradeRight.get(_position).setCode = (aSetCodes[item]);
@@ -857,7 +887,12 @@ public class TradeFragment extends FamiliarFragment {
 				priceField.setText(data.hasPrice() ? data.getPriceString() : data.message);
 
 				if (data.hasPrice()) {
-					priceField.setTextColor(getActivity().getResources().getColor(R.color.light_gray));
+					if (data.customPrice == true) {
+						priceField.setTextColor(getActivity().getResources().getColor(R.color.green));
+					}
+					else {
+						priceField.setTextColor(getActivity().getResources().getColor(R.color.light_gray));
+					}
 				}
 				else {
 					priceField.setTextColor(getActivity().getResources().getColor(R.color.red));

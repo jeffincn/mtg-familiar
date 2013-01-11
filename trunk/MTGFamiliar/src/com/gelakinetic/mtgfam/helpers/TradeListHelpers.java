@@ -1,14 +1,7 @@
 package com.gelakinetic.mtgfam.helpers;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
-import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
-import android.os.AsyncTask;
-
-import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler.FetchPriceTask;
 
 public class TradeListHelpers {
 
@@ -58,44 +51,6 @@ public class TradeListHelpers {
 			data.message = database_busy;
 		}
 		return data;
-	}
-
-	public static final int MAX_SIMULTANEOUS_THREADS = 9; // could be 10, but leaves space for when one is winding down while the next is starting
-	public static LinkedBlockingQueue<FetchPriceTask> pendingTasks = new LinkedBlockingQueue<FetchPriceTask>();
-	public static ArrayBlockingQueue<FetchPriceTask> currentExecutingTasks = new ArrayBlockingQueue<FetchPriceTask>(MAX_SIMULTANEOUS_THREADS);
-	
-	public static void addTaskAndExecute(FetchPriceTask fpt){
-		pendingTasks.add(fpt);
-		executeIfAvailableSpace();
-	}
-	
-	@SuppressLint("NewApi")
-	public static void executeIfAvailableSpace()
-	{
-		if(currentExecutingTasks.size() < MAX_SIMULTANEOUS_THREADS)
-		{
-			FetchPriceTask toExecute = pendingTasks.poll();
-			if(toExecute != null){
-				currentExecutingTasks.add(toExecute);
-				
-
-				boolean API_LEVEL_11 = android.os.Build.VERSION.SDK_INT > 11;
-
-				if(API_LEVEL_11) {
-					toExecute.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void[])null);
-				}
-				else {
-					toExecute.execute((Void[])null);
-				}
-			}
-		}
-	}
-	
-	public static void cancelAllTasks(){
-		pendingTasks.clear();
-		for(FetchPriceTask fpa : currentExecutingTasks){
-			fpa.cancel(true);
-		}
 	}
 
 	public class CardData implements Cloneable {

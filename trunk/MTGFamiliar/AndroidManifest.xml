@@ -22,6 +22,7 @@
         android:targetSdkVersion="15" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     
@@ -72,7 +73,10 @@
 
         <service android:name="com.gelakinetic.mtgfam.helpers.DbUpdaterService" />
         <service android:name="com.gelakinetic.mtgfam.helpers.RoundTimerService" />
-
+      <service
+          android:name="com.gelakinetic.mtgfam.helpers.PriceFetchService"
+          android:exported="false" />
+      
         <!-- Provides search suggestions for words and their definitions. -->
         <provider
             android:name="com.gelakinetic.mtgfam.helpers.CardSearchProvider"

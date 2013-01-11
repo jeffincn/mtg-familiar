@@ -79,7 +79,9 @@ import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.DbUpdaterService;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 import com.gelakinetic.mtgfam.helpers.PreferencesAdapter;
+import com.gelakinetic.mtgfam.helpers.PriceFetchService;
 import com.gelakinetic.mtgfam.helpers.RoundTimerService;
+import com.octo.android.robospice.SpiceManager;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.SlidingMenu.OnOpenedListener;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
@@ -104,10 +106,35 @@ public class MainActivity extends SlidingFragmentActivity {
 	private Bundle mFragResults;
 	private boolean bounceMenu = false;
 
+	/*
+	 * Robospice setup
+	 */
+	private SpiceManager spiceManager = new SpiceManager( PriceFetchService.class );
+    
+    @Override
+    protected void onStart() {
+        super.onStart();
+        spiceManager.start( this );
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        spiceManager.shouldStop();
+    }
+
+    public SpiceManager getSpiceManager() {
+        return spiceManager;
+    }
+    
+    /*
+     * End Robospice
+     */
+	  
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		mFragmentManager = getSupportFragmentManager();
 
 		try {
@@ -671,7 +698,7 @@ public class MainActivity extends SlidingFragmentActivity {
 		}
 		return null;
 	}
-
+    
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_SEARCH) {

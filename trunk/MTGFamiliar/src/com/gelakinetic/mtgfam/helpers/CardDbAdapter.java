@@ -1823,12 +1823,12 @@ public class CardDbAdapter {
 	}
 
 	public static class priceInfo {
-		int price_low;
-		int price_avg;
-		int price_high;
+		float price_low;
+		float price_avg;
+		float price_high;
 		String url;
 		
-		public priceInfo(int low, int avg, int high, String url) {
+		public priceInfo(float low, float avg, float high, String url) {
 			this.price_low = low;
 			this.price_avg = avg;
 			this.price_high = high;
@@ -1874,9 +1874,9 @@ public class CardDbAdapter {
 				// if the timestamp is less than a day old
 				if (System.currentTimeMillis() - timestamp < 24 * 60 * 60 * 1000) {
 					return new priceInfo(
-							mCursor.getInt(mCursor.getColumnIndex(KEY_PRICE_LOW)),
-							mCursor.getInt(mCursor.getColumnIndex(KEY_PRICE_AVG)),
-							mCursor.getInt(mCursor.getColumnIndex(KEY_PRICE_HIGH)),
+							mCursor.getInt(mCursor.getColumnIndex(KEY_PRICE_LOW)) / 100.0f,
+							mCursor.getInt(mCursor.getColumnIndex(KEY_PRICE_AVG)) / 100.0f,
+							mCursor.getInt(mCursor.getColumnIndex(KEY_PRICE_HIGH)) / 100.0f,
 							mCursor.getString(mCursor.getColumnIndex(KEY_PRICE_URL)));
 				}
 				else {

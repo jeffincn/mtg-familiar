@@ -79,10 +79,11 @@ import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
-import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler;
-import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler.FetchPriceTask;
-import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler.onFetchPriceCompleteListener;
+import com.gelakinetic.mtgfam.helpers.PriceFetchRequest;
 import com.gelakinetic.mtgfam.helpers.WishlistHelpers;
+import com.octo.android.robospice.persistence.DurationInMillis;
+import com.octo.android.robospice.persistence.exception.SpiceException;
+import com.octo.android.robospice.request.listener.RequestListener;
 
 public class CardViewFragment extends FamiliarFragment {
 
@@ -1051,27 +1052,27 @@ public class CardViewFragment extends FamiliarFragment {
 				return true;
 			case R.id.price:
 				progDialog.show();
-				asyncTask = new FetchPriceTask(mDbHelper, cardName, setCode, number, multiverseId, this.getMainActivity());
-				((FetchPriceTask)asyncTask).setOnFetchPriceCompleteListener(new onFetchPriceCompleteListener(){
-
-					@Override
-					public void onFetchPriceSuccess( TCGPlayerXMLHandler XMLhandler) {
-						progDialog.dismiss();
-						
-						lowprice = XMLhandler.lowprice;
-						avgprice = XMLhandler.avgprice;
-						hiprice = XMLhandler.highprice;
-						TCGPlayerLink = XMLhandler.link;
-
-						showDialog(GETPRICE);
-					}
-
-					@Override
-					public void onFetchPriceFail(String error) {
-						progDialog.dismiss();
-					}});
 				
-				asyncTask.execute((Void[]) null);
+				PriceFetchRequest priceRequest = new PriceFetchRequest(cardName, setCode, number, multiverseId,mDbHelper);
+				getMainActivity().getSpiceManager().execute( priceRequest, cardName + "-" + setCode, DurationInMillis.ONE_DAY, new RequestListener< String >(){
+			        @Override
+			        public void onRequestFailure( SpiceException spiceException ) {
+			        	progDialog.dismiss();
+			        	Toast.makeText( getMainActivity(), spiceException.getCause().getMessage(), Toast.LENGTH_SHORT ).show();
+			        }
+
+			        @Override
+			        public void onRequestSuccess( final String result ) {
+			        	progDialog.dismiss();
+			        	String pieces[] = result.split("@@");
+			        	lowprice = pieces[0];
+			        	avgprice = pieces[1];
+			        	hiprice = pieces[2];
+			        	TCGPlayerLink = pieces[3];
+			        	showDialog(GETPRICE);
+			        }
+				} );
+
 				return true;
 			case R.id.changeset:
 				showDialog(CHANGESET);
@@ -1094,22 +1095,10 @@ public class CardViewFragment extends FamiliarFragment {
 		}
 	}
 
-	// @Override
-	// protected void onPrepareDialog(int id, Dialog dialog) {
-	// switch (id) {
-	// case GETIMAGE:
-	// if (DialogImageView != null) {
-	// DialogImageView.setImageDrawable(cardPicture);
-	// }
-	// break;
-	// }
-	// }
-
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.card_menu, menu);
 	}
-	
 	
 }

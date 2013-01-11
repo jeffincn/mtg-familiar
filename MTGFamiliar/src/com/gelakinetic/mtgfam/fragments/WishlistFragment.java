@@ -38,12 +38,13 @@ import com.gelakinetic.mtgfam.helpers.AutocompleteCursorAdapter;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
-import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler;
-import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler.FetchPriceTask;
-import com.gelakinetic.mtgfam.helpers.TCGPlayerXMLHandler.onFetchPriceCompleteListener;
+import com.gelakinetic.mtgfam.helpers.PriceFetchRequest;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
 import com.gelakinetic.mtgfam.helpers.WishlistHelpers;
+import com.octo.android.robospice.persistence.DurationInMillis;
+import com.octo.android.robospice.persistence.exception.SpiceException;
+import com.octo.android.robospice.request.listener.RequestListener;
 
 public class WishlistFragment extends FamiliarFragment {
 
@@ -201,7 +202,7 @@ public class WishlistFragment extends FamiliarFragment {
 					lWishlist.add(card);
 		}
 		WishlistHelpers.WriteWishlist(getActivity(), lWishlist);
-		TradeListHelpers.cancelAllTasks();
+		getMainActivity().getSpiceManager().cancelAllRequests();
 	}
 
 	@Override
@@ -1012,49 +1013,43 @@ public class WishlistFragment extends FamiliarFragment {
 	}
 
 	private void loadPrice(final CardData data, final WishlistAdapter adapter) {
-		final FetchPriceTask loadPrice = new FetchPriceTask(mDbHelper, data, getMainActivity());
-		loadPrice.setOnFetchPriceCompleteListener(new onFetchPriceCompleteListener(){
+		
+		PriceFetchRequest priceRequest = new PriceFetchRequest(data.name, data.setCode, data.cardNumber, -1,mDbHelper);
+		getMainActivity().getSpiceManager().execute( priceRequest, data.name + "-" + data.setCode, DurationInMillis.ONE_DAY, new RequestListener< String >(){
+	        @Override
+	        public void onRequestFailure( SpiceException spiceException ) {
+				data.message = spiceException.getCause().getMessage();
+				
+				UpdateTotalPrices();
+				adapter.notifyDataSetChanged();
+	        }
 
-			@Override
-			public void onFetchPriceSuccess(TCGPlayerXMLHandler XMLhandler) {
-
+	        @Override
+	        public void onRequestSuccess( final String result ) {
+	        	String pieces[] = result.split("@@");
 				switch(priceSetting) {
-					case LOW_PRICE:
-					{
-						data.price = (int) (Double.parseDouble(XMLhandler.lowprice) * 100);
-						break;
-					}
-					default:
-					case AVG_PRICE:
-					{
-						data.price = (int) (Double.parseDouble(XMLhandler.avgprice) * 100);
-						break;
-					}
-					case HIGH_PRICE:
-					{
-						data.price = (int) (Double.parseDouble(XMLhandler.highprice) * 100);
-						break;
-					}
+				case LOW_PRICE:
+				{
+					data.price = (int) (Double.parseDouble(pieces[0]) * 100);
+					break;
 				}
-				data.message = null;
-				
-				UpdateTotalPrices();
-				adapter.notifyDataSetChanged();
-				
-				TradeListHelpers.currentExecutingTasks.remove(loadPrice);
-				TradeListHelpers.executeIfAvailableSpace();
+				default:
+				case AVG_PRICE:
+				{
+					data.price = (int) (Double.parseDouble(pieces[1]) * 100);
+					break;
+				}
+				case HIGH_PRICE:
+				{
+					data.price = (int) (Double.parseDouble(pieces[2]) * 100);
+					break;
+				}
 			}
-
-			@Override
-			public void onFetchPriceFail(String error) {
-				data.message = error;
-				
-				UpdateTotalPrices();
-				adapter.notifyDataSetChanged();
-				
-				TradeListHelpers.currentExecutingTasks.remove(loadPrice);
-				TradeListHelpers.executeIfAvailableSpace();
-			}});
-		TradeListHelpers.addTaskAndExecute(loadPrice);
+			data.message = null;
+			
+			UpdateTotalPrices();
+			adapter.notifyDataSetChanged();
+	        }
+		} );
 	}
 }

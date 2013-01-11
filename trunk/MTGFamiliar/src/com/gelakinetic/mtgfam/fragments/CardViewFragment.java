@@ -213,7 +213,9 @@ public class CardViewFragment extends FamiliarFragment {
 		progDialog.setOnCancelListener(new OnCancelListener() {
 			public void onCancel(DialogInterface pd) {
 				// when the dialog is dismissed
-				asyncTask.cancel(true);
+				if(asyncTask != null) {
+					asyncTask.cancel(true);
+				}
 			}
 		});
 

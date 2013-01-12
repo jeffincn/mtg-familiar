@@ -5,7 +5,6 @@ import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.DecimalFormat;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,8 +19,8 @@ import org.xml.sax.SAXException;
 
 import android.database.Cursor;
 import android.os.Build;
+import android.util.Log;
 
-import com.gelakinetic.mtgfam.helpers.CardDbAdapter.priceInfo;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.SpiceRequest;
 
@@ -45,6 +44,7 @@ public class PriceFetchRequest extends SpiceRequest<String> {
 	@Override
 	public String loadDataFromNetwork() throws SpiceException {
 
+		Log.e("robospice", "loadDataFromNetwork");
 		try {
 			if(number == null) {
 				Cursor c = mDbHelper.fetchCardByNameAndSet(cardName, setCode);
@@ -52,56 +52,42 @@ public class PriceFetchRequest extends SpiceRequest<String> {
 				c.close();
 			}
 
-			priceInfo prices = mDbHelper.getCachedPrice(cardName, setCode);
-			if(prices != null) {
-				return
-						formatPrice(prices.price_low) + "@@" + 
-						formatPrice(prices.price_avg) + "@@" + 
-						formatPrice(prices.price_high) + "@@" + 
-						prices.url;
+			String tcgname = mDbHelper.getTCGname(setCode);
+			String tcgCardName;
+			if (CardDbAdapter.isTransformable(number, setCode) && number.contains("b")) {
+				tcgCardName = mDbHelper.getTransformName(setCode, number.replace("b", "a"));
+			}
+			else if (multiverseId!= -1 && mDbHelper.isSplitCard(multiverseId)) {
+				tcgCardName = mDbHelper.getSplitName(multiverseId);
 			}
 			else {
-
-				String tcgname = mDbHelper.getTCGname(setCode);
-				String tcgCardName;
-				if (CardDbAdapter.isTransformable(number, setCode) && number.contains("b")) {
-					tcgCardName = mDbHelper.getTransformName(setCode, number.replace("b", "a"));
-				}
-				else if (multiverseId!= -1 && mDbHelper.isSplitCard(multiverseId)) {
-					tcgCardName = mDbHelper.getSplitName(multiverseId);
-				}
-				else {
-					tcgCardName = cardName;
-				}
-				URL priceurl = new URL(CardDbAdapter.removeAccentMarks(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p="
-						+ tcgCardName).replace(" ", "%20").replace("Æ", "Ae")));
-
-
-				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) {
-					System.setProperty("http.keepAlive", "false");
-				}
-
-				HttpURLConnection urlConnection = (HttpURLConnection) priceurl.openConnection();
-				String result = IOUtils.toString(urlConnection.getInputStream());
-				urlConnection.disconnect();
-
-				String retval;
-				Document d = loadXMLFromString(result);
-				Element e = d.getDocumentElement();
-				retval =
-						getString("lowprice", e) + "@@" + 
-								getString("avgprice", e) + "@@" + 
-								getString("hiprice", e) + "@@" + 
-								getString("link", e);
-
-				mDbHelper.setCachedPrice(cardName, setCode,
-						(int) (Double.parseDouble(getString("lowprice", e)) * 100),
-						(int) (Double.parseDouble(getString("avgprice", e)) * 100),
-						(int) (Double.parseDouble(getString("hiprice", e)) * 100),
-						getString("link", e));
-
-				return retval;
+				tcgCardName = cardName;
 			}
+			URL priceurl = new URL(CardDbAdapter.removeAccentMarks(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p="
+					+ tcgCardName).replace(" ", "%20").replace("Æ", "Ae")));
+
+
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) {
+				System.setProperty("http.keepAlive", "false");
+			}
+
+			HttpURLConnection urlConnection = (HttpURLConnection) priceurl.openConnection();
+			String result = IOUtils.toString(urlConnection.getInputStream());
+			urlConnection.disconnect();
+
+			String retval;
+			Document d = loadXMLFromString(result);
+			Element e = d.getDocumentElement();
+			retval = getString("lowprice", e);
+			if(retval == null) {
+				throw new SpiceException("PriceDNE");
+			}
+			else {
+			retval += "@@" + getString("avgprice", e) +
+					"@@" + getString("hiprice", e) +
+					"@@" + getString("link", e);
+			}
+			return retval;
 		}
 		catch(FamiliarDbException e) {
 			throw new SpiceException("FamiliarDbException");
@@ -114,11 +100,6 @@ public class PriceFetchRequest extends SpiceRequest<String> {
 		} catch (SAXException e) {
 			throw new SpiceException("SAXException");
 		}
-	}
-
-	private String formatPrice(float price) {
-        DecimalFormat df = new DecimalFormat("#.##");
-		return df.format(price);
 	}
 
 	public static Document loadXMLFromString(String xml) throws ParserConfigurationException, SAXException, IOException

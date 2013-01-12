@@ -324,6 +324,7 @@ public class TradeFragment extends FamiliarFragment {
 		
 						View view = LayoutInflater.from(getActivity()).inflate(R.layout.trader_card_click_dialog, null);
 						Button removeAll = (Button) view.findViewById(R.id.traderDialogRemove);
+						Button resetPrice = (Button) view.findViewById(R.id.traderDialogResetPrice);
 						Button info = (Button) view.findViewById(R.id.traderDialogInfo);
 						Button changeSet = (Button) view.findViewById(R.id.traderDialogChangeSet);
 						Button cancelbtn = (Button) view.findViewById(R.id.traderDialogCancel);
@@ -352,6 +353,23 @@ public class TradeFragment extends FamiliarFragment {
 								removeDialog();
 							}
 						});
+						
+						if(!lSide.get(position).customPrice) {
+							resetPrice.setVisibility(View.GONE);
+						}
+						else {
+						resetPrice.setOnClickListener(new OnClickListener() {
+							
+							@Override
+							public void onClick(View v) {
+								lSide.get(position).customPrice = false;
+								loadPrice(lSide.get(position), aaSide);
+								aaSide.notifyDataSetChanged();
+								UpdateTotalPrices(side);
+								removeDialog();
+							}
+						});
+						}
 						
 						info.setOnClickListener(new OnClickListener() {
 							
@@ -443,14 +461,18 @@ public class TradeFragment extends FamiliarFragment {
 		
 										// Update ALL the prices!
 										for (CardData data : lTradeLeft) {
-											data.message = "loading";
-											loadPrice(data, aaTradeLeft);
+											if (data.customPrice == false) {
+												data.message = "loading";
+												loadPrice(data, aaTradeLeft);
+											}
 										}
 										aaTradeLeft.notifyDataSetChanged();
 		
 										for (CardData data : lTradeRight) {
-											data.message = "loading";
-											loadPrice(data, aaTradeRight);
+											if (data.customPrice == false) {
+												data.message = "loading";
+												loadPrice(data, aaTradeRight);
+											}
 										}
 										aaTradeRight.notifyDataSetChanged();
 		
@@ -708,6 +730,7 @@ public class TradeFragment extends FamiliarFragment {
 			Toast.makeText(this.getActivity(), "IOException", Toast.LENGTH_LONG).show();
 		}
 		doneLoading = true;
+		UpdateTotalPrices(); // this is for custom prices
 	}
 
 	protected void ChangeSet(final String _side, final int _position) throws FamiliarDbException {

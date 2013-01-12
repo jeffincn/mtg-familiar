@@ -50,12 +50,23 @@
         android:layout_height="wrap_content"
         android:text="@string/trader_edit_dialog_change_set" />
 
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
     <Button
         android:id="@+id/traderDialogRemove"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/trader_edit_dialog_remove" />
-
+        android:text="@string/trader_edit_dialog_remove"
+        android:layout_weight="1" />
+    <Button
+        android:id="@+id/traderDialogResetPrice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/trader_edit_dialog_reset_price" 
+        android:layout_weight="1"/>
+</LinearLayout>
     <Button
         android:id="@+id/traderDialogInfo"
         android:layout_width="match_parent"

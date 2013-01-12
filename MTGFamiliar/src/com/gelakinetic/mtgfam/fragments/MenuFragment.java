@@ -75,7 +75,7 @@ public class MenuFragment extends ListFragment {
 		mAdapter.addItem(R.string.main_wishlist, R.drawable.wishlist_icon);
 		mAdapter.addItem(R.string.main_timer, R.drawable.round_timer_icon);
 		mAdapter.addItem(R.string.main_rules, R.drawable.rules_icon);
-		mAdapter.addItem(R.string.main_judges_corner, R.drawable.rules_icon);
+		//mAdapter.addItem(R.string.main_judges_corner, R.drawable.rules_icon);
 		mAdapter.addItem(R.string.main_mojhosto, R.drawable.mojhosto_icon);
 		mAdapter.addHeader(R.string.main_extras);
 		mAdapter.addItem(R.string.main_settings_title);

@@ -22,7 +22,13 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     android:layout_height="match_parent"
     android:gravity="top"
     android:orientation="vertical" >
-
+
+
+
+
+
+
+
     <GridView
         android:id="@+id/edh_grid"
         android:layout_width="fill_parent"

@@ -9,7 +9,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
-
+
+
+
         <EditText
             android:id="@+id/numberInput"
             android:layout_width="50dp"
@@ -20,7 +22,8 @@
             android:maxLength="2"
             android:selectAllOnFocus="true" >
 
-        </EditText>
+        </EditText>
+
         <AutoCompleteTextView
             android:id="@+id/namesearch"
             android:layout_width="0dp"
@@ -31,7 +34,8 @@
 
             <requestFocus />
         </AutoCompleteTextView>
-
+
+
         <ImageButton
             android:id="@+id/cameraButton"
             android:layout_width="wrap_content"

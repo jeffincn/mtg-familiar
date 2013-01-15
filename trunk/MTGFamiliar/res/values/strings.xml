@@ -42,7 +42,6 @@
         &lt;a href="mailto:mtg.familiar@gmail.com">mtg.familiar@gmail.com&lt;/a> so we can track this bug and fix it.
         In the meantime, if it doesn\'t manage to fix itself, please try clearing the app data in your device\'s settings,
         and if that doesn\'t work reinstall the app from the Play Store.</string>
-    <string name="error_couldnt_open_db_toast">: Please try again.</string>
     <string name="error_no_email_client">It does not appear that you have an active email client installed. Please configure an email application.</string>
     
     <!-- Placeholder text -->
@@ -196,7 +195,6 @@
     <string name="life_counter_gathering_dialog_title">Load a Gathering</string>
     <string name="life_counter_clear_dialog_text">Clear life totals or players?\nMana pool will also be cleared.</string>
     <string name="life_counter_edit_name_dialog_title">Enter Name</string>
-	<string name="life_counter_search_from_photo">Search card from photo</string>
 	<string name="life_counter_tts_has"> has </string>
 	<string name="life_counter_tts_life">life</string>
 	<string name="life_counter_tts_lifes">life</string>	
@@ -386,18 +384,16 @@
     <string name="pref_wishlist_prices_summary">Display each card price in the wishlist</string>
     
     
-    <!-- Debug -->
+    <!-- Debug
     <string name="main_refresh_db">Refresh DB from APK</string>
     <string name="main_build_db">Build DB from Web</string>
-    
+     -->
     
     <!-- Default language -->
     <string name="main_card_language">en</string>
     
     
     <!-- Goggles -->
-    <string name="goggles_cssid_expired">CSSID expired!</string>
-    <string name="goggles_3_attempts">Three attempts were broken!</string>
     <string name="goggles_photo_analysis">Photo analysis…</string>
     <string name="goggles_no_card_on_photo">No card found on the photo</string>
     

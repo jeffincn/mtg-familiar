@@ -258,7 +258,6 @@ public class FamiliarFragment extends SherlockFragment {
 				}
 				mImageBitmap.recycle();
 				tmp_img_file.delete();
-				System.gc(); // take out the trash
 			} catch (Exception e) {
 				cardName = null;
 			}
@@ -267,6 +266,7 @@ public class FamiliarFragment extends SherlockFragment {
 
 		@Override
 		protected void onPostExecute(Void param) {
+			System.gc(); // take out the trash
 			try {
 				progDialog.dismiss();
 			}

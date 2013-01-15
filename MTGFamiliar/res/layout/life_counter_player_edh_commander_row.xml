@@ -7,7 +7,35 @@
     android:orientation="horizontal"
     android:padding="3dp"
     android:weightSum="1" >
-
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <TextView
         android:id="@+id/edh_commander_row_name"
         android:layout_width="wrap_content"
@@ -17,12 +45,20 @@
         android:paddingLeft="5dp"
         android:text="@string/name_search_hint"
         android:textSize="18dp" />
-
+
+
+
+
     <View
         android:layout_width="1dp"
         android:layout_height="fill_parent"
         android:background="#4fa5d5" />
-
+
+
+
+
+
+
     <TextView
         android:id="@+id/edh_commander_row_damage"
         android:layout_width="wrap_content"

@@ -16,7 +16,8 @@
             android:layout_margin="4dp"
             android:scaleType="fitCenter"
             android:src="@drawable/icon" />
-
+
+
         <TextView
             android:id="@+id/widget_namefield"
             android:layout_width="wrap_content"

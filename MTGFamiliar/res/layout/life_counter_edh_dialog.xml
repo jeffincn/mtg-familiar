@@ -5,7 +5,19 @@
     android:layout_height="match_parent"
     android:minHeight="50dp"
     android:orientation="vertical" >
-
+
+
+
+
+
+
+
+
+
+
+
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -15,7 +27,15 @@
         android:layout_weight="1"
         android:background="@xml/textview_backdrop"
         android:baselineAligned="false" >
-
+
+
+
+
+
+
+
+
+
         <ListView
             android:id="@+id/commander_damage_list"
             android:layout_width="match_parent"

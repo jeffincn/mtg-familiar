@@ -91,7 +91,6 @@ public class SearchWidgetFragment extends FamiliarFragment {
 	}
 
 	private void fillData(Cursor c) {
-
 		String[] from = { CardDbAdapter.KEY_NAME };
 		int[] to = { R.id.cardname };
 
@@ -124,6 +123,11 @@ public class SearchWidgetFragment extends FamiliarFragment {
 
 		@Override
 		protected Void doInBackground(String... params) {
+			if(getActivity() == null) {
+				// happens when the fragment is on the backstack, and being cleared
+				return null;
+			}
+
 			try {
 				c = mDbHelper.PrefixSearch(params[0], new String[] { CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME });
 			} catch (FamiliarDbException e) {
@@ -134,6 +138,11 @@ public class SearchWidgetFragment extends FamiliarFragment {
 
 		@Override
 		protected void onPostExecute(Void param) {
+			if(getActivity() == null) {
+				// happens when the fragment is on the backstack, and being cleared
+				return;
+			}
+
 			if(c != null) {
 				fillData(c);
 			}

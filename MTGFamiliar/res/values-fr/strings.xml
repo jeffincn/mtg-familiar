@@ -82,6 +82,7 @@
     <string name="main_whats_new_text">
 	- Amélioration de la navigation par menu glissant&lt;br />&lt;br />
  	- Recherches de prix plus efficaces.&lt;br />&lt;br />
+ 	- L\'échange de cartes sauve les prix personnalisés..&lt;br />&lt;br />
  	- Meilleure gestion des erreurs, corrections de bugs
     </string>
     
@@ -109,16 +110,18 @@
 		Merci à Reuben d\'avoir été le meilleur genre d\'utilisateur. Vous savez, le genre qui devient un développeur!&lt;br /&gt;&lt;br /&gt;
 		Merci à Lotier de Reddit d\'être arrivé de nulpart avec un outil génial d\'échange de cartes!&lt;br /&gt;&lt;br /&gt;
 		Merci à Daniel d\'avoir appris Android en premier, puis d\'avoir créé la liste de voeux!&lt;br /&gt;&lt;br /&gt;
-		Merci à chaudakh pour le merveilleux programme Gatherer Extractor.&lt;br /&gt;&lt;br /&gt;
+		Merci à Aethys pour ses traductions en français et son API de recherche des cartes depuis une photo.&lt;br /&gt;&lt;br /&gt;
+		Merci à chaudakh pour le merveilleux programme &lt;a href="http://forums.mtgsalvation.com/showthread.php?t=303454">Gatherer Extractor&lt;/a>.&lt;br /&gt;&lt;br /&gt;
 		Merci à reddit\'s &lt;a href=&quot;http://www.reddit.com/r/magicTCG/&quot;&gt;/r/magictcg&lt;/a&gt; pour les tests et retours.&lt;br /&gt;&lt;br /&gt;
 		Merci à mon frère pour l\'icône.&lt;br /&gt;&lt;br /&gt;
 		Merci à Chedy @ &lt;a href=&quot;http://tcgplayer.com&quot;&gt;TCGPlayer.com&lt;/a&gt; pour l\'API des prix.&lt;br /&gt;&lt;br /&gt;
-		Merci à Jake Wharton pour le magnifique &lt;a href=&quot;http://actionbarsherlock.com/&quot;&gt;ActionBarSherlock&lt;/a&gt;.&lt;br /&gt;&lt;br /&gt;
-		Merci à Aethys pour ses traductions en français et son API de recherche des cartes depuis une photo.&lt;br /&gt;&lt;br /&gt;
 		Merci spécial à Richard Garfield et le reste des gens à &lt;a href=&quot;http://www.wizards.com/magic&quot;&gt;Wizards of the Coast&lt;/a&gt;.&lt;br /&gt;&lt;br /&gt;
 		-gelakinetic&lt;br /&gt;&lt;br /&gt;&lt;br /&gt;
 		Magic the Gathering et Magic the Gathering cards sont ™ &amp; © Wizards of the Coast LLC.&lt;br /&gt;&lt;br /&gt;
 		The Android robot is © Google &lt;br /&gt;&lt;br /&gt;
+		&lt;a href="http://actionbarsherlock.com/index.html"&gt;ActionBarSherlock&lt;/a> utilisé sous Licence Apache, Version 2.0&lt;/a&gt;.&lt;br /&gt;&lt;br /&gt;
+		&lt;a href="https://github.com/octo-online/robospice"&gt;Robospice&lt;/a&gt; utilisé sous Licence Apache, Version 2.0&lt;/a&gt;.&lt;br /&gt;&lt;br /&gt;
+		&lt;a href="https://github.com/jfeinstein10/SlidingMenu"&gt;SlidingMenu&lt;/a&gt; utilisé sous Licence Apache, Version 2.0&lt;/a&gt;.&lt;br /&gt;&lt;br /&gt;
 		Programme sous licence &lt;a href=&quot;http://www.gnu.org/licenses/gpl.html&quot;&gt;GNU General Public License v3+&lt;/a&gt;.&lt;br /&gt;&lt;br /&gt;
 		Médias sous licence &lt;a href=&quot;http://creativecommons.org/licenses/by-sa/3.0/&quot;&gt;Creative Commons Attribution-ShareAlike 3.0 Unported License&lt;a&gt;.
 	</string>

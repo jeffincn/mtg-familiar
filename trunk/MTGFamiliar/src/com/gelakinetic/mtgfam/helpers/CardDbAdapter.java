@@ -250,7 +250,13 @@ public class CardDbAdapter {
 	}
 
 	public void close() {
-		mDbHelper.close();
+		try {
+			mDbHelper.close();
+		}
+		catch (Exception e) {
+			// This threw an exception at the GTC prerelease. Something to do with price fetching, not really sure
+			// Doing it pokemon style and hoping to remember to dig deeper later
+		}
 	}
 
 	public void dropCreateDB() throws FamiliarDbException {

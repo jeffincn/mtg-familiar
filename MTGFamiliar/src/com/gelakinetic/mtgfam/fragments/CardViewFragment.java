@@ -1060,7 +1060,7 @@ public class CardViewFragment extends FamiliarFragment {
 			        @Override
 			        public void onRequestFailure( SpiceException spiceException ) {
 			        	progDialog.dismiss();
-			        	Toast.makeText( getMainActivity(), spiceException.getCause().getMessage(), Toast.LENGTH_SHORT ).show();
+			        	Toast.makeText( getMainActivity(), spiceException.getMessage(), Toast.LENGTH_SHORT ).show();
 			        }
 
 			        @Override

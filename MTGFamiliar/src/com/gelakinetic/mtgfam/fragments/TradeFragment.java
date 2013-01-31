@@ -341,7 +341,7 @@ public class TradeFragment extends FamiliarFragment {
 						numberOf.setText(numberOfStr);
 						numberOf.setSelection(numberOfStr.length());
 		
-						String priceNumberStr = lSide.get(position).hasPrice() ? priceOfCard.substring(1) : "";
+						final String priceNumberStr = lSide.get(position).hasPrice() ? priceOfCard.substring(1) : "";
 						priceText.setText(priceNumberStr);
 						priceText.setSelection(priceNumberStr.length());
 		
@@ -419,7 +419,8 @@ public class TradeFragment extends FamiliarFragment {
 		
 								// validate the price text
 								String userInputPrice = priceText.getText().toString();
-								if (userInputPrice != priceOfCard){
+								
+								if (!userInputPrice.equals(priceNumberStr)){
 									lSide.get(position).SetIsCustomPrice();
 								}
 								

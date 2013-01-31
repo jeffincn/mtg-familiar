@@ -1018,7 +1018,7 @@ public class WishlistFragment extends FamiliarFragment {
 		getMainActivity().getSpiceManager().execute( priceRequest, data.name + "-" + data.setCode, DurationInMillis.ONE_DAY, new RequestListener< String >(){
 	        @Override
 	        public void onRequestFailure( SpiceException spiceException ) {
-				data.message = spiceException.getCause().getMessage();
+				data.message = spiceException.getMessage();
 				
 				UpdateTotalPrices();
 				adapter.notifyDataSetChanged();

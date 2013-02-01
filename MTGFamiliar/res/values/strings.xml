@@ -178,6 +178,7 @@
     <string name="card_view_gatherer_page">Gatherer Page</string>
     <string name="card_view_set_dialog_title">Pick a Set</string>
     <string name="card_view_loading_dialog">Loading. Please wait…</string>
+    <string name="card_view_price_not_found">Price not found.</string>
     
     
     <!-- Life counter activity -->
@@ -257,6 +258,7 @@
     <string name="trader_toast_no_trades">You have no saved trades.</string>
     <string name="trader_toast_save_error">The trade could not be saved; please try again.</string>
     <string name="trader_toast_invalid_chars">Trade names may not contain the path separator character (\'/\').</string>
+    <string name="trader_no_price">N/A</string>
         
     <!-- Wishlist activity -->
     <string name="wishlist_name">Name</string>

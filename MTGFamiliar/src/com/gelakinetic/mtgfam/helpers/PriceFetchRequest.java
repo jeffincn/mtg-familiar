@@ -80,7 +80,7 @@ public class PriceFetchRequest extends SpiceRequest<String> {
 			Element e = d.getDocumentElement();
 			retval = getString("lowprice", e);
 			if(retval == null) {
-				throw new SpiceException("PriceDNE");
+				return null;
 			}
 			else {
 			retval += "@@" + getString("avgprice", e) +

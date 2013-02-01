@@ -1026,29 +1026,34 @@ public class WishlistFragment extends FamiliarFragment {
 
 	        @Override
 	        public void onRequestSuccess( final String result ) {
-	        	String pieces[] = result.split("@@");
-				switch(priceSetting) {
-				case LOW_PRICE:
-				{
-					data.price = (int) (Double.parseDouble(pieces[0]) * 100);
-					break;
-				}
-				default:
-				case AVG_PRICE:
-				{
-					data.price = (int) (Double.parseDouble(pieces[1]) * 100);
-					break;
-				}
-				case HIGH_PRICE:
-				{
-					data.price = (int) (Double.parseDouble(pieces[2]) * 100);
-					break;
-				}
-			}
-			data.message = null;
-			
-			UpdateTotalPrices();
-			adapter.notifyDataSetChanged();
+	        	if (result != null) {
+		        	String pieces[] = result.split("@@");
+					switch(priceSetting) {
+						case LOW_PRICE:
+						{
+							data.price = (int) (Double.parseDouble(pieces[0]) * 100);
+							break;
+						}
+						default:
+						case AVG_PRICE:
+						{
+							data.price = (int) (Double.parseDouble(pieces[1]) * 100);
+							break;
+						}
+						case HIGH_PRICE:
+						{
+							data.price = (int) (Double.parseDouble(pieces[2]) * 100);
+							break;
+						}
+					}
+					data.message = null;
+	        	}
+	        	else {
+	        		data.message = getString(R.string.trader_no_price);
+	        	}
+	        	
+				UpdateTotalPrices();
+				adapter.notifyDataSetChanged();
 	        }
 		} );
 	}

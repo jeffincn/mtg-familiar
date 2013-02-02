@@ -33,8 +33,6 @@
             android:singleLine="true"
             android:textColor="@color/mythic"
             android:textSize="18dp" >
-
-            <requestFocus />
         </TextView>
 
         <ImageView

@@ -21,12 +21,14 @@
                 android:id="@+id/imageViewMo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:src="@drawable/momir" />
 
             <LinearLayout
                 android:id="@+id/linearLayout2"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:orientation="vertical" >
 
                 <TextView
@@ -61,12 +63,14 @@
                 android:id="@+id/imageViewSto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:src="@drawable/stonehewer" />
 
             <LinearLayout
                 android:id="@+id/linearLayout4"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:orientation="vertical" >
 
                 <TextView
@@ -100,13 +104,16 @@
             <ImageView
                 android:id="@+id/imageViewJho"
                 android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:src="@drawable/jhoira" />
 
             <LinearLayout
                 android:id="@+id/linearLayout6"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
                 android:orientation="vertical" >
 
                 <Button

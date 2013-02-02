@@ -597,8 +597,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 						nameInput = (EditText) textEntryView.findViewById(R.id.player_name);
 						if (playerToHaveNameChanged != null) {
 							nameInput.setText(playerToHaveNameChanged.name);
-							nameInput.selectAll();
+							setKeyboardFocus(savedInstanceState, nameInput, true);
 						}
+						else {
+							setKeyboardFocus(savedInstanceState, nameInput, false);
+						}
+						
 						Dialog dialog = new AlertDialog.Builder(getActivity()).setTitle(R.string.life_counter_edit_name_dialog_title).setView(textEntryView)
 								.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int whichButton) {

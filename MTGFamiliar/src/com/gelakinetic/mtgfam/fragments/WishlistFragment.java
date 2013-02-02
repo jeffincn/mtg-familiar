@@ -110,7 +110,8 @@ public class WishlistFragment extends FamiliarFragment {
 
 		namefield = (AutoCompleteTextView) myFragmentView.findViewById(R.id.namesearch);
 		namefield.setAdapter(new AutocompleteCursorAdapter(getActivity(), null));
-
+		setKeyboardFocus(savedInstanceState, namefield, false);
+		
 		numberfield = (EditText) myFragmentView.findViewById(R.id.numberInput);
 		numberfield.setText("1");
 

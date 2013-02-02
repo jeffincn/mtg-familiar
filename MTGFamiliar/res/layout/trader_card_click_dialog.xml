@@ -20,8 +20,6 @@
             android:maxLength="2"
             android:selectAllOnFocus="true"
             android:text="@string/trader_default_number_of" >
-
-            <requestFocus />
         </EditText>
 
         <TextView

@@ -2,6 +2,7 @@ package com.slidingmenu.lib.app;
 
 import android.app.ListActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ListView;
@@ -115,14 +116,14 @@ public class SlidingListActivity extends ListActivity implements SlidingActivity
 	}
 
 	/* (non-Javadoc)
-	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showContent()
+	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showAbove()
 	 */
 	public void showContent() {
 		mHelper.showContent();
 	}
 
 	/* (non-Javadoc)
-	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showMenu()
+	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showBehind()
 	 */
 	public void showMenu() {
 		mHelper.showMenu();
@@ -146,11 +147,11 @@ public class SlidingListActivity extends ListActivity implements SlidingActivity
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onKeyUp(int, android.view.KeyEvent)
 	 */
-//	@Override
-//	public boolean onKeyUp(int keyCode, KeyEvent event) {
-//		boolean b = mHelper.onKeyUp(keyCode, event);
-//		if (b) return b;
-//		return super.onKeyUp(keyCode, event);
-//	}
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+		boolean b = mHelper.onKeyUp(keyCode, event);
+		if (b) return b;
+		return super.onKeyUp(keyCode, event);
+	}
 
 }

@@ -482,6 +482,16 @@ public class MainActivity extends SlidingFragmentActivity {
 			// eat it
 		}
 	}
+	
+	public void showKeyboard(View v) {
+		try {
+			InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.showSoftInput(v, 0);
+		}
+		catch (NullPointerException e) {
+			// eat it
+		}
+	}
 
 	@Override
 	protected void onDestroy() {

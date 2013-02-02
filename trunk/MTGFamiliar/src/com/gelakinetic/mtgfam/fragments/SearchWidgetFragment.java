@@ -47,6 +47,7 @@ public class SearchWidgetFragment extends FamiliarFragment {
 		View myFragmentView = inflater.inflate(R.layout.widget_search_frag, container, false);
 
 		namefield = (EditText) myFragmentView.findViewById(R.id.widget_namefield);
+		setKeyboardFocus(savedInstanceState, namefield, false);
 		searchButton = (ImageView) myFragmentView.findViewById(R.id.search_button);
 		resultList = (ListView) myFragmentView.findViewById(R.id.result_list);
 

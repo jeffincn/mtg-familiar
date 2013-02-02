@@ -123,6 +123,8 @@ public class TradeFragment extends FamiliarFragment {
 		namefield = (AutoCompleteTextView) myFragmentView.findViewById(R.id.namesearch);
 		namefield.setAdapter(new AutocompleteCursorAdapter(this.getActivity(), null));
 
+		setKeyboardFocus(savedInstanceState, namefield, false);
+		
 		camerabutton = (ImageButton) myFragmentView.findViewById(R.id.cameraButton);
 
 		numberfield = (EditText) myFragmentView.findViewById(R.id.numberInput);

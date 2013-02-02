@@ -395,6 +395,8 @@ public class SearchViewFragment extends FamiliarFragment {
 		
 		checkDialogButtonColors();
 
+		setKeyboardFocus(savedInstanceState, namefield, false);
+	    
 		return myFragmentView;
 	}
 	

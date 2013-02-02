@@ -12,14 +12,18 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -289,5 +293,20 @@ public class FamiliarFragment extends SherlockFragment {
 	protected void onGoogleGogglesSuccess(String cardName) {
 		// this method must be overridden by each class calling takePictureAndSearchGoogleGogglesIntent
 		mGogglesTask = null;
+	}
+	
+	public static void setKeyboardFocus(Bundle savedInstanceState, final EditText primaryTextField, final boolean selectAll) {
+		if (!(savedInstanceState != null && !savedInstanceState.isEmpty())){
+			(new Handler()).postDelayed(new Runnable() {
+				public void run() {
+					primaryTextField.clearFocus();
+					primaryTextField.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, 0, 0, 0));
+					primaryTextField.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_UP , 0, 0, 0));
+					if(selectAll) {
+						primaryTextField.selectAll();
+					}
+				}
+			}, 100);
+		}
 	}
 }

@@ -19,7 +19,6 @@ import org.xml.sax.SAXException;
 
 import android.database.Cursor;
 import android.os.Build;
-import android.util.Log;
 
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.SpiceRequest;
@@ -44,7 +43,6 @@ public class PriceFetchRequest extends SpiceRequest<String> {
 	@Override
 	public String loadDataFromNetwork() throws SpiceException {
 
-		Log.e("robospice", "loadDataFromNetwork");
 		try {
 			if(number == null) {
 				Cursor c = mDbHelper.fetchCardByNameAndSet(cardName, setCode);

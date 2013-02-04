@@ -179,6 +179,7 @@
     <string name="card_view_gatherer_page">Voir sur Gatherer</string>
     <string name="card_view_set_dialog_title">Choix d\'extension</string>
     <string name="card_view_loading_dialog">Chargement. Veuillez patienter…</string>
+    <string name="card_view_price_not_found">Prix non trouvé.</string>
     
     
     <!-- Life counter activity -->
@@ -257,6 +258,7 @@
     <string name="trader_toast_no_trades">Vous n\'avez aucun échange sauvé.</string>
     <string name="trader_toast_save_error">L\'échange n\'a pu être sauvé; veuillez réessayer.</string>
     <string name="trader_toast_invalid_chars">Les noms d\'échanges ne peuvent contenir le caractère de séparation des chemins (\'/\').</string>
+    <string name="trader_no_price">N/D</string>
     
     
     <!-- Wishlist activity -->

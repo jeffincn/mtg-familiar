@@ -176,8 +176,6 @@ public class CardDbAdapter {
 	public static final int RESTRICTED = 2;
 
 	// use a hash map for performance
-	private HashMap<String, String> setSymbolsNames;
-	private HashMap<String, String> setNamesSymbols;
 	private static final HashMap<String, String> mColumnMap = buildColumnMap();
 
 	public static final String DB_PATH = "/data/data/com.gelakinetic.mtgfam/databases/";
@@ -323,8 +321,7 @@ public class CardDbAdapter {
 
 		boolean wasSuccess = mDb.update(DATABASE_TABLE_SETS, args, KEY_CODE
 				+ " = '" + code + "'", null) > 0;
-		if (wasSuccess)
-			saturateSetCache();
+
 		return wasSuccess;
 	}
 
@@ -1226,40 +1223,32 @@ public class CardDbAdapter {
 		}
 	}
 
-	public void saturateSetCache() throws FamiliarDbException {
-		setSymbolsNames = new HashMap<String, String>();
-		setNamesSymbols = new HashMap<String, String>();
-		Cursor setCursor = fetchAllTcgNames();
-		setCursor.moveToFirst();
-
-		setSymbolsNames.clear();
-		setNamesSymbols.clear();
-
-		for (int i = 0; i < setCursor.getCount(); i++) {
-			setSymbolsNames.put(setCursor.getString(setCursor
-					.getColumnIndex(CardDbAdapter.KEY_CODE)), setCursor
-					.getString(setCursor
-							.getColumnIndex(CardDbAdapter.KEY_NAME_TCGPLAYER)));
-			setNamesSymbols.put(setCursor.getString(setCursor
-					.getColumnIndex(CardDbAdapter.KEY_NAME_TCGPLAYER)),
-					setCursor.getString(setCursor
-							.getColumnIndex(CardDbAdapter.KEY_CODE)));
-			setCursor.moveToNext();
-		}
-
-		setCursor.close();
-	}
-
 	public String getTCGname(String setCode) throws FamiliarDbException {
-		if (setSymbolsNames == null || mDbHelper == null)
-			saturateSetCache();
-		return setSymbolsNames.get(setCode);
+		try {
+			String sql = "SELECT " + KEY_NAME_TCGPLAYER + " FROM " + DATABASE_TABLE_SETS + " WHERE " + KEY_CODE + " = '" + setCode.replace("'", "''") + "';";
+			Cursor c = mDb.rawQuery(sql, null);
+			c.moveToFirst();
+			String TCGname = c.getString(c.getColumnIndex(KEY_NAME_TCGPLAYER));
+			return TCGname;
+		} catch (SQLiteException e) {
+			throw new FamiliarDbException(e);
+		} catch (IllegalStateException e) {
+			throw new FamiliarDbException(e);
+		}
 	}
 
 	public String getSetCode(String TCGname) throws FamiliarDbException {
-		if (setSymbolsNames == null || mDbHelper == null)
-			saturateSetCache();
-		return setNamesSymbols.get(TCGname);
+		try {
+			String sql = "SELECT " + KEY_CODE + " FROM " + DATABASE_TABLE_SETS + " WHERE " + KEY_NAME_TCGPLAYER + " = '" + TCGname.replace("'", "''") + "';";
+			Cursor c = mDb.rawQuery(sql, null);
+			c.moveToFirst();
+			String setCode = c.getString(c.getColumnIndex(KEY_CODE));
+			return setCode;
+		} catch (SQLiteException e) {
+			throw new FamiliarDbException(e);
+		} catch (IllegalStateException e) {
+			throw new FamiliarDbException(e);
+		}
 	}
 
 	public Cursor fetchAllTcgNames() throws FamiliarDbException {

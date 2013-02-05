@@ -226,7 +226,7 @@ public class RulesFragment extends FamiliarFragment {
 		else {
 			keywordPattern = null;
 		}
-		hyperlinkPattern = Pattern.compile("\\<(http://)?(www|gatherer)(.+?)\\>");
+		hyperlinkPattern = Pattern.compile("\\<(http://)?(www|gatherer|mtgcommander)(.+?)\\>");
 
 		/*
 		 * Regex breakdown for Adam: [1-9]{1}: first character is between 1 and 9

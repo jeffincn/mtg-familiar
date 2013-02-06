@@ -111,14 +111,14 @@ public class SlidingFragmentActivity extends SherlockFragmentActivity implements
 	}
 
 	/* (non-Javadoc)
-	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showAbove()
+	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showContent()
 	 */
 	public void showContent() {
 		mHelper.showContent();
 	}
 
 	/* (non-Javadoc)
-	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showBehind()
+	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showMenu()
 	 */
 	public void showMenu() {
 		mHelper.showMenu();

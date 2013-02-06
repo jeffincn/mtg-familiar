@@ -1,12 +1,11 @@
 package com.slidingmenu.lib.app;
 
-import com.slidingmenu.lib.SlidingMenu;
-
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+
+import com.slidingmenu.lib.SlidingMenu;
 
 public class SlidingPreferenceActivity extends PreferenceActivity implements SlidingActivityBase {
 
@@ -112,14 +111,14 @@ public class SlidingPreferenceActivity extends PreferenceActivity implements Sli
 	}
 
 	/* (non-Javadoc)
-	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showAbove()
+	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showContent()
 	 */
 	public void showContent() {
 		mHelper.showContent();
 	}
 
 	/* (non-Javadoc)
-	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showBehind()
+	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showMenu()
 	 */
 	public void showMenu() {
 		mHelper.showMenu();
@@ -142,10 +141,10 @@ public class SlidingPreferenceActivity extends PreferenceActivity implements Sli
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onKeyUp(int, android.view.KeyEvent)
 	 */
-	@Override
-	public boolean onKeyUp(int keyCode, KeyEvent event) {
-		boolean b = mHelper.onKeyUp(keyCode, event);
-		if (b) return b;
-		return super.onKeyUp(keyCode, event);
-	}
+//	@Override
+//	public boolean onKeyUp(int keyCode, KeyEvent event) {
+//		boolean b = mHelper.onKeyUp(keyCode, event);
+//		if (b) return b;
+//		return super.onKeyUp(keyCode, event);
+//	}
 }

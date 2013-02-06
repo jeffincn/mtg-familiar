@@ -1,7 +1,6 @@
 package com.slidingmenu.lib.app;
 
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 
@@ -112,14 +111,14 @@ public abstract class SlidingMapActivity extends MapActivity implements SlidingA
 	}
 
 	/* (non-Javadoc)
-	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showAbove()
+	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showContent()
 	 */
 	public void showContent() {
 		mHelper.showContent();
 	}
 
 	/* (non-Javadoc)
-	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showBehind()
+	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showMenu()
 	 */
 	public void showMenu() {
 		mHelper.showMenu();
@@ -142,11 +141,11 @@ public abstract class SlidingMapActivity extends MapActivity implements SlidingA
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onKeyUp(int, android.view.KeyEvent)
 	 */
-	@Override
-	public boolean onKeyUp(int keyCode, KeyEvent event) {
-		boolean b = mHelper.onKeyUp(keyCode, event);
-		if (b) return b;
-		return super.onKeyUp(keyCode, event);
-	}
+//	@Override
+//	public boolean onKeyUp(int keyCode, KeyEvent event) {
+//		boolean b = mHelper.onKeyUp(keyCode, event);
+//		if (b) return b;
+//		return super.onKeyUp(keyCode, event);
+//	}
 
 }

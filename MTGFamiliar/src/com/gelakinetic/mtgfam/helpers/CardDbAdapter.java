@@ -1560,27 +1560,19 @@ public class CardDbAdapter {
 	 */
 	public Cursor getWordMatches(String query, String[] columns)
 			throws FamiliarDbException {
-		String selection = KEY_NAME + " LIKE '"
-				+ query.replace("'", "''").replace("æ", "Æ").trim() + "%'";
-		String[] selectionArgs = null;
 
-		return query(selection, selectionArgs, columns);
-
-		/*
-		 * This builds a query that looks like: SELECT <columns> FROM <table>
-		 * WHERE <KEY_WORD> MATCH 'query*' which is an FTS3 search for the query
-		 * text (plus a wildcard) inside the word column.
-		 * 
-		 * - "rowid" is the unique id for all rows but we need this value for
-		 * the "_id" column in order for the Adapters to work, so the columns
-		 * need to make "_id" an alias for "rowid" - "rowid" also needs to be
-		 * used by the SUGGEST_COLUMN_INTENT_DATA alias in order for suggestions
-		 * to carry the proper intent data. These aliases are defined in the
-		 * DictionaryProvider when queries are made. - This can be revised to
-		 * also search the definition text with FTS3 by changing the selection
-		 * clause to use FTS_VIRTUAL_TABLE instead of KEY_WORD (to search across
-		 * the entire table, but sorting the relevance could be difficult.
-		 */
+		if(query.length() == 0) {
+			return null;
+		}
+		
+		String sql =
+				"SELECT * FROM (" + 
+				"SELECT " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " + DATABASE_TABLE_CARDS + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_ID + " AS " + SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID +
+				" FROM " + DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = " + DATABASE_TABLE_CARDS + "." + KEY_SET +
+				" WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " LIKE '" + query.replace("'", "''").replace("æ", "Æ").trim() +
+				"%' ORDER BY " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " DESC, " + DATABASE_TABLE_SETS + "." + KEY_DATE + " ASC " +
+				") GROUP BY " + KEY_NAME;
+		return mDb.rawQuery(sql, null);
 	}
 
 	public static boolean isDbOutOfDate(Context ctx) {

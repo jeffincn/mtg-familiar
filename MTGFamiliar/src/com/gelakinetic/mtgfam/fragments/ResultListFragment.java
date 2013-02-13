@@ -25,11 +25,11 @@ import com.gelakinetic.mtgfam.helpers.ResultListAdapter;
 
 public class ResultListFragment extends FamiliarFragment {
 
-	private static int				cursorPosition;
-	private static int				cursorPositionOffset;
+	private static int				cursorPosition = 0;
+	private static int				cursorPositionOffset = 0;
 	private ListView	lv;
-	private static boolean		isSingle;
-	private static boolean		isRandom;
+	private static boolean		isSingle = false;
+	private static boolean		isRandom = false;
 	private static int				numChoices;
 	private static int[]		randomSequence;
 	private Cursor		c;
@@ -50,14 +50,6 @@ public class ResultListFragment extends FamiliarFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		//reset variables
-		isSingle = false;
-		isRandom = false;
-		
-		// After a search, make sure the position is on top
-		cursorPosition = 0;
-		cursorPositionOffset = 0;
 
 		String[] returnTypes = new String[] { CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_SET,
 				CardDbAdapter.KEY_RARITY, CardDbAdapter.KEY_MANACOST, CardDbAdapter.KEY_TYPE, CardDbAdapter.KEY_ABILITY,

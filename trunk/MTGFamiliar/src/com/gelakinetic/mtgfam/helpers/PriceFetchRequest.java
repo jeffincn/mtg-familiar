@@ -5,6 +5,7 @@ import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -61,10 +62,12 @@ public class PriceFetchRequest extends SpiceRequest<String> {
 			else {
 				tcgCardName = cardName;
 			}
-			URL priceurl = new URL(CardDbAdapter.removeAccentMarks(new String("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + tcgname + "&p="
-					+ tcgCardName).replace(" ", "%20").replace("Æ", "Ae")));
-
-
+			URL priceurl = new URL("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + 
+			URLEncoder.encode(tcgname.replace(Character.toChars(0xC6)[0]+"", "Ae"), "UTF-8")
+			+ "&p="	+
+			URLEncoder.encode(tcgCardName.replace(Character.toChars(0xC6)[0]+"", "Ae"), "UTF-8")
+			);
+			
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) {
 				System.setProperty("http.keepAlive", "false");
 			}

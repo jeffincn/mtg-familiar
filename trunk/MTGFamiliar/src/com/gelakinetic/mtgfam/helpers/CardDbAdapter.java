@@ -411,7 +411,8 @@ public class CardDbAdapter {
 
 	public Cursor fetchCardByName(String name, String[] fields)
 			throws FamiliarDbException {
-		name = name.replace("æ", "Æ");
+		// replace lowercase ae with Ae
+		name = name.replace(Character.toChars(0xE6)[0], Character.toChars(0xC6)[0]);
 		String sql = "SELECT ";
 		boolean first = true;
 		for (String field : fields) {
@@ -446,7 +447,8 @@ public class CardDbAdapter {
 
 	public Cursor fetchLatestCardByName(String name, String[] fields)
 			throws FamiliarDbException {
-		name = name.replace("æ", "Æ");
+		// replace lowercase ae with Ae
+		name = name.replace(Character.toChars(0xE6)[0], Character.toChars(0xC6)[0]);
 		String sql = "SELECT ";
 		boolean first = true;
 		for (String field : fields) {
@@ -481,7 +483,8 @@ public class CardDbAdapter {
 
 	public Cursor fetchCardByNameAndSet(String name, String setCode)
 			throws FamiliarDbException {
-		name = name.replace("æ", "Æ");
+		// replace lowercase ae with Ae
+		name = name.replace(Character.toChars(0xE6)[0], Character.toChars(0xC6)[0]);
 		String sql = "SELECT " + DATABASE_TABLE_CARDS + "." + KEY_ID + ", "
 				+ DATABASE_TABLE_CARDS + "." + KEY_NAME + ", "
 				+ DATABASE_TABLE_CARDS + "." + KEY_SET + ", "
@@ -517,7 +520,8 @@ public class CardDbAdapter {
 	}
 
 	public long fetchIdByName(String name) throws FamiliarDbException {
-		name = name.replace("æ", "Æ");
+		// replace lowercase ae with Ae
+		name = name.replace(Character.toChars(0xE6)[0], Character.toChars(0xC6)[0]);
 		
 		String sql = "SELECT " + DATABASE_TABLE_CARDS + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_SET + ", " + DATABASE_TABLE_SETS + "." + KEY_DATE +
 				" FROM (" + DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_CARDS + "." + KEY_SET + "=" + DATABASE_TABLE_SETS + "." + KEY_CODE + ")" +
@@ -546,7 +550,7 @@ public class CardDbAdapter {
 		Cursor mCursor = null;
 
 		if (cardname != null)
-			cardname = cardname.replace("æ", "Æ").trim();
+			cardname = cardname.replace(Character.toChars(0xE6)[0], Character.toChars(0xC6)[0]).trim();
 
 		String sql = "SELECT MIN(" + KEY_ID + ") AS " + KEY_ID + ", "
 				+ KEY_NAME + " FROM " + DATABASE_TABLE_CARDS + " WHERE "
@@ -577,7 +581,7 @@ public class CardDbAdapter {
 		Cursor mCursor = null;
 
 		if (cardname != null)
-			cardname = cardname.replace("'", "''").replace("æ", "Æ").trim();
+			cardname = cardname.replace("'", "''").replace(Character.toChars(0xE6)[0], Character.toChars(0xC6)[0]).trim();
 		if (cardtext != null)
 			cardtext = cardtext.replace("'", "''").trim();
 		if (cardtype != null)
@@ -1045,7 +1049,7 @@ public class CardDbAdapter {
 		Cursor mCursor = null;
 
 		if (cardname != null)
-			cardname = cardname.replace("æ", "Æ").trim();
+			cardname = cardname.replace(Character.toChars(0xE6)[0], Character.toChars(0xC6)[0]).trim();
 
 		String statement = " WHERE 1=1";
 
@@ -1181,7 +1185,7 @@ public class CardDbAdapter {
 
 	public int checkLegality(String mCardName, String format)
 			throws FamiliarDbException {
-		mCardName = mCardName.replace("'", "''").replace("æ", "Æ");
+		mCardName = mCardName.replace("'", "''").replace(Character.toChars(0xE6)[0], Character.toChars(0xC6)[0]);
 		format = format.replace("'", "''"); // Just to be safe; remember Bobby
 		// Tables
 		try {
@@ -1569,7 +1573,7 @@ public class CardDbAdapter {
 				"SELECT * FROM (" + 
 				"SELECT " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " + DATABASE_TABLE_CARDS + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_ID + " AS " + SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID +
 				" FROM " + DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = " + DATABASE_TABLE_CARDS + "." + KEY_SET +
-				" WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " LIKE '" + query.replace("'", "''").replace("æ", "Æ").trim() +
+				" WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " LIKE '" + query.replace("'", "''").replace(Character.toChars(0xE6)[0], Character.toChars(0xC6)[0]).trim() +
 				"%' ORDER BY " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " DESC, " + DATABASE_TABLE_SETS + "." + KEY_DATE + " ASC " +
 				") GROUP BY " + KEY_NAME;
 		return mDb.rawQuery(sql, null);
@@ -1718,59 +1722,68 @@ public class CardDbAdapter {
 		return false;
 	}
 	
-	public static String removeAccentMarks(String s) {
-		return s.replace("À", "A")
-		.replace("È", "E")
-		.replace("Ì", "I")
-		.replace("Ò", "O")
-		.replace("Ù", "U")
-		.replace("à", "a")
-		.replace("è", "e")
-		.replace("ì", "I")
-		.replace("ò", "o")
-		.replace("ù", "u")
-		.replace("Á", "A")
-		.replace("É", "E")
-		.replace("Í", "I")
-		.replace("Ó", "O")
-		.replace("Ú", "U")
-		.replace("Ý", "Y")
-		.replace("á", "a")
-		.replace("é", "e")
-		.replace("í", "I")
-		.replace("ó", "o")
-		.replace("ú", "u")
-		.replace("ý", "y")
-		.replace("Â", "A")
-		.replace("Ê", "E")
-		.replace("Î", "I")
-		.replace("Ô", "O")
-		.replace("Û", "U")
-		.replace("â", "a")
-		.replace("ê", "e")
-		.replace("î", "I")
-		.replace("ô", "o")
-		.replace("û", "u")
-		.replace("Ã", "A")
-		.replace("Ñ", "N")
-		.replace("Õ", "O")
-		.replace("ã", "s")
-		.replace("ñ", "n")
-		.replace("õ", "o")
-		.replace("Ä", "A")
-		.replace("Ë", "E")
-		.replace("Ï", "I")
-		.replace("Ö", "O")
-		.replace("Ü", "U")
-		.replace("Ÿ", "Y")
-		.replace("ä", "a")
-		.replace("ë", "e")
-		.replace("ï", "I")
-		.replace("ö", "o")
-		.replace("ü", "u")
-		.replace("ÿ", "y");
+    public static String removeAccentMarks(String s) {
+        return s.replace(Character.toChars(0xC0)[0]+"", "A")
+        		.replace(Character.toChars(0xC1)[0]+"", "A")
+        		.replace(Character.toChars(0xC2)[0]+"", "A")
+        		.replace(Character.toChars(0xC3)[0]+"", "A")
+        		.replace(Character.toChars(0xC4)[0]+"", "A")
+        		.replace(Character.toChars(0xC5)[0]+"", "A")
+        		.replace(Character.toChars(0xC6)[0]+"", "Ae")
+        		.replace(Character.toChars(0xC7)[0]+"", "C")
+        		.replace(Character.toChars(0xC8)[0]+"", "E")
+        		.replace(Character.toChars(0xC9)[0]+"", "E")
+        		.replace(Character.toChars(0xCA)[0]+"", "E")
+        		.replace(Character.toChars(0xCB)[0]+"", "E")
+        		.replace(Character.toChars(0xCC)[0]+"", "I")
+        		.replace(Character.toChars(0xCD)[0]+"", "I")
+        		.replace(Character.toChars(0xCE)[0]+"", "I")
+        		.replace(Character.toChars(0xCF)[0]+"", "I")
+        		.replace(Character.toChars(0xD0)[0]+"", "D")
+        		.replace(Character.toChars(0xD1)[0]+"", "N")
+        		.replace(Character.toChars(0xD2)[0]+"", "O")
+        		.replace(Character.toChars(0xD3)[0]+"", "O")
+        		.replace(Character.toChars(0xD4)[0]+"", "O")
+        		.replace(Character.toChars(0xD5)[0]+"", "O")
+        		.replace(Character.toChars(0xD6)[0]+"", "O")
+        		.replace(Character.toChars(0xD7)[0]+"", "x")
+        		.replace(Character.toChars(0xD8)[0]+"", "O")
+        		.replace(Character.toChars(0xD9)[0]+"", "U")
+        		.replace(Character.toChars(0xDA)[0]+"", "U")
+        		.replace(Character.toChars(0xDB)[0]+"", "U")
+        		.replace(Character.toChars(0xDC)[0]+"", "U")
+        		.replace(Character.toChars(0xDD)[0]+"", "Y")
+        		.replace(Character.toChars(0xE0)[0]+"", "a")
+        		.replace(Character.toChars(0xE1)[0]+"", "a")
+        		.replace(Character.toChars(0xE2)[0]+"", "a")
+        		.replace(Character.toChars(0xE3)[0]+"", "a")
+        		.replace(Character.toChars(0xE4)[0]+"", "a")
+        		.replace(Character.toChars(0xE5)[0]+"", "a")
+        		.replace(Character.toChars(0xE6)[0]+"", "ae")
+        		.replace(Character.toChars(0xE7)[0]+"", "c")
+        		.replace(Character.toChars(0xE8)[0]+"", "e")
+        		.replace(Character.toChars(0xE9)[0]+"", "e")
+        		.replace(Character.toChars(0xEA)[0]+"", "e")
+        		.replace(Character.toChars(0xEB)[0]+"", "e")
+        		.replace(Character.toChars(0xEC)[0]+"", "i")
+        		.replace(Character.toChars(0xED)[0]+"", "i")
+        		.replace(Character.toChars(0xEE)[0]+"", "i")
+        		.replace(Character.toChars(0xEF)[0]+"", "i")
+        		.replace(Character.toChars(0xF1)[0]+"", "n")
+        		.replace(Character.toChars(0xF2)[0]+"", "o")
+        		.replace(Character.toChars(0xF3)[0]+"", "o")
+        		.replace(Character.toChars(0xF4)[0]+"", "o")
+        		.replace(Character.toChars(0xF5)[0]+"", "o")
+        		.replace(Character.toChars(0xF6)[0]+"", "o")
+        		.replace(Character.toChars(0xF8)[0]+"", "o")
+        		.replace(Character.toChars(0xF9)[0]+"", "u")
+        		.replace(Character.toChars(0xFA)[0]+"", "u")
+        		.replace(Character.toChars(0xFB)[0]+"", "u")
+        		.replace(Character.toChars(0xFC)[0]+"", "u")
+        		.replace(Character.toChars(0xFD)[0]+"", "y")
+        		.replace(Character.toChars(0xFF)[0]+"", "y");
+    }
 
-	}
 	
 
 	public static boolean isTransformable(String number, String setCode) {

@@ -119,6 +119,16 @@ public class ResultListFragment extends FamiliarFragment {
 		}
 		WishlistHelpers.WriteWishlist(this.getActivity(), cards);
 		*/
+		
+		/*
+		 * savedInstanceState is only null when the fragment is starting a new result
+		 * reset the position then, but not on rotation or putting it on the backstack
+		 * see onSaveInstanceState() in Familiar Fragment
+		 */
+		if(savedInstanceState == null) {
+			cursorPosition = 0;
+			cursorPositionOffset = 0;
+		}
 	}
 
 	@Override

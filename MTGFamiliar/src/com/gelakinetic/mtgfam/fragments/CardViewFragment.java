@@ -550,7 +550,7 @@ public class CardViewFragment extends FamiliarFragment {
 					String picurl;
 					if (setCode.equals("PP2")) {
 						picurl = "http://magiccards.info/extras/plane/planechase-2012-edition/" + cardName + ".jpg";
-						picurl = picurl.replace(" ", "-").replace("Æ", "Ae").replace("?", "").replace(",", "").replace("'", "")
+						picurl = picurl.replace(" ", "-").replace(Character.toChars(0xC6)[0]+"", "Ae").replace("?", "").replace(",", "").replace("'", "")
 								.replace("!", "");
 					}
 					else if (setCode.equals("PCP")) {
@@ -569,12 +569,12 @@ public class CardViewFragment extends FamiliarFragment {
 						else {
 							picurl = "http://magiccards.info/extras/plane/planechase/" + cardName + ".jpg";
 						}
-						picurl = picurl.replace(" ", "-").replace("Æ", "Ae").replace("?", "").replace(",", "").replace("'", "")
+						picurl = picurl.replace(" ", "-").replace(Character.toChars(0xC6)[0]+"", "Ae").replace("?", "").replace(",", "").replace("'", "")
 								.replace("!", "");
 					}
 					else if (setCode.equals("ARS")) {
 						picurl = "http://magiccards.info/extras/scheme/archenemy/" + cardName + ".jpg";
-						picurl = picurl.replace(" ", "-").replace("Æ", "Ae").replace("?", "").replace(",", "").replace("'", "")
+						picurl = picurl.replace(" ", "-").replace(Character.toChars(0xC6)[0]+"", "Ae").replace("?", "").replace(",", "").replace("'", "")
 								.replace("!", "");
 					}
 					else {

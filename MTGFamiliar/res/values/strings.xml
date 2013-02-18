@@ -73,7 +73,7 @@
         For a premium M:TG app like this, how much would you pay? $1,000? $10,000?&lt;br />&lt;br />
         Well, if you\'re reading this, you already know we\'re giving it away for free!&lt;br />&lt;br />
         Coding is hard work though, and us devs appreciate the extra dollar here or there.&lt;br />&lt;br />
-        We\'ve got a drafting habit to fuel, ok?&lt;br />&lt;br />
+        We\'ve got a drafting habit to fuel, OK?&lt;br />&lt;br />
         You can click the button below to donate via PayPal. $1 is cool. $5 is cooler. You get the drift.&lt;br />&lt;br />
         So, how generous are you feeling today?
     </string>
@@ -81,9 +81,10 @@
     <string name="main_whats_new_in_title">What\'s New in Version</string>
     <string name="main_whats_new_text">
 	- Improved Sliding Menu navigation&lt;br />&lt;br />
- 	- More efficient price lookups.&lt;br />&lt;br />
- 	- Trader saves custom prices..&lt;br />&lt;br />
- 	- Better error handling, bugfixes
+ 	- More efficient price lookups&lt;br />&lt;br />
+ 	- Trader saves custom prices&lt;br />&lt;br />
+ 	- Many small bug fixes&lt;br />&lt;br />
+ 	- Better error handling
     </string>
     
     <string name="main_tts_warning_title">Text-to-Speech</string>

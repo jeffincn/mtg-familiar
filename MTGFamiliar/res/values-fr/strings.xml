@@ -81,9 +81,10 @@
     <string name="main_whats_new_in_title">Nouveautés dans la Version</string>
     <string name="main_whats_new_text">
 	- Amélioration de la navigation par menu glissant&lt;br />&lt;br />
- 	- Recherches de prix plus efficaces.&lt;br />&lt;br />
- 	- L\'échange de cartes sauve les prix personnalisés..&lt;br />&lt;br />
- 	- Meilleure gestion des erreurs, corrections de bugs
+ 	- Recherches de prix plus efficaces&lt;br />&lt;br />
+ 	- L\'échange de cartes sauve les prix personnalisés&lt;br />&lt;br />
+ 	- Plusieurs petites corrections de bugs&lt;br />&lt;br />
+ 	- Meilleure gestion des erreurs
     </string>
     
     <string name="main_tts_warning_title">Synthèse vocale (TTS)</string>

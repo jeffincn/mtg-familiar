@@ -152,7 +152,42 @@
     <string name="search_toast_no_results">Aucun résultat trouvé.</string>
     <string name="search_toast_cannot_save">Sauvegarde impossible des options de recherche.</string>
     <string name="search_toast_cannot_load">Chargement impossible des options de recherche.</string>
-    
+	<string name="search_All_types">Tous les types saisis</string>
+	<string name="search_Any_types">Au moins un des types saisis</string>
+	<string name="search_NOT_any_selected_types">AUCUN des types saisis</string>
+	<string name="search_All_words">Tous les mots</string>
+	<string name="search_Any_words">Au moins 1 mot</string>
+	<string name="search_Exact_phrase">Phrase exacte</string>
+	<string name="search_Most_recent_printing">Edition la plus récente</string>
+	<string name="search_Original_printing">Edition originale</string>
+	<string name="search_All_printings">Toutes les éditions</string>
+	<string name="search_Reprints_only">Rééditions seulement</string>
+	<string name="search_May_include_any_colors">Au moins 1 de ces couleurs</string>
+	<string name="search_Must_include_all_colors">Au moins toutes ces couleurs</string>
+	<string name="search_No_other_colors">Que ces couleurs</string>
+	<string name="search_Exact_all_selected_and_no_others">Exactement ces couleurs</string>
+	<string name="search_Common">Commune</string>
+	<string name="search_Uncommon">Unco</string>
+	<string name="search_Rare">Rare</string>
+	<string name="search_Mythic">Mythique</string>
+	<string name="search_Timeshifted">Timeshifted</string>
+	<string name="search_Artifact">Artefact</string>
+	<string name="search_Basic">Basic</string>
+	<string name="search_Creature">Créature</string>
+	<string name="search_Enchantment">Enchantement</string>
+	<string name="search_Instant">Ephémère</string>
+	<string name="search_Land">Terrain</string>
+	<string name="search_Legendary">Légendaire</string>
+	<string name="search_Ongoing">Ongoing</string>
+	<string name="search_Plane">Plane</string>
+	<string name="search_Planeswalker">Arpenteur</string>
+	<string name="search_Scheme">Scheme</string>
+	<string name="search_Snow">Neigeux</string>
+	<string name="search_Sorcery">Rituel</string>
+	<string name="search_Tribal">Tribal</string>
+	<string name="search_Vanguard">Fun cards</string>
+	<string name="search_World">Du monde</string>
+
     
     <!-- Card view activity -->
     <string name="card_view_transform">Transformer</string>
@@ -203,7 +238,9 @@
 	<string name="life_counter_tts_lifes">points de vie</string>
 	<string name="life_counter_tts_poison_counter">marqueur poison</string>	
 	<string name="life_counter_tts_poison_counters">marqueurs poison</string>	
-	
+	<string name="life_counter_Commander">Commander</string>
+    <string name="life_counter_Compact">Compact</string>
+    <string name="life_counter_Normal">Normal</string>
     
     <!-- Default gathering activity -->
     <string name="gathering_custom_name">Nom</string>
@@ -260,7 +297,9 @@
     <string name="trader_toast_save_error">L\'échange n\'a pu être sauvé; veuillez réessayer.</string>
     <string name="trader_toast_invalid_chars">Les noms d\'échanges ne peuvent contenir le caractère de séparation des chemins (\'/\').</string>
     <string name="trader_no_price">N/D</string>
-    
+    <string name="trader_Low">Bas</string>
+	<string name="trader_Average">Moyen</string>
+	<string name="trader_High">Haut</string>
     
     <!-- Wishlist activity -->
     <string name="wishlist_name">Nom</string>
@@ -285,7 +324,13 @@
     <string name="timer_set_warnings">Définir Alertes</string>
     <string name="timer_warning_dialog_title">Alertes parlées</string>
     <string name="timer_tone_dialog_title">Choix Sonnerie Alerte</string>
-    
+    <string name="timer_30_minutes">30 minutes</string>
+    <string name="timer_35_minutes">35 minutes</string>
+    <string name="timer_40_minutes">40 minutes</string>
+    <string name="timer_45_minutes">45 minutes</string>
+    <string name="timer_50_minutes">50 minutes</string>
+    <string name="timer_55_minutes">55 minutes</string>
+    <string name="timer_1_hour">1 heure</string>
     
     <!-- Rules activity -->
     <string name="rules_exit">Quitter règles</string>
@@ -386,11 +431,19 @@
     <string name="pref_wishlist_prices_title">Afficher Prix Cartes</string>
     <string name="pref_wishlist_prices_summary">Afficher le prix de chaque carte de la liste de voeux</string>
     
-    
-    <!-- Debug
-    <string name="main_refresh_db">Raffraîchir DB depuis APK</string>
-    <string name="main_build_db">Construire DB depuis Web</string>
-     -->
+	<string name="pref_English">Anglais</string>
+    <string name="pref_French">Français</string>
+    <string name="pref_Italian">Italien</string>
+    <string name="pref_Spanish">Espagnol</string>
+    <string name="pref_Japanese">Japonais</string>
+    <string name="pref_Russian">Russe</string>
+    <string name="pref_German">Allemand</string>
+    <string name="pref_1_day">1 jour</string>
+    <string name="pref_2_days">2 jours</string>
+    <string name="pref_3_days">3 jours</string>
+    <string name="pref_5_days">5 jours</string>
+    <string name="pref_1_week">1 semaine</string>
+    <string name="pref_2_weeks">2 semaine</string>
     
     <!-- Default language -->
     <string name="main_card_language">fr</string>
@@ -411,212 +464,5 @@
 	<string name="deck_counter_4">+4</string>
 	<string name="deck_counter_reset">Rétablir</string>
 	<string name="deck_counter_undo">Annuler</string>
-    
-    
-    <!-- Arrays -->
-    <string-array name="supertypes">
-        <item>Artefact</item>
-        <item>Basic</item>
-        <item>Créature</item>
-        <item>Enchantement</item>
-        <item>Ephémère</item>
-        <item>Terrain</item>
-        <item>Légendaire</item>
-        <item>Ongoing</item>
-        <item>Plane</item>
-        <item>Arpenteur</item>
-        <item>Scheme</item>
-        <item>Neigeux</item>
-        <item>Rituel</item>
-        <item>Tribal</item>
-        <item>Fun cards</item>
-        <item>Du monde</item>
-    </string-array>
-    <string-array name="logic_spinner">
-        <item>></item>
-        <item>&lt;</item>
-        <item>=</item>
-    </string-array>
-    <string-array name="rarities">
-        <item>Commune</item>
-        <item>Unco</item>
-        <item>Rare</item>
-        <item>Mythique</item>
-        <item>Timeshifted</item>
-    </string-array>
-    <string-array name="pt_spinner">
-        <item/>
-        <item>-1</item>
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-        <item>7</item>
-        <item>8</item>
-        <item>9</item>
-        <item>10</item>
-        <item>11</item>
-        <item>12</item>
-        <item>13</item>
-        <item>14</item>
-        <item>15</item>
-        <item>*</item>
-        <item>1+*</item>
-        <item>2+*</item>
-        <item>7-*</item>
-        <item>99</item>
-        <item>*^2</item>
-        <item>0.5</item>
-        <item>1.5</item>
-        <item>2.5</item>
-        <item>3.5</item>
-    </string-array>
-    <string-array name="cmc_spinner">
-        <item/>
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-        <item>7</item>
-        <item>8</item>
-        <item>9</item>
-        <item>10</item>
-        <item>11</item>
-        <item>12</item>
-        <item>13</item>
-        <item>14</item>
-        <item>15</item>
-        <item>16</item>
-        <item>1000000</item>
-    </string-array>
-    <string-array name="momir_spinner">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-        <item>7</item>
-        <item>8</item>
-        <item>9</item>
-        <item>10</item>
-        <item>11</item>
-        <item>12</item>
-        <item>15</item>
-        <item>16</item>
-    </string-array>
-    <string-array name="color_spinner">
-        <item>Au moins 1 de ces couleurs</item>
-        <item>Au moins toutes ces couleurs</item>
-        <item>Que ces couleurs</item>
-        <item>Exactement ces couleurs</item>
-    </string-array>
-    <string-array name="trade_option_entries">
-        <item>Bas</item>
-        <item>Moyen</item>
-        <item>Haut</item>
-    </string-array>
-    <string-array name="trade_option_values">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-    </string-array>
-    <string-array name="set_spinner">
-        <item >Edition la plus récente</item>
-        <item >Edition originale</item>
-        <item >Toutes les éditions</item>
-        <item >Rééditions seulement</item>
-    </string-array>
-    <string-array name="rt_defaulttimes">
-    	<item>30 minutes</item>
-        <item>35 minutes</item>
-        <item>40 minutes</item>
-        <item>45 minutes</item>
-        <item>50 minutes</item>
-        <item>55 minutes</item>
-        <item>1 heure</item>
-    </string-array>
-    <string-array name="rt_defaulttimesvalues">
-        <item>30</item>
-        <item>35</item>
-        <item>40</item>
-        <item>45</item>
-        <item>50</item>
-        <item>55</item>
-        <item>60</item>
-    </string-array>
-    <string-array name="type_spinner">
-	    <item>Tous les types saisis</item>
-	    <item>Au moins un des types saisis</item>
-	    <item>AUCUN des types saisis</item>
-    </string-array>
-    <string-array name="text_spinner">
-	    <item>Tous les mots</item>
-	    <item>Au moins 1 mot</item>
-	    <item>Phrase exacte</item>
-    </string-array>
-    <string-array name="update_frequency_days">
-        <item>1 jour</item>
-        <item>2 jours</item>
-        <item>3 jours</item>
-        <item>5 jours</item>
-        <item>1 semaine</item>
-        <item>2 semaines</item>
-    </string-array>
-    <string-array name="update_frequency_days_values">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>5</item>
-        <item>7</item>
-        <item>14</item>
-    </string-array>
-    <string-array name="display_array_entries">
-        <item>Normal</item>
-        <item>Compact</item>
-        <item>Commander</item>
-    </string-array>
-    <string-array name="display_array_values">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-    </string-array>
-	<string-array name="default_fragment_array_entries">
-		<item>@string/main_card_search</item>
-		<item>@string/main_life_counter</item>
-		<item>@string/main_mana_pool</item>
-		<item>@string/main_dice</item>
-		<item>@string/main_trade</item>
-		<item>@string/main_wishlist</item>
-		<item>@string/main_timer</item>
-		<item>@string/main_rules</item>
-		<item>@string/main_mojhosto</item>
-<!-- 	<item>@string/main_judges_corner</item>  -->
-	</string-array>
-	<string-array name="card_language">
-		<item>Anglais</item>
-		<item>Français</item>
-		<item>Italien</item>
-		<item>Espagnol</item>
-		<item>Japonais</item>
-		<item>Russe</item>
-		<item>Allemand</item>
-	</string-array>
-	<string-array name="card_language_values">
-		<item>en</item>
-		<item>fr</item>
-		<item>it</item>
-		<item>es</item>
-		<item>jp</item>
-		<item>ru</item>
-		<item>de</item>
-	</string-array>
 
 </resources>

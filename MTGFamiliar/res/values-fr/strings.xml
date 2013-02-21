@@ -443,7 +443,7 @@
     <string name="pref_3_days">3 jours</string>
     <string name="pref_5_days">5 jours</string>
     <string name="pref_1_week">1 semaine</string>
-    <string name="pref_2_weeks">2 semaine</string>
+    <string name="pref_2_weeks">2 semaines</string>
     
     <!-- Default language -->
     <string name="main_card_language">fr</string>

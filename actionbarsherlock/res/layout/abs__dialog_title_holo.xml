@@ -19,10 +19,12 @@
 This is an optimized layout for a screen, with the minimum set of features
 enabled.
 -->
-
 <com.actionbarsherlock.internal.widget.FakeDialogPhoneWindow xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="true"
     android:orientation="vertical"
-    android:fitsSystemWindows="true">
+    tools:ignore="RequiredSize" >
+
     <TextView android:id="@android:id/title" style="?android:attr/windowTitleStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -39,7 +39,9 @@
     <issue id="ManifestOrder" severity="ignore" />
     <issue id="MergeRootFrame" severity="ignore" />
     <issue id="MissingPrefix" severity="ignore" />
-    <issue id="MissingTranslation" severity="ignore" />
+    <issue id="MissingTranslation" severity="ignore">
+        <ignore path="res\values\abs__strings.xml" />
+    </issue>
     <issue id="MultipleUsesSdk" severity="ignore" />
     <issue id="NamespaceTypo" severity="ignore" />
     <issue id="NestedScrolling" severity="ignore" />

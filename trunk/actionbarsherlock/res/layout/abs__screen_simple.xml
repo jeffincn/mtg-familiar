@@ -20,10 +20,12 @@
 This is an optimized layout for a screen, with the minimum set of features
 enabled.
 -->
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:fitsSystemWindows="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:ignore="RequiredSize" >
+
     <ViewStub android:id="@+id/abs__action_mode_bar_stub"
               android:inflatedId="@+id/abs__action_mode_bar"
               android:layout="@layout/abs__action_mode_bar"

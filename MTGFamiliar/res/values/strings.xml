@@ -80,7 +80,8 @@
  	- More efficient price lookups&lt;br />&lt;br />
  	- Trader saves custom prices&lt;br />&lt;br />
  	- Many small bug fixes&lt;br />&lt;br />
- 	- Better error handling</string>
+ 	- Better error handling&lt;br />&lt;br />
+ 	- 2.0.3: Fixed Prices for Eclair, Froyo devices</string>
     <string name="main_tts_warning_title">Text-to-Speech</string>
     <string name="main_tts_warning_text">This application has text-to-speech capability for some of its features, but you don\'t seem to have it installed. 
         If you want to install it, use the "Install Text-to-Speech" link in the settings menu.</string>

@@ -1068,11 +1068,16 @@ public class CardViewFragment extends FamiliarFragment {
 			        	progDialog.dismiss();
 			        	if (result != null) {
 				        	String pieces[] = result.split("@@");
-				        	lowprice = pieces[0];
-				        	avgprice = pieces[1];
-				        	hiprice = pieces[2];
-				        	TCGPlayerLink = pieces[3];
-				        	showDialog(GETPRICE);
+				        	if(pieces.length < 4) {
+				        		Toast.makeText( getMainActivity(), "Exception", Toast.LENGTH_SHORT ).show();
+				        	}
+				        	else {
+					        	lowprice = pieces[0];
+					        	avgprice = pieces[1];
+					        	hiprice = pieces[2];
+					        	TCGPlayerLink = pieces[3];
+					        	showDialog(GETPRICE);
+				        	}
 			        	}
 			        	else {
 			        		Toast.makeText( getMainActivity(), R.string.card_view_price_not_found, Toast.LENGTH_SHORT ).show();

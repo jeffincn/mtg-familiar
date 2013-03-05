@@ -144,6 +144,10 @@ public class SearchViewFragment extends FamiliarFragment {
 			return;
 		}
 
+		Resources res = getResources();
+		rarityNames = res.getStringArray(R.array.rarities);
+		rarityChecked = new boolean[rarityNames.length];
+
 		setNames = new String[setCursor.getCount()];
 		setSymbols = new String[setCursor.getCount()];
 		setChecked = new boolean[setCursor.getCount()];
@@ -177,9 +181,6 @@ public class SearchViewFragment extends FamiliarFragment {
 		else {
 			formatNames = new String[0];
 		}
-		Resources res = getResources();
-		rarityNames = res.getStringArray(R.array.rarities);
-		rarityChecked = new boolean[rarityNames.length];
 
 		selectedFormat = -1;
 	}

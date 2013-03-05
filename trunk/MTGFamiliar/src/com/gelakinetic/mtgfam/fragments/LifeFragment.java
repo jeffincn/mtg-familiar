@@ -1641,6 +1641,9 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	
 	private void speakFromList() {
 		boolean first = true;
+		if(sentences == null) {
+			return;
+		}
 		while(sentences.size() > 0) {
 			TtsSentence s = sentences.remove(0); //Dequeue the first sentence
 			String sentence = s.getSentence();

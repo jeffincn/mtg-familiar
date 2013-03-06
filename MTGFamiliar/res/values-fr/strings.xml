@@ -85,7 +85,7 @@
  	- L\'échange de cartes sauve les prix personnalisés&lt;br />&lt;br />
  	- Plusieurs petites corrections de bugs&lt;br />&lt;br />
  	- Meilleure gestion des erreurs&lt;br />&lt;br />
- 	- 2.0.3: Fixé les prix pour Eclair et Froyo
+ 	- 2.0.3: Correction des prix pour les appareils sous Eclair et Froyo
     </string>
     
     <string name="main_tts_warning_title">Synthèse vocale (TTS)</string>

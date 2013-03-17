@@ -252,26 +252,26 @@ public class WishlistFragment extends FamiliarFragment {
 		doneLoading = true;
 	}
 
-	private void AddCardOrUpdateSetCounts(CardData card) throws FamiliarDbException {
+	private void AddCardOrUpdateSetCounts(CardData cardToAdd) throws FamiliarDbException {
 		ArrayList<String> setCodes;
 		ArrayList<CardData> lCardlist;
 
-		int position = cardNames.indexOf(card.name);
+		int position = cardNames.indexOf(cardToAdd.name);
 		// if the card's not in the list yet
 		if (position == -1) {
 			setCodes = new ArrayList<String>();
 			lCardlist = new ArrayList<CardData>();
-			if (verbose || card.setCode == "" || card.rarity == 45) {
+			if (verbose || cardToAdd.setCode == "" || cardToAdd.rarity == 45) {
 				Cursor c;
-				if (card.setCode != "" && card.rarity != 45) {
-					c = mDbHelper.fetchCardByNameAndSet(card.name, card.setCode);
+				if (cardToAdd.setCode != "" && cardToAdd.rarity != 45) {
+					c = mDbHelper.fetchCardByNameAndSet(cardToAdd.name, cardToAdd.setCode);
 				}
 				else {
 					if (verbose) {
-						c = mDbHelper.fetchLatestCardByName(card.name, CardDbAdapter.allData);
+						c = mDbHelper.fetchLatestCardByName(cardToAdd.name, CardDbAdapter.allData);
 					}
 					else {
-						c = mDbHelper.fetchLatestCardByName(card.name, new String[] { CardDbAdapter.KEY_SET,
+						c = mDbHelper.fetchLatestCardByName(cardToAdd.name, new String[] { CardDbAdapter.KEY_SET,
 								CardDbAdapter.KEY_NUMBER, CardDbAdapter.KEY_RARITY });
 					}
 				}
@@ -285,7 +285,7 @@ public class WishlistFragment extends FamiliarFragment {
 				setCodes.add(setCode);
 
 				if (verbose) {
-					card = mTradeListHelper.new CardData(card.name, tcgName, setCode, card.numberOf, 0, "loading", c.getString(c
+					cardToAdd = mTradeListHelper.new CardData(cardToAdd.name, tcgName, setCode, cardToAdd.numberOf, 0, "loading", c.getString(c
 							.getColumnIndex(CardDbAdapter.KEY_NUMBER)), c.getString(c.getColumnIndex(CardDbAdapter.KEY_TYPE)),
 							c.getString(c.getColumnIndex(CardDbAdapter.KEY_MANACOST)), c.getString(c
 									.getColumnIndex(CardDbAdapter.KEY_ABILITY)), c.getString(c.getColumnIndex(CardDbAdapter.KEY_POWER)),
@@ -293,65 +293,55 @@ public class WishlistFragment extends FamiliarFragment {
 									.getColumnIndex(CardDbAdapter.KEY_LOYALTY)), c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY)));
 				}
 				else {
-					card = mTradeListHelper.new CardData(card.name, tcgName, setCode, card.numberOf, 0, "loading", c.getString(c
+					cardToAdd = mTradeListHelper.new CardData(cardToAdd.name, tcgName, setCode, cardToAdd.numberOf, 0, "loading", c.getString(c
 							.getColumnIndex(CardDbAdapter.KEY_NUMBER)), null, null, null, null, null, 0, c.getInt(c
 							.getColumnIndex(CardDbAdapter.KEY_RARITY)));
 				}
 				c.close();
-				lCardlist.add(card);
+				lCardlist.add(cardToAdd);
 			}
 			else {
-				setCodes.add(card.setCode);
-				lCardlist.add(card);
+				setCodes.add(cardToAdd.setCode);
+				lCardlist.add(cardToAdd);
 			}
 			// add it (with child lists)
-			cardNames.add(card.name);
+			cardNames.add(cardToAdd.name);
 			cardSetNames.add(setCodes);
 			cardSetWishlists.add(lCardlist);
 		}
 		else {
 			setCodes = cardSetNames.get(position);
 			lCardlist = cardSetWishlists.get(position);
-			String setCode = card.setCode;
-			String tcgName = card.tcgName;
-			int rarity = card.rarity;
-			int numberOf = card.numberOf;
-			if (setCode == "" || rarity == 45) {
+			if (cardToAdd.setCode == "" || cardToAdd.rarity == 45) {
 				Cursor c;
-				c = mDbHelper.fetchLatestCardByName(card.name, new String[] { CardDbAdapter.KEY_SET, CardDbAdapter.KEY_NUMBER,
+				c = mDbHelper.fetchLatestCardByName(cardToAdd.name, new String[] { CardDbAdapter.KEY_SET, CardDbAdapter.KEY_NUMBER,
 						CardDbAdapter.KEY_RARITY });
 				if (c.getCount() == 0) {
 					Toast.makeText(getActivity(), R.string.wishlist_toast_no_card, Toast.LENGTH_LONG).show();
 					c.close();
 					return;
 				}
-				setCode = c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET));
-				rarity = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY));
+				cardToAdd.setCode = c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET));
+				cardToAdd.rarity = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY));
 				c.close();
-				tcgName = mDbHelper.getTCGname(card.setCode);
+				cardToAdd.tcgName = mDbHelper.getTCGname(cardToAdd.setCode);
 			}
-			int location = setCodes.indexOf(card.setCode);
+			int location = setCodes.indexOf(cardToAdd.setCode);
 			if (location != -1) {
-				card = lCardlist.get(location);
-				card.numberOf += numberOf;
+				CardData existingCard = lCardlist.get(location);
+				existingCard.numberOf += cardToAdd.numberOf;
 				// we shouldn't need this if it's a pointer
 				// lCardlist.set(location, card);
 			}
 			else {
-				// clone the first item in the list to get whatever details we need
-				card = (CardData) lCardlist.get(0).clone();
-				card.setCode = setCode;
-				card.tcgName = tcgName;
-				card.rarity = rarity;
-				card.numberOf = numberOf;
-				setCodes.add(card.setCode);
-				lCardlist.add(card);
+				setCodes.add(cardToAdd.setCode);
+				lCardlist.add(cardToAdd);
 			}
 
 		}
 
 		if (showTotalPrice || showIndividualPrices) {
-			loadPrice(card, aaExpWishlist);
+			loadPrice(cardToAdd, aaExpWishlist);
 		}
 	}
 

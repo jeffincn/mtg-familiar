@@ -101,6 +101,9 @@ public class ResultListFragment extends FamiliarFragment {
 				id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
 				startCardViewFrag(id, isRandom, isSingle);
 			}
+			else {
+				isSingle = false;
+			}
 		}
 		
 		/* Uncomment this to add the result of a search directly into the wishlist */

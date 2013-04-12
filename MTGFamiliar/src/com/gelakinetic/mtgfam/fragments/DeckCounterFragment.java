@@ -96,11 +96,7 @@ public class DeckCounterFragment extends FamiliarFragment implements ViewFactory
 			@Override
 			public void onClick(View v) {
 				if (sequence.size() > 0) {
-					sequence.remove(sequence.size() - 1);
-					deckCount = 0;
-					for (Integer i : sequence) {
-						deckCount += i;
-					}
+					deckCount -= sequence.remove(sequence.size() - 1);
 					deckCountText.setText("" + deckCount);
 				}
 			}

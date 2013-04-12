@@ -67,15 +67,14 @@ public class MenuFragment extends ListFragment {
 		mAdapter = new SlidingMenuAdapter(mActivity);
 		mAdapter.addHeader(R.string.main_pages);
 		mAdapter.addItem(R.string.main_card_search, R.drawable.card_search_icon);
-		mAdapter.addItem(R.string.main_life_counter,
-				R.drawable.life_counter_icon);
+		mAdapter.addItem(R.string.main_life_counter, R.drawable.life_counter_icon);
 		mAdapter.addItem(R.string.main_mana_pool, R.drawable.mana_pool_icon);
 		mAdapter.addItem(R.string.main_dice, R.drawable.dice_icon);
 		mAdapter.addItem(R.string.main_trade, R.drawable.trade_icon);
 		mAdapter.addItem(R.string.main_wishlist, R.drawable.wishlist_icon);
 		mAdapter.addItem(R.string.main_timer, R.drawable.round_timer_icon);
 		mAdapter.addItem(R.string.main_rules, R.drawable.rules_icon);
-		//mAdapter.addItem(R.string.main_judges_corner, R.drawable.rules_icon);
+		mAdapter.addItem(R.string.main_judges_corner, R.drawable.rules_icon);
 		mAdapter.addItem(R.string.main_mojhosto, R.drawable.mojhosto_icon);
 		mAdapter.addHeader(R.string.main_extras);
 		mAdapter.addItem(R.string.main_settings_title);
@@ -124,7 +123,6 @@ public class MenuFragment extends ListFragment {
 			fragment = new RulesFragment();
 			break;
 		case R.string.main_judges_corner:
-			//fragment = new JudgesCornerFragment();
 			fragment = new JudgesCornerFragment();
 			break;
 		case R.string.main_mojhosto:

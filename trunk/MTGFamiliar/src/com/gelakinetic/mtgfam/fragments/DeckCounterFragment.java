@@ -3,7 +3,6 @@ package com.gelakinetic.mtgfam.fragments;
 import java.util.ArrayList;
 
 import android.os.Bundle;
-import android.text.SpannableString;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;

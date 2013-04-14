@@ -240,6 +240,7 @@
     <string name="life_counter_Commander">Commander</string>
     <string name="life_counter_Compact">Compact</string>
     <string name="life_counter_Normal">Normal</string>
+    <string name="life_counter_commander_cast">Commander Casting</string>
 
     <!-- Default gathering activity -->
     <string name="gathering_custom_name">Name</string>

@@ -25,6 +25,8 @@ import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.Instrumentation;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -42,6 +44,7 @@ import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationCompat;
 import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -500,6 +503,15 @@ public class MainActivity extends SlidingFragmentActivity {
 			unregisterReceiver(endTimeReceiver);
 			unregisterReceiver(startTimeReceiver);
 			unregisterReceiver(cancelTimeReceiver);
+			
+			if (endTime > SystemClock.elapsedRealtime()) {
+				//Timer Active
+			} else {
+				Intent i = new Intent(this, RoundTimerService.class);
+				stopService(i);
+			}
+				
+			
 		}
 		catch (IllegalArgumentException e) {
 			// EAT IT

@@ -396,7 +396,16 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 					cLife = null;
 				}
 				
-				addPlayer(data[0], Integer.parseInt(data[1]), Integer.parseInt(data[3]), lhist, phist, getActivity(), lifeDefault, cLife);
+				int commanderCastings;
+				try {
+					commanderCastings = Integer.parseInt(data[7]);
+				}
+				catch (Exception e){
+					commanderCastings = 0;
+				}
+				
+				
+				addPlayer(data[0], Integer.parseInt(data[1]), Integer.parseInt(data[3]), lhist, phist, getActivity(), lifeDefault, cLife, commanderCastings);
 
 				numPlayers++;
 			}
@@ -540,7 +549,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 								ArrayList<GatheringsPlayerData> players = gIO.ReadGatheringXML(fGatherings[item]);
 								for (GatheringsPlayerData player : players) {
-									addPlayer(player.getName(), player.getStartingLife(), INITIAL_POISON, null, null, anchor.getActivity(), player.getStartingLife(), null);
+									addPlayer(player.getName(), player.getStartingLife(), INITIAL_POISON, null, null, anchor.getActivity(), player.getStartingLife(), null, 0);
 								}
 
 								restartFragment();
@@ -815,11 +824,11 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	}
 
 	private void addPlayer(String name, int initialLife, int initialPoison, int[] lhist, int[] phist, Context context) {
-		addPlayer(name, initialLife, initialPoison, lhist, phist, context, -1, null);
+		addPlayer(name, initialLife, initialPoison, lhist, phist, context, -1, null, 0);
 	}
 
 	private void addPlayer(String name, int initialLife, int initialPoison, int[] lhist, int[] phist, Context context,
-			int defaultLife, int[] comDamage) {
+			int defaultLife, int[] comDamage, int commanderCastings) {
 		LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		LinearLayout layout;
 		if (orientation == LANDSCAPE) {
@@ -833,11 +842,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		if (name == null) {
 			name = "Player " + numPlayers;
 		}
-		Player p = new Player(name, initialLife, initialPoison, lhist, phist, context, defaultLife, comDamage);
+		Player p = new Player(name, initialLife, initialPoison, lhist, phist, context, defaultLife, comDamage, commanderCastings);
 		p.addButtons((Button) layout.findViewById(R.id.player_minus1), (Button) layout.findViewById(R.id.player_plus1),
 				(Button) layout.findViewById(R.id.player_minus5), (Button) layout.findViewById(R.id.player_plus5));
 		p.addOutputViews((TextView) layout.findViewById(R.id.player_name),
 				(TextView) layout.findViewById(R.id.player_readout), (ListView) layout.findViewById(R.id.player_history));
+		p.addCommanderCastingView((TextView) layout.findViewById(R.id.commanderCastText), (Button) layout.findViewById(R.id.commanderCast));
 		p.addLayout(layout);
 
 		players.add(p);
@@ -1273,6 +1283,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		public int								poison;
 		public ArrayList<Integer>	commanderDamage;
 		public Player							me;
+		public int								commanderCasting;
 
 		public TextView						TVname;
 		public TextView						TVlife;
@@ -1285,10 +1296,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		private HistoryAdapter		lifeAdapter, poisonAdapter;
 		private CommanderPlayerAdapter commanderAdapter;
 		private LinearLayout			layout;
+		public Button						commanderCastButton;
+		public TextView						commanderCastText;
 
 		public static final int		CONSTRAINT_POISON	= 0, CONSTRAINT_LIFE = Integer.MAX_VALUE - 1;
 
-		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context, int _defaultLife, int[] comDamage) {
+		public Player(String n, int l, int p, int[] lhist, int[] phist, Context context, int _defaultLife, int[] comDamage, int commanderCastings) {
 			name = n;
 			life = l;
 			defaultLife = _defaultLife;
@@ -1300,6 +1313,8 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			for(int idx = 0; idx < players.size(); idx++){
 				commanderDamage.add(0);
 			}
+			
+			commanderCasting = commanderCastings;
 
 			me = this;
 
@@ -1352,6 +1367,8 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 					break;
 				case COMMANDER:
 					history.setAdapter(this.commanderAdapter);
+					commanderCastText.setVisibility(View.VISIBLE);
+					commanderCastButton.setVisibility(View.VISIBLE);
 					break;
 			}
 			history.invalidate();
@@ -1478,7 +1495,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			
 			commanderPlayersAdapter.notifyDataSetChanged();
 		}
-
+		
 		public void addButtons(Button minus1, Button plus1, Button minus5, Button plus5) {
 			minusButton1 = minus1;
 			plusButton1 = plus1;
@@ -1526,6 +1543,19 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 				}
 			});
 		}
+		
+		public void addCommanderCastingView(TextView commandCastText, final Button commanderCast){
+			commanderCastButton = commanderCast;
+			commanderCastText = commandCastText;
+			commanderCastButton.setText(Integer.toString(commanderCasting));
+			
+			commanderCastButton.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					commanderCasting += 1;
+					commanderCast.setText(Integer.toString(commanderCasting));
+				}
+			});
+		}
 
 		// returns all persistent data associated with a player
 		public String toString() {
@@ -1569,6 +1599,8 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 					data += "," + i;
 				}
 			}
+			
+			data += ";" + commanderCasting;
 			
 			return data + ";\n";
 		}

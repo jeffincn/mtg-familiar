@@ -25,6 +25,7 @@ import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.TextToSpeech.OnUtteranceCompletedListener;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -1367,8 +1368,10 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 					break;
 				case COMMANDER:
 					history.setAdapter(this.commanderAdapter);
-					commanderCastText.setVisibility(View.VISIBLE);
-					commanderCastButton.setVisibility(View.VISIBLE);
+					if (getResources().getDisplayMetrics().densityDpi >= DisplayMetrics.DENSITY_HIGH) {
+						commanderCastText.setVisibility(View.VISIBLE);
+						commanderCastButton.setVisibility(View.VISIBLE);
+					}
 					break;
 			}
 			history.invalidate();
@@ -1553,6 +1556,14 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 				public void onClick(View v) {
 					commanderCasting += 1;
 					commanderCast.setText(Integer.toString(commanderCasting));
+				}
+			});
+			
+			commanderCastButton.setOnLongClickListener(new View.OnLongClickListener() {
+				public boolean onLongClick(View v) {
+					commanderCasting = 0;
+					commanderCast.setText(Integer.toString(commanderCasting));
+					return false;
 				}
 			});
 		}

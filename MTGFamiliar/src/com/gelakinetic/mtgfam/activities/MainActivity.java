@@ -19,14 +19,13 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam.activities;
 
+import java.lang.reflect.Field;
 import java.util.Date;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.Instrumentation;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -37,6 +36,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -44,11 +44,11 @@ import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NotificationCompat;
 import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
@@ -134,10 +134,27 @@ public class MainActivity extends SlidingFragmentActivity {
      * End Robospice
      */
 	  
+	public static final int DEVICE_VERSION   = Build.VERSION.SDK_INT;
+	public static final int DEVICE_HONEYCOMB = Build.VERSION_CODES.HONEYCOMB;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+
+		if (DEVICE_VERSION >= DEVICE_HONEYCOMB) {
+			try {
+				ViewConfiguration config = ViewConfiguration.get(this);
+				Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+				if (menuKeyField != null) {
+					menuKeyField.setAccessible(true);
+					menuKeyField.setBoolean(config, false);
+				}
+			} catch (Exception ex) {
+				// Ignore
+			}
+		}
+	    
 		mFragmentManager = getSupportFragmentManager();
 
 		try {
@@ -720,7 +737,22 @@ public class MainActivity extends SlidingFragmentActivity {
 		}
 		return null;
 	}
-    
+
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+		/*
+		 * This is for ForceOverflow
+		 */
+		if (DEVICE_VERSION < DEVICE_HONEYCOMB) {
+			if (event.getAction() == KeyEvent.ACTION_UP
+					&& keyCode == KeyEvent.KEYCODE_MENU) {
+				openOptionsMenu();
+				return true;
+			}
+		}
+		return super.onKeyUp(keyCode, event);
+	}
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_SEARCH) {

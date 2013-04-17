@@ -111,14 +111,14 @@ public class SlidingFragmentActivity extends SherlockFragmentActivity implements
 	}
 
 	/* (non-Javadoc)
-	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showContent()
+	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showAbove()
 	 */
 	public void showContent() {
 		mHelper.showContent();
 	}
 
 	/* (non-Javadoc)
-	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showMenu()
+	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showBehind()
 	 */
 	public void showMenu() {
 		mHelper.showMenu();
@@ -141,11 +141,12 @@ public class SlidingFragmentActivity extends SherlockFragmentActivity implements
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onKeyUp(int, android.view.KeyEvent)
 	 */
-//	@Override
-//	public boolean onKeyUp(int keyCode, KeyEvent event) {
-//		boolean b = mHelper.onKeyUp(keyCode, event);
-//		if (b) return b;
-//		return super.onKeyUp(keyCode, event);
-//	}
-
+	/*
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+		boolean b = mHelper.onKeyUp(keyCode, event);
+		if (b) return b;
+		return super.onKeyUp(keyCode, event);
+	}
+	*/
 }

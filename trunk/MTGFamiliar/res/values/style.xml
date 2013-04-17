@@ -33,7 +33,7 @@
         <item name="android:textSize">24dp</item>
     </style>
 
-    <style name="Theme.ForceOverflowBlack" parent="@style/Theme.Sherlock.ForceOverflow">
+    <style name="Theme.ForceOverflowBlack" parent="@style/Theme.Sherlock">
         <item name="actionBarItemBackground">@drawable/selectable_background_actionbar</item>
         <item name="popupMenuStyle">@style/actionbar_PopupMenu</item>
         <item name="dropDownListViewStyle">@style/actionbar_DropDownListView</item>

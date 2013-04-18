@@ -1368,10 +1368,6 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 					break;
 				case COMMANDER:
 					history.setAdapter(this.commanderAdapter);
-					if (getResources().getDisplayMetrics().densityDpi >= DisplayMetrics.DENSITY_MEDIUM) {
-						commanderCastText.setVisibility(View.VISIBLE);
-						commanderCastButton.setVisibility(View.VISIBLE);
-					}
 					break;
 			}
 			history.invalidate();
@@ -1551,6 +1547,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			commanderCastButton = commanderCast;
 			commanderCastText = commandCastText;
 			commanderCastButton.setText(Integer.toString(commanderCasting));
+			
+			if (displayMode == COMMANDER
+				&& getResources().getDisplayMetrics().densityDpi >= DisplayMetrics.DENSITY_MEDIUM) {
+				commanderCastText.setVisibility(View.VISIBLE);
+				commanderCastButton.setVisibility(View.VISIBLE);
+			}
 			
 			commanderCastButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {

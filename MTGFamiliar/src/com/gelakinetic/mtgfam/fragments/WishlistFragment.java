@@ -10,7 +10,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -346,13 +345,15 @@ public class WishlistFragment extends FamiliarFragment {
 	}
 
 	private void mailWishlist(boolean includeTcgName) {
-		// blank mailId - user will have to fill in To: field
-		Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "", null));
-		emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "MTG Familiar Wishlist");
-		emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
-				WishlistHelpers.GetReadableWishlist(cardSetWishlists, includeTcgName));
+		// Use a more generic send text intent. It can also do emails
+		Intent sendIntent = new Intent();
+		sendIntent.setAction(Intent.ACTION_SEND);
+		sendIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "MTG Familiar Wishlist");
+		sendIntent.putExtra(Intent.EXTRA_TEXT, WishlistHelpers.GetReadableWishlist(cardSetWishlists, includeTcgName));
+		sendIntent.setType("text/plain");
+		
 		try {
-			startActivity(Intent.createChooser(emailIntent, "Send email..."));
+		startActivity(Intent.createChooser(sendIntent, "Share Wishlist"));
 		}
 		catch (android.content.ActivityNotFoundException ex) {
 			Toast.makeText(getActivity(), getString(R.string.error_no_email_client), Toast.LENGTH_SHORT).show();

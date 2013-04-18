@@ -133,6 +133,8 @@ public class SearchWidgetFragment extends FamiliarFragment {
 				c = mDbHelper.PrefixSearch(params[0], new String[] { CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME });
 			} catch (FamiliarDbException e) {
 				c = null;
+			} catch (IllegalStateException e) {
+				c = null;
 			}
 			return null;
 		}

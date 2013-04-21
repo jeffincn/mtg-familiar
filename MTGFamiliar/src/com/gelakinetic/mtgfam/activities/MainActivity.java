@@ -140,7 +140,6 @@ public class MainActivity extends SlidingFragmentActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
 
 		if (DEVICE_VERSION >= DEVICE_HONEYCOMB) {
 			try {
@@ -224,6 +223,17 @@ public class MainActivity extends SlidingFragmentActivity {
 		setContentView(R.layout.fragment_activity);
 		getSupportFragmentManager().beginTransaction().replace(R.id.frag_menu, new MenuFragment()).commit();
 
+		if (findViewById(R.id.middle_container) != null) {
+			// The detail container view will be present only in the
+			// large-screen layouts (res/values-large and
+			// res/values-sw600dp). If this view is present, then the
+			// activity should be in two-pane mode.
+			mThreePane = true;
+		}
+		else {
+			mThreePane = false;
+		}
+		
 		Intent intent = getIntent();
 
 		if (Intent.ACTION_VIEW.equals(intent.getAction())) {
@@ -238,9 +248,7 @@ public class MainActivity extends SlidingFragmentActivity {
 			CardViewFragment rlFrag = new CardViewFragment();
 			rlFrag.setArguments(args);
 
-			FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-			fragmentTransaction.add(R.id.frag_view, rlFrag);
-			fragmentTransaction.commit();
+			attachSingleFragment(rlFrag, "left_frag", false, false);
 			hideKeyboard();
 		}
 		else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
@@ -257,9 +265,7 @@ public class MainActivity extends SlidingFragmentActivity {
 			ResultListFragment rlFrag = new ResultListFragment();
 			rlFrag.setArguments(args);
 
-			FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-			fragmentTransaction.add(R.id.frag_view, rlFrag);
-			fragmentTransaction.commit();
+			attachSingleFragment(rlFrag, "left_frag", false, false);
 			hideKeyboard();
 		}
 		else {
@@ -268,7 +274,7 @@ public class MainActivity extends SlidingFragmentActivity {
 
 				String defaultFragment = prefAdapter.getDefaultFragment();
 
-				Fragment frag;
+				FamiliarFragment frag;
 				if (defaultFragment.equals(this.getString(R.string.main_card_search))) {
 					frag = new SearchViewFragment();
 				}
@@ -303,9 +309,6 @@ public class MainActivity extends SlidingFragmentActivity {
 					frag = new SearchViewFragment();
 				}
 
-				mFragmentManager = getSupportFragmentManager();
-				FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-
 				if (action != null) {
 					if (action.equals(ACTION_FULL_SEARCH)) {
 						frag = new SearchViewFragment();
@@ -318,8 +321,7 @@ public class MainActivity extends SlidingFragmentActivity {
 					}
 				}
 
-				fragmentTransaction.add(R.id.frag_view, frag);
-				fragmentTransaction.commit();
+				attachSingleFragment(frag, "left_frag", false, false);
 			}
 		}
 	}
@@ -646,6 +648,7 @@ public class MainActivity extends SlidingFragmentActivity {
 			sendBroadcast(i);
 		}
 	};
+	public boolean mThreePane;
 
 	public void startUpdatingDisplay() {
 		updatingDisplay = true;
@@ -756,7 +759,8 @@ public class MainActivity extends SlidingFragmentActivity {
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_SEARCH) {
-			Fragment f = mFragmentManager.findFragmentById(R.id.frag_view);
+			// Send the search key to the leftmost fragment
+			Fragment f = mFragmentManager.findFragmentById(R.id.left_container);
 			if (((FamiliarFragment)f).onInterceptSearchKey() == false) {
 				return super.onKeyDown(keyCode, event);
 			}
@@ -798,5 +802,158 @@ public class MainActivity extends SlidingFragmentActivity {
 			// Eat it; this will happen if we try to toast in a non-UI thread.
 			// It can happen when we get an error in autocomplete.
 		}
+	}
+	
+	/********************************
+	 *                              *
+	 *    Three Pane Management     *
+	 *                              *
+	 ********************************/
+	
+	/**
+	 * 
+	 * @param containerId The resource id of the container view
+	 * @param frag The fragment to be added
+	 * @param tag Optional tag name for the fragment, to later retrieve the fragment with FragmentManager.findFragmentByTag(String)
+	 * @param addToBackStack Add this transaction to the back stack. This means that the transaction will be remembered after it is committed, and will reverse its operation when later popped off the stack.
+	 * @param replace Set this to true to replace the fragment in the container, or false to add the fragment to the container
+	 */
+	private void attachFragment(int containerId, FamiliarFragment frag, String tag, boolean addToBackStack, boolean replace) {
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		if(replace) {
+			ft.replace(containerId, frag, tag);
+		}
+		else {
+			ft.add(containerId, frag, tag);
+		}
+		if (addToBackStack) {
+			ft.addToBackStack(null);
+		}
+		ft.commit();
+	}
+	
+	/**
+	 * Attach a single fragment. This should be used even on tablets when only one fragment is showing
+	 * @param frag The fragment to attach
+	 * @param tag Optional tag name for the fragment, to later retrieve the fragment with FragmentManager.findFragmentByTag(String)
+	 * @param addToBackStack Add this transaction to the back stack. This means that the transaction will be remembered after it is committed, and will reverse its operation when later popped off the stack.
+	 * @param replace Set this to true to replace the fragment in the container, or false to add the fragment to the container
+	 */
+	public void attachSingleFragment(FamiliarFragment frag, String tag, boolean addToBackStack, boolean replace) {
+		attachFragment(R.id.left_container, frag, tag, addToBackStack, replace);
+	}
+	
+	/**
+	 * Attach a fragment to the leftmost container. It will be added, not replaced.
+	 * This usually isn't called, as attachSingleFragment() does pretty much the same thing
+	 * @param frag The fragment to attach
+	 * @param tag Optional tag name for the fragment, to later retrieve the fragment with FragmentManager.findFragmentByTag(String)
+	 * @param addToBackStack Add this transaction to the back stack. This means that the transaction will be remembered after it is committed, and will reverse its operation when later popped off the stack.
+	 */
+	public void attachLeftFragment(FamiliarFragment frag, String tag, boolean addToBackStack) {
+		if (!mThreePane) {
+			return;
+		}
+		attachFragment(R.id.left_container, frag, tag, addToBackStack, false);
+	}
+
+	/**
+	 * Attach a fragment to the middle container. It will be added, not replaced.
+	 * @param frag The fragment to attach
+	 * @param tag Optional tag name for the fragment, to later retrieve the fragment with FragmentManager.findFragmentByTag(String)
+	 * @param addToBackStack Add this transaction to the back stack. This means that the transaction will be remembered after it is committed, and will reverse its operation when later popped off the stack.
+	 */
+	public void attachMiddleFragment(FamiliarFragment frag, String tag, boolean addToBackStack) {
+		if (!mThreePane) {
+			return;
+		}
+		attachFragment(R.id.middle_container, frag, tag, addToBackStack, false);
+	}
+
+	/**
+	 * Attach a fragment to the rightmost container. It will be added, not replaced.
+	 * @param frag The fragment to attach
+	 * @param tag Optional tag name for the fragment, to later retrieve the fragment with FragmentManager.findFragmentByTag(String)
+	 * @param addToBackStack Add this transaction to the back stack. This means that the transaction will be remembered after it is committed, and will reverse its operation when later popped off the stack.
+	 */
+	public void attachRightFragment(FamiliarFragment frag, String tag, boolean addToBackStack) {
+		if (!mThreePane) {
+			return;
+		}
+		attachFragment(R.id.right_container, frag, tag, addToBackStack, false);
+	}
+
+	/**
+	 * Send a message to the fragment in the leftmost container
+	 * @param bundle The message
+	 */
+	public void sendMessageToLeftFragment(Bundle bundle) {
+		if (!mThreePane) {
+			return;
+		}
+		((FamiliarFragment) getSupportFragmentManager().findFragmentById(R.id.left_container)).receiveMessage(bundle);
+	}
+
+	/**
+	 * Send a message to the fragment in the middle container
+	 * @param bundle The message
+	 */
+	public void sendMessageToMiddleFragment(Bundle bundle) {
+		if (!mThreePane) {
+			return;
+		}
+		((FamiliarFragment) getSupportFragmentManager().findFragmentById(R.id.middle_container)).receiveMessage(bundle);
+	}
+
+	/**
+	 * Send a message to the fragment in the rightmost container
+	 * @param bundle The message
+	 */
+	public void sendMessageToRightFragment(Bundle bundle) {
+		if (!mThreePane) {
+			return;
+		}
+		((FamiliarFragment) getSupportFragmentManager().findFragmentById(R.id.right_container)).receiveMessage(bundle);
+	}
+	
+	/**
+	 * Show all three panes and dividers. Middle and right panes should be populated after this
+	 */
+	public void showThreePanes() {
+		if(!mThreePane) {
+			return;
+		}
+		findViewById(R.id.middle_container).setVisibility(View.VISIBLE);
+		findViewById(R.id.right_container).setVisibility(View.VISIBLE);
+		findViewById(R.id.firstDivider).setVisibility(View.VISIBLE);
+		findViewById(R.id.secondDivider).setVisibility(View.VISIBLE);
+
+	}
+	
+	/**
+	 * Remove the right and middle fragments, if they exist, and set the container and divider visibilities to View.GONE
+	 */
+	public void showOnePane() {
+		if(!mThreePane){
+			return;
+		}
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
+		Fragment middle = getSupportFragmentManager().findFragmentById(R.id.middle_container);
+		if(middle != null) {
+			ft.remove(middle);
+		}
+		
+		Fragment right = getSupportFragmentManager().findFragmentById(R.id.right_container);
+		if(right != null) {
+			ft.remove(right);
+		}
+
+		ft.commit();
+		
+		findViewById(R.id.middle_container).setVisibility(View.GONE);
+		findViewById(R.id.right_container).setVisibility(View.GONE);
+		findViewById(R.id.firstDivider).setVisibility(View.GONE);
+		findViewById(R.id.secondDivider).setVisibility(View.GONE);
 	}
 }

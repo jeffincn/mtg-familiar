@@ -24,6 +24,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -37,7 +38,7 @@ import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 import com.gelakinetic.mtgfam.helpers.GoogleGoggles;
 
-public class FamiliarFragment extends SherlockFragment {
+public abstract class FamiliarFragment extends SherlockFragment {
 
 	public CardDbAdapter								mDbHelper;
 	protected ProgressDialog progDialog;
@@ -49,6 +50,9 @@ public class FamiliarFragment extends SherlockFragment {
 	private static final String TMP_IMG_FILENAME = "mtgfam-tmp.jpg";
 	File tmp_img_file;
 
+	protected LinearLayout mFragmentMenu;
+	protected ViewGroup masterLayout;
+	
 	public FamiliarFragment() {
 		/* http://developer.android.com/reference/android/app/Fragment.html
 		 * All subclasses of Fragment must include a public empty constructor.
@@ -98,6 +102,9 @@ public class FamiliarFragment extends SherlockFragment {
 	public void onPause() {
 		super.onPause();
 		removeDialog();
+		if(masterLayout != null && mFragmentMenu != null){
+			masterLayout.removeView(mFragmentMenu);
+		}
 	}
 
 	@Override
@@ -107,6 +114,7 @@ public class FamiliarFragment extends SherlockFragment {
 		// Clear any results. We don't want them persisting past this fragment, and
 		// they should have been looked at by now anyway
 		getMainActivity().getFragmentResults();
+		addFragmentMenu();
 	}
 
 	@Override
@@ -169,14 +177,7 @@ public class FamiliarFragment extends SherlockFragment {
 
 	protected void startNewFragment(FamiliarFragment frag, Bundle args, boolean allowBackStack) {
 		frag.setArguments(args);
-
-		FragmentTransaction fragmentTransaction = this.getMainActivity().mFragmentManager.beginTransaction();
-		if (allowBackStack) {
-			fragmentTransaction.addToBackStack(null);
-		}
-
-		fragmentTransaction.replace(R.id.frag_view, frag);
-		fragmentTransaction.commit();
+		this.getMainActivity().attachSingleFragment(frag, "left_frag", allowBackStack, true);
 		this.getMainActivity().hideKeyboard();
 	}
 
@@ -308,5 +309,19 @@ public class FamiliarFragment extends SherlockFragment {
 				}
 			}, 100);
 		}
+	}
+		
+	protected void addFragmentMenu() {
+		if(masterLayout != null && mFragmentMenu != null &&
+				masterLayout.findViewWithTag(mFragmentMenu.getTag()) == null) {
+			masterLayout.addView(mFragmentMenu);
+		}
+	}
+
+	/*
+	 * Override this method to receive messages from other fragments in three-pane mide
+	 */
+	public void receiveMessage(Bundle bundle) {
+		;
 	}
 }

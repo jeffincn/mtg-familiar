@@ -19,7 +19,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,10 +57,6 @@ public class MenuFragment extends ListFragment {
 			throw new IllegalStateException(
 					"MenuFragment must be attached to an instance of MainActivity");
 		}
-		if (getActivity().findViewById(R.id.frag_view) == null) {
-			throw new IllegalStateException(
-					"MenuFragment must be attached to an Activity with R.id.frag_view");
-		}
 		mActivity = (MainActivity) getActivity();
 		// add everything
 		mAdapter = new SlidingMenuAdapter(mActivity);
@@ -96,7 +91,7 @@ public class MenuFragment extends ListFragment {
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		SlidingMenuItem item = mAdapter.getItem(position);
-		Fragment fragment = null;
+		FamiliarFragment fragment = null;
 		switch (item.title) {
 		case R.string.main_card_search:
 			fragment = new SearchViewFragment();
@@ -262,18 +257,17 @@ public class MenuFragment extends ListFragment {
 		zos.close();
 	}
 
-	public void switchContent(final Fragment fragment) {
+	public void switchContent(final FamiliarFragment fragment) {
 		
 		// Clear the backstack, otherwise replacing a cardview after a search
 		// messes up the hierarchy
 		for(int i=0; i < mActivity.getSupportFragmentManager().getBackStackEntryCount(); i++) {
 			mActivity.getSupportFragmentManager().popBackStack();
 		}
+		mActivity.showOnePane();
+				
+		mActivity.attachSingleFragment(fragment, "left_frag", false, true);
 		
-		mActivity.getSupportFragmentManager()
-		.beginTransaction()
-		.replace(R.id.frag_view, fragment)
-		.commit();
 		Handler h = new Handler();
 		h.postDelayed(new Runnable() {
 			public void run() {

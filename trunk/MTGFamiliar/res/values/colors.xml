@@ -33,6 +33,9 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <color name="red">#FF0000</color>
     <color name="green">#00FF00</color>
 
-    <color name="holo_blue">#33B5E5</color>
+    <color name="holo_blue_light">#33B5E5</color>
+    <color name="holo_blue_dark">#0099CC</color>
+    <color name="in_fragment_menu_background_color">#99333333</color>
+    <color name="transparent">#00000000</color>
     
 </resources>

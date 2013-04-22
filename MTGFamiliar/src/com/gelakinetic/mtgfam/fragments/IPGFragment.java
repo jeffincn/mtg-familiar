@@ -10,7 +10,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.ProgressBar;
 
 import com.gelakinetic.mtgfam.R;
 
@@ -33,6 +35,18 @@ public class IPGFragment extends FamiliarFragment {
 		View v = inflater.inflate(R.layout.mtr_ipg_frag, container, false);
 
 		final WebView wv = (WebView) v.findViewById(R.id.mtr_ipg_webview);
+		final ProgressBar prog = (ProgressBar) v.findViewById(R.id.mtr_ipg_progress_bar);
+		wv.setWebViewClient(new WebViewClient() {
+			
+			@Override
+			public void onPageFinished(WebView view, String url) {
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						prog.setVisibility(View.GONE);
+					}
+				});
+			}
+		});
 		wv.setBackgroundColor(0);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(getResources().openRawResource(R.raw.ipg)));
 		StringBuilder html = new StringBuilder();

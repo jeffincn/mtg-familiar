@@ -18,6 +18,7 @@ import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import com.actionbarsherlock.view.Menu;
@@ -27,6 +28,7 @@ import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
+import com.gelakinetic.mtgfam.helpers.InFragmentMenuLoader;
 
 public class MoJhoStoFragment extends FamiliarFragment {
 
@@ -71,6 +73,12 @@ public class MoJhoStoFragment extends FamiliarFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		if(getMainActivity().mThreePane) {
+			getMainActivity().showThreePanes();
+			getMainActivity().attachMiddleFragment(new ResultListFragment(), "result_list", false);
+			getMainActivity().attachRightFragment(new CardViewFragment(), "card_view", false);
+		}
+		
 		momirListener = new View.OnClickListener() {
 
 			public void onClick(View v) {
@@ -98,7 +106,12 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					Bundle args = new Bundle();
 					args.putLong("id", mDbHelper.fetchIdByName(name));
 					ResultListFragment rlFrag = new ResultListFragment();
-					startNewFragment(rlFrag, args);
+					if(getMainActivity().mThreePane) {
+						getMainActivity().sendMessageToMiddleFragment(args);
+					}
+					else {
+						startNewFragment(rlFrag, args);
+					}
 				}
 				catch (FamiliarDbException e) {
 					getMainActivity().showDbErrorToast();
@@ -138,7 +151,12 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					Bundle args = new Bundle();
 					args.putLong("id", mDbHelper.fetchIdByName(name));
 					ResultListFragment rlFrag = new ResultListFragment();
-					startNewFragment(rlFrag, args);
+					if(getMainActivity().mThreePane) {
+						getMainActivity().sendMessageToMiddleFragment(args);
+					}
+					else {
+						startNewFragment(rlFrag, args);
+					}
 				}
 				catch (FamiliarDbException e) {
 					getMainActivity().showDbErrorToast();
@@ -183,7 +201,12 @@ public class MoJhoStoFragment extends FamiliarFragment {
 
 					// add a fragment
 					ResultListFragment rlFrag = new ResultListFragment();
-					startNewFragment(rlFrag, args);
+					if(getMainActivity().mThreePane) {
+						getMainActivity().sendMessageToMiddleFragment(args);
+					}
+					else {
+						startNewFragment(rlFrag, args);
+					}
 				}
 				catch (FamiliarDbException e) {
 					getMainActivity().showDbErrorToast();
@@ -230,7 +253,12 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					// add a fragment
 					ResultListFragment rlFrag = new ResultListFragment();
 					rlFrag.setArguments(args);
-					startNewFragment(rlFrag, args);
+					if(getMainActivity().mThreePane) {
+						getMainActivity().sendMessageToMiddleFragment(args);
+					}
+					else {
+						startNewFragment(rlFrag, args);
+					}
 				}
 				catch (FamiliarDbException e) {
 					getMainActivity().showDbErrorToast();
@@ -263,7 +291,8 @@ public class MoJhoStoFragment extends FamiliarFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 		View myFragmentView = inflater.inflate(R.layout.mojhosto_frag, container, false);
-
+		masterLayout = (LinearLayout)myFragmentView.findViewById(R.id.master_layout);
+		
 		momirImage = (ImageView) myFragmentView.findViewById(R.id.imageViewMo);
 		stonehewerImage = (ImageView) myFragmentView.findViewById(R.id.imageViewSto);
 		jhoiraImage = (ImageView) myFragmentView.findViewById(R.id.imageViewJho);
@@ -314,7 +343,15 @@ public class MoJhoStoFragment extends FamiliarFragment {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(R.menu.random_menu, menu);
+		if(getMainActivity().mThreePane) {
+			InFragmentMenuLoader cml = new InFragmentMenuLoader(this);
+			cml.inflate(R.menu.random_menu, menu);
+			mFragmentMenu = cml.getView();
+			addFragmentMenu();
+		}
+		else {
+			inflater.inflate(R.menu.random_menu, menu);
+		}		
 	}
 
 	@Override
@@ -395,5 +432,4 @@ public class MoJhoStoFragment extends FamiliarFragment {
 		};
 		newFragment.show(ft, DIALOG_TAG);
 	}
-
 }

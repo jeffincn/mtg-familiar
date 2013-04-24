@@ -229,7 +229,6 @@ public class Main implements ActionListener {
 				JSONObject c = card.getJSONObject(i);
 
 				if (c.getString("name").contains("//")) {
-
 					card_cnt++;
 					
 					String names[] = c.getString("name").split(" // ");
@@ -276,7 +275,7 @@ public class Main implements ActionListener {
 					card1.put("id", mID);
 					card2.put("id", mID);
 
-					card.remove(i);
+					card.remove(i--);
 					card.put(card1);
 					card.put(card2);
 				}

@@ -292,7 +292,7 @@ public class Main implements ActionListener {
 			
 			//REGEX ALL THE THINGS
 			//...By which I mean validate the JSON to make sure all the identifiers are one character long
-			Pattern p = Pattern.compile("(\"[a-zA-Z0-9]{2,}\":)");
+			Pattern p = Pattern.compile("(\"[a-zA-Z0-9_]{2,}\":)");
 			Matcher m = p.matcher(s);
 			if(m.find()) {
 				//If we find a match, that's a bad thing

@@ -175,18 +175,6 @@
 	<string name="search_Vanguard">Vanguard</string>
 	<string name="search_World">World</string>
     
-    <string name="search_Land">Land</string>
-    <string name="search_Legendary">Legendary</string>
-    <string name="search_Ongoing">Ongoing</string>
-    <string name="search_Plane">Plane</string>
-    <string name="search_Planeswalker">Planeswalker</string>
-    <string name="search_Scheme">Scheme</string>
-    <string name="search_Snow">Snow</string>
-    <string name="search_Sorcery">Sorcery</string>
-    <string name="search_Tribal">Tribal</string>
-    <string name="search_Vanguard">Vanguard</string>
-    <string name="search_World">World</string>
-
     <!-- Card view activity -->
     <string name="card_view_transform">Transform</string>
     <string name="card_view_fuse">Fuse</string>

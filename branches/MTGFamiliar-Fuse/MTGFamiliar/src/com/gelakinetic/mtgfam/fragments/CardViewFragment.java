@@ -371,7 +371,31 @@ public class CardViewFragment extends FamiliarFragment {
 			pt.setText("");
 		}
 
-		if (CardDbAdapter.isTransformable(number, c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)))) {
+		boolean isMulticard = false;
+		switch (CardDbAdapter.isMulticard(number, c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)))) {
+			case CardDbAdapter.NOPE:
+				isMulticard = false;
+				transform.setVisibility(View.GONE);
+				break;
+			case CardDbAdapter.TRANSFORM:
+				isMulticard = true;
+				transform.setVisibility(View.VISIBLE);
+				transform.setText(R.string.card_view_transform);
+				break;
+			case CardDbAdapter.FUSE:
+				isMulticard = true;
+				transform.setVisibility(View.VISIBLE);
+				transform.setText(R.string.card_view_fuse);
+				break;
+			case CardDbAdapter.SPLIT:
+				isMulticard = true;
+				transform.setVisibility(View.VISIBLE);
+				transform.setText(R.string.card_view_other_half);
+				break;
+		}
+
+
+		if(isMulticard) {
 			transform.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					cardPicture = null;
@@ -391,12 +415,8 @@ public class CardViewFragment extends FamiliarFragment {
 					
 				}
 			});
-			transform.setVisibility(View.VISIBLE);
 		}
-		else {
-			transform.setVisibility(View.GONE);
-		}
-
+		
 		if (isRandom) {
 			leftRandom.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {

@@ -193,6 +193,7 @@
     <!-- Card view activity -->
     <string name="card_view_transform">Transformer</string>
 	<string name="card_view_fuse">Fusion</string>
+	<string name="card_view_other_half">Autre moitié</string>
     <string name="card_view_left">&lt;</string>
     <string name="card_view_right">></string>
     <string name="card_view_copy">Copier Section Vers Presse-papier</string>

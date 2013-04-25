@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:padding="2dp"
+    android:layout_height="match_parent" >
+
+    <ImageView
+        android:id="@+id/menu_icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:paddingRight="5dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/card_search_icon" />
+
+    <TextView
+        android:id="@+id/menu_title"
+        style="@style/text"
+        android:layout_width="match_parent"
+        android:paddingLeft="5dp"
+        android:layout_height="48dp"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/menu_icon"
+        android:gravity="center_vertical"
+        android:text="@string/main_card_search"
+        android:textSize="24dp" />
+
+</RelativeLayout>

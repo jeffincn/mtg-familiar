@@ -80,13 +80,10 @@
     <string name="main_whats_new_title">Nouveautés</string>
     <string name="main_whats_new_in_title">Nouveautés dans la Version</string>
     <string name="main_whats_new_text">
-	- Amélioration de la navigation par menu glissant&lt;br />&lt;br />
- 	- Recherches de prix plus efficaces&lt;br />&lt;br />
- 	- L\'échange de cartes sauve les prix personnalisés&lt;br />&lt;br />
- 	- Plusieurs petites corrections de bugs&lt;br />&lt;br />
- 	- Meilleure gestion des erreurs&lt;br />&lt;br />
- 	- 2.0.3: Correction des prix pour les appareils sous Eclair et Froyo
-    </string>
+        - Ajout d\'un Espace Arbitre! Il contient les Magic Tournament Rules(MTR), l\'Infraction Procedure Guide (IPG) et un compteur de deck rapide.&lt;br />&lt;br />
+ 		- Ajout d\'un compteur du coût de lancement du Commander dans le Compteur de Vie.&lt;br />&lt;br />
+ 		- Navigation dans la recherche de carte corrigée.
+ 	</string>
     
     <string name="main_tts_warning_title">Synthèse vocale (TTS)</string>
     <string name="main_tts_warning_text">Cette appli permet la synthèse vocale parmi ses foncionnalités, mais il semble que vous ne l\'ayiez pas installée. 
@@ -172,6 +169,23 @@
 	<string name="search_Rare">Rare</string>
 	<string name="search_Mythic">Mythique</string>
 	<string name="search_Timeshifted">Timeshifted</string>
+    <string name="search_Artifact">Artifact</string>
+    <string name="search_Basic">Basic</string>
+    <string name="search_Creature">Creature</string>
+    <string name="search_Enchantment">Enchantment</string>
+    <string name="search_Instant">Instant</string>
+	<string name="search_Land">Land</string>
+	<string name="search_Legendary">Legendary</string>
+	<string name="search_Ongoing">Ongoing</string>
+	<string name="search_Plane">Plane</string>
+	<string name="search_Planeswalker">Planeswalker</string>
+	<string name="search_Scheme">Scheme</string>
+	<string name="search_Snow">Snow</string>
+	<string name="search_Sorcery">Sorcery</string>
+	<string name="search_Tribal">Tribal</string>
+	<string name="search_Vanguard">Vanguard</string>
+	<string name="search_World">World</string>
+	<!-- The database is in English so types must be entered in english in order to find cards.
 	<string name="search_Artifact">Artefact</string>
 	<string name="search_Basic">Basic</string>
 	<string name="search_Creature">Créature</string>
@@ -188,7 +202,7 @@
 	<string name="search_Tribal">Tribal</string>
 	<string name="search_Vanguard">Fun cards</string>
 	<string name="search_World">Du monde</string>
-
+    -->
     
     <!-- Card view activity -->
     <string name="card_view_transform">Transformer</string>
@@ -242,6 +256,7 @@
 	<string name="life_counter_Commander">Commander</string>
     <string name="life_counter_Compact">Compact</string>
     <string name="life_counter_Normal">Normal</string>
+    <string name="life_counter_commander_cast">Coût Commander</string>
     
     <!-- Default gathering activity -->
     <string name="gathering_custom_name">Nom</string>
@@ -449,16 +464,15 @@
     <!-- Default language -->
     <string name="main_card_language">fr</string>
     
-    
     <!-- Goggles -->
     <string name="goggles_photo_analysis">Analyse de la photo…</string>
     <string name="goggles_no_card_on_photo">Aucune carte trouvée sur la photo</string>
     
-    
     <!-- Judge's Corner -->
     <string name="judges_corner_MTR">MTR</string>
 	<string name="judges_corner_IPG">IPG</string>
-	<string name="judges_corner_counter">Compteur</string>
+	<string name="judges_corner_jump_to_top">Retour en haut</string>
+    <string name="judges_corner_counter">Compteur</string>
 	<string name="deck_counter_1">+1</string>
 	<string name="deck_counter_2">+2</string>
 	<string name="deck_counter_3">+3</string>

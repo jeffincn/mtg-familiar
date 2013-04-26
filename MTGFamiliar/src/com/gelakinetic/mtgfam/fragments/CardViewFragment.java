@@ -77,7 +77,6 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
-import com.gelakinetic.mtgfam.helpers.InFragmentMenuLoader;
 import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 import com.gelakinetic.mtgfam.helpers.PriceFetchRequest;
@@ -105,8 +104,8 @@ public class CardViewFragment extends FamiliarFragment {
 	private static final int					GETLEGALITY			= 7;
 
 	// Where the card image is loaded to
-	private static final int					MAINPAGE				= 1;
-	private static final int					DIALOG					= 2;
+	private static final int					MAINPAGE				= 0;
+	private static final int					DIALOG					= 1;
 
 	// Random useful things
 	private ImageGetter								imgGetter;
@@ -143,7 +142,7 @@ public class CardViewFragment extends FamiliarFragment {
 	private int												multiverseId;
 
 	// Preferences
-	private int												loadTo = 0;
+	private int												loadTo;
 	private boolean										isRandom;
 	private boolean										isSingle;
 	private boolean										scroll_results;
@@ -164,20 +163,12 @@ public class CardViewFragment extends FamiliarFragment {
 		 * will occur in some cases during state restore. 
 		 */
 	}
-	
-	@Override
-	public void receiveMessage(Bundle bundle) {
-		setInfoFromBundle(bundle);
-	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 		myFragmentView = inflater.inflate(R.layout.card_view_frag, container, false);
 
-		masterLayout = (LinearLayout)myFragmentView.findViewById(R.id.master_layout);
-		addFragmentMenu();
-		
 		name = (TextView) myFragmentView.findViewById(R.id.name);
 		cost = (TextView) myFragmentView.findViewById(R.id.cost);
 		type = (TextView) myFragmentView.findViewById(R.id.type);
@@ -201,6 +192,19 @@ public class CardViewFragment extends FamiliarFragment {
 		registerForContextMenu(flavor);
 		registerForContextMenu(artist);
 
+		Bundle extras = this.getArguments();
+		cardID = extras.getLong("id");
+		isRandom = extras.getBoolean(SearchViewFragment.RANDOM);
+		isSingle = extras.getBoolean("isSingle", false);
+		if (getMainActivity().getPreferencesAdapter().getPicFirst()) {
+			loadTo = MAINPAGE;
+		}
+		else {
+			loadTo = DIALOG;
+		}
+		scroll_results = getMainActivity().getPreferencesAdapter().getScrollResults();
+		cardLanguage = getMainActivity().getPreferencesAdapter().getCardLanguage();
+
 		progDialog = new ProgressDialog(this.getMainActivity());
 		progDialog.setTitle("");
 		progDialog.setMessage(getString(R.string.card_view_loading_dialog));
@@ -214,40 +218,6 @@ public class CardViewFragment extends FamiliarFragment {
 				}
 			}
 		});
-		
-		Bundle extras = this.getArguments();
-		
-		setInfoFromBundle(extras);
-
-		return myFragmentView;
-	}
-
-	private void setInfoFromBundle(Bundle extras) {
-		if(extras == null) {
-			name.setText("");
-			cost.setText("");
-			type.setText("");
-			set.setText("");
-			ability.setText("");
-			flavor.setText("");
-			artist.setText("");
-			pt.setText("");
-			transform.setVisibility(View.GONE);
-			leftRandom.setVisibility(View.GONE);
-			rightRandom.setVisibility(View.GONE);
-			return;
-		}
-		cardID = extras.getLong("id");
-		isRandom = extras.getBoolean(SearchViewFragment.RANDOM);
-		isSingle = extras.getBoolean("isSingle", false);
-		if (getMainActivity().getPreferencesAdapter().getPicFirst()) {
-			loadTo = MAINPAGE;
-		}
-		else {
-			loadTo = DIALOG;
-		}
-		scroll_results = getMainActivity().getPreferencesAdapter().getScrollResults();
-		cardLanguage = getMainActivity().getPreferencesAdapter().getCardLanguage();
 
 		try {
 			setInfoFromID(cardID);
@@ -255,6 +225,8 @@ public class CardViewFragment extends FamiliarFragment {
 			getMainActivity().showDbErrorToast();
 			getMainActivity().getSupportFragmentManager().popBackStack();
 		}
+
+		return myFragmentView;
 	}
 
 	@Override
@@ -399,7 +371,31 @@ public class CardViewFragment extends FamiliarFragment {
 			pt.setText("");
 		}
 
-		if (CardDbAdapter.isTransformable(number, c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)))) {
+		boolean isMulticard = false;
+		switch (CardDbAdapter.isMulticard(number, c.getString(c.getColumnIndex(CardDbAdapter.KEY_SET)))) {
+			case CardDbAdapter.NOPE:
+				isMulticard = false;
+				transform.setVisibility(View.GONE);
+				break;
+			case CardDbAdapter.TRANSFORM:
+				isMulticard = true;
+				transform.setVisibility(View.VISIBLE);
+				transform.setText(R.string.card_view_transform);
+				break;
+			case CardDbAdapter.FUSE:
+				isMulticard = true;
+				transform.setVisibility(View.VISIBLE);
+				transform.setText(R.string.card_view_fuse);
+				break;
+			case CardDbAdapter.SPLIT:
+				isMulticard = true;
+				transform.setVisibility(View.VISIBLE);
+				transform.setText(R.string.card_view_other_half);
+				break;
+		}
+
+
+		if(isMulticard) {
 			transform.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					cardPicture = null;
@@ -419,12 +415,8 @@ public class CardViewFragment extends FamiliarFragment {
 					
 				}
 			});
-			transform.setVisibility(View.VISIBLE);
 		}
-		else {
-			transform.setVisibility(View.GONE);
-		}
-
+		
 		if (isRandom) {
 			leftRandom.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
@@ -452,8 +444,7 @@ public class CardViewFragment extends FamiliarFragment {
 
 		if (loadTo == MAINPAGE) {
 			cardpic = (ImageView) myFragmentView.findViewById(R.id.cardpic);
-			cardpic.setVisibility(View.VISIBLE);
-			
+
 			name.setVisibility(View.GONE);
 			cost.setVisibility(View.GONE);
 			type.setVisibility(View.GONE);
@@ -470,16 +461,6 @@ public class CardViewFragment extends FamiliarFragment {
 		}
 		else {
 			((ImageView) myFragmentView.findViewById(R.id.cardpic)).setVisibility(View.GONE);
-			
-			name.setVisibility(View.VISIBLE);
-			cost.setVisibility(View.VISIBLE);
-			type.setVisibility(View.VISIBLE);
-			set.setVisibility(View.VISIBLE);
-			ability.setVisibility(View.VISIBLE);
-			pt.setVisibility(View.VISIBLE);
-			flavor.setVisibility(View.VISIBLE);
-			artist.setVisibility(View.VISIBLE);
-			((FrameLayout) myFragmentView.findViewById(R.id.frameLayout1)).setVisibility(View.VISIBLE);			
 		}
 
 		if (!isSingle && scroll_results) {
@@ -860,7 +841,6 @@ public class CardViewFragment extends FamiliarFragment {
 			
 			@Override
 			public Dialog onCreateDialog(Bundle savedInstanceState) {
-				
 				setShowsDialog(true);
 				switch (id) {
 					case GETIMAGE: {
@@ -1085,10 +1065,6 @@ public class CardViewFragment extends FamiliarFragment {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if(cardName == null) {
-			//disable menu buttons if the card isn't initialized
-			return false;
-		}
 		// Handle item selection
 		switch (item.getItemId()) {
 			case R.id.image:
@@ -1154,15 +1130,7 @@ public class CardViewFragment extends FamiliarFragment {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
-		
-		if(getMainActivity().mThreePane) {
-			InFragmentMenuLoader cml = new InFragmentMenuLoader(this);
-			cml.inflate(R.menu.card_menu, menu);
-			mFragmentMenu = cml.getView();
-			addFragmentMenu();
-		}
-		else {
-			inflater.inflate(R.menu.card_menu, menu);
-		}
-	}	
+		inflater.inflate(R.menu.card_menu, menu);
+	}
+	
 }

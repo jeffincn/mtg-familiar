@@ -22,10 +22,6 @@ public class DeckCounterFragment extends FamiliarFragment implements ViewFactory
 	private ArrayList<Integer> sequence = new ArrayList<Integer>();
 	private int deckCount = 0;
 	private TextSwitcher deckCountText;
-	private TextView deckCountHistory;
-	
-	private static final int COUNT_FLAG_UNDO = -1;
-	private static final int COUNT_FLAG_RESET = -2;
 
 	public DeckCounterFragment() {
 		/* http://developer.android.com/reference/android/app/Fragment.html
@@ -52,15 +48,15 @@ public class DeckCounterFragment extends FamiliarFragment implements ViewFactory
 		deckCountText.setOutAnimation(out);
 
 		deckCountText.setText("" + deckCount);
-		
-		deckCountHistory = (TextView) myFragmentView.findViewById(R.id.deck_counter_history);
 
 		Button b1 = (Button) myFragmentView.findViewById(R.id.deck_counter_1);
 		b1.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				updateCardCount(1);
+				deckCount += 1;
+				sequence.add(1);
+				deckCountText.setText("" + deckCount);
 			}
 		});
 		Button b2 = (Button) myFragmentView.findViewById(R.id.deck_counter_2);
@@ -68,7 +64,9 @@ public class DeckCounterFragment extends FamiliarFragment implements ViewFactory
 
 			@Override
 			public void onClick(View v) {
-				updateCardCount(2);
+				deckCount += 2;
+				sequence.add(2);
+				deckCountText.setText("" + deckCount);
 			}
 		});
 		Button b3 = (Button) myFragmentView.findViewById(R.id.deck_counter_3);
@@ -76,7 +74,9 @@ public class DeckCounterFragment extends FamiliarFragment implements ViewFactory
 
 			@Override
 			public void onClick(View v) {
-				updateCardCount(3);
+				deckCount += 3;
+				sequence.add(3);
+				deckCountText.setText("" + deckCount);
 			}
 		});
 		Button b4 = (Button) myFragmentView.findViewById(R.id.deck_counter_4);
@@ -84,7 +84,9 @@ public class DeckCounterFragment extends FamiliarFragment implements ViewFactory
 
 			@Override
 			public void onClick(View v) {
-				updateCardCount(4);
+				deckCount += 4;
+				sequence.add(4);
+				deckCountText.setText("" + deckCount);
 			}
 		});
 
@@ -93,7 +95,14 @@ public class DeckCounterFragment extends FamiliarFragment implements ViewFactory
 
 			@Override
 			public void onClick(View v) {
-				updateCardCount(COUNT_FLAG_UNDO);
+				if (sequence.size() > 0) {
+					sequence.remove(sequence.size() - 1);
+					deckCount = 0;
+					for (Integer i : sequence) {
+						deckCount += i;
+					}
+					deckCountText.setText("" + deckCount);
+				}
 			}
 		});
 
@@ -102,7 +111,9 @@ public class DeckCounterFragment extends FamiliarFragment implements ViewFactory
 
 			@Override
 			public void onClick(View v) {
-				updateCardCount(COUNT_FLAG_RESET);
+				sequence.clear();
+				deckCount = 0;
+				deckCountText.setText("" + deckCount);
 			}
 		});
 		return myFragmentView;
@@ -115,43 +126,5 @@ public class DeckCounterFragment extends FamiliarFragment implements ViewFactory
 		t.setTextAppearance(this.getActivity(), R.style.text);
 		t.setTextSize(70);
 		return t;
-	}
-	
-	
-	private void updateCardCount(int count) {
-		boolean updateUi = true;
-		
-		switch (count) {
-			case COUNT_FLAG_UNDO:
-				if (sequence.size() > 0) {
-					deckCount -= sequence.remove(sequence.size() - 1);
-				}
-				else {
-					updateUi = false;
-				}
-				break;
-			case COUNT_FLAG_RESET:
-				if (sequence.size() > 0) {
-					deckCount = 0;
-					sequence.clear();	
-				}
-				else {
-					updateUi = false;
-				}
-				break;
-			default:
-				deckCount += count;
-				sequence.add(count);
-				break;
-		}
-		
-		if (updateUi) {
-			StringBuilder history = new StringBuilder();
-			for (int i = 0; i < sequence.size(); i++) {
-				history.append("+" + sequence.get(i) + "   ");
-			}
-			deckCountHistory.setText(history.toString());
-			deckCountText.setText("" + deckCount);
-		}
 	}
 }

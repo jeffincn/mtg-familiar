@@ -30,7 +30,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,7 +40,6 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.AutocompleteCursorAdapter;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
-import com.gelakinetic.mtgfam.helpers.InFragmentMenuLoader;
 import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 
 public class SearchViewFragment extends FamiliarFragment {
@@ -131,13 +129,7 @@ public class SearchViewFragment extends FamiliarFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		if(getMainActivity().mThreePane) {
-			getMainActivity().showThreePanes();
-			getMainActivity().attachMiddleFragment(new ResultListFragment(), "result_list", false);
-			getMainActivity().attachRightFragment(new CardViewFragment(), "card_view", false);
-		}
-		
+
 		// This is necessary to persist the goggles task through rotation
 		this.setRetainInstance(true);
 
@@ -197,9 +189,6 @@ public class SearchViewFragment extends FamiliarFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 		View myFragmentView = inflater.inflate(R.layout.search_frag, container, false);
-
-		masterLayout = (LinearLayout)myFragmentView.findViewById(R.id.master_layout);
-		addFragmentMenu();
 
 		namefield = (AutoCompleteTextView) myFragmentView.findViewById(R.id.namesearch);
 		namefield.setAdapter(new AutocompleteCursorAdapter(this.getActivity(), null));
@@ -292,6 +281,7 @@ public class SearchViewFragment extends FamiliarFragment {
 
 		searchbutton = (Button) myFragmentView.findViewById(R.id.searchbutton);
 		camerabutton = (ImageButton) myFragmentView.findViewById(R.id.cameraButton);
+		// randombutton = (Button) myFragmentView.findViewById(R.id.s);
 
 		checkboxW = (CheckBox) myFragmentView.findViewById(R.id.checkBoxW);
 		checkboxU = (CheckBox) myFragmentView.findViewById(R.id.checkBoxU);
@@ -394,7 +384,7 @@ public class SearchViewFragment extends FamiliarFragment {
 
 		searchbutton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				doSearch();
+				doSearch(false);
 			}
 		});
 
@@ -416,7 +406,7 @@ public class SearchViewFragment extends FamiliarFragment {
 	// this method must be overridden by each class calling takePictureAndSearchGoogleGogglesIntent
 		super.onGoogleGogglesSuccess(cardName);
     namefield.setText(cardName);
-		doSearch();
+		doSearch(false);
 	}
     
 	private SearchCriteria parseForm() {
@@ -588,19 +578,15 @@ public class SearchViewFragment extends FamiliarFragment {
 		return searchCriteria;
 	}
 
-	private void doSearch() {
+	private void doSearch(boolean isRandom) {
 		SearchCriteria searchCriteria = parseForm();
+
+		// add a fragment
 		Bundle args = new Bundle();
+		args.putBoolean(RANDOM, isRandom);
 		args.putSerializable(CRITERIA, searchCriteria);
-		
-		if(getMainActivity().mThreePane) {
-			getMainActivity().sendMessageToMiddleFragment(args);
-		}
-		else {
-			// add a fragment
-			ResultListFragment rlFrag = new ResultListFragment();
-			startNewFragment(rlFrag, args);
-		}
+		ResultListFragment rlFrag = new ResultListFragment();
+		startNewFragment(rlFrag, args);
 	}
 
 	public void clear() {
@@ -819,6 +805,9 @@ public class SearchViewFragment extends FamiliarFragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
+			case R.id.search_menu_random_search:
+				doSearch(true);
+				return true;
 			case R.id.search_menu_clear:
 				clear();
 				return true;
@@ -836,15 +825,7 @@ public class SearchViewFragment extends FamiliarFragment {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
-			if(getMainActivity().mThreePane) {
-			InFragmentMenuLoader cml = new InFragmentMenuLoader(this);
-			cml.inflate(R.menu.search_menu, menu);
-			mFragmentMenu = cml.getView();
-			addFragmentMenu();
-		}
-		else {
-			inflater.inflate(R.menu.search_menu, menu);
-		}
+		inflater.inflate(R.menu.search_menu, menu);
 	}
 
 	protected void showDialog(final int id) {
@@ -906,7 +887,7 @@ public class SearchViewFragment extends FamiliarFragment {
 
 	@Override
 	public boolean onInterceptSearchKey() {
-		doSearch();
+		doSearch(false);
 		return true;
 	}
 }

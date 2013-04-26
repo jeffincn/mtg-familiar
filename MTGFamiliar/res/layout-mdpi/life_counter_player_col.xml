@@ -52,7 +52,6 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
             android:layout_height="fill_parent"
             android:layout_weight="1"
             android:orientation="horizontal" android:layout_width="fill_parent" android:weightSum="1" android:baselineAligned="false">
-
             <LinearLayout android:layout_height="fill_parent" android:id="@+id/linearLayout1" android:layout_weight=".5" android:layout_width="0dp" android:orientation="vertical">
 
                 <TextView
@@ -61,7 +60,6 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
                     android:layout_height="fill_parent"
                     android:layout_marginLeft="-18dp"
                     android:layout_marginRight="-18dp"
-                    android:layout_weight="1"
                     android:gravity="center"
                     android:maxLines="1"
                     android:paddingBottom="10dp"
@@ -70,28 +68,7 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
                     android:paddingTop="10dp"
                     android:text="@string/life_counter_twenty"
                     android:textSize="72dp" >
-
 </TextView>
-
-                <TextView
-                    android:id="@+id/commanderCastText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0"
-                    android:gravity="center"
-                    android:paddingTop="10dp"
-                    android:text="@string/life_counter_commander_cast"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:visibility="gone" />
-
-                <Button
-                    android:id="@+id/commanderCast"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0"
-                    android:text="@string/mana_pool_zero"
-                    android:visibility="gone" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -105,7 +82,6 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
                     android:padding="1dp" android:layout_width="fill_parent" android:paddingLeft="36dp">
                 </ListView>
             </LinearLayout>
-
         </LinearLayout>
 
         <LinearLayout

@@ -53,10 +53,11 @@ public class PriceFetchRequest extends SpiceRequest<String> {
 
 			String tcgname = mDbHelper.getTCGname(setCode);
 			String tcgCardName;
-			if (CardDbAdapter.isTransformable(number, setCode) && number.contains("b")) {
+			int multicardType = CardDbAdapter.isMulticard(number, setCode);
+			if ((multicardType == CardDbAdapter.TRANSFORM) && number.contains("b")) {
 				tcgCardName = mDbHelper.getTransformName(setCode, number.replace("b", "a"));
 			}
-			else if (multiverseId!= -1 && mDbHelper.isSplitCard(multiverseId)) {
+			else if (multiverseId!= -1 && (multicardType == CardDbAdapter.SPLIT || multicardType == CardDbAdapter.FUSE)) {
 				tcgCardName = mDbHelper.getSplitName(multiverseId);
 			}
 			else {

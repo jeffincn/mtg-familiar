@@ -77,9 +77,9 @@
     <string name="main_whats_new_title">What\'s New</string>
     <string name="main_whats_new_in_title">What\'s New in Version</string>
     <string name="main_whats_new_text">
-        - Added Judge\'s Corner! It has the Magic Tournament Rules, Infraction Procedure Guide, and a quick deck counter.&lt;br />&lt;br />
- 		- Added Commander casting count to the life counter.&lt;br />&lt;br />
- 		- Fixed card search navigation.</string>
+ 	- Fused card support, better split card support&lt;br />&lt;br />
+ 	- Bug fixes
+ 	</string>
     <string name="main_tts_warning_title">Text-to-Speech</string>
     <string name="main_tts_warning_text">This application has text-to-speech capability for some of its features, but you don\'t seem to have it installed. 
         If you want to install it, use the "Install Text-to-Speech" link in the settings menu.</string>
@@ -177,6 +177,8 @@
     
     <!-- Card view activity -->
     <string name="card_view_transform">Transform</string>
+    <string name="card_view_fuse">Fuse</string>
+    <string name="card_view_other_half">Other Half</string>
     <string name="card_view_left">&lt;</string>
     <string name="card_view_right">></string>
     <string name="card_view_copy">Copy Section To Clipboard</string>
@@ -226,7 +228,6 @@
     <string name="life_counter_Commander">Commander</string>
     <string name="life_counter_Compact">Compact</string>
     <string name="life_counter_Normal">Normal</string>
-    <string name="life_counter_commander_cast">Commander Casting</string>
 
     <!-- Default gathering activity -->
     <string name="gathering_custom_name">Name</string>
@@ -426,7 +427,6 @@
     <!-- Judge's Corner -->
     <string name="judges_corner_MTR">MTR</string>
     <string name="judges_corner_IPG">IPG</string>
-    <string name="judges_corner_jump_to_top">Jump to top</string>
     <string name="judges_corner_counter">Counter</string>
     <string name="deck_counter_1">+1</string>
     <string name="deck_counter_2">+2</string>

@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,19 +58,24 @@ public class MenuFragment extends ListFragment {
 			throw new IllegalStateException(
 					"MenuFragment must be attached to an instance of MainActivity");
 		}
+		if (getActivity().findViewById(R.id.frag_view) == null) {
+			throw new IllegalStateException(
+					"MenuFragment must be attached to an Activity with R.id.frag_view");
+		}
 		mActivity = (MainActivity) getActivity();
 		// add everything
 		mAdapter = new SlidingMenuAdapter(mActivity);
 		mAdapter.addHeader(R.string.main_pages);
 		mAdapter.addItem(R.string.main_card_search, R.drawable.card_search_icon);
-		mAdapter.addItem(R.string.main_life_counter, R.drawable.life_counter_icon);
+		mAdapter.addItem(R.string.main_life_counter,
+				R.drawable.life_counter_icon);
 		mAdapter.addItem(R.string.main_mana_pool, R.drawable.mana_pool_icon);
 		mAdapter.addItem(R.string.main_dice, R.drawable.dice_icon);
 		mAdapter.addItem(R.string.main_trade, R.drawable.trade_icon);
 		mAdapter.addItem(R.string.main_wishlist, R.drawable.wishlist_icon);
 		mAdapter.addItem(R.string.main_timer, R.drawable.round_timer_icon);
 		mAdapter.addItem(R.string.main_rules, R.drawable.rules_icon);
-		mAdapter.addItem(R.string.main_judges_corner, R.drawable.judge_icon);
+		//mAdapter.addItem(R.string.main_judges_corner, R.drawable.rules_icon);
 		mAdapter.addItem(R.string.main_mojhosto, R.drawable.mojhosto_icon);
 		mAdapter.addHeader(R.string.main_extras);
 		mAdapter.addItem(R.string.main_settings_title);
@@ -91,7 +97,7 @@ public class MenuFragment extends ListFragment {
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		SlidingMenuItem item = mAdapter.getItem(position);
-		FamiliarFragment fragment = null;
+		Fragment fragment = null;
 		switch (item.title) {
 		case R.string.main_card_search:
 			fragment = new SearchViewFragment();
@@ -118,6 +124,7 @@ public class MenuFragment extends ListFragment {
 			fragment = new RulesFragment();
 			break;
 		case R.string.main_judges_corner:
+			//fragment = new JudgesCornerFragment();
 			fragment = new JudgesCornerFragment();
 			break;
 		case R.string.main_mojhosto:
@@ -257,17 +264,18 @@ public class MenuFragment extends ListFragment {
 		zos.close();
 	}
 
-	public void switchContent(final FamiliarFragment fragment) {
+	public void switchContent(final Fragment fragment) {
 		
 		// Clear the backstack, otherwise replacing a cardview after a search
 		// messes up the hierarchy
 		for(int i=0; i < mActivity.getSupportFragmentManager().getBackStackEntryCount(); i++) {
 			mActivity.getSupportFragmentManager().popBackStack();
 		}
-		mActivity.showOnePane();
-				
-		mActivity.attachSingleFragment(fragment, "left_frag", false, true);
 		
+		mActivity.getSupportFragmentManager()
+		.beginTransaction()
+		.replace(R.id.frag_view, fragment)
+		.commit();
 		Handler h = new Handler();
 		h.postDelayed(new Runnable() {
 			public void run() {

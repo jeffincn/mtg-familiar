@@ -69,7 +69,7 @@ public class CardDbAdapter {
 	private static final String DATABASE_TABLE_RULES = "rules";
 	private static final String DATABASE_TABLE_GLOSSARY = "glossary";
 
-	public static final int DATABASE_VERSION = 34;
+	public static final int DATABASE_VERSION = 36;
 
 	public static final String KEY_ID = "_id";
 	public static final String KEY_NAME = SearchManager.SUGGEST_COLUMN_TEXT_1; // "name";
@@ -1784,17 +1784,6 @@ public class CardDbAdapter {
         		.replace(Character.toChars(0xFF)[0]+"", "y");
     }
 
-	
-
-	public static boolean isTransformable(String number, String setCode) {
-		if (number.contains("a") || number.contains("b")) {
-			if (setCode.compareTo("ISD") == 0 || setCode.compareTo("DKA") == 0) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	public int fetchMultiverseId(String name, String setCode) throws FamiliarDbException{
 		name = name.replace("'", "''"); // Sanitization
 		setCode = setCode.replace("'", "''"); // Sanitization
@@ -1813,5 +1802,25 @@ public class CardDbAdapter {
 			throw new FamiliarDbException(e);
 		}
 		return -1;
+	}
+	
+	public static final int NOPE = 0;
+	public static final int TRANSFORM = 1;
+	public static final int FUSE = 2;
+	public static final int SPLIT = 3;
+
+	public static int isMulticard(String number, String setCode) {
+		if (number.contains("a") || number.contains("b")) {
+			if (setCode.compareTo("ISD") == 0 || setCode.compareTo("DKA") == 0) {
+				return TRANSFORM;
+			}
+			else if (setCode.compareTo("DGM") == 0) {
+				return FUSE;
+			}
+			else {
+				return SPLIT;
+			}
+		}
+		return NOPE;
 	}
 }

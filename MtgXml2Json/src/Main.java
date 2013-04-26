@@ -56,12 +56,16 @@ public class Main implements ActionListener {
 		{"\"bdd_date\"",						"\"v\""},
 		{"\"num_cards\"",						"\"w\""},
 
-		{"£", 											"<br>"},
+		{"Â£", 											"<br>"},
 		{"#_",											"<i>"},
 		{"_#",											"</i>"},
 
-		{"‘",												"'"},
+		{"â€˜",												"'"},
 		{"'",												"'"}};
+	
+ 
+
+
 
 	private static JFrame			UIFrame;
 	private static JPanel			UIPanel;
@@ -181,6 +185,13 @@ public class Main implements ActionListener {
 
 			JSONObject cdb = jo.getJSONObject("mtg_carddatabase");
 			
+			if(cdb.remove("bdd_editor") == null) {
+				System.out.println("fail");
+			}
+			if(cdb.remove("bdd_name") == null) {
+				System.out.println("fail");
+			}
+			
 			JSONObject sets = cdb.getJSONObject("sets");
 			
 			JSONArray set = null;
@@ -295,7 +306,8 @@ public class Main implements ActionListener {
 			Matcher m = p.matcher(s);
 			if(m.find()) {
 				//If we find a match, that's a bad thing
-				statusLabel.setText("Validation error; check fields");
+				statusLabel.setText("Validation error; " + m.group());
+				
 				return;
 			}
 

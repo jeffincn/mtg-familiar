@@ -1657,6 +1657,32 @@ public class CardDbAdapter {
 		}
 		return false;
 	}
+	
+	public int getSplitMultiverseID(String name) throws FamiliarDbException {
+		Cursor mCursor = null;
+		String statement = "SELECT " + KEY_MULTIVERSEID + " from "
+				+ DATABASE_TABLE_CARDS + " WHERE " + KEY_NAME + " = '"
+				+ name +"'";
+
+		try {
+			mCursor = mDb.rawQuery(statement, null);
+
+			if (mCursor.getCount() == 1) {
+				mCursor.moveToFirst();
+				int retVal = mCursor.getInt(mCursor
+						.getColumnIndex(KEY_MULTIVERSEID));
+				mCursor.close();
+				return retVal;
+			} else {
+				mCursor.close();
+				return -1;
+			}
+		} catch (SQLiteException e) {
+			throw new FamiliarDbException(e);
+		} catch (IllegalStateException e) {
+			throw new FamiliarDbException(e);
+		}
+	}
 
 	public String getSplitName(int multiverseId) throws FamiliarDbException {
 		Cursor mCursor = null;

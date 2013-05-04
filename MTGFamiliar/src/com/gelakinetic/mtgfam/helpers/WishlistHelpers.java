@@ -161,10 +161,12 @@ public class WishlistHelpers {
 					String number = parts.length < 4 ? null : parts[3];
 					int rarity = parts.length < 5 ? '-' : Integer
 							.parseInt(parts[4]);
+					boolean foil = parts.length < 6 ? false : Boolean.parseBoolean(parts[5]);
 
 					CardData cd = tradeListHelper.new CardData(cardName,
 							tcgName, cardSet, numberOf, 0, "loading", number,
 							rarity);
+					cd.setIsFoil(foil);
 					if (rarity == '-' || number == null)
 						cd = TradeListHelpers.FetchCardData(cd, mDbHelper);
 					lWishlist.add(0, cd);
@@ -235,13 +237,17 @@ public class WishlistHelpers {
 
 	public Dialog getDialog(String cn, final FamiliarFragment ff,
 			MainActivity ma, ArrayList<CardData> list) throws FamiliarDbException {
+		return getDialog(cn, ff, ma, list, false);
+	};
+	public Dialog getDialog(String cn, final FamiliarFragment ff,
+			MainActivity ma, ArrayList<CardData> list, boolean foil) throws FamiliarDbException {
 
 		this.ff = ff;
 		this.ma = ma;
 		cardName = cn;
 		AlertDialog.Builder b = new AlertDialog.Builder(ma);
 
-		b.setTitle(cardName + " in the Wishlist");
+		b.setTitle(cardName + (foil ? " (Foil)" : "") +" in the Wishlist");
 
 		View view = ma.getLayoutInflater().inflate(
 				R.layout.card_setwishlist_dialog, null);

@@ -70,6 +70,7 @@ public class TradeListHelpers {
 		public int		loyalty;
 		public int		rarity;
 		public boolean  customPrice = false; //default is false as all cards should first grab internet prices.
+		public boolean 	foil = false;
 
 		public CardData(String name, String tcgName, String setCode, int numberOf, int price, String message, String number, String type, String cost,
 				String ability, String p, String t, int loyalty, int rarity) {
@@ -100,7 +101,7 @@ public class TradeListHelpers {
 			this.rarity = rarity;
 		}
 		
-		public CardData(String name, String tcgName, String setCode, int numberOf, int price, String message, String number, int rarity, boolean customPrice) {
+		public CardData(String name, String tcgName, String setCode, int numberOf, int price, String message, String number, int rarity, boolean customPrice, boolean foil) {
 			this.name = name;
 			this.cardNumber = number;
 			this.setCode = setCode;
@@ -110,6 +111,7 @@ public class TradeListHelpers {
 			this.message = message;
 			this.rarity = rarity;
 			this.customPrice = customPrice;
+			this.foil = foil;
 		}
 
 		public CardData(String cardName, String cardSet, int numberOf, String number, int rarity) {
@@ -139,7 +141,7 @@ public class TradeListHelpers {
 		}
 
 		public String toString(int side) {
-			return side + delimiter + this.name + delimiter + this.setCode + delimiter + this.numberOf + delimiter + this.customPrice + delimiter + this.price + '\n';
+			return side + delimiter + this.name + delimiter + this.setCode + delimiter + this.numberOf + delimiter + this.customPrice + delimiter + this.price + delimiter + this.foil + '\n';
 		}
 
 		public String toReadableString(boolean includeTcgName) {

@@ -283,6 +283,7 @@ public class WishlistHelpers {
 	public void fillWishlistDialog(ArrayList<CardData> list) throws FamiliarDbException {
 		lCardlist = new ArrayList<CardData>();
 		lCardlist.clear();
+		ArrayList<String> setList = new ArrayList<String>();
 		
 		boolean opened = false;
 		if(!ff.mDbHelper.mDb.isOpen()) {
@@ -301,8 +302,12 @@ public class WishlistHelpers {
 					.getColumnIndex(CardDbAdapter.KEY_NUMBER));
 			int rarity = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY));
 
-			lCardlist.add(new TradeListHelpers().new CardData(cardName,
+			if (! setList.contains(setCode)){
+				setList.add(setCode);
+				lCardlist.add(new TradeListHelpers().new CardData(cardName,
 					tcgName, setCode, 0, 0, "loading", number, rarity));
+				
+			}
 			c.moveToNext();
 		}
 		c.close();

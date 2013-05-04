@@ -169,6 +169,8 @@ public class MainActivity extends SlidingFragmentActivity {
 
 		int lastVersion = prefAdapter.getLastVersion();
 		if (pInfo.versionCode != lastVersion) {
+			// Clear the robospice cache on upgrade. This way, no cached values w/o foil prices will exist
+			spiceManager.removeAllDataFromCache();
 			showDialogFragment(CHANGELOGDIALOG);
 			prefAdapter.setLastVersion(pInfo.versionCode);
 			bounceMenu = lastVersion <= 15; //Only bounce if the last version is 1.8.1 or lower (or a fresh install) 

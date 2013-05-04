@@ -38,6 +38,7 @@ import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 import com.gelakinetic.mtgfam.helpers.PriceFetchRequest;
+import com.gelakinetic.mtgfam.helpers.PriceInfo;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
 import com.gelakinetic.mtgfam.helpers.WishlistHelpers;
@@ -82,6 +83,7 @@ public class WishlistFragment extends FamiliarFragment {
 	private static final int	LOW_PRICE	= 0;
 	private static final int	AVG_PRICE	= 1;
 	private static final int	HIGH_PRICE	= 2;
+	private static final int	FOIL_PRICE	= 3;
 
 	public WishlistFragment() {
 		/* http://developer.android.com/reference/android/app/Fragment.html
@@ -1007,7 +1009,7 @@ public class WishlistFragment extends FamiliarFragment {
 	private void loadPrice(final CardData data, final WishlistAdapter adapter) {
 		
 		PriceFetchRequest priceRequest = new PriceFetchRequest(data.name, data.setCode, data.cardNumber, -1,mDbHelper);
-		getMainActivity().getSpiceManager().execute( priceRequest, data.name + "-" + data.setCode, DurationInMillis.ONE_DAY, new RequestListener< String >(){
+		getMainActivity().getSpiceManager().execute( priceRequest, data.name + "-" + data.setCode, DurationInMillis.ONE_DAY, new RequestListener< PriceInfo >(){
 	        @Override
 	        public void onRequestFailure( SpiceException spiceException ) {
 				data.message = spiceException.getMessage();
@@ -1017,33 +1019,32 @@ public class WishlistFragment extends FamiliarFragment {
 	        }
 
 	        @Override
-	        public void onRequestSuccess( final String result ) {
+	        public void onRequestSuccess( final PriceInfo result ) {
 	        	if (result != null) {
-		        	String pieces[] = result.split("@@");
-		        	if(pieces.length < 4) {
-		        		data.message = getString(R.string.trader_no_price);
-		        	}
-		        	else {
-						switch(priceSetting) {
-							case LOW_PRICE:
-							{
-								data.price = (int) (Double.parseDouble(pieces[0]) * 100);
-								break;
-							}
-							default:
-							case AVG_PRICE:
-							{
-								data.price = (int) (Double.parseDouble(pieces[1]) * 100);
-								break;
-							}
-							case HIGH_PRICE:
-							{
-								data.price = (int) (Double.parseDouble(pieces[2]) * 100);
-								break;
-							}
-						}
-						data.message = null;
-		        	}
+	        		switch(priceSetting) {
+		        		case LOW_PRICE:
+		        		{
+		        			data.price = (int) (result.low * 100);
+		        			break;
+		        		}
+		        		default:
+		        		case AVG_PRICE:
+		        		{
+		        			data.price = (int) (result.average * 100);
+		        			break;
+		        		}
+		        		case HIGH_PRICE:
+		        		{
+		        			data.price = (int) (result.high * 100);
+		        			break;
+		        		}
+		        		case FOIL_PRICE:
+		        		{
+		        			data.price = (int) (result.foil_average * 100);
+		        			break;
+		        		}
+	        		}
+	        		data.message = null;
 	        	}
 	        	else {
 	        		data.message = getString(R.string.trader_no_price);

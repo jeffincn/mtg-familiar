@@ -81,6 +81,7 @@ import com.gelakinetic.mtgfam.helpers.InFragmentMenuLoader;
 import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
 import com.gelakinetic.mtgfam.helpers.PriceFetchRequest;
+import com.gelakinetic.mtgfam.helpers.PriceInfo;
 import com.gelakinetic.mtgfam.helpers.WishlistHelpers;
 import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.SpiceException;
@@ -150,10 +151,7 @@ public class CardViewFragment extends FamiliarFragment {
 	private View											myFragmentView;
 	private String cardLanguage;
 
-	private String lowprice;
-	private String avgprice;
-	private String hiprice;
-	private String TCGPlayerLink;
+    private PriceInfo mPriceInfo;
 
 	public CardViewFragment() {
 		/* http://developer.android.com/reference/android/app/Fragment.html
@@ -945,13 +943,15 @@ public class CardViewFragment extends FamiliarFragment {
 						TextView l = (TextView) dialog.findViewById(R.id.low);
 						TextView m = (TextView) dialog.findViewById(R.id.med);
 						TextView h = (TextView) dialog.findViewById(R.id.high);
+						TextView f = (TextView) dialog.findViewById(R.id.foil);
 						TextView pricelink = (TextView) dialog.findViewById(R.id.pricelink);
 
-						l.setText("$" + lowprice);
-						m.setText("$" + avgprice);
-						h.setText("$" + hiprice);
+						l.setText(String.format("$%1$,.2f", mPriceInfo.low));
+						m.setText(String.format("$%1$,.2f", mPriceInfo.average));
+						h.setText(String.format("$%1$,.2f", mPriceInfo.high));
+						f.setText(String.format("$%1$,.2f", mPriceInfo.foil_average));
 						pricelink.setMovementMethod(LinkMovementMethod.getInstance());
-						pricelink.setText(ImageGetterHelper.jellyBeanHack("<a href=\"" + TCGPlayerLink + "\">"
+						pricelink.setText(ImageGetterHelper.jellyBeanHack("<a href=\"" + mPriceInfo.url + "\">"
 								+ getString(R.string.card_view_price_dialog_link) + "</a>"));
 						return dialog;
 					}
@@ -1120,28 +1120,20 @@ public class CardViewFragment extends FamiliarFragment {
 				progDialog.show();
 				
 				PriceFetchRequest priceRequest = new PriceFetchRequest(cardName, setCode, number, multiverseId,mDbHelper);
-				getMainActivity().getSpiceManager().execute( priceRequest, cardName + "-" + setCode, DurationInMillis.ONE_DAY, new RequestListener< String >(){
-			        @Override
+				getMainActivity().getSpiceManager().execute( priceRequest, cardName + "-" + setCode, DurationInMillis.ONE_DAY, new RequestListener< PriceInfo >(){
+
+					@Override
 			        public void onRequestFailure( SpiceException spiceException ) {
 			        	progDialog.dismiss();
 			        	Toast.makeText( getMainActivity(), spiceException.getMessage(), Toast.LENGTH_SHORT ).show();
 			        }
 
 			        @Override
-			        public void onRequestSuccess( final String result ) {
+			        public void onRequestSuccess( final PriceInfo result ) {
 			        	progDialog.dismiss();
 			        	if (result != null) {
-				        	String pieces[] = result.split("@@");
-				        	if(pieces.length < 4) {
-				        		Toast.makeText( getMainActivity(), "Exception", Toast.LENGTH_SHORT ).show();
-				        	}
-				        	else {
-					        	lowprice = pieces[0];
-					        	avgprice = pieces[1];
-					        	hiprice = pieces[2];
-					        	TCGPlayerLink = pieces[3];
-					        	showDialog(GETPRICE);
-				        	}
+			        		mPriceInfo = result;
+			        		showDialog(GETPRICE);
 			        	}
 			        	else {
 			        		Toast.makeText( getMainActivity(), R.string.card_view_price_not_found, Toast.LENGTH_SHORT ).show();

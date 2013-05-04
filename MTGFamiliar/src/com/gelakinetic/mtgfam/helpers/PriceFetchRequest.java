@@ -24,7 +24,7 @@ import android.os.Build;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.SpiceRequest;
 
-public class PriceFetchRequest extends SpiceRequest<String> {
+public class PriceFetchRequest extends SpiceRequest<PriceInfo> {
 
 	private String number;
 	private CardDbAdapter mDbHelper;
@@ -33,7 +33,7 @@ public class PriceFetchRequest extends SpiceRequest<String> {
 	private int multiverseId;
 
 	public PriceFetchRequest(String cardName, String setCode, String number, int multiverseID, CardDbAdapter helper) {
-		super(String.class);
+		super(PriceInfo.class);
 		this.cardName = cardName;
 		this.setCode = setCode;
 		this.number = number;
@@ -42,7 +42,7 @@ public class PriceFetchRequest extends SpiceRequest<String> {
 	}
 
 	@Override
-	public String loadDataFromNetwork() throws SpiceException {
+	public PriceInfo loadDataFromNetwork() throws SpiceException {
 
 		try {
 			if(number == null) {
@@ -70,7 +70,7 @@ public class PriceFetchRequest extends SpiceRequest<String> {
 			else {
 				tcgCardName = cardName;
 			}
-			URL priceurl = new URL("http://partner.tcgplayer.com/x2/phl.asmx/p?pk=MTGFAMILIA&s=" + 
+			URL priceurl = new URL("http://partner.tcgplayer.com/x3/phl.asmx/p?pk=MTGFAMILIA&s=" + 
 			URLEncoder.encode(tcgname.replace(Character.toChars(0xC6)[0]+"", "Ae"), "UTF-8")
 			+ "&p="	+
 			URLEncoder.encode(tcgCardName.replace(Character.toChars(0xC6)[0]+"", "Ae"), "UTF-8")
@@ -84,19 +84,21 @@ public class PriceFetchRequest extends SpiceRequest<String> {
 			String result = IOUtils.toString(urlConnection.getInputStream());
 			urlConnection.disconnect();
 
-			String retval;
 			Document d = loadXMLFromString(result);
 			Element e = d.getDocumentElement();
-			retval = getString("lowprice", e);
-			if(retval == null) {
+
+			try {
+				PriceInfo pi = new PriceInfo();
+				pi.low = Double.parseDouble(getString("lowprice", e));
+				pi.average = Double.parseDouble(getString("avgprice", e));
+				pi.high = Double.parseDouble(getString("hiprice", e));
+				pi.foil_average = Double.parseDouble(getString("foilavgprice", e));
+				pi.url = getString("link", e);
+				return pi;
+			}
+			catch(Exception error) {
 				return null;
 			}
-			else {
-			retval += "@@" + getString("avgprice", e) +
-					"@@" + getString("hiprice", e) +
-					"@@" + getString("link", e);
-			}
-			return retval;
 		}
 		catch(FamiliarDbException e) {
 			throw new SpiceException("FamiliarDbException");

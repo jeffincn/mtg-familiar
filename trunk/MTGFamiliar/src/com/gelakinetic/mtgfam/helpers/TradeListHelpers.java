@@ -133,11 +133,15 @@ public class TradeListHelpers {
 		public void SetIsCustomPrice(){
 			customPrice = true;
 		}
+		
+		public void setIsFoil(boolean foil){
+			this.foil = foil;
+		}		
 
 		public static final String	delimiter	= "%";
 
 		public String toString() {
-			return this.name + delimiter + this.setCode + delimiter + this.numberOf + delimiter + this.cardNumber + delimiter + this.rarity + '\n';
+			return this.name + delimiter + this.setCode + delimiter + this.numberOf + delimiter + this.cardNumber + delimiter + this.rarity + delimiter + this.foil + '\n';
 		}
 
 		public String toString(int side) {

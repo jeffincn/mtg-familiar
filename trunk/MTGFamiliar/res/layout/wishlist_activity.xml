@@ -15,7 +15,7 @@
         <EditText
             android:id="@+id/numberInput"
             android:layout_width="50dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:ems="10"
             android:gravity="center"
             android:inputType="number"
@@ -26,18 +26,18 @@
         <AutoCompleteTextView
             android:id="@+id/namesearch"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:layout_weight="1"
             android:hint="@string/wishlist_name" >
 
             <requestFocus />
         </AutoCompleteTextView>
 
-        <Button
-            android:id="@+id/addCard"
+        <CheckBox
+            android:id="@+id/wishlistFoil"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/wishlist_add_card" />
+            android:layout_height="match_parent"
+            android:button="@xml/foilcheck_selector" />
 
         <ImageButton
             android:id="@+id/cameraButton"
@@ -45,6 +45,12 @@
             android:layout_height="wrap_content"
             android:src="@android:drawable/ic_menu_camera" />
     </LinearLayout>
+
+    <Button
+        android:id="@+id/addCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/wishlist_add_card" />
 
     <TextView
         android:id="@+id/priceText"

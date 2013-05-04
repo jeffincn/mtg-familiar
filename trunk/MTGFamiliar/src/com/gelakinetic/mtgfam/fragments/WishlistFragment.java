@@ -21,10 +21,12 @@ import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,6 +61,7 @@ public class WishlistFragment extends FamiliarFragment {
 	private Button																bAdd;
 	private ImageButton															camerabutton;
 	private TextView															tradePrice;
+	private CheckBox												foilButton;
 	private ExpandableListView										expWishlist;
 	private WishlistAdapter												aaExpWishlist;
 	private ArrayList<String>											cardNames;
@@ -116,6 +119,8 @@ public class WishlistFragment extends FamiliarFragment {
 		numberfield = (EditText) myFragmentView.findViewById(R.id.numberInput);
 		numberfield.setText("1");
 
+		foilButton = (CheckBox) myFragmentView.findViewById(R.id.wishlistFoil);
+		
 		camerabutton = (ImageButton) myFragmentView.findViewById(R.id.cameraButton);
 
 		cardNames = new ArrayList<String>();
@@ -142,6 +147,8 @@ public class WishlistFragment extends FamiliarFragment {
 					CardData data = mTradeListHelper.new CardData(namefield.getText().toString(), "", "", numberOf, 0, "loading",
 							null, null, null, null, null, null, CardDbAdapter.NOONECARES, '-');
 
+					data.setIsFoil(foilButton.isChecked());
+					
 					try {
 						AddCardOrUpdateSetCounts(data);
 					} catch (FamiliarDbException e) {
@@ -153,6 +160,7 @@ public class WishlistFragment extends FamiliarFragment {
 
 					namefield.setText("");
 					numberfield.setText("1");
+					foilButton.setChecked(false);
 				}
 				else {
 					Toast.makeText(getActivity(), getString(R.string.wishlist_toast_select_card), Toast.LENGTH_SHORT).show();
@@ -258,10 +266,14 @@ public class WishlistFragment extends FamiliarFragment {
 		ArrayList<CardData> lCardlist;
 
 		int position = cardNames.indexOf(cardToAdd.name);
+		if (position != -1 && cardToAdd.foil != cardSetWishlists.get(position).get(0).foil){
+			position = -1;
+		}
 		// if the card's not in the list yet
 		if (position == -1) {
 			setCodes = new ArrayList<String>();
 			lCardlist = new ArrayList<CardData>();
+			boolean isFoil = cardToAdd.foil;
 			if (verbose || cardToAdd.setCode == "" || cardToAdd.rarity == 45) {
 				Cursor c;
 				if (cardToAdd.setCode != "" && cardToAdd.rarity != 45) {
@@ -305,6 +317,8 @@ public class WishlistFragment extends FamiliarFragment {
 				setCodes.add(cardToAdd.setCode);
 				lCardlist.add(cardToAdd);
 			}
+			cardToAdd.setIsFoil(isFoil);
+			
 			// add it (with child lists)
 			cardNames.add(cardToAdd.name);
 			cardSetNames.add(setCodes);
@@ -474,6 +488,7 @@ public class WishlistFragment extends FamiliarFragment {
 			// v = inf.inflate(R.layout.wishlist_cardset_row, null);
 			TextView setField = (TextView) v.findViewById(R.id.wishlistRowSet);
 			TextView priceField = (TextView) v.findViewById(R.id.wishlistRowPrice);
+
 			
 			if(setField == null || priceField == null) {
 				LayoutInflater inf = getActivity().getLayoutInflater();
@@ -506,6 +521,7 @@ public class WishlistFragment extends FamiliarFragment {
 					setField.setTextColor(resources.getColor(R.color.timeshifted));
 					break;
 			}
+			
 			priceField.setText((showIndividualPrices ? "" : "x") + data.numberOf
 					+ (showIndividualPrices ? ("x" + (data.hasPrice() ? data.getPriceString() : data.message)) : ""));
 			if (data.hasPrice() || !showIndividualPrices) {
@@ -561,6 +577,7 @@ public class WishlistFragment extends FamiliarFragment {
 				TextView slashField = (TextView) v.findViewById(R.id.cardslash);
 				TextView tField = (TextView) v.findViewById(R.id.cardt);
 				ImageButton cardviewButton = (ImageButton) v.findViewById(R.id.cardview_button);
+				ImageView foilField = (ImageView) v.findViewById(R.id.wishlistRowFoil);
 				
 				if (nameField == null) {
 					return v;
@@ -570,7 +587,6 @@ public class WishlistFragment extends FamiliarFragment {
 
 					@Override
 					public void onClick(View v) {
-						// TODO Auto-generated method stub
 						Bundle args = new Bundle();
 						try {
 							args.putLong("id", mDbHelper.fetchIdByName(finalData.name));
@@ -584,6 +600,8 @@ public class WishlistFragment extends FamiliarFragment {
 				
 				nameField.setText(data.name);
 				nameField.setOnClickListener(onClick);
+				
+				foilField.setVisibility((data.foil ? View.VISIBLE : View.GONE));
 
 				if (!verbose) {
 					typeField.setVisibility(View.GONE);
@@ -802,6 +820,8 @@ public class WishlistFragment extends FamiliarFragment {
 
 							ArrayList<CardData> cardlist = cardSetWishlists.get(positionForDialog);
 							ArrayList<String> setNames = cardSetNames.get(positionForDialog);
+							
+							boolean isFoil = cardlist.get(0).foil;
 
 							cardlist.clear();
 							setNames.clear();
@@ -829,6 +849,7 @@ public class WishlistFragment extends FamiliarFragment {
 									totalCards += numberField;
 									CardData cd = mTradeListHelper.new CardData(cardNames.get(positionForDialog), setName, setCode,
 											numberField, 0, "loading", null, null, null, null, null, null, CardDbAdapter.NOONECARES, '-');
+									cd.setIsFoil(isFoil);
 
 									try {
 										if (showTotalPrice || showIndividualPrices) {
@@ -871,7 +892,7 @@ public class WishlistFragment extends FamiliarFragment {
 						if (doneLoading) {
 							try{
 								dlg = (wh).getDialog(cardNames.get(positionForDialog), WishlistFragment.this, getMainActivity(), 
-										cardSetWishlists.get(positionForDialog));
+										cardSetWishlists.get(positionForDialog), cardSetWishlists.get(positionForDialog).get(0).foil);
 							}
 							catch(IndexOutOfBoundsException ex){
 								try {
@@ -1009,6 +1030,7 @@ public class WishlistFragment extends FamiliarFragment {
 	private void loadPrice(final CardData data, final WishlistAdapter adapter) {
 		
 		PriceFetchRequest priceRequest = new PriceFetchRequest(data.name, data.setCode, data.cardNumber, -1,mDbHelper);
+		final boolean foilOverride = data.foil;
 		getMainActivity().getSpiceManager().execute( priceRequest, data.name + "-" + data.setCode, DurationInMillis.ONE_DAY, new RequestListener< PriceInfo >(){
 	        @Override
 	        public void onRequestFailure( SpiceException spiceException ) {
@@ -1021,7 +1043,9 @@ public class WishlistFragment extends FamiliarFragment {
 	        @Override
 	        public void onRequestSuccess( final PriceInfo result ) {
 	        	if (result != null) {
-	        		switch(priceSetting) {
+	        		int cardPrice = (foilOverride ? FOIL_PRICE : priceSetting);
+	        		
+	        		switch(cardPrice) {
 		        		case LOW_PRICE:
 		        		{
 		        			data.price = (int) (result.low * 100);

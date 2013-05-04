@@ -149,7 +149,7 @@ public class TradeListHelpers {
 		}
 
 		public String toReadableString(boolean includeTcgName) {
-			return String.valueOf(this.numberOf) + ' ' + this.name + (includeTcgName?" (" + this.tcgName + ')':"") + '\n';
+			return String.valueOf(this.numberOf) + ' ' + this.name + (this.foil ? " - Foil " : "") + (includeTcgName?" (" + this.tcgName + ')':"") + '\n';
 		}
 
 		public Object clone() { 

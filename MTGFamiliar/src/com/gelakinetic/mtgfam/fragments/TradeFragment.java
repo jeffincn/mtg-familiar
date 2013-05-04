@@ -28,8 +28,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -76,6 +78,7 @@ public class TradeFragment extends FamiliarFragment {
 	private ArrayList<CardData>		lTradeRight;
 
 	private EditText				numberfield;
+	private CheckBox				checkboxFoil;
 
 	private int						priceSetting;
 
@@ -131,6 +134,8 @@ public class TradeFragment extends FamiliarFragment {
 
 		numberfield = (EditText) myFragmentView.findViewById(R.id.numberInput);
 		numberfield.setText("1");
+		
+		checkboxFoil = (CheckBox) myFragmentView.findViewById(R.id.trader_foil);
 
 		lTradeLeft = new ArrayList<CardData>();
 		bAddTradeLeft = (Button) myFragmentView.findViewById(R.id.addCardLeft);
@@ -160,6 +165,7 @@ public class TradeFragment extends FamiliarFragment {
 						numberOfFromField = "1";
 					}
 					int numberOf = Integer.parseInt(numberOfFromField);
+					boolean foil = checkboxFoil.isChecked();
 
 					String cardName = "", 
 							setCode = "", 
@@ -180,15 +186,14 @@ public class TradeFragment extends FamiliarFragment {
 						numberfield.setText("1");
 						return;
 					}
-					final CardData data = mTradeListHelper.new CardData(cardName, tcgName, setCode, numberOf, 0, "loading", cardNumber, '-');
+					final CardData data = mTradeListHelper.new CardData(cardName, tcgName, setCode, numberOf, 0, "loading", cardNumber, '-', false, foil);
 					
 					lTradeLeft.add(0, data);
 					aaTradeLeft.notifyDataSetChanged();
-					
 					loadPrice(data, aaTradeLeft);
-					
 					namefield.setText("");
 					numberfield.setText("1");
+					checkboxFoil.setChecked(false);
 				}
 				else {
 					Toast.makeText(getActivity(), getString(R.string.trader_toast_select_card), Toast.LENGTH_SHORT).show();
@@ -204,6 +209,7 @@ public class TradeFragment extends FamiliarFragment {
 						numberOfFromField = "1";
 					}
 					int numberOf = Integer.parseInt(numberOfFromField);
+					boolean foil = checkboxFoil.isChecked();
 
 					String cardName = "", 
 							setCode = "", 
@@ -224,13 +230,14 @@ public class TradeFragment extends FamiliarFragment {
 						numberfield.setText("1");
 						return;
 					}
-					CardData data = mTradeListHelper.new CardData(cardName, tcgName, setCode, numberOf, 0, "loading", cardNumber,'-');
+					CardData data = mTradeListHelper.new CardData(cardName, tcgName, setCode, numberOf, 0, "loading", cardNumber,'-', false, foil);
 
 					lTradeRight.add(0, data);
 					aaTradeRight.notifyDataSetChanged();
 					loadPrice(data, aaTradeRight);
 					namefield.setText("");
 					numberfield.setText("1");
+					checkboxFoil.setChecked(false);
 				}
 				else {
 					Toast.makeText(getActivity(), getString(R.string.trader_toast_select_card), Toast.LENGTH_SHORT).show();
@@ -325,6 +332,7 @@ public class TradeFragment extends FamiliarFragment {
 						final TradeListAdapter aaSide = (sideForDialog.equals("left") ? aaTradeLeft : aaTradeRight);
 						final int numberOfCards = lSide.get(position).numberOf;
 						final String priceOfCard = lSide.get(position).getPriceString();
+						final boolean foil = lSide.get(position).foil;
 		
 						View view = LayoutInflater.from(getActivity()).inflate(R.layout.trader_card_click_dialog, null);
 						Button removeAll = (Button) view.findViewById(R.id.traderDialogRemove);
@@ -333,6 +341,7 @@ public class TradeFragment extends FamiliarFragment {
 						Button changeSet = (Button) view.findViewById(R.id.traderDialogChangeSet);
 						Button cancelbtn = (Button) view.findViewById(R.id.traderDialogCancel);
 						Button donebtn = (Button) view.findViewById(R.id.traderDialogDone);
+						final CheckBox foilbtn = (CheckBox) view.findViewById(R.id.traderDialogFoil);
 						final EditText numberOf = (EditText) view.findViewById(R.id.traderDialogNumber);
 						final EditText priceText = (EditText) view.findViewById(R.id.traderDialogPrice);
 		
@@ -344,6 +353,7 @@ public class TradeFragment extends FamiliarFragment {
 						String numberOfStr = String.valueOf(numberOfCards);
 						numberOf.setText(numberOfStr);
 						numberOf.setSelection(numberOfStr.length());
+						foilbtn.setChecked(foil);
 		
 						final String priceNumberStr = lSide.get(position).hasPrice() ? priceOfCard.substring(1) : "";
 						priceText.setText(priceNumberStr);
@@ -431,6 +441,11 @@ public class TradeFragment extends FamiliarFragment {
 								//Hack to regrab price, if the set price is blank.
 								if (userInputPrice.length() == 0){
 									lSide.get(position).customPrice = false;
+									loadPrice(lSide.get(position), aaSide);
+								}
+								
+								lSide.get(position).foil = foilbtn.isChecked();
+								if (foil != foilbtn.isChecked()){
 									loadPrice(lSide.get(position), aaSide);
 								}
 									
@@ -691,21 +706,24 @@ public class TradeFragment extends FamiliarFragment {
 					boolean customPrice = false;
 					int price = 0;
 					String message = "loading";
+					boolean foil = false;
 					
 					CardData cd = null;
 					
 					try {
 						customPrice = Boolean.parseBoolean(parts[4]);
 						price = Integer.parseInt(parts[5]);
+						foil = Boolean.parseBoolean(parts[6]);
 						message = "";
 					}
 					catch (Exception e)	{
 						customPrice = false;
 						price = 0;
 						message = "loading";
+						foil = false;
 					}
 					finally {
-						cd = mTradeListHelper.new CardData(cardName, tcgName, cardSet, numberOf, price, message, null, '-', customPrice);
+						cd = mTradeListHelper.new CardData(cardName, tcgName, cardSet, numberOf, price, message, null, '-', customPrice, foil);
 					}
 					
 					if (side == CardDbAdapter.LEFT) {
@@ -909,11 +927,13 @@ public class TradeFragment extends FamiliarFragment {
 				TextView setField = (TextView) v.findViewById(R.id.traderRowSet);
 				TextView numberField = (TextView) v.findViewById(R.id.traderNumber);
 				TextView priceField = (TextView) v.findViewById(R.id.traderRowPrice);
+				ImageView foilField = (ImageView) v.findViewById(R.id.traderRowFoil);
 
 				nameField.setText(data.name);
 				setField.setText(data.tcgName);
 				numberField.setText(data.hasPrice() ? data.numberOf + "x" : "");
 				priceField.setText(data.hasPrice() ? data.getPriceString() : data.message);
+				foilField.setVisibility((data.foil ? View.VISIBLE : View.GONE));
 
 				if (data.hasPrice()) {
 					if (data.customPrice == true) {
@@ -932,7 +952,8 @@ public class TradeFragment extends FamiliarFragment {
 	}
 	
 	private void loadPrice(final CardData data, final TradeListAdapter adapter) {
-		PriceFetchRequest priceRequest = new PriceFetchRequest(data.name, data.setCode, data.cardNumber, -1,mDbHelper);
+		PriceFetchRequest priceRequest = new PriceFetchRequest(data.name, data.setCode, data.cardNumber, -1, mDbHelper);
+		final boolean foilOverride = data.foil;
 		getMainActivity().getSpiceManager().execute( priceRequest, data.name + "-" + data.setCode, DurationInMillis.ONE_DAY, new RequestListener< PriceInfo >(){
 	        @Override
 	        public void onRequestFailure( SpiceException spiceException ) {
@@ -942,7 +963,9 @@ public class TradeFragment extends FamiliarFragment {
 	        @Override
 	        public void onRequestSuccess( final PriceInfo result ) {
 	        	if (result != null) {
-	        		switch(priceSetting) {
+	        		int cardPrice = (foilOverride ? FOIL_PRICE : priceSetting);
+	        		
+	        		switch(cardPrice) {
 		        		case LOW_PRICE:
 		        		{
 		        			data.price = (int) (result.low * 100);

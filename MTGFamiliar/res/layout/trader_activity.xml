@@ -9,12 +9,10 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
-
-
         <EditText
             android:id="@+id/numberInput"
             android:layout_width="50dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:ems="10"
             android:gravity="center"
             android:inputType="number"
@@ -26,7 +24,7 @@
         <AutoCompleteTextView
             android:id="@+id/namesearch"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:hint="@string/search_name"
             android:inputType="text" >
@@ -34,6 +32,13 @@
             <requestFocus />
         </AutoCompleteTextView>
 
+        <CheckBox
+            android:id="@+id/trader_foil"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:button="@xml/foilcheck_selector" />
 
         <ImageButton
             android:id="@+id/cameraButton"

@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:gravity="right|center"
     android:orientation="vertical" >
 
     <LinearLayout
@@ -40,14 +41,29 @@
             android:inputType="numberDecimal"
             android:selectAllOnFocus="true"
             android:text="@string/trader_default_price" />
+
     </LinearLayout>
 
-    <Button
-        android:id="@+id/traderDialogChangeSet"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/trader_edit_dialog_change_set" />
+        android:layout_height="wrap_content" >
 
+        <Button
+            android:id="@+id/traderDialogChangeSet"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/trader_edit_dialog_change_set" />
+
+        <CheckBox
+            android:id="@+id/traderDialogFoil"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:button="@xml/foilcheck_selector" />
+
+    </LinearLayout>
     
     <LinearLayout
         android:layout_width="match_parent"

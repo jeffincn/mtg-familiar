@@ -949,7 +949,14 @@ public class CardViewFragment extends FamiliarFragment {
 						l.setText(String.format("$%1$,.2f", mPriceInfo.low));
 						m.setText(String.format("$%1$,.2f", mPriceInfo.average));
 						h.setText(String.format("$%1$,.2f", mPriceInfo.high));
-						f.setText(String.format("$%1$,.2f", mPriceInfo.foil_average));
+						
+						if(mPriceInfo.foil_average != 0) {
+							f.setText(String.format("$%1$,.2f", mPriceInfo.foil_average));
+						}
+						else {
+							f.setVisibility(View.GONE);
+							dialog.findViewById(R.id.foil_label).setVisibility(View.GONE);
+						}
 						pricelink.setMovementMethod(LinkMovementMethod.getInstance());
 						pricelink.setText(ImageGetterHelper.jellyBeanHack("<a href=\"" + mPriceInfo.url + "\">"
 								+ getString(R.string.card_view_price_dialog_link) + "</a>"));

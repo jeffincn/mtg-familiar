@@ -9,6 +9,13 @@ public class PriceInfo {
 	public double foil_average = 0;
 	public String url;
 	
+	public PriceInfo() {
+		
+	}
+	
+	public PriceInfo(byte [] bytes) {
+		this.fromBytes(bytes);
+	}
 	/**
 	 * Pack all the fields into a byte buffer and return it.
 	 * @return the byte buffer containing this object's information

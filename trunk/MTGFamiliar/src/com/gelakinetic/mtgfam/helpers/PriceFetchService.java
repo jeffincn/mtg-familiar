@@ -1,13 +1,15 @@
 package com.gelakinetic.mtgfam.helpers;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import android.app.Application;
 
-import com.google.common.io.ByteProcessor;
-import com.google.common.io.Files;
 import com.octo.android.robospice.SpiceService;
 import com.octo.android.robospice.persistence.CacheManager;
 import com.octo.android.robospice.persistence.exception.CacheLoadingException;
@@ -29,24 +31,7 @@ public class PriceFetchService extends SpiceService {
                     long timeInCache = System.currentTimeMillis() - file.lastModified();
                     if ( maxTimeInCacheBeforeExpiry == 0 || timeInCache <= maxTimeInCacheBeforeExpiry ) {
                         try {
-                        	return Files.readBytes(file, new ByteProcessor<PriceInfo>(){
-
-								private PriceInfo pi;
-
-								@Override
-								public PriceInfo getResult() {
-									return pi;
-								}
-
-								@Override
-								public boolean processBytes(byte[] arg0, int arg1, int arg2) throws IOException {									
-									byte toProcess[] = new byte[arg2-arg1];
-									System.arraycopy(arg0, arg1, toProcess, 0, arg2-arg1);
-									pi = new PriceInfo();
-									pi.fromBytes(toProcess);
-									return true;
-									
-								}});
+                        	return new PriceInfo(fileToBytes(file));
                         } catch ( FileNotFoundException e ) {
                             return null;
                         } catch ( Exception e ) {
@@ -66,14 +51,20 @@ public class PriceFetchService extends SpiceService {
                             @Override
                             public void run() {
                                 try {
-                                    Files.write( data.toBytes(), getCacheFile( cacheKey ) );
+                                	BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(getCacheFile( cacheKey )));
+                                	bos.write(data.toBytes());
+                                	bos.flush();
+                                	bos.close();
                                 } catch ( IOException e ) {
-                                	// eat it
+                                	return;
                                 }
                             };
                         }.start();
                     } else {
-                        Files.write( data.toBytes(), getCacheFile( cacheKey ));
+                    	BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(getCacheFile( cacheKey )));
+                    	bos.write(data.toBytes());
+                    	bos.flush();
+                    	bos.close();
                     }
                 } catch ( Exception e ) {
                     throw new CacheSavingException( e );
@@ -86,4 +77,25 @@ public class PriceFetchService extends SpiceService {
         cacheManager.addPersister(priceInfoPersister);
         return cacheManager;
     }
+    
+	public byte[] fileToBytes(File file) throws IOException {
+
+		byte[] buffer = new byte[(int) file.length()];
+		InputStream ios = null;
+		try {
+			ios = new FileInputStream(file);
+			if (ios.read(buffer) == -1) {
+				throw new IOException(
+						"EOF reached while trying to read the whole file");
+			}
+		} finally {
+			try {
+				if (ios != null)
+					ios.close();
+			} catch (IOException e) {
+			}
+		}
+
+		return buffer;
+	}
 }

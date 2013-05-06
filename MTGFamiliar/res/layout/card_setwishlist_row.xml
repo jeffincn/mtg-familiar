@@ -27,6 +27,12 @@
         android:selectAllOnFocus="true" >
     </EditText>
 
+    <CheckBox
+        android:id="@+id/wishlistDialogFoil"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:button="@xml/foilcheck_selector" />
+
     <TextView
         android:id="@+id/cardset"
         style="@style/text"

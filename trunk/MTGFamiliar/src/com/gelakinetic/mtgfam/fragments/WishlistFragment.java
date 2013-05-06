@@ -266,9 +266,6 @@ public class WishlistFragment extends FamiliarFragment {
 		ArrayList<CardData> lCardlist;
 
 		int position = cardNames.indexOf(cardToAdd.name);
-		if (position != -1 && cardToAdd.foil != cardSetWishlists.get(position).get(0).foil){
-			position = -1;
-		}
 		// if the card's not in the list yet
 		if (position == -1) {
 			setCodes = new ArrayList<String>();
@@ -343,8 +340,12 @@ public class WishlistFragment extends FamiliarFragment {
 			}
 			int location = setCodes.indexOf(cardToAdd.setCode);
 			if (location != -1) {
-				CardData existingCard = lCardlist.get(location);
-				existingCard.numberOf += cardToAdd.numberOf;
+				if (lCardlist.get(location).foil == cardToAdd.foil){
+					CardData existingCard = lCardlist.get(location);
+					existingCard.numberOf += cardToAdd.numberOf;
+				} else {
+					lCardlist.add(cardToAdd);
+				}
 				// we shouldn't need this if it's a pointer
 				// lCardlist.set(location, card);
 			}
@@ -488,6 +489,7 @@ public class WishlistFragment extends FamiliarFragment {
 			// v = inf.inflate(R.layout.wishlist_cardset_row, null);
 			TextView setField = (TextView) v.findViewById(R.id.wishlistRowSet);
 			TextView priceField = (TextView) v.findViewById(R.id.wishlistRowPrice);
+			ImageView foilField = (ImageView) v.findViewById(R.id.wishlistSetRowFoil);
 
 			
 			if(setField == null || priceField == null) {
@@ -521,6 +523,9 @@ public class WishlistFragment extends FamiliarFragment {
 					setField.setTextColor(resources.getColor(R.color.timeshifted));
 					break;
 			}
+			
+			foilField.setVisibility((data.foil ? View.VISIBLE : View.GONE));
+			
 			
 			priceField.setText((showIndividualPrices ? "" : "x") + data.numberOf
 					+ (showIndividualPrices ? ("x" + (data.hasPrice() ? data.getPriceString() : data.message)) : ""));
@@ -577,7 +582,6 @@ public class WishlistFragment extends FamiliarFragment {
 				TextView slashField = (TextView) v.findViewById(R.id.cardslash);
 				TextView tField = (TextView) v.findViewById(R.id.cardt);
 				ImageButton cardviewButton = (ImageButton) v.findViewById(R.id.cardview_button);
-				ImageView foilField = (ImageView) v.findViewById(R.id.wishlistRowFoil);
 				
 				if (nameField == null) {
 					return v;
@@ -600,8 +604,6 @@ public class WishlistFragment extends FamiliarFragment {
 				
 				nameField.setText(data.name);
 				nameField.setOnClickListener(onClick);
-				
-				foilField.setVisibility((data.foil ? View.VISIBLE : View.GONE));
 
 				if (!verbose) {
 					typeField.setVisibility(View.GONE);
@@ -820,8 +822,6 @@ public class WishlistFragment extends FamiliarFragment {
 
 							ArrayList<CardData> cardlist = cardSetWishlists.get(positionForDialog);
 							ArrayList<String> setNames = cardSetNames.get(positionForDialog);
-							
-							boolean isFoil = cardlist.get(0).foil;
 
 							cardlist.clear();
 							setNames.clear();
@@ -838,6 +838,8 @@ public class WishlistFragment extends FamiliarFragment {
 
 								if (numberField > 0) {
 									String setName = ((TextView) v.findViewById(R.id.cardset)).getText().toString();
+									boolean setIsFoil = ((CheckBox) v.findViewById(R.id.wishlistDialogFoil)).isChecked();
+									
 									String setCode;
 									try {
 										setCode = mDbHelper.getSetCode(setName);
@@ -849,7 +851,7 @@ public class WishlistFragment extends FamiliarFragment {
 									totalCards += numberField;
 									CardData cd = mTradeListHelper.new CardData(cardNames.get(positionForDialog), setName, setCode,
 											numberField, 0, "loading", null, null, null, null, null, null, CardDbAdapter.NOONECARES, '-');
-									cd.setIsFoil(isFoil);
+									cd.setIsFoil(setIsFoil);
 
 									try {
 										if (showTotalPrice || showIndividualPrices) {

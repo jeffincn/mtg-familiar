@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import android.R.integer;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -14,6 +15,9 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -330,9 +334,28 @@ public class WishlistHelpers {
 				for (int j = 0; j < lCardlist.size(); j++) {
 					if (lCardlist.get(j).setCode.equalsIgnoreCase(lWishlist
 							.get(i).setCode)) {
-						// set the number, but don't modify the wishlist
-						lCardlist.get(j).numberOf = lWishlist.get(i).numberOf;
+						if (lWishlist.get(i).foil){
+//							lCardlist.add(j, lCardlist.get(j));
+//							lCardlist.get(j).numberOf = lWishlist.get(i).numberOf;
+							break;
+							//lCardlist.add(nonfoil);
+						} else {						
+							// set the number, but don't modify the wishlist
+							lCardlist.get(j).numberOf = lWishlist.get(i).numberOf;
+						}
 					}
+				}
+				if (lWishlist.get(i).foil){
+					int position = -1;
+					for (int j = 0; j < lCardlist.size(); j++) {
+						if (lCardlist.get(j).setCode.equalsIgnoreCase(lWishlist
+								.get(i).setCode)) {
+							position = j;
+							break;
+						}
+					}
+					lCardlist.add(position+1, lWishlist.get(i));
+					lCardlist.get(position+1).numberOf = lWishlist.get(i).numberOf;
 				}
 			}
 		}
@@ -349,7 +372,51 @@ public class WishlistHelpers {
 			View v = inf.inflate(R.layout.card_setwishlist_row, null);
 
 			EditText numberField = (EditText) v.findViewById(R.id.numberInput);
+			CheckBox foilField = (CheckBox) v.findViewById(R.id.wishlistDialogFoil);
+			foilField.setChecked(cd.foil);
 			TextView setField = (TextView) v.findViewById(R.id.cardset);
+			final CardData cardInfo = cd;
+			
+			//Check card list to see if a foil version exist, blank the foil button if so.
+			if (!cd.foil){
+				int position = lCardlist.indexOf(cd);
+				if (position + 1 < lCardlist.size() && lCardlist.get(position + 1).foil){
+					foilField.setVisibility(View.GONE);
+				}
+			}
+			
+			foilField.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					if (isChecked){
+						
+						LayoutInflater inf = ma.getLayoutInflater();
+						View newRow = inf.inflate(R.layout.card_setwishlist_row, null);
+						
+						EditText newNumberField = (EditText) newRow.findViewById(R.id.numberInput);
+						CheckBox newFoilField = (CheckBox) newRow.findViewById(R.id.wishlistDialogFoil);
+						newFoilField.setVisibility(View.GONE);
+						TextView newSetField = (TextView) newRow.findViewById(R.id.cardset);
+						
+						newNumberField.setText("0");
+						newSetField.setText(cardInfo.tcgName);
+						
+						int position = lCardlist.indexOf(cardInfo);
+						cardInfo.setIsFoil(isChecked);
+						
+						lvSets.addView(newRow, position);
+						lCardlist.add(position, cardInfo);
+					} else {
+						int position = lCardlist.indexOf(cardInfo);
+						//This should be save as the foil child always comes after the non-foil child.
+						lvSets.getChildAt(position -1).findViewById(R.id.wishlistDialogFoil).setVisibility(View.VISIBLE);
+						
+						lvSets.removeViewAt(position);
+						lCardlist.remove(position);
+						
+					}
+				}
+			});
 
 			numberField.setText(cd.numberOf + "");
 			setField.setText(cd.tcgName);

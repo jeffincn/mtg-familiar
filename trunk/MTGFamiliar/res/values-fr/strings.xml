@@ -193,7 +193,7 @@
     <string name="card_view_restricted">Restreint</string>
     <string name="card_view_banned">Banni</string>
     <string name="card_view_error">Erreur</string>
-    <string name="card_view_price_dialog_title">TCGPlayer.com Prix</string>
+    <string name="card_view_price_dialog_title">Prix sur TCGPlayer.com</string>
     <string name="card_view_price_dialog_low">Bas:</string>
     <string name="card_view_price_dialog_medium">Moyen:</string>
     <string name="card_view_price_dialog_high">Haut:</string>
@@ -287,7 +287,8 @@
     <string name="trader_Low">Bas</string>
 	<string name="trader_Average">Moyen</string>
 	<string name="trader_High">Haut</string>
-    
+	<string name="trader_price_dialog_title">Options Prix</string>
+
     <!-- Wishlist activity -->
     <string name="wishlist_name">Nom</string>
     <string name="wishlist_add_card">Ajouter</string>
@@ -302,7 +303,8 @@
     <string name="wishlist_empty_dialog_text">Etes-vous sûr de vouloir vider votre liste de voeux ?</string>
     <string name="wishlist_edit_dialog_title_foil">Premium</string>
     <string name="wishlist_edit_dialog_title_end">dans la liste de voeux</string>
-    
+	<string name="wishlist_price_dialog_title">Options Prix</string>
+
     <!-- Round timer activity -->
     <string name="timer_how_long">Combien dure un round?\n(HH:MM)</string>
     <string name="timer_how_long_landscape">Combien dure un round? (HH:MM)</string>
@@ -388,7 +390,7 @@
     <string name="pref_five_minutes_title">Avertissement 5-Minute</string>
     <string name="pref_cat_trade_window">Fenêtre Echange</string>
     <string name="pref_trade_price_title">Réglages Prix</string>
-    <string name="pref_trade_price_summary">Prix TCGplayer à utilser lors des échanges</string>
+    <string name="pref_trade_price_summary">Prix TCGplayer à utiliser lors des échanges</string>
     <string name="pref_cat_result_list">Liste Résultats</string>
     <string name="pref_consolidate_title">Regrouper Résultats</string>
     <string name="pref_consolidate_summary">Afficher uniquement l\'édition la plus récente de la carte</string>

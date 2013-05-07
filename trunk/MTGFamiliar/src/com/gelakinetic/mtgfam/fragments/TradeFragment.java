@@ -472,8 +472,8 @@ public class TradeFragment extends FamiliarFragment {
 					case DIALOG_PRICE_SETTING: {
 						AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
 		
-						builder.setTitle("Price Options");
-						builder.setSingleChoiceItems(new String[] { "Low", "Average", "High" }, priceSetting,
+						builder.setTitle(R.string.trader_pricing_dialog_title);
+						builder.setSingleChoiceItems(new String[] { getString(R.string.trader_Low), getString(R.string.trader_Average), getString(R.string.trader_High) }, priceSetting,
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int which) {
 										priceSetting = which;

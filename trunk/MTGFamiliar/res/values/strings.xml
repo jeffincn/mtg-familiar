@@ -287,7 +287,8 @@
 	<string name="trader_Low">Low</string>
 	<string name="trader_Average">Average</string>
 	<string name="trader_High">High</string>
-	
+	<string name="trader_pricing_dialog_title">Price Options</string>
+
 	<!-- Wishlist activity -->
     <string name="wishlist_name">Name</string>
     <string name="wishlist_add_card">Add</string>
@@ -302,7 +303,7 @@
     <string name="wishlist_empty_dialog_text">Are you sure you want to empty your wishlist?</string>
     <string name="wishlist_edit_dialog_title_foil">Foil</string>
     <string name="wishlist_edit_dialog_title_end">in the Wishlist</string>
-    
+
     <!-- Round timer activity -->
     <string name="timer_how_long">How long is the round?\n(HH:MM)</string>
     <string name="timer_how_long_landscape">How long is the round? (HH:MM)</string>

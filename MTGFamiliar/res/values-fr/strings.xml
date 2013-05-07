@@ -303,7 +303,6 @@
     <string name="wishlist_empty_dialog_text">Etes-vous sûr de vouloir vider votre liste de voeux ?</string>
     <string name="wishlist_edit_dialog_title_foil">Premium</string>
     <string name="wishlist_edit_dialog_title_end">dans la liste de voeux</string>
-	<string name="wishlist_price_dialog_title">Options Prix</string>
 
     <!-- Round timer activity -->
     <string name="timer_how_long">Combien dure un round?\n(HH:MM)</string>

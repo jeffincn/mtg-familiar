@@ -25,7 +25,6 @@ import java.util.Date;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
-import android.app.Instrumentation;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -57,9 +56,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.fragments.CardViewFragment;
 import com.gelakinetic.mtgfam.fragments.DiceFragment;
@@ -571,34 +568,6 @@ public class MainActivity extends SlidingFragmentActivity {
 		super.onPause();
 		updatingDisplay = false;
 		timerHandler.removeCallbacks(timerUpdate);
-	}
-
-	/*
-	 * Always add a virtual search key to the menu on the actionbar super.onCreateOptionsMenu should always be called
-	 * from FamiliarActivities
-	 */
-	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(R.string.name_search_hint).setIcon(R.drawable.menu_search).setOnMenuItemClickListener(new OnMenuItemClickListener() {
-
-			@Override
-			public boolean onMenuItemClick(MenuItem item) {
-				new Thread(new Runnable() {
-
-					@Override
-					public void run() {
-						try {
-							new Instrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_SEARCH);
-						}
-						catch (java.lang.SecurityException e) {
-							// apparently this can inject an event into another app if the user switches fast enough
-						}
-					}
-				}).start();
-				return true;
-			}
-		}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-		return true;
 	}
 
 	/*

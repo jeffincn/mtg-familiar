@@ -360,7 +360,12 @@ public class RulesFragment extends FamiliarFragment {
 		showDialog(SEARCH);
 		return true;
 	}
-
+	
+	@Override
+	public boolean canInterceptSearchKey() {
+		return true;
+	}
+	
 	private SpannableString formatText(String input, boolean linkify) {
 		String encodedInput = input;
 		encodedInput = underscorePattern.matcher(encodedInput).replaceAll("\\<i\\>$1\\</i\\>");

@@ -5,11 +5,15 @@ import java.io.IOException;
 
 import android.app.Instrumentation;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.app.SearchableInfo;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -32,6 +36,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
+import com.actionbarsherlock.widget.SearchView;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.activities.MainActivity;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
@@ -136,26 +141,41 @@ public abstract class FamiliarFragment extends SherlockFragment {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
-
 		menu.clear();
-		menu.add(R.string.name_search_hint).setIcon(R.drawable.menu_search)
-		.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-			@Override
-			public boolean onMenuItemClick(MenuItem item) {
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						try{
-							new Instrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_SEARCH);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO && !canInterceptSearchKey()) {
+
+			SearchView sv = new SearchView(getActivity());
+			SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+			SearchableInfo si = searchManager.getSearchableInfo(getActivity().getComponentName());
+			sv.setSearchableInfo(si);
+			
+			menu.add(R.string.name_search_hint)
+				.setIcon(R.drawable.menu_search)
+				.setActionView(sv)
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		}
+		else {
+			menu.add(R.string.name_search_hint)
+				.setIcon(R.drawable.menu_search)
+				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick(MenuItem item) {
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+							try{
+								new Instrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_SEARCH);
+							}
+							catch(java.lang.SecurityException e){
+								//apparently this can inject an event into another app if the user switches fast enough
+							}
 						}
-						catch(java.lang.SecurityException e){
-							//apparently this can inject an event into another app if the user switches fast enough
-						}
-					}
-				}).start();
-				return true;
-			}
-		}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+					}).start();
+					return true;
+				}
+			}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		}
 	}
 
 	public MainActivity getMainActivity() {
@@ -168,6 +188,14 @@ public abstract class FamiliarFragment extends SherlockFragment {
 	 * whatever, and return true
 	 */
 	public boolean onInterceptSearchKey() {
+		return false;
+	}
+
+	/*
+	 * Just return true if the search key is interceptable. This is checked when
+	 * building the me
+	 */
+	public boolean canInterceptSearchKey() {
 		return false;
 	}
 

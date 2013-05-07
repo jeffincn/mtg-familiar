@@ -836,7 +836,7 @@ public class SearchViewFragment extends FamiliarFragment {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
-			if(getMainActivity().mThreePane) {
+		if(getMainActivity().mThreePane) {
 			InFragmentMenuLoader cml = new InFragmentMenuLoader(this);
 			cml.inflate(R.menu.search_menu, menu);
 			mFragmentMenu = cml.getView();
@@ -907,6 +907,11 @@ public class SearchViewFragment extends FamiliarFragment {
 	@Override
 	public boolean onInterceptSearchKey() {
 		doSearch();
+		return true;
+	}
+	
+	@Override
+	public boolean canInterceptSearchKey() {
 		return true;
 	}
 }

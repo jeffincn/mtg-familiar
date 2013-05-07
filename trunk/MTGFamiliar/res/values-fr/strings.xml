@@ -81,7 +81,7 @@
  	- Corrections de bugs
     </string>
     <string name="main_tts_warning_title">Synthèse vocale (TTS)</string>
-    <string name="main_tts_warning_text">Cette appli permet la synthèse vocale parmi ses foncionnalités, mais il semble que vous ne l\'ayiez pas installée. 
+    <string name="main_tts_warning_text">Cette appli permet la synthèse vocale parmi ses fonctionnalités, mais il semble que vous ne l\'ayiez pas installée. 
         Si vous voulez l\'installer, utiliser le lien "Installer Text-to-Speech" dans le menu des paramètres.</string>
     <string name="main_export_data_title">Export vers SD</string>
     <string name="main_export_success">Export réalisé avec succès vers </string>
@@ -105,7 +105,7 @@
 		Merci à reddit\'s &lt;a href=&quot;http://www.reddit.com/r/magicTCG/&quot;&gt;/r/magictcg&lt;/a&gt; pour les tests et retours.&lt;br /&gt;&lt;br /&gt;
 		Merci à mon frère pour l\'icône.&lt;br /&gt;&lt;br /&gt;
 		Merci à Chedy @ &lt;a href=&quot;http://tcgplayer.com&quot;&gt;TCGPlayer.com&lt;/a&gt; pour l\'API des prix.&lt;br /&gt;&lt;br /&gt;
-		Merci spécial à Richard Garfield et le reste des gens à &lt;a href=&quot;http://www.wizards.com/magic&quot;&gt;Wizards of the Coast&lt;/a&gt;.&lt;br /&gt;&lt;br /&gt;
+		Merci spécial à Richard Garfield et le reste des gens chez &lt;a href=&quot;http://www.wizards.com/magic&quot;&gt;Wizards of the Coast&lt;/a&gt;.&lt;br /&gt;&lt;br /&gt;
 		-gelakinetic&lt;br /&gt;&lt;br /&gt;&lt;br /&gt;
 		Magic the Gathering et Magic the Gathering cards sont ™ &amp; © Wizards of the Coast LLC.&lt;br /&gt;&lt;br /&gt;
 		The Android robot is © Google &lt;br /&gt;&lt;br /&gt;
@@ -128,7 +128,7 @@
     <string name="search_format">Format</string>
     <string name="search_formats">Formats</string>
     <string name="search_rarity">Rareté</string>
-    <string name="search_rarities">Rareté</string>
+    <string name="search_rarities">Raretés</string>
     <string name="search_flavor_text">Texte d\'ambiance</string>
     <string name="search_artist">Artiste</string>
     <string name="search_search">Chercher!</string>
@@ -185,7 +185,7 @@
     <string name="card_view_copy_all">Copier Carte vers Presse-papier</string>
     <string name="card_view_image">Image de cette Carte</string>
     <string name="card_view_price">Prix de cette Carte</string>
-    <string name="card_view_change_set">Changer l\'Extension</string>
+    <string name="card_view_change_set">Changer d\'Extension</string>
     <string name="card_view_legality">Autorisations</string>
     <string name="card_view_rulings">Règles de cette Carte</string>
     <string name="card_view_wishlist">Ajout Liste de voeux</string>
@@ -214,7 +214,7 @@
     <string name="life_counter_minus_five">-5</string>
     <string name="life_counter_announce_life">Annoncer Totaux Vie</string>
     <string name="life_counter_change_default_gathering">Modifier Types de Match</string>
-    <string name="life_counter_set_gathering">Choisir Type de Match</string>
+    <string name="life_counter_set_gathering">Choisir le Type de Match</string>
     <string name="life_counter_change_display">Changer Mode Affichage</string>
     <string name="life_counter_remove_player">Enlever un joueur</string>
     <string name="life_counter_add_player">Ajouter un joueur</string>
@@ -244,7 +244,7 @@
     <string name="gathering_delete">Effacer Type de Match</string>
     <string name="gathering_remove_player">Enlever un joueur</string>
     <string name="gathering_add_player">Ajouter un joueur</string>
-    <string name="gathering_toast_no_gatherings">Aucun Type de Match existe.</string>
+    <string name="gathering_toast_no_gatherings">Aucun Type de Match n\'existe.</string>
     <string name="gathering_toast_no_name">Veuillez saisir un nom pour ce type de match.</string>
     <string name="gathering_empty_field">Les champs ne peuvent pas être vides. Veuillez vérifier tous les champs.</string>
 
@@ -404,7 +404,7 @@
     <string name="pref_install_tts_summary">Cliquer ici vous enverra vers la page d\'installation de la synthèse vocale (text-to-speech) dans le Google Play Store</string>
     <string name="pref_cat_wishlist">Liste de voeux</string>
     <string name="pref_wishlist_details_title">Afficher Détails</string>
-    <string name="pref_wishlist_details_summary">Afficher les détailes complets des cartes de la liste de voeux</string>
+    <string name="pref_wishlist_details_summary">Afficher les détails complets des cartes de la liste de voeux</string>
     <string name="pref_wishlist_totals_title">Afficher Prix Total</string>
     <string name="pref_wishlist_totals_summary">Afficher le prix total de la liste de voeux</string>
     <string name="pref_wishlist_prices_title">Afficher Prix Cartes</string>

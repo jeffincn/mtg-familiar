@@ -300,7 +300,9 @@
     <string name="wishlist_share_include_set">Include Set Names?</string>
     <string name="wishlist_empty_dialog_title">Empty Wishlist</string>
     <string name="wishlist_empty_dialog_text">Are you sure you want to empty your wishlist?</string>
-
+    <string name="wishlist_edit_dialog_title_foil">Foil</string>
+    <string name="wishlist_edit_dialog_title_end">in the Wishlist</string>
+    
     <!-- Round timer activity -->
     <string name="timer_how_long">How long is the round?\n(HH:MM)</string>
     <string name="timer_how_long_landscape">How long is the round? (HH:MM)</string>

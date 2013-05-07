@@ -251,8 +251,8 @@ public class WishlistHelpers {
 		cardName = cn;
 		AlertDialog.Builder b = new AlertDialog.Builder(ma);
 
-		b.setTitle(cardName + (foil ? " (Foil)" : "") +" in the Wishlist");
-
+		b.setTitle(cardName + (foil ? " (" + ma.getString(R.string.wishlist_edit_dialog_title_foil) + ") " : " ") + ma.getString(R.string.wishlist_edit_dialog_title_end));
+		
 		View view = ma.getLayoutInflater().inflate(
 				R.layout.card_setwishlist_dialog, null);
 		lvSets = (LinearLayout) view.findViewById(R.id.setList);

@@ -774,7 +774,7 @@ public class TradeFragment extends FamiliarFragment {
 		final String[] aSets = sets.toArray(new String[sets.size()]);
 		final String[] aSetCodes = setCodes.toArray(new String[setCodes.size()]);
 		AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
-		builder.setTitle("Pick a Set");
+		builder.setTitle(R.string.card_view_set_dialog_title);
 		builder.setItems(aSets, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialogInterface, int item) {
 				if (_side.equals("left")) {

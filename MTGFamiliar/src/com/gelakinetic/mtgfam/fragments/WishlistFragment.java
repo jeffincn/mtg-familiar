@@ -838,7 +838,8 @@ public class WishlistFragment extends FamiliarFragment {
 
 								if (numberField > 0) {
 									String setName = ((TextView) v.findViewById(R.id.cardset)).getText().toString();
-									boolean setIsFoil = ((CheckBox) v.findViewById(R.id.wishlistDialogFoil)).isChecked();
+									int visiblity = ((ImageView) v.findViewById(R.id.wishlistDialogFoil)).getVisibility();
+									boolean setIsFoil = ( visiblity == View.VISIBLE ? true : false);
 									
 									String setCode;
 									try {
@@ -882,7 +883,7 @@ public class WishlistFragment extends FamiliarFragment {
 						}
 					}
 				}
-				removeDialog();
+				//removeDialog();
 				dlg = null;
 			}
 

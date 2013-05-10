@@ -27,17 +27,17 @@
         android:selectAllOnFocus="true" >
     </EditText>
 
-    <CheckBox
+    <ImageView
         android:id="@+id/wishlistDialogFoil"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:button="@xml/foilcheck_selector" />
+        android:layout_height="match_parent"
+        android:src="@drawable/foilindictor" />
 
     <TextView
         android:id="@+id/cardset"
         style="@style/text"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:gravity="left|center_vertical"

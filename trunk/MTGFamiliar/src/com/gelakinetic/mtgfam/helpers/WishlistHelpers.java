@@ -19,6 +19,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +28,9 @@ import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.activities.MainActivity;
 import com.gelakinetic.mtgfam.fragments.FamiliarFragment;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
+import com.octo.android.robospice.persistence.DurationInMillis;
+import com.octo.android.robospice.persistence.exception.SpiceException;
+import com.octo.android.robospice.request.listener.RequestListener;
 
 public class WishlistHelpers {
 	private static final String wishlistName = "card.wishlist";
@@ -296,7 +300,7 @@ public class WishlistHelpers {
 		}
 		
 		Cursor c = ff.mDbHelper.fetchCardByName(cardName,
-				new String[] { CardDbAdapter.KEY_SET, CardDbAdapter.KEY_NUMBER, CardDbAdapter.KEY_RARITY });
+				new String[] { CardDbAdapter.KEY_SET, CardDbAdapter.KEY_NUMBER, CardDbAdapter.KEY_RARITY, CardDbAdapter.KEY_MULTIVERSEID });
 		// make a place holder item for each version set of this card
 		while (!c.isAfterLast()) {
 			String setCode = c.getString(c
@@ -305,11 +309,32 @@ public class WishlistHelpers {
 			String number = c.getString(c
 					.getColumnIndex(CardDbAdapter.KEY_NUMBER));
 			int rarity = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY));
+			int multiverseId = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_MULTIVERSEID));
 
 			if (! setList.contains(setCode)){
 				setList.add(setCode);
 				lCardlist.add(new TradeListHelpers().new CardData(cardName,
 					tcgName, setCode, 0, 0, "loading", number, rarity));
+				
+//				PriceFetchRequest priceRequest = new PriceFetchRequest(cardName, setCode, number, multiverseId, ff.mDbHelper);
+//				ff.getMainActivity().getSpiceManager().execute( priceRequest, cardName + "-" + setCode, DurationInMillis.ONE_DAY, new RequestListener< PriceInfo >(){
+//
+//					@Override
+//			        public void onRequestFailure( SpiceException spiceException ) {
+//			        	Toast.makeText( ff.getMainActivity(), spiceException.getMessage(), Toast.LENGTH_SHORT ).show();
+//			        }
+//
+//			        @Override
+//			        public void onRequestSuccess( final PriceInfo result ) {
+//			        	if (result != null && result.foil_average != 0) {
+			        		CardData newCard = new TradeListHelpers().new CardData(cardName,
+			    					tcgName, setCode, 0, 0, "loading", number, rarity);
+			        		newCard.setIsFoil(true);
+			        		lCardlist.add(newCard);
+//			        	}
+//			        }
+//				} );
+				
 				
 			}
 			c.moveToNext();
@@ -334,29 +359,26 @@ public class WishlistHelpers {
 				for (int j = 0; j < lCardlist.size(); j++) {
 					if (lCardlist.get(j).setCode.equalsIgnoreCase(lWishlist
 							.get(i).setCode)) {
-						if (lWishlist.get(i).foil){
-//							lCardlist.add(j, lCardlist.get(j));
-//							lCardlist.get(j).numberOf = lWishlist.get(i).numberOf;
-							break;
-							//lCardlist.add(nonfoil);
-						} else {						
+						if (lCardlist.get(j).foil && lWishlist.get(i).foil){
+							lCardlist.get(j).numberOf = lWishlist.get(i).numberOf;
+						} else if (!lCardlist.get(j).foil && !lWishlist.get(i).foil){						
 							// set the number, but don't modify the wishlist
 							lCardlist.get(j).numberOf = lWishlist.get(i).numberOf;
 						}
 					}
 				}
-				if (lWishlist.get(i).foil){
-					int position = -1;
-					for (int j = 0; j < lCardlist.size(); j++) {
-						if (lCardlist.get(j).setCode.equalsIgnoreCase(lWishlist
-								.get(i).setCode)) {
-							position = j;
-							break;
-						}
-					}
-					lCardlist.add(position+1, lWishlist.get(i));
-					lCardlist.get(position+1).numberOf = lWishlist.get(i).numberOf;
-				}
+//				if (lWishlist.get(i).foil){
+//					int position = -1;
+//					for (int j = 0; j < lCardlist.size(); j++) {
+//						if (lCardlist.get(j).setCode.equalsIgnoreCase(lWishlist
+//								.get(i).setCode)) {
+//							position = j;
+//							break;
+//						}
+//					}
+//					lCardlist.add(position+1, lWishlist.get(i));
+//					lCardlist.get(position+1).numberOf = lWishlist.get(i).numberOf;
+//				}
 			}
 		}
 		if(opened) {
@@ -372,51 +394,15 @@ public class WishlistHelpers {
 			View v = inf.inflate(R.layout.card_setwishlist_row, null);
 
 			EditText numberField = (EditText) v.findViewById(R.id.numberInput);
-			CheckBox foilField = (CheckBox) v.findViewById(R.id.wishlistDialogFoil);
-			foilField.setChecked(cd.foil);
+			ImageView foilField = (ImageView) v.findViewById(R.id.wishlistDialogFoil);
 			TextView setField = (TextView) v.findViewById(R.id.cardset);
-			final CardData cardInfo = cd;
 			
 			//Check card list to see if a foil version exist, blank the foil button if so.
 			if (!cd.foil){
-				int position = lCardlist.indexOf(cd);
-				if (position + 1 < lCardlist.size() && lCardlist.get(position + 1).foil){
-					foilField.setVisibility(View.GONE);
-				}
+				foilField.setVisibility(View.GONE);
+			} else {
+				foilField.setVisibility(View.VISIBLE);
 			}
-			
-			foilField.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-				@Override
-				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-					if (isChecked){
-						
-						LayoutInflater inf = ma.getLayoutInflater();
-						View newRow = inf.inflate(R.layout.card_setwishlist_row, null);
-						
-						EditText newNumberField = (EditText) newRow.findViewById(R.id.numberInput);
-						CheckBox newFoilField = (CheckBox) newRow.findViewById(R.id.wishlistDialogFoil);
-						newFoilField.setVisibility(View.GONE);
-						TextView newSetField = (TextView) newRow.findViewById(R.id.cardset);
-						
-						newNumberField.setText("0");
-						newSetField.setText(cardInfo.tcgName);
-						
-						int position = lCardlist.indexOf(cardInfo);
-						cardInfo.setIsFoil(isChecked);
-						
-						lvSets.addView(newRow, position);
-						lCardlist.add(position, cardInfo);
-					} else {
-						int position = lCardlist.indexOf(cardInfo);
-						//This should be save as the foil child always comes after the non-foil child.
-						lvSets.getChildAt(position -1).findViewById(R.id.wishlistDialogFoil).setVisibility(View.VISIBLE);
-						
-						lvSets.removeViewAt(position);
-						lCardlist.remove(position);
-						
-					}
-				}
-			});
 
 			numberField.setText(cd.numberOf + "");
 			setField.setText(cd.tcgName);

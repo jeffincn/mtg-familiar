@@ -27,17 +27,18 @@ import com.gelakinetic.mtgfam.helpers.ResultListAdapter;
 
 public class ResultListFragment extends FamiliarFragment {
 
+	private ListView	mListView;
+
+	private Cursor		mCursor;
 	private static int				cursorPosition = 0;
 	private static int				cursorPositionOffset = 0;
-	private ListView	lv;
+	
 	private static boolean		isSingle = false;
 	private static boolean		isRandom = false;
+	
 	private static int				numChoices;
 	private static int[]		randomSequence;
-	private Cursor		c;
 	private static int				randomIndex;
-	private static boolean		randomFromMenu;
-	private static long			id;
 
 	public ResultListFragment() {
 		/* http://developer.android.com/reference/android/app/Fragment.html
@@ -48,13 +49,17 @@ public class ResultListFragment extends FamiliarFragment {
 		 * will occur in some cases during state restore. 
 		 */
 	}
-	
-	
+		
 	@Override
 	public void receiveMessage(Bundle bundle) {
 		try{
-			setResultFromBundle(bundle);
-			fillData(c);
+			if(bundle.containsKey("resultCode")) {
+				onFragmentResult(bundle);
+			}
+			else {
+				setResultFromBundle(bundle);
+				fillData(mCursor);
+			}
 		}
 		catch (FamiliarDbException e) {
 			getMainActivity().showDbErrorToast();
@@ -106,7 +111,7 @@ public class ResultListFragment extends FamiliarFragment {
 	}
 
 	private void setResultFromBundle(Bundle args) throws FamiliarDbException{
-		
+		long id;
 		if(args == null) {
 			return;
 		}
@@ -116,7 +121,7 @@ public class ResultListFragment extends FamiliarFragment {
 				CardDbAdapter.KEY_POWER, CardDbAdapter.KEY_TOUGHNESS, CardDbAdapter.KEY_LOYALTY , CardDbAdapter.KEY_NUMBER };
 
 			if ((id = args.getLong("id")) != 0L) {
-				c = mDbHelper.fetchCard(id, null);
+				mCursor = mDbHelper.fetchCard(id, null);
 			}
 			else if ((id = args.getLong("id0")) != 0L) {
 				long id1 = args.getLong("id1");
@@ -125,7 +130,7 @@ public class ResultListFragment extends FamiliarFragment {
 				cs[0] = mDbHelper.fetchCard(id, null);
 				cs[1] = mDbHelper.fetchCard(id1, null);
 				cs[2] = mDbHelper.fetchCard(id2, null);
-				c = new MergeCursor(cs);
+				mCursor = new MergeCursor(cs);
 			}
 			else {
 				SearchCriteria criteria = (SearchCriteria) args.getSerializable(SearchViewFragment.CRITERIA);
@@ -135,22 +140,22 @@ public class ResultListFragment extends FamiliarFragment {
 					// Just in case. it happened to a user once...
 					mDbHelper = new CardDbAdapter(this.getActivity());
 				}
-				c = mDbHelper.Search(criteria.Name, criteria.Text, criteria.Type, criteria.Color, criteria.Color_Logic,
+				mCursor = mDbHelper.Search(criteria.Name, criteria.Text, criteria.Type, criteria.Color, criteria.Color_Logic,
 						criteria.Set, criteria.Pow_Choice, criteria.Pow_Logic, criteria.Tou_Choice, criteria.Tou_Logic, criteria.Cmc,
 						criteria.Cmc_Logic, criteria.Format, criteria.Rarity, criteria.Flavor, criteria.Artist, criteria.Type_Logic,
 						criteria.Text_Logic, criteria.Set_Logic, true, returnTypes, consolidate);
 			}
 			
 			if (this.isAdded()) {
-				if (c == null || c.getCount() == 0) {
+				if (mCursor == null || mCursor.getCount() == 0) {
 					Toast.makeText(this.getActivity(), getString(R.string.search_toast_no_results), Toast.LENGTH_SHORT).show();
 					getMainActivity().mFragmentManager.popBackStack();
 					return;
 				}
-				else if (c.getCount() == 1) {
+				else if (mCursor.getCount() == 1) {
 					isSingle = true;
-					c.moveToFirst();
-					id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
+					mCursor.moveToFirst();
+					id = mCursor.getLong(mCursor.getColumnIndex(CardDbAdapter.KEY_ID));
 					startCardViewFrag(id, isRandom, isSingle);
 				}
 				else {
@@ -163,24 +168,24 @@ public class ResultListFragment extends FamiliarFragment {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if (c != null) {
-			c.close();
+		if (mCursor != null) {
+			mCursor.close();
 		}
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		cursorPosition = lv.getFirstVisiblePosition();
-		View cursorPositionView = lv.getChildAt(0);
+		cursorPosition = mListView.getFirstVisiblePosition();
+		View cursorPositionView = mListView.getChildAt(0);
 		cursorPositionOffset = (cursorPositionView == null) ? 0 : cursorPositionView.getTop();
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		fillData(c);
-		lv.setSelectionFromTop(cursorPosition, cursorPositionOffset);
+		fillData(mCursor);
+		mListView.setSelectionFromTop(cursorPosition, cursorPositionOffset);
 	}
 
 	@Override
@@ -198,8 +203,8 @@ public class ResultListFragment extends FamiliarFragment {
 		masterLayout = (LinearLayout)myFragmentView.findViewById(R.id.master_layout);
 		addFragmentMenu();
 		
-		lv = (ListView) myFragmentView.findViewById(R.id.resultList);// getListView();
-		registerForContextMenu(lv);
+		mListView = (ListView) myFragmentView.findViewById(R.id.resultList);// getListView();
+		registerForContextMenu(mListView);
 		Bundle res = getMainActivity().getFragmentResults();
 		if (res != null) {
 			onFragmentResult(res);
@@ -208,8 +213,9 @@ public class ResultListFragment extends FamiliarFragment {
 			startRandom();
 		}
 
-		lv.setOnItemClickListener(new OnItemClickListener() {
+		mListView.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				isRandom = false;
 				if(getMainActivity().mThreePane) {
 					Bundle args = new Bundle();
 					args.putLong("id", id);
@@ -266,84 +272,85 @@ public class ResultListFragment extends FamiliarFragment {
 
 			ResultListAdapter rla = new ResultListAdapter(getMainActivity(), R.layout.card_row, c, from, to,
 					this.getResources());
-			lv.setAdapter(rla);
+			mListView.setAdapter(rla);
 		}
 	}
 
 	public void onFragmentResult(Bundle args) {
-		long id;
+		long id = -1;
 		int resultCode = args.getInt("resultCode", -1);
 		long lastID = args.getLong("lastID", -1L);
-		boolean bundleIsSingle = args.getBoolean("isSingle", false);
 
 		switch (resultCode) {
-			case CardViewFragment.RANDOMLEFT:
+			case CardViewFragment.RANDOMLEFT: {
 				randomIndex--;
 				if (randomIndex < 0) {
 					randomIndex += numChoices;
 				}
-				c.moveToPosition(randomSequence[randomIndex]);
-				id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
-				startCardViewFrag(id, isRandom, isSingle);
+				mCursor.moveToPosition(randomSequence[randomIndex]);
+				id = mCursor.getLong(mCursor.getColumnIndex(CardDbAdapter.KEY_ID));
 				break;
-			case CardViewFragment.RANDOMRIGHT:
+			}
+			case CardViewFragment.RANDOMRIGHT: {
 				randomIndex++;
 				if (randomIndex >= numChoices) {
 					randomIndex -= numChoices;
 				}
-				c.moveToPosition(randomSequence[randomIndex]);
-				id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
-				startCardViewFrag(id, isRandom, isSingle);
+				mCursor.moveToPosition(randomSequence[randomIndex]);
+				id = mCursor.getLong(mCursor.getColumnIndex(CardDbAdapter.KEY_ID));
 				break;
-			case CardViewFragment.SWIPELEFT:
-				c.moveToFirst();
-				while (!c.isAfterLast()) {
-					if (lastID == c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID))) {
-						c.moveToPrevious();
-
+			}
+			case CardViewFragment.SWIPELEFT: {
+				mCursor.moveToFirst();
+				while (!mCursor.isAfterLast()) {
+					if (lastID == mCursor.getLong(mCursor.getColumnIndex(CardDbAdapter.KEY_ID))) {
+						mCursor.moveToPrevious();
+	
 						// In case the id was matched against the first item.
-						if (c.isBeforeFirst())
-							c.moveToLast();
-
+						if (mCursor.isBeforeFirst())
+							mCursor.moveToLast();
+	
 						break;
-					}
-					else
-						c.moveToNext();
+					} else
+						mCursor.moveToNext();
 				}
-
-				id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
-				startCardViewFrag(id, isRandom, isSingle);
+				id = mCursor.getLong(mCursor.getColumnIndex(CardDbAdapter.KEY_ID));
 				break;
-			case CardViewFragment.SWIPERIGHT:
-				c.moveToFirst();
-				while (!c.isAfterLast()) {
-					if (lastID == c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID))) {
-						c.moveToNext();
-
+			}
+			case CardViewFragment.SWIPERIGHT: {
+				mCursor.moveToFirst();
+				while (!mCursor.isAfterLast()) {
+					if (lastID == mCursor.getLong(mCursor.getColumnIndex(CardDbAdapter.KEY_ID))) {
+						mCursor.moveToNext();
+	
 						// In case the id was matched against the last item.
-						if (c.isAfterLast())
-							c.moveToFirst();
-
+						if (mCursor.isAfterLast())
+							mCursor.moveToFirst();
+	
 						break;
-					}
-					else
-						c.moveToNext();
+					} else
+						mCursor.moveToNext();
 				}
-
-				id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
-				startCardViewFrag(id, isRandom, isSingle);
+				id = mCursor.getLong(mCursor.getColumnIndex(CardDbAdapter.KEY_ID));
 				break;
-			case CardViewFragment.ISCLOSING:
-			default:
-				if (bundleIsSingle || (isRandom && !randomFromMenu)) {
-					// TODO check on rotation
+			}
+			default: {
+				if (args.getBoolean("isSingle", false)) {
 					getMainActivity().mFragmentManager.popBackStack();
 				}
-				if (randomFromMenu) {
-					randomFromMenu = false;
-					isRandom = false;
-				}
-				break;
+				return;
+			}
+		}
+		if (id != -1) {
+			if (getMainActivity().mThreePane) {
+				Bundle bundle = new Bundle();
+				bundle.putLong("id", id);
+				bundle.putBoolean(SearchViewFragment.RANDOM, isRandom);
+				bundle.putBoolean("isSingle", isSingle);
+				getMainActivity().sendMessageToRightFragment(bundle);
+			} else {
+				startCardViewFrag(id, isRandom, isSingle);
+			}
 		}
 	}
 
@@ -363,11 +370,11 @@ public class ResultListFragment extends FamiliarFragment {
 	}
 
 	private void startRandom() {
-		if (c == null || c.getCount() == 0) {
+		if (mCursor == null || mCursor.getCount() == 0) {
 			return;
 		}
 		
-		if(c.getCount() == 1) {
+		if(mCursor.getCount() == 1) {
 			isRandom = false;
 		}
 		else {
@@ -375,7 +382,7 @@ public class ResultListFragment extends FamiliarFragment {
 		}
 
 		// implements http://en.wikipedia.org/wiki/Fisher-Yates_shuffle
-		numChoices = c.getCount();
+		numChoices = mCursor.getCount();
 		Random rand = new Random(System.currentTimeMillis());
 		randomSequence = new int[numChoices];
 		int temp, k, j;
@@ -390,8 +397,8 @@ public class ResultListFragment extends FamiliarFragment {
 		}
 
 		int randomIndex = rand.nextInt(numChoices);
-		c.moveToPosition(randomSequence[randomIndex]);
-		long id = c.getLong(c.getColumnIndex(CardDbAdapter.KEY_ID));
+		mCursor.moveToPosition(randomSequence[randomIndex]);
+		long id = mCursor.getLong(mCursor.getColumnIndex(CardDbAdapter.KEY_ID));
 		startCardViewFrag(id, isRandom, isSingle);
 	}
 
@@ -400,7 +407,6 @@ public class ResultListFragment extends FamiliarFragment {
 		// Handle item selection
 		switch (item.getItemId()) {
 			case R.id.search_menu_random_search:
-				randomFromMenu = true;
 				startRandom();
 				return true;
 			default:

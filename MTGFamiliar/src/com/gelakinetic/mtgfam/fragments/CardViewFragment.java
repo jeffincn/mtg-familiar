@@ -95,7 +95,6 @@ public class CardViewFragment extends FamiliarFragment {
 	public static final int						QUITTOSEARCH		= 4;
 	public static final int						SWIPELEFT				= 5;
 	public static final int						SWIPERIGHT			= 6;
-	public static final int						ISCLOSING			= 7;
 
 	// Dialogs
 	private static final int					GETPRICE				= 1;
@@ -145,7 +144,7 @@ public class CardViewFragment extends FamiliarFragment {
 
 	// Preferences
 	private int												loadTo = 0;
-	private boolean										isRandom;
+	private static boolean										isRandom;
 	private boolean										isSingle;
 	private boolean										scroll_results;
 	private View											myFragmentView;
@@ -271,14 +270,6 @@ public class CardViewFragment extends FamiliarFragment {
 		if (asyncTask != null) {
 			asyncTask.cancel(true);
 		}
-		
-		// Notify the ResultListFragment that the CardView is closing, if there is no other resultCode
-		Bundle res = this.getMainActivity().getFragmentResults();
-		if(res == null && isRandom){
-			res = new Bundle();
-			res.putInt("resultCode", ISCLOSING);
-		}
-		this.getMainActivity().setFragmentResult(res);
 	}
 
 	private void setInfoFromID(long id) throws FamiliarDbException {
@@ -443,21 +434,63 @@ public class CardViewFragment extends FamiliarFragment {
 			});
 		}
 		
-		if (isRandom) {
+		if (!isSingle && isRandom) {
 			leftRandom.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					Bundle res = new Bundle();
 					res.putInt("resultCode", RANDOMLEFT);
-					getMainActivity().setFragmentResult(res);
-					getMainActivity().mFragmentManager.popBackStack();
+					if(getMainActivity().mThreePane) {
+						getMainActivity().sendMessageToMiddleFragment(res);
+					}
+					else {
+						getMainActivity().setFragmentResult(res);
+						getMainActivity().mFragmentManager.popBackStack();
+					}
 				}
 			});
 			rightRandom.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					Bundle res = new Bundle();
 					res.putInt("resultCode", RANDOMRIGHT);
-					getMainActivity().setFragmentResult(res);
-					getMainActivity().mFragmentManager.popBackStack();
+					if(getMainActivity().mThreePane) {
+						getMainActivity().sendMessageToMiddleFragment(res);
+					}
+					else {
+						getMainActivity().setFragmentResult(res);
+						getMainActivity().mFragmentManager.popBackStack();
+					}
+				}
+			});
+			leftRandom.setVisibility(View.VISIBLE);
+			rightRandom.setVisibility(View.VISIBLE);
+		}
+		else if (!isSingle && scroll_results) {
+			leftRandom.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					Bundle res = new Bundle();
+					res.putInt("resultCode", SWIPELEFT);
+					res.putLong("lastID", cardID);
+					if(getMainActivity().mThreePane) {
+						getMainActivity().sendMessageToMiddleFragment(res);
+					}
+					else {
+						getMainActivity().setFragmentResult(res);
+						getMainActivity().mFragmentManager.popBackStack();
+					}
+				}
+			});
+			rightRandom.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					Bundle res = new Bundle();
+					res.putInt("resultCode", SWIPERIGHT);
+					res.putLong("lastID", cardID);
+					if(getMainActivity().mThreePane) {
+						getMainActivity().sendMessageToMiddleFragment(res);
+					}
+					else {
+						getMainActivity().setFragmentResult(res);
+						getMainActivity().mFragmentManager.popBackStack();
+					}
 				}
 			});
 			leftRandom.setVisibility(View.VISIBLE);
@@ -498,29 +531,6 @@ public class CardViewFragment extends FamiliarFragment {
 			flavor.setVisibility(View.VISIBLE);
 			artist.setVisibility(View.VISIBLE);
 			((FrameLayout) myFragmentView.findViewById(R.id.frameLayout1)).setVisibility(View.VISIBLE);			
-		}
-
-		if (!isSingle && scroll_results) {
-			leftRandom.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-					Bundle res = new Bundle();
-					res.putInt("resultCode", SWIPELEFT);
-					res.putLong("lastID", cardID);
-					getMainActivity().setFragmentResult(res);
-					getMainActivity().mFragmentManager.popBackStack();
-				}
-			});
-			rightRandom.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-					Bundle res = new Bundle();
-					res.putInt("resultCode", SWIPERIGHT);
-					res.putLong("lastID", cardID);
-					getMainActivity().setFragmentResult(res);
-					getMainActivity().mFragmentManager.popBackStack();
-				}
-			});
-			leftRandom.setVisibility(View.VISIBLE);
-			rightRandom.setVisibility(View.VISIBLE);
 		}
 
 		multiverseId = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_MULTIVERSEID));

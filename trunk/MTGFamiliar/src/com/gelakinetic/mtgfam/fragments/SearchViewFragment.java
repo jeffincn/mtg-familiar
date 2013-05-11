@@ -406,16 +406,28 @@ public class SearchViewFragment extends FamiliarFragment {
 		
 		checkDialogButtonColors();
 
-		setKeyboardFocus(savedInstanceState, namefield, false);
-	    
 		return myFragmentView;
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		Bundle extras = this.getArguments();
+		if(extras != null && extras.containsKey(SearchViewFragment.CRITERIA)) {
+			SearchCriteria sc = (SearchCriteria) extras.getSerializable(SearchViewFragment.CRITERIA);
+			namefield.setText(sc.Name);
+			doSearch();
+		}
+		else {
+			setKeyboardFocus(null, namefield, false);			
+		}
 	}
 	
 	@Override
   protected void onGoogleGogglesSuccess(String cardName) {
 	// this method must be overridden by each class calling takePictureAndSearchGoogleGogglesIntent
 		super.onGoogleGogglesSuccess(cardName);
-    namefield.setText(cardName);
+		namefield.setText(cardName);
 		doSearch();
 	}
     

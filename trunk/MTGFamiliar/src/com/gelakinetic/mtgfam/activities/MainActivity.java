@@ -235,7 +235,7 @@ public class MainActivity extends SlidingFragmentActivity {
 		
 		Intent intent = getIntent();
 
-		if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+		if (intent.getAction().equals(Intent.ACTION_VIEW)) {
 			// handles a click on a search suggestion; launches activity to show word
 			Uri u = intent.getData();
 			long id = Long.parseLong(u.getLastPathSegment());
@@ -248,9 +248,10 @@ public class MainActivity extends SlidingFragmentActivity {
 			rlFrag.setArguments(args);
 
 			attachSingleFragment(rlFrag, "left_frag", false, false);
+			showOnePane();
 			hideKeyboard();
 		}
-		else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+		else if (intent.getAction().equals(Intent.ACTION_SEARCH)) {
 			boolean consolidate = prefAdapter.getConsolidateSearch();
 			String query = intent.getStringExtra(SearchManager.QUERY);
 			SearchCriteria sc = new SearchCriteria();
@@ -261,15 +262,32 @@ public class MainActivity extends SlidingFragmentActivity {
 			Bundle args = new Bundle();
 			args.putBoolean(SearchViewFragment.RANDOM, false);
 			args.putSerializable(SearchViewFragment.CRITERIA, sc);
-			ResultListFragment rlFrag = new ResultListFragment();
-			rlFrag.setArguments(args);
-
-			attachSingleFragment(rlFrag, "left_frag", false, false);
+			if(mThreePane) {
+				SearchViewFragment svFrag = new SearchViewFragment();
+				svFrag.setArguments(args);
+				attachSingleFragment(svFrag, "left_frag", false, false);
+			}
+			else {
+				ResultListFragment rlFrag = new ResultListFragment();
+				rlFrag.setArguments(args);
+				attachSingleFragment(rlFrag, "left_frag", false, false);
+			}
 			hideKeyboard();
+		}
+		else if (intent.getAction().equals(ACTION_FULL_SEARCH)) {
+			attachSingleFragment(new SearchViewFragment(), "left_frag", false, false);
+			showOnePane();
+		}
+		else if (intent.getAction().equals(ACTION_WIDGET_SEARCH)) {
+			attachSingleFragment(new SearchWidgetFragment(), "left_frag", false, false);
+			showOnePane();
+		}
+		else if (intent.getAction().equals(ACTION_ROUND_TIMER)) {
+			attachSingleFragment(new RoundTimerFragment(), "left_frag", false, false);
+			showOnePane();
 		}
 		else {
 			if (savedInstanceState == null) {
-				String action = getIntent().getAction();
 
 				String defaultFragment = prefAdapter.getDefaultFragment();
 
@@ -307,19 +325,6 @@ public class MainActivity extends SlidingFragmentActivity {
 				else {
 					frag = new SearchViewFragment();
 				}
-
-				if (action != null) {
-					if (action.equals(ACTION_FULL_SEARCH)) {
-						frag = new SearchViewFragment();
-					}
-					else if (action.equals(ACTION_WIDGET_SEARCH)) {
-						frag = new SearchWidgetFragment();
-					}
-					else if (action.equals(ACTION_ROUND_TIMER)) {
-						frag = new RoundTimerFragment();
-					}
-				}
-
 				attachSingleFragment(frag, "left_frag", false, false);
 			}
 		}

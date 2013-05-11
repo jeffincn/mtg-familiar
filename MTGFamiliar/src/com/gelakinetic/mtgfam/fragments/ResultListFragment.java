@@ -6,6 +6,7 @@ import java.util.Random;
 import android.database.Cursor;
 import android.database.MergeCursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +22,8 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.fragments.SearchViewFragment.SearchCriteria;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
-import com.gelakinetic.mtgfam.helpers.InFragmentMenuLoader;
 import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
+import com.gelakinetic.mtgfam.helpers.InFragmentMenuLoader;
 import com.gelakinetic.mtgfam.helpers.ResultListAdapter;
 
 public class ResultListFragment extends FamiliarFragment {
@@ -66,6 +67,13 @@ public class ResultListFragment extends FamiliarFragment {
 			getMainActivity().getSupportFragmentManager().popBackStack();
 			return;
 		}
+
+		(new Handler()).postDelayed(new Runnable() {
+			public void run() {
+				getMainActivity().hideKeyboard();
+			}
+		}, 1000);
+		
 	}
 
 	@Override

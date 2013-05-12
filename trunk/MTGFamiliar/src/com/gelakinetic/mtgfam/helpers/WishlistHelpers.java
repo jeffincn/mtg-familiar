@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import android.R.integer;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -15,9 +14,6 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -28,9 +24,6 @@ import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.activities.MainActivity;
 import com.gelakinetic.mtgfam.fragments.FamiliarFragment;
 import com.gelakinetic.mtgfam.helpers.TradeListHelpers.CardData;
-import com.octo.android.robospice.persistence.DurationInMillis;
-import com.octo.android.robospice.persistence.exception.SpiceException;
-import com.octo.android.robospice.request.listener.RequestListener;
 
 public class WishlistHelpers {
 	private static final String wishlistName = "card.wishlist";
@@ -309,7 +302,7 @@ public class WishlistHelpers {
 			String number = c.getString(c
 					.getColumnIndex(CardDbAdapter.KEY_NUMBER));
 			int rarity = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY));
-			int multiverseId = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_MULTIVERSEID));
+//			int multiverseId = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_MULTIVERSEID));
 
 			if (! setList.contains(setCode)){
 				setList.add(setCode);

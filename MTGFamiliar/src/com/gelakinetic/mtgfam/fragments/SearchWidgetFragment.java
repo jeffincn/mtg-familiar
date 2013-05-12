@@ -13,14 +13,17 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.fragments.SearchViewFragment.SearchCriteria;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
+import com.gelakinetic.mtgfam.helpers.InFragmentMenuLoader;
 import com.gelakinetic.mtgfam.helpers.ResultListAdapter;
 
 public class SearchWidgetFragment extends FamiliarFragment {
@@ -46,6 +49,14 @@ public class SearchWidgetFragment extends FamiliarFragment {
 		super.onCreateView(inflater, container, savedInstanceState);
 		View myFragmentView = inflater.inflate(R.layout.widget_search_frag, container, false);
 
+		if(getMainActivity().mThreePane) {
+			getMainActivity().showThreePanes();
+			getMainActivity().attachMiddleFragment(new ResultListFragment(), "result_list", false);
+			getMainActivity().attachRightFragment(new CardViewFragment(), "card_view", false);
+		}
+		
+		masterLayout = (LinearLayout)myFragmentView.findViewById(R.id.master_layout);
+		
 		namefield = (EditText) myFragmentView.findViewById(R.id.widget_namefield);
 		setKeyboardFocus(savedInstanceState, namefield, false);
 		searchButton = (ImageView) myFragmentView.findViewById(R.id.search_button);
@@ -66,8 +77,13 @@ public class SearchWidgetFragment extends FamiliarFragment {
 				Bundle args = new Bundle();
 				args.putBoolean(SearchViewFragment.RANDOM, false);
 				args.putSerializable("id", id);
-				CardViewFragment cvFrag = new CardViewFragment();
-				startNewFragment(cvFrag, args);
+				if(getMainActivity().mThreePane) {
+					getMainActivity().sendMessageToRightFragment(args);
+				}
+				else {
+					CardViewFragment cvFrag = new CardViewFragment();
+					startNewFragment(cvFrag, args);
+				}
 			}
 		});
 
@@ -114,8 +130,13 @@ public class SearchWidgetFragment extends FamiliarFragment {
 		Bundle args = new Bundle();
 		args.putBoolean(SearchViewFragment.RANDOM, false);
 		args.putSerializable(SearchViewFragment.CRITERIA, criteria);
-		ResultListFragment rlFrag = new ResultListFragment();
-		startNewFragment(rlFrag, args);
+		if(getMainActivity().mThreePane) {
+			getMainActivity().sendMessageToMiddleFragment(args);
+		}
+		else{
+			ResultListFragment rlFrag = new ResultListFragment();
+			startNewFragment(rlFrag, args);
+		}
 	}
 
 	private class AutocompleteQueryTask extends AsyncTask<String, Void, Void> {
@@ -161,5 +182,26 @@ public class SearchWidgetFragment extends FamiliarFragment {
 		super.onCreateOptionsMenu(menu, inflater);
 		// MenuInflater inflater = new MenuInflater(this);
 		// inflater.inflate(R.menu.main_menu, menu);
+		if(getMainActivity().mThreePane) {
+			InFragmentMenuLoader cml = new InFragmentMenuLoader(this);
+			cml.inflate(R.menu.search_widget_menu, menu);
+			mFragmentMenu = cml.getView();
+			addFragmentMenu();
+		}
+		else {
+			inflater.inflate(R.menu.search_widget_menu, menu);
+		}
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+			case R.id.search_menu_clear:
+				namefield.setText("");
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
 	}
 }

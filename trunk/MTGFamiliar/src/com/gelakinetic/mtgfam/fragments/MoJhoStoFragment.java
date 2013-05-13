@@ -107,7 +107,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					args.putLong("id", mDbHelper.fetchIdByName(name));
 					ResultListFragment rlFrag = new ResultListFragment();
 					if(getMainActivity().mThreePane) {
-						getMainActivity().sendMessageToMiddleFragment(args);
+						getMainActivity().sendMessageToMiddleFragment(args, true);
 					}
 					else {
 						startNewFragment(rlFrag, args);
@@ -152,7 +152,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					args.putLong("id", mDbHelper.fetchIdByName(name));
 					ResultListFragment rlFrag = new ResultListFragment();
 					if(getMainActivity().mThreePane) {
-						getMainActivity().sendMessageToMiddleFragment(args);
+						getMainActivity().sendMessageToMiddleFragment(args, true);
 					}
 					else {
 						startNewFragment(rlFrag, args);
@@ -202,7 +202,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					// add a fragment
 					ResultListFragment rlFrag = new ResultListFragment();
 					if(getMainActivity().mThreePane) {
-						getMainActivity().sendMessageToMiddleFragment(args);
+						getMainActivity().sendMessageToMiddleFragment(args, true);
 					}
 					else {
 						startNewFragment(rlFrag, args);
@@ -254,7 +254,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					ResultListFragment rlFrag = new ResultListFragment();
 					rlFrag.setArguments(args);
 					if(getMainActivity().mThreePane) {
-						getMainActivity().sendMessageToMiddleFragment(args);
+						getMainActivity().sendMessageToMiddleFragment(args, true);
 					}
 					else {
 						startNewFragment(rlFrag, args);

@@ -419,7 +419,9 @@ public class SearchViewFragment extends FamiliarFragment {
 			doSearch();
 		}
 		else {
-			setKeyboardFocus(null, namefield, false);			
+			if(getMainActivity().findViewById(R.id.left_container).getVisibility() != View.GONE) {
+				setKeyboardFocus(null, namefield, false);
+			}
 		}
 	}
 	
@@ -606,7 +608,7 @@ public class SearchViewFragment extends FamiliarFragment {
 		args.putSerializable(CRITERIA, searchCriteria);
 		
 		if(getMainActivity().mThreePane) {
-			getMainActivity().sendMessageToMiddleFragment(args);
+			getMainActivity().sendMessageToMiddleFragment(args, true);
 		}
 		else {
 			// add a fragment

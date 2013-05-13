@@ -78,7 +78,7 @@ public class SearchWidgetFragment extends FamiliarFragment {
 				args.putBoolean(SearchViewFragment.RANDOM, false);
 				args.putSerializable("id", id);
 				if(getMainActivity().mThreePane) {
-					getMainActivity().sendMessageToRightFragment(args);
+					getMainActivity().sendMessageToRightFragment(args, true);
 				}
 				else {
 					CardViewFragment cvFrag = new CardViewFragment();
@@ -131,7 +131,7 @@ public class SearchWidgetFragment extends FamiliarFragment {
 		args.putBoolean(SearchViewFragment.RANDOM, false);
 		args.putSerializable(SearchViewFragment.CRITERIA, criteria);
 		if(getMainActivity().mThreePane) {
-			getMainActivity().sendMessageToMiddleFragment(args);
+			getMainActivity().sendMessageToMiddleFragment(args, true);
 		}
 		else{
 			ResultListFragment rlFrag = new ResultListFragment();

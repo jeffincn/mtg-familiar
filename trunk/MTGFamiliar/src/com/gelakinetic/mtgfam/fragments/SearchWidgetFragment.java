@@ -58,7 +58,7 @@ public class SearchWidgetFragment extends FamiliarFragment {
 		masterLayout = (LinearLayout)myFragmentView.findViewById(R.id.master_layout);
 		
 		namefield = (EditText) myFragmentView.findViewById(R.id.widget_namefield);
-		setKeyboardFocus(savedInstanceState, namefield, false);
+		setKeyboardFocus(savedInstanceState, namefield, false, 100);
 		searchButton = (ImageView) myFragmentView.findViewById(R.id.search_button);
 		resultList = (ListView) myFragmentView.findViewById(R.id.result_list);
 
@@ -78,7 +78,7 @@ public class SearchWidgetFragment extends FamiliarFragment {
 				args.putBoolean(SearchViewFragment.RANDOM, false);
 				args.putSerializable("id", id);
 				if(getMainActivity().mThreePane) {
-					getMainActivity().sendMessageToRightFragment(args, true);
+					getMainActivity().sendMessageToRightFragment(args);
 				}
 				else {
 					CardViewFragment cvFrag = new CardViewFragment();
@@ -131,7 +131,7 @@ public class SearchWidgetFragment extends FamiliarFragment {
 		args.putBoolean(SearchViewFragment.RANDOM, false);
 		args.putSerializable(SearchViewFragment.CRITERIA, criteria);
 		if(getMainActivity().mThreePane) {
-			getMainActivity().sendMessageToMiddleFragment(args, true);
+			getMainActivity().sendMessageToMiddleFragment(args);
 		}
 		else{
 			ResultListFragment rlFrag = new ResultListFragment();

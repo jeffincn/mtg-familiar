@@ -72,12 +72,6 @@ public class MoJhoStoFragment extends FamiliarFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		if(getMainActivity().mThreePane) {
-			getMainActivity().showThreePanes();
-			getMainActivity().attachMiddleFragment(new ResultListFragment(), "result_list", false);
-			getMainActivity().attachRightFragment(new CardViewFragment(), "card_view", false);
-		}
 		
 		momirListener = new View.OnClickListener() {
 
@@ -107,7 +101,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					args.putLong("id", mDbHelper.fetchIdByName(name));
 					ResultListFragment rlFrag = new ResultListFragment();
 					if(getMainActivity().mThreePane) {
-						getMainActivity().sendMessageToMiddleFragment(args, true);
+						getMainActivity().sendMessageToMiddleFragment(args);
 					}
 					else {
 						startNewFragment(rlFrag, args);
@@ -152,7 +146,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					args.putLong("id", mDbHelper.fetchIdByName(name));
 					ResultListFragment rlFrag = new ResultListFragment();
 					if(getMainActivity().mThreePane) {
-						getMainActivity().sendMessageToMiddleFragment(args, true);
+						getMainActivity().sendMessageToMiddleFragment(args);
 					}
 					else {
 						startNewFragment(rlFrag, args);
@@ -202,7 +196,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					// add a fragment
 					ResultListFragment rlFrag = new ResultListFragment();
 					if(getMainActivity().mThreePane) {
-						getMainActivity().sendMessageToMiddleFragment(args, true);
+						getMainActivity().sendMessageToMiddleFragment(args);
 					}
 					else {
 						startNewFragment(rlFrag, args);
@@ -254,7 +248,7 @@ public class MoJhoStoFragment extends FamiliarFragment {
 					ResultListFragment rlFrag = new ResultListFragment();
 					rlFrag.setArguments(args);
 					if(getMainActivity().mThreePane) {
-						getMainActivity().sendMessageToMiddleFragment(args, true);
+						getMainActivity().sendMessageToMiddleFragment(args);
 					}
 					else {
 						startNewFragment(rlFrag, args);
@@ -290,6 +284,13 @@ public class MoJhoStoFragment extends FamiliarFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
+
+		if(getMainActivity().mThreePane) {
+			getMainActivity().showThreePanes();
+			getMainActivity().attachMiddleFragment(new ResultListFragment(), "result_list", false);
+			getMainActivity().attachRightFragment(new CardViewFragment(), "card_view", false);
+		}
+		
 		View myFragmentView = inflater.inflate(R.layout.mojhosto_frag, container, false);
 		masterLayout = (LinearLayout)myFragmentView.findViewById(R.id.master_layout);
 		

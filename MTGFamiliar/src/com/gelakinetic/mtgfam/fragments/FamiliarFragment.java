@@ -119,7 +119,9 @@ public abstract class FamiliarFragment extends SherlockFragment {
 		// Clear any results. We don't want them persisting past this fragment, and
 		// they should have been looked at by now anyway
 		getMainActivity().getFragmentResults();
-		addFragmentMenu();
+		if(getMainActivity().mThreePane) {
+			addFragmentMenu();
+		}
 	}
 
 	@Override
@@ -324,7 +326,7 @@ public abstract class FamiliarFragment extends SherlockFragment {
 		mGogglesTask = null;
 	}
 	
-	public static void setKeyboardFocus(Bundle savedInstanceState, final EditText primaryTextField, final boolean selectAll) {
+	public static void setKeyboardFocus(Bundle savedInstanceState, final EditText primaryTextField, final boolean selectAll, long postTime) {
 		if (!(savedInstanceState != null && !savedInstanceState.isEmpty())){
 			(new Handler()).postDelayed(new Runnable() {
 				public void run() {
@@ -335,12 +337,12 @@ public abstract class FamiliarFragment extends SherlockFragment {
 						primaryTextField.selectAll();
 					}
 				}
-			}, 100);
+			}, postTime);
 		}
 	}
 		
 	protected void addFragmentMenu() {
-		if(masterLayout != null && mFragmentMenu != null &&
+		if(getMainActivity().mThreePane && masterLayout != null && mFragmentMenu != null &&
 				masterLayout.findViewWithTag(mFragmentMenu.getTag()) == null) {
 			masterLayout.addView(mFragmentMenu);
 		}

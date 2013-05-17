@@ -132,12 +132,6 @@ public class SearchViewFragment extends FamiliarFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		if(getMainActivity().mThreePane) {
-			getMainActivity().showThreePanes();
-			getMainActivity().attachMiddleFragment(new ResultListFragment(), "result_list", false);
-			getMainActivity().attachRightFragment(new CardViewFragment(), "card_view", false);
-		}
-		
 		// This is necessary to persist the goggles task through rotation
 		this.setRetainInstance(true);
 
@@ -196,6 +190,13 @@ public class SearchViewFragment extends FamiliarFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
+		
+		if(getMainActivity().mThreePane) {
+			getMainActivity().showThreePanes();
+			getMainActivity().attachMiddleFragment(new ResultListFragment(), "result_list", false);
+			getMainActivity().attachRightFragment(new CardViewFragment(), "card_view", false);
+		}
+		
 		View myFragmentView = inflater.inflate(R.layout.search_frag, container, false);
 
 		masterLayout = (LinearLayout)myFragmentView.findViewById(R.id.master_layout);
@@ -420,7 +421,7 @@ public class SearchViewFragment extends FamiliarFragment {
 		}
 		else {
 			if(getMainActivity().findViewById(R.id.left_container).getVisibility() != View.GONE) {
-				setKeyboardFocus(null, namefield, false);
+				setKeyboardFocus(null, namefield, false, 100);
 			}
 		}
 	}
@@ -608,7 +609,7 @@ public class SearchViewFragment extends FamiliarFragment {
 		args.putSerializable(CRITERIA, searchCriteria);
 		
 		if(getMainActivity().mThreePane) {
-			getMainActivity().sendMessageToMiddleFragment(args, true);
+			getMainActivity().sendMessageToMiddleFragment(args);
 		}
 		else {
 			// add a fragment

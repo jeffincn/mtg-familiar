@@ -21,7 +21,6 @@ package com.gelakinetic.mtgfam.activities;
 
 import java.lang.reflect.Field;
 import java.util.Date;
-import java.util.Stack;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -224,7 +223,9 @@ public class MainActivity extends SlidingFragmentActivity {
 		setContentView(R.layout.fragment_activity);
 		getSupportFragmentManager().beginTransaction().replace(R.id.frag_menu, new MenuFragment()).commit();
 
-		if (findViewById(R.id.middle_container) != null) {
+		showOnePane();
+		if (findViewById(R.id.middle_container) != null &&
+				getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 			// The detail container view will be present only in the
 			// large-screen layouts (res/values-large and
 			// res/values-sw600dp). If this view is present, then the
@@ -233,6 +234,10 @@ public class MainActivity extends SlidingFragmentActivity {
 		}
 		else {
 			mThreePane = false;
+			if(findViewById(R.id.middle_container) != null) {
+				findViewById(R.id.middle_container).setVisibility(View.GONE);
+				findViewById(R.id.right_container).setVisibility(View.GONE);
+			}
 		}
 		
 		Intent intent = getIntent();
@@ -559,17 +564,6 @@ public class MainActivity extends SlidingFragmentActivity {
 		if (!updatingDisplay) {
 			startUpdatingDisplay();
 		}
-		
-		if(mThreePane) {
-			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-				if(!displayingOnePane) {
-					showOnlyLeft(true);
-				}
-			}
-			else {
-				showThreePanes();
-			}
-		}
 	}
 
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -586,6 +580,12 @@ public class MainActivity extends SlidingFragmentActivity {
 		super.onPause();
 		updatingDisplay = false;
 		timerHandler.removeCallbacks(timerUpdate);
+		
+		if(!mThreePane && findViewById(R.id.middle_container) != null) {
+			for(int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++) {
+				getSupportFragmentManager().popBackStack();
+			}
+		}
 	}
 
 	/*
@@ -762,21 +762,7 @@ public class MainActivity extends SlidingFragmentActivity {
 			if(getSupportFragmentManager().getBackStackEntryCount() > 0 || !this.isTaskRoot()) {
 				return super.onKeyDown(keyCode, event);
 			}
-			else if(actionHist.size() > 1) {
-				actionHist.pop();
-				switch(actionHist.peek()) {
-				case LEFT:
-					showOnlyLeft(false);
-					break;
-				case MIDDLE:
-					showOnlyMiddle(false);
-					break;
-				case RIGHT:
-					showOnlyRight(false);
-					break;
-				}
-				return true;
-			}			// Else if were at the root, and the SlidingMenu is closed, it should open the menu
+			// Else if were at the root, and the SlidingMenu is closed, it should open the menu
 			else if(!this.getSlidingMenu().isMenuShowing()) {
 				this.getSlidingMenu().showMenu();
 				return true;
@@ -891,16 +877,9 @@ public class MainActivity extends SlidingFragmentActivity {
 	 * Send a message to the fragment in the leftmost container
 	 * @param bundle The message
 	 */
-	public void sendMessageToLeftFragment(Bundle bundle, boolean addToStack) {
+	public void sendMessageToLeftFragment(Bundle bundle) {
 		if (!mThreePane) {
 			return;
-		}
-		if(addToStack) {
-			showOnlyLeft(true);
-		}
-		else {
-			showOnlyLeft(false);
-			actionHist.pop();
 		}
 		((FamiliarFragment) getSupportFragmentManager().findFragmentById(R.id.left_container)).receiveMessage(bundle);
 	}
@@ -909,16 +888,9 @@ public class MainActivity extends SlidingFragmentActivity {
 	 * Send a message to the fragment in the middle container
 	 * @param bundle The message
 	 */
-	public void sendMessageToMiddleFragment(Bundle bundle, boolean addToStack) {
+	public void sendMessageToMiddleFragment(Bundle bundle) {
 		if (!mThreePane) {
 			return;
-		}
-		if(addToStack) {
-			showOnlyMiddle(true);
-		}
-		else {
-			showOnlyMiddle(false);
-			actionHist.pop();
 		}
 		((FamiliarFragment) getSupportFragmentManager().findFragmentById(R.id.middle_container)).receiveMessage(bundle);
 	}
@@ -927,16 +899,9 @@ public class MainActivity extends SlidingFragmentActivity {
 	 * Send a message to the fragment in the rightmost container
 	 * @param bundle The message
 	 */
-	public void sendMessageToRightFragment(Bundle bundle, boolean addToStack) {
+	public void sendMessageToRightFragment(Bundle bundle) {
 		if (!mThreePane) {
 			return;
-		}
-		if(addToStack) {
-			showOnlyRight(true);
-		}
-		else {
-			showOnlyRight(false);
-			actionHist.pop();
 		}
 		((FamiliarFragment) getSupportFragmentManager().findFragmentById(R.id.right_container)).receiveMessage(bundle);
 	}
@@ -948,7 +913,6 @@ public class MainActivity extends SlidingFragmentActivity {
 		if(!mThreePane) {
 			return;
 		}
-		displayingOnePane = false;
 		findViewById(R.id.middle_container).setVisibility(View.VISIBLE);
 		findViewById(R.id.right_container).setVisibility(View.VISIBLE);
 		findViewById(R.id.firstDivider).setVisibility(View.VISIBLE);
@@ -960,7 +924,7 @@ public class MainActivity extends SlidingFragmentActivity {
 	 * Remove the right and middle fragments, if they exist, and set the container and divider visibilities to View.GONE
 	 */
 	public void showOnePane() {
-		if(!mThreePane){
+		if(findViewById(R.id.middle_container) == null){
 			return;
 		}
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -982,54 +946,5 @@ public class MainActivity extends SlidingFragmentActivity {
 		findViewById(R.id.right_container).setVisibility(View.GONE);
 		findViewById(R.id.firstDivider).setVisibility(View.GONE);
 		findViewById(R.id.secondDivider).setVisibility(View.GONE);
-	}
-	
-	public Stack<Integer> actionHist = new Stack<Integer>();
-	private static boolean displayingOnePane;
-	private static final int LEFT = 0;
-	private static final int MIDDLE = 1;
-	private static final int RIGHT = 2;
-	
-	public void showOnlyLeft(boolean push) {
-		displayingOnePane = true;
-
-		findViewById(R.id.left_container).setVisibility(View.VISIBLE);
-		findViewById(R.id.middle_container).setVisibility(View.GONE);
-		findViewById(R.id.right_container).setVisibility(View.GONE);
-		
-		findViewById(R.id.firstDivider).setVisibility(View.GONE);
-		findViewById(R.id.secondDivider).setVisibility(View.GONE);
-		
-		if(push) {
-			actionHist.push(LEFT);
-		}
-	}
-	public void showOnlyMiddle(boolean push) {
-		displayingOnePane = true;
-
-		findViewById(R.id.left_container).setVisibility(View.GONE);
-		findViewById(R.id.middle_container).setVisibility(View.VISIBLE);
-		findViewById(R.id.right_container).setVisibility(View.GONE);
-		
-		findViewById(R.id.firstDivider).setVisibility(View.GONE);
-		findViewById(R.id.secondDivider).setVisibility(View.GONE);
-		
-		if(push) {
-			actionHist.push(MIDDLE);
-		}
-	}
-	public void showOnlyRight(boolean push) {
-		displayingOnePane = true;
-
-		findViewById(R.id.left_container).setVisibility(View.GONE);
-		findViewById(R.id.middle_container).setVisibility(View.GONE);
-		findViewById(R.id.right_container).setVisibility(View.VISIBLE);
-		
-		findViewById(R.id.firstDivider).setVisibility(View.GONE);
-		findViewById(R.id.secondDivider).setVisibility(View.GONE);
-		
-		if(push) {
-			actionHist.push(RIGHT);
-		}
 	}
 }

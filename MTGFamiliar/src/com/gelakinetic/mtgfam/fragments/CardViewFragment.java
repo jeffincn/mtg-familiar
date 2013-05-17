@@ -440,7 +440,7 @@ public class CardViewFragment extends FamiliarFragment {
 					Bundle res = new Bundle();
 					res.putInt("resultCode", RANDOMLEFT);
 					if(getMainActivity().mThreePane) {
-						getMainActivity().sendMessageToMiddleFragment(res, false);
+						getMainActivity().sendMessageToMiddleFragment(res);
 					}
 					else {
 						getMainActivity().setFragmentResult(res);
@@ -453,7 +453,7 @@ public class CardViewFragment extends FamiliarFragment {
 					Bundle res = new Bundle();
 					res.putInt("resultCode", RANDOMRIGHT);
 					if(getMainActivity().mThreePane) {
-						getMainActivity().sendMessageToMiddleFragment(res, false);
+						getMainActivity().sendMessageToMiddleFragment(res);
 					}
 					else {
 						getMainActivity().setFragmentResult(res);
@@ -471,7 +471,7 @@ public class CardViewFragment extends FamiliarFragment {
 					res.putInt("resultCode", SWIPELEFT);
 					res.putLong("lastID", cardID);
 					if(getMainActivity().mThreePane) {
-						getMainActivity().sendMessageToMiddleFragment(res, false);
+						getMainActivity().sendMessageToMiddleFragment(res);
 					}
 					else {
 						getMainActivity().setFragmentResult(res);
@@ -485,7 +485,7 @@ public class CardViewFragment extends FamiliarFragment {
 					res.putInt("resultCode", SWIPERIGHT);
 					res.putLong("lastID", cardID);
 					if(getMainActivity().mThreePane) {
-						getMainActivity().sendMessageToMiddleFragment(res, false);
+						getMainActivity().sendMessageToMiddleFragment(res);
 					}
 					else {
 						getMainActivity().setFragmentResult(res);

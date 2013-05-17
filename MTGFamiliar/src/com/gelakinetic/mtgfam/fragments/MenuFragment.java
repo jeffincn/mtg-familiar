@@ -264,7 +264,6 @@ public class MenuFragment extends ListFragment {
 		for(int i=0; i < mActivity.getSupportFragmentManager().getBackStackEntryCount(); i++) {
 			mActivity.getSupportFragmentManager().popBackStack();
 		}
-		mActivity.actionHist.clear();
 		mActivity.showOnePane();
 		mActivity.attachSingleFragment(fragment, "left_frag", false, true);
 		

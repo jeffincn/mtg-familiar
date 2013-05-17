@@ -38,8 +38,9 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
         android:title="@string/card_view_legality"/>
     <item
         android:id="@+id/cardrulings"
-        android:showAsAction="never"
-        android:title="@string/card_view_rulings" />
+        android:title="@string/card_view_rulings"
+		android:icon="@drawable/menu_rules"
+        android:showAsAction="ifRoom" />
     <item
         android:id="@+id/addtowishlist"
         android:showAsAction="never"

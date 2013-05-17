@@ -229,7 +229,7 @@ public class ResultListFragment extends FamiliarFragment {
 					args.putLong("id", id);
 					args.putBoolean(SearchViewFragment.RANDOM, isRandom);
 					args.putBoolean("isSingle", isSingle);
-					getMainActivity().sendMessageToRightFragment(args, true);
+					getMainActivity().sendMessageToRightFragment(args);
 				}
 				else {
 					startCardViewFrag(id, isRandom, isSingle);
@@ -355,7 +355,7 @@ public class ResultListFragment extends FamiliarFragment {
 				bundle.putLong("id", id);
 				bundle.putBoolean(SearchViewFragment.RANDOM, isRandom);
 				bundle.putBoolean("isSingle", isSingle);
-				getMainActivity().sendMessageToRightFragment(bundle, true);
+				getMainActivity().sendMessageToRightFragment(bundle);
 			} else {
 				startCardViewFrag(id, isRandom, isSingle);
 			}
@@ -369,7 +369,7 @@ public class ResultListFragment extends FamiliarFragment {
 		args.putBoolean(SearchViewFragment.RANDOM, isRandom);
 		args.putBoolean("isSingle", isSingle);
 		if(getMainActivity().mThreePane) {
-			getMainActivity().sendMessageToRightFragment(args, true);
+			getMainActivity().sendMessageToRightFragment(args);
 		}
 		else {
 			CardViewFragment cvFrag = new CardViewFragment();

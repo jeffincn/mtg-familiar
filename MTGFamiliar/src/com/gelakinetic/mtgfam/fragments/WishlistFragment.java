@@ -144,10 +144,22 @@ public class WishlistFragment extends FamiliarFragment {
 					}
 					int numberOf = Integer.parseInt(numberOfFromField);
 
+					
+					boolean foil = foilButton.isChecked();	
+					try {
+						String cardName = namefield.getText().toString();
+						Cursor cards = mDbHelper.fetchCardByName(cardName, new String[]{CardDbAdapter.KEY_SET, CardDbAdapter.KEY_NUMBER, CardDbAdapter.KEY_RARITY});
+						String setCode = cards.getString(cards.getColumnIndex(CardDbAdapter.KEY_SET));
+						if (!TradeListHelpers.canBeFoil(setCode, mDbHelper)){						
+							foil = false;
+						}
+					} catch (FamiliarDbException e1) {
+					}
+					
 					CardData data = mTradeListHelper.new CardData(namefield.getText().toString(), "", "", numberOf, 0, "loading",
 							null, null, null, null, null, null, CardDbAdapter.NOONECARES, '-');
-
-					data.setIsFoil(foilButton.isChecked());
+		
+					data.setIsFoil(foil);
 					
 					try {
 						AddCardOrUpdateSetCounts(data);

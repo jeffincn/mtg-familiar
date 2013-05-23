@@ -1270,6 +1270,22 @@ public class CardDbAdapter {
 
 		return c;
 	}
+	
+	public boolean isModernLegalSet(String setName) throws FamiliarDbException {
+		try {
+			String sql = "SELECT " + KEY_SET + " FROM " + DATABASE_TABLE_LEGAL_SETS + " WHERE " + KEY_SET + " = '" + setName.replace("'", "''") + "';";
+			Cursor c = mDb.rawQuery(sql, null);
+			if (c.getCount() >= 1)
+				return true;
+			else
+				return false;
+			
+		} catch (SQLiteException e) {
+			throw new FamiliarDbException(e);
+		} catch (IllegalStateException e) {
+			throw new FamiliarDbException(e);
+		}
+	}
 
 	public Cursor getRules(int category, int subcategory)
 			throws FamiliarDbException {

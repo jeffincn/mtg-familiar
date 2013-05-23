@@ -1,5 +1,8 @@
 package com.gelakinetic.mtgfam.helpers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 
@@ -51,6 +54,18 @@ public class TradeListHelpers {
 			data.message = database_busy;
 		}
 		return data;
+	}
+	
+	public static boolean canBeFoil(String setCode, CardDbAdapter mDbHelper) throws FamiliarDbException {
+		String[] extraSets = {"US","UL","6E","UD","P3","MM","NE","PY","IN","PS","7E","AP","OD","TO","JU","ON","LE","SC"};
+		ArrayList<String> nonModernLegalSets = new ArrayList<String>(Arrays.asList(extraSets));
+		for (String value : nonModernLegalSets)
+			if (value.equals(setCode))
+				return true;
+		
+		if (mDbHelper.isModernLegalSet(setCode))
+			return true;
+		return false;
 	}
 
 	public class CardData implements Cloneable {

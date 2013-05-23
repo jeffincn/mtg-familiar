@@ -293,7 +293,7 @@ public class WishlistHelpers {
 		}
 		
 		Cursor c = ff.mDbHelper.fetchCardByName(cardName,
-				new String[] { CardDbAdapter.KEY_SET, CardDbAdapter.KEY_NUMBER, CardDbAdapter.KEY_RARITY, CardDbAdapter.KEY_MULTIVERSEID });
+				new String[] { CardDbAdapter.KEY_SET, CardDbAdapter.KEY_NUMBER, CardDbAdapter.KEY_RARITY });
 		// make a place holder item for each version set of this card
 		while (!c.isAfterLast()) {
 			String setCode = c.getString(c
@@ -302,33 +302,18 @@ public class WishlistHelpers {
 			String number = c.getString(c
 					.getColumnIndex(CardDbAdapter.KEY_NUMBER));
 			int rarity = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_RARITY));
-//			int multiverseId = c.getInt(c.getColumnIndex(CardDbAdapter.KEY_MULTIVERSEID));
 
 			if (! setList.contains(setCode)){
 				setList.add(setCode);
 				lCardlist.add(new TradeListHelpers().new CardData(cardName,
 					tcgName, setCode, 0, 0, "loading", number, rarity));
 				
-//				PriceFetchRequest priceRequest = new PriceFetchRequest(cardName, setCode, number, multiverseId, ff.mDbHelper);
-//				ff.getMainActivity().getSpiceManager().execute( priceRequest, cardName + "-" + setCode, DurationInMillis.ONE_DAY, new RequestListener< PriceInfo >(){
-//
-//					@Override
-//			        public void onRequestFailure( SpiceException spiceException ) {
-//			        	Toast.makeText( ff.getMainActivity(), spiceException.getMessage(), Toast.LENGTH_SHORT ).show();
-//			        }
-//
-//			        @Override
-//			        public void onRequestSuccess( final PriceInfo result ) {
-//			        	if (result != null && result.foil_average != 0) {
-			        		CardData newCard = new TradeListHelpers().new CardData(cardName,
-			    					tcgName, setCode, 0, 0, "loading", number, rarity);
-			        		newCard.setIsFoil(true);
-			        		lCardlist.add(newCard);
-//			        	}
-//			        }
-//				} );
-				
-				
+				if (TradeListHelpers.canBeFoil(setCode, ff.mDbHelper)) {
+	        		CardData newCard = new TradeListHelpers().new CardData(cardName,
+	    					tcgName, setCode, 0, 0, "loading", number, rarity);
+	        		newCard.setIsFoil(true);
+	        		lCardlist.add(newCard);
+				}
 			}
 			c.moveToNext();
 		}
@@ -360,18 +345,6 @@ public class WishlistHelpers {
 						}
 					}
 				}
-//				if (lWishlist.get(i).foil){
-//					int position = -1;
-//					for (int j = 0; j < lCardlist.size(); j++) {
-//						if (lCardlist.get(j).setCode.equalsIgnoreCase(lWishlist
-//								.get(i).setCode)) {
-//							position = j;
-//							break;
-//						}
-//					}
-//					lCardlist.add(position+1, lWishlist.get(i));
-//					lCardlist.get(position+1).numberOf = lWishlist.get(i).numberOf;
-//				}
 			}
 		}
 		if(opened) {

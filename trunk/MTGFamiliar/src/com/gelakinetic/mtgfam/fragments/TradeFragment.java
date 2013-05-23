@@ -91,6 +91,7 @@ public class TradeFragment extends FamiliarFragment {
 	public static final String		fetch_failed					= "Fetch Failed";
 	public static final String		number_of_invalid			= "Number of Cards Invalid";
 	public static final String		card_corrupted					= "Card Data corrupted, discarding.";
+	public static final String		cannot_be_foil				= 	"Removing Foil - Card set does not match those printed for foil.";
 
 	private static final String		autosaveName					= "autosave";
 	private static final String		tradeExtension				= ".trade";
@@ -186,6 +187,13 @@ public class TradeFragment extends FamiliarFragment {
 						numberfield.setText("1");
 						return;
 					}
+					try {
+						if (foil && !TradeListHelpers.canBeFoil(setCode, mDbHelper)){
+							Toast.makeText(getActivity(), cannot_be_foil, Toast.LENGTH_LONG).show();
+							foil = false;
+						}
+					} catch (FamiliarDbException e) {}
+					
 					final CardData data = mTradeListHelper.new CardData(cardName, tcgName, setCode, numberOf, 0, "loading", cardNumber, '-', false, foil);
 					
 					lTradeLeft.add(0, data);
@@ -230,6 +238,13 @@ public class TradeFragment extends FamiliarFragment {
 						numberfield.setText("1");
 						return;
 					}
+					try {
+						if (foil && !TradeListHelpers.canBeFoil(setCode, mDbHelper)){
+							Toast.makeText(getActivity(), cannot_be_foil, Toast.LENGTH_LONG).show();
+							foil = false;
+						}
+					} catch (FamiliarDbException e) {}
+					
 					CardData data = mTradeListHelper.new CardData(cardName, tcgName, setCode, numberOf, 0, "loading", cardNumber,'-', false, foil);
 
 					lTradeRight.add(0, data);
@@ -445,6 +460,12 @@ public class TradeFragment extends FamiliarFragment {
 								}
 								
 								lSide.get(position).foil = foilbtn.isChecked();
+								try {
+									if (lSide.get(position).foil && !TradeListHelpers.canBeFoil(lSide.get(position).setCode, mDbHelper)){
+										Toast.makeText(getActivity(), cannot_be_foil, Toast.LENGTH_LONG).show();
+										lSide.get(position).foil = false;
+									}
+								} catch (FamiliarDbException e) {}
 								if (foil != foilbtn.isChecked()){
 									loadPrice(lSide.get(position), aaSide);
 								}

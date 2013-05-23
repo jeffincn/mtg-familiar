@@ -31,7 +31,7 @@
     <string name="update_notification">Recherche de mise à jour des données</string>
     <string name="update_updating_set">Ajout de %s…</string>
     <string name="update_updating_rules">Mise à jour des règles complètes…</string>
-    <string name="update_added">Ajouté</string>
+    <string name="update_added">Ajout :</string>
     <string name="update_added_rules">nouvelles règles complètes</string>
     <string name="update_parse_cards">Analyse de %s</string>
     <string name="update_parse_rules">Analyse des règles complètes</string>

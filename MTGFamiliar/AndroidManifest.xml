@@ -91,6 +91,11 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/mtgfamiliar_appwidget_info" />
         </receiver>
+        
     </application>
 
+    <instrumentation
+	    android:name="android.test.InstrumentationTestRunner"
+	    android:label="Tests for MTG Familiar"
+	    android:targetPackage="com.gelakinetic.mtgfam" />
 </manifest>

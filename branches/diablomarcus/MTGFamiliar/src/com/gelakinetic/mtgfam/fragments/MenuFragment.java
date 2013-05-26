@@ -1,38 +1,18 @@
 package com.gelakinetic.mtgfam.fragments;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
+import java.io.*;
+import java.util.*;
+import java.util.zip.*;
 
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.support.v4.app.ListFragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.content.*;
+import android.os.*;
+import android.support.v4.app.*;
+import android.view.*;
+import android.widget.*;
 
-import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.activities.MainActivity;
-import com.gelakinetic.mtgfam.activities.PreferencesActivity;
-import com.gelakinetic.mtgfam.helpers.DbUpdaterService;
+import com.gelakinetic.mtgfam.*;
+import com.gelakinetic.mtgfam.activities.*;
+import com.gelakinetic.mtgfam.helpers.*;
 
 public class MenuFragment extends ListFragment {
 
@@ -40,22 +20,23 @@ public class MenuFragment extends ListFragment {
 	private SlidingMenuAdapter mAdapter;
 
 	public MenuFragment() {
-		/* http://developer.android.com/reference/android/app/Fragment.html
-		 * All subclasses of Fragment must include a public empty constructor.
-		 * The framework will often re-instantiate a fragment class when needed,
-		 * in particular during state restore, and needs to be able to find this constructor
-		 * to instantiate it. If the empty constructor is not available, a runtime exception
-		 * will occur in some cases during state restore. 
+		/*
+		 * http://developer.android.com/reference/android/app/Fragment.html All
+		 * subclasses of Fragment must include a public empty constructor. The
+		 * framework will often re-instantiate a fragment class when needed, in
+		 * particular during state restore, and needs to be able to find this
+		 * constructor to instantiate it. If the empty constructor is not
+		 * available, a runtime exception will occur in some cases during state
+		 * restore.
 		 */
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
 		// TODO just to be safe?
-		if (!(getActivity() instanceof MainActivity)) {			
-			throw new IllegalStateException(
-					"MenuFragment must be attached to an instance of MainActivity");
+		if (!(getActivity() instanceof MainActivity)) {
+			throw new IllegalStateException("MenuFragment must be attached to an instance of MainActivity");
 		}
 		mActivity = (MainActivity) getActivity();
 		// add everything
@@ -67,6 +48,7 @@ public class MenuFragment extends ListFragment {
 		mAdapter.addItem(R.string.main_dice, R.drawable.dice_icon);
 		mAdapter.addItem(R.string.main_trade, R.drawable.trade_icon);
 		mAdapter.addItem(R.string.main_wishlist, R.drawable.wishlist_icon);
+		mAdapter.addItem(R.string.main_collection, R.drawable.rules_icon);
 		mAdapter.addItem(R.string.main_timer, R.drawable.round_timer_icon);
 		mAdapter.addItem(R.string.main_rules, R.drawable.rules_icon);
 		mAdapter.addItem(R.string.main_judges_corner, R.drawable.judge_icon);
@@ -83,8 +65,7 @@ public class MenuFragment extends ListFragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.sliding_menu_list, null);
 	}
 
@@ -113,6 +94,9 @@ public class MenuFragment extends ListFragment {
 			break;
 		case R.string.main_timer:
 			fragment = new RoundTimerFragment();
+			break;
+		case R.string.main_collection:
+			fragment = new CollectionFragment();
 			break;
 		case R.string.main_rules:
 			fragment = new RulesFragment();
@@ -160,14 +144,14 @@ public class MenuFragment extends ListFragment {
 
 			File sdCard = Environment.getExternalStorageDirectory();
 			File zipOut = new File(sdCard, "MTGFamiliarBackup.zip");
-			if(zipOut.exists()) {
+			if (zipOut.exists()) {
 				zipOut.delete();
 			}
 			try {
 				zipIt(zipOut, files);
 				Toast.makeText(mActivity, getString(R.string.main_export_success) + " " + zipOut.getAbsolutePath(), Toast.LENGTH_SHORT).show();
 			} catch (IOException e) {
-				Toast.makeText(mActivity, getString(R.string.main_export_fail), Toast.LENGTH_SHORT).show();				
+				Toast.makeText(mActivity, getString(R.string.main_export_fail), Toast.LENGTH_SHORT).show();
 			}
 			mActivity.showContent();
 			break;
@@ -177,14 +161,13 @@ public class MenuFragment extends ListFragment {
 			switchContent(fragment);
 		}
 	}
-	
+
 	ArrayList<File> findAllFiles(File dir) {
-		ArrayList<File> files = new  ArrayList<File>();
-		for(File tmp : dir.listFiles()) {
-			if(tmp.isDirectory()) {
+		ArrayList<File> files = new ArrayList<File>();
+		for (File tmp : dir.listFiles()) {
+			if (tmp.isDirectory()) {
 				files.addAll(findAllFiles(tmp));
-			}
-			else {
+			} else {
 				files.add(tmp);
 			}
 		}
@@ -207,19 +190,18 @@ public class MenuFragment extends ListFragment {
 			}
 			String[] path = entry.getName().split("/");
 			String pathCat = "";
-			if(path.length > 1) {
-				for(int i=0; i < path.length-1; i++) {
+			if (path.length > 1) {
+				for (int i = 0; i < path.length - 1; i++) {
 					pathCat += path[i] + "/";
 					File tmp = new File(mActivity.getFilesDir(), pathCat);
-					if(!tmp.exists()) {
+					if (!tmp.exists()) {
 						tmp.mkdir();
 					}
 				}
 			}
 
 			InputStream in = zipFile.getInputStream(entry);
-			OutputStream out = new BufferedOutputStream(new FileOutputStream(
-					new File(mActivity.getFilesDir(), entry.getName())));
+			OutputStream out = new BufferedOutputStream(new FileOutputStream(new File(mActivity.getFilesDir(), entry.getName())));
 			byte[] buffer = new byte[1024];
 			int len;
 			while ((len = in.read(buffer)) >= 0) {
@@ -239,7 +221,7 @@ public class MenuFragment extends ListFragment {
 
 		FileOutputStream fos = new FileOutputStream(zipFile);
 		ZipOutputStream zos = new ZipOutputStream(fos);
-		int fileDirLen = (int) mActivity.getFilesDir().getAbsolutePath().length()+1;
+		int fileDirLen = (int) mActivity.getFilesDir().getAbsolutePath().length() + 1;
 		for (File file : files) {
 			ZipEntry ze = new ZipEntry(file.getAbsolutePath().substring(fileDirLen));
 			zos.putNextEntry(ze);
@@ -258,23 +240,23 @@ public class MenuFragment extends ListFragment {
 	}
 
 	public void switchContent(final FamiliarFragment fragment) {
-		
+
 		// Clear the backstack, otherwise replacing a cardview after a search
 		// messes up the hierarchy
-		for(int i=0; i < mActivity.getSupportFragmentManager().getBackStackEntryCount(); i++) {
+		for (int i = 0; i < mActivity.getSupportFragmentManager().getBackStackEntryCount(); i++) {
 			mActivity.getSupportFragmentManager().popBackStack();
 		}
 		mActivity.showOnePane();
-				
+
 		mActivity.attachSingleFragment(fragment, "left_frag", false, true);
-		
+
 		Handler h = new Handler();
 		h.postDelayed(new Runnable() {
 			public void run() {
 				mActivity.getSlidingMenu().showContent();
 			}
 		}, 50);
-	}	
+	}
 
 	private class SlidingMenuItem {
 		public int title;
@@ -325,15 +307,11 @@ public class MenuFragment extends ListFragment {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			SlidingMenuItem item = getItem(position);
 			if (convertView == null) {
-				int layout = item.isHeader ? R.layout.sliding_menu_header
-						: R.layout.sliding_menu_item;
-				convertView = LayoutInflater.from(getContext()).inflate(layout,
-						null);
+				int layout = item.isHeader ? R.layout.sliding_menu_header : R.layout.sliding_menu_item;
+				convertView = LayoutInflater.from(getContext()).inflate(layout, null);
 			}
-			((TextView) convertView.findViewById(R.id.menu_title))
-					.setText(item.title);
-			ImageView icon = (ImageView) convertView
-					.findViewById(R.id.menu_icon);
+			((TextView) convertView.findViewById(R.id.menu_title)).setText(item.title);
+			ImageView icon = (ImageView) convertView.findViewById(R.id.menu_icon);
 			if (icon != null) {
 				if (item.icon > 0) {
 					icon.setVisibility(View.VISIBLE);

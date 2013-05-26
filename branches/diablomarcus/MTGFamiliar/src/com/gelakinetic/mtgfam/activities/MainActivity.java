@@ -19,75 +19,39 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam.activities;
 
-import java.lang.reflect.Field;
-import java.util.Date;
+import java.lang.reflect.*;
+import java.util.*;
 
-import android.app.AlertDialog;
+import android.app.*;
 import android.app.AlertDialog.Builder;
-import android.app.Dialog;
-import android.app.Instrumentation;
-import android.app.SearchManager;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
+import android.content.*;
 import android.content.DialogInterface.OnClickListener;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageInfo;
+import android.content.pm.*;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.os.SystemClock;
+import android.net.*;
+import android.os.*;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.text.method.LinkMovementMethod;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewConfiguration;
-import android.view.ViewGroup;
+import android.text.method.*;
+import android.view.*;
 import android.view.WindowManager.LayoutParams;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.view.inputmethod.*;
+import android.widget.*;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.*;
+import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.gelakinetic.mtgfam.R;
-import com.gelakinetic.mtgfam.fragments.CardViewFragment;
-import com.gelakinetic.mtgfam.fragments.DiceFragment;
-import com.gelakinetic.mtgfam.fragments.FamiliarDialogFragment;
-import com.gelakinetic.mtgfam.fragments.FamiliarFragment;
-import com.gelakinetic.mtgfam.fragments.JudgesCornerFragment;
-import com.gelakinetic.mtgfam.fragments.LifeFragment;
-import com.gelakinetic.mtgfam.fragments.ManaPoolFragment;
-import com.gelakinetic.mtgfam.fragments.MenuFragment;
-import com.gelakinetic.mtgfam.fragments.MoJhoStoFragment;
-import com.gelakinetic.mtgfam.fragments.ResultListFragment;
-import com.gelakinetic.mtgfam.fragments.RoundTimerFragment;
-import com.gelakinetic.mtgfam.fragments.RulesFragment;
-import com.gelakinetic.mtgfam.fragments.SearchViewFragment;
+import com.gelakinetic.mtgfam.fragments.*;
 import com.gelakinetic.mtgfam.fragments.SearchViewFragment.SearchCriteria;
-import com.gelakinetic.mtgfam.fragments.SearchWidgetFragment;
-import com.gelakinetic.mtgfam.fragments.TradeFragment;
-import com.gelakinetic.mtgfam.fragments.WishlistFragment;
-import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
-import com.gelakinetic.mtgfam.helpers.DbUpdaterService;
-import com.gelakinetic.mtgfam.helpers.ImageGetterHelper;
-import com.gelakinetic.mtgfam.helpers.PreferencesAdapter;
-import com.gelakinetic.mtgfam.helpers.PriceFetchService;
-import com.gelakinetic.mtgfam.helpers.RoundTimerService;
-import com.octo.android.robospice.SpiceManager;
-import com.slidingmenu.lib.SlidingMenu;
+import com.gelakinetic.mtgfam.helpers.*;
+import com.octo.android.robospice.*;
+import com.slidingmenu.lib.*;
 import com.slidingmenu.lib.SlidingMenu.OnOpenedListener;
-import com.slidingmenu.lib.app.SlidingFragmentActivity;
+import com.slidingmenu.lib.app.*;
 
 public class MainActivity extends SlidingFragmentActivity {
 
@@ -104,7 +68,7 @@ public class MainActivity extends SlidingFragmentActivity {
 
 	protected static MainActivity me;
 	private PreferencesAdapter prefAdapter;
-	
+
 	public FragmentManager mFragmentManager;
 	private Bundle mFragResults;
 	private boolean bounceMenu = false;
@@ -112,31 +76,31 @@ public class MainActivity extends SlidingFragmentActivity {
 	/*
 	 * Robospice setup
 	 */
-	private SpiceManager spiceManager = new SpiceManager( PriceFetchService.class );
-    
-    @Override
-    protected void onStart() {
-        super.onStart();
-        spiceManager.start( this );
-    }
+	private SpiceManager spiceManager = new SpiceManager(PriceFetchService.class);
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        spiceManager.shouldStop();
-    }
+	@Override
+	protected void onStart() {
+		super.onStart();
+		spiceManager.start(this);
+	}
 
-    public SpiceManager getSpiceManager() {
-        return spiceManager;
-    }
-    
-    /*
-     * End Robospice
-     */
-	  
-	public static final int DEVICE_VERSION   = Build.VERSION.SDK_INT;
+	@Override
+	protected void onStop() {
+		super.onStop();
+		spiceManager.shouldStop();
+	}
+
+	public SpiceManager getSpiceManager() {
+		return spiceManager;
+	}
+
+	/*
+	 * End Robospice
+	 */
+
+	public static final int DEVICE_VERSION = Build.VERSION.SDK_INT;
 	public static final int DEVICE_HONEYCOMB = Build.VERSION_CODES.HONEYCOMB;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -153,17 +117,16 @@ public class MainActivity extends SlidingFragmentActivity {
 				// Ignore
 			}
 		}
-	    
+
 		mFragmentManager = getSupportFragmentManager();
 
 		try {
 			pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-		}
-		catch (NameNotFoundException e) {
+		} catch (NameNotFoundException e) {
 			pInfo = null;
 		}
-		
-		if(prefAdapter == null) {
+
+		if (prefAdapter == null) {
 			prefAdapter = new PreferencesAdapter(this);
 		}
 
@@ -171,7 +134,9 @@ public class MainActivity extends SlidingFragmentActivity {
 		if (pInfo.versionCode != lastVersion) {
 			showDialogFragment(CHANGELOGDIALOG);
 			prefAdapter.setLastVersion(pInfo.versionCode);
-			bounceMenu = lastVersion <= 15; //Only bounce if the last version is 1.8.1 or lower (or a fresh install) 
+			bounceMenu = lastVersion <= 15; // Only bounce if the last version
+											// is 1.8.1 or lower (or a fresh
+											// install)
 		}
 
 		ActionBar actionBar = getSupportActionBar();
@@ -219,7 +184,7 @@ public class MainActivity extends SlidingFragmentActivity {
 				hideKeyboard();
 			}
 		});
-		
+
 		setContentView(R.layout.fragment_activity);
 		getSupportFragmentManager().beginTransaction().replace(R.id.frag_menu, new MenuFragment()).commit();
 
@@ -229,15 +194,15 @@ public class MainActivity extends SlidingFragmentActivity {
 			// res/values-sw600dp). If this view is present, then the
 			// activity should be in two-pane mode.
 			mThreePane = true;
-		}
-		else {
+		} else {
 			mThreePane = false;
 		}
-		
+
 		Intent intent = getIntent();
 
 		if (Intent.ACTION_VIEW.equals(intent.getAction())) {
-			// handles a click on a search suggestion; launches activity to show word
+			// handles a click on a search suggestion; launches activity to show
+			// word
 			Uri u = intent.getData();
 			long id = Long.parseLong(u.getLastPathSegment());
 
@@ -250,8 +215,7 @@ public class MainActivity extends SlidingFragmentActivity {
 
 			attachSingleFragment(rlFrag, "left_frag", false, false);
 			hideKeyboard();
-		}
-		else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+		} else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
 			boolean consolidate = prefAdapter.getConsolidateSearch();
 			String query = intent.getStringExtra(SearchManager.QUERY);
 			SearchCriteria sc = new SearchCriteria();
@@ -267,8 +231,7 @@ public class MainActivity extends SlidingFragmentActivity {
 
 			attachSingleFragment(rlFrag, "left_frag", false, false);
 			hideKeyboard();
-		}
-		else {
+		} else {
 			if (savedInstanceState == null) {
 				String action = getIntent().getAction();
 
@@ -277,46 +240,36 @@ public class MainActivity extends SlidingFragmentActivity {
 				FamiliarFragment frag;
 				if (defaultFragment.equals(this.getString(R.string.main_card_search))) {
 					frag = new SearchViewFragment();
-				}
-				else if (defaultFragment.equals(this.getString(R.string.main_life_counter))) {
+				} else if (defaultFragment.equals(this.getString(R.string.main_life_counter))) {
 					frag = new LifeFragment();
-				}
-				else if (defaultFragment.equals(this.getString(R.string.main_mana_pool))) {
+				} else if (defaultFragment.equals(this.getString(R.string.main_mana_pool))) {
 					frag = new ManaPoolFragment();
-				}
-				else if (defaultFragment.equals(this.getString(R.string.main_dice))) {
+				} else if (defaultFragment.equals(this.getString(R.string.main_dice))) {
 					frag = new DiceFragment();
-				}
-				else if (defaultFragment.equals(this.getString(R.string.main_trade))) {
+				} else if (defaultFragment.equals(this.getString(R.string.main_trade))) {
 					frag = new TradeFragment();
-				}
-				else if (defaultFragment.equals(this.getString(R.string.main_wishlist))) {
+				} else if (defaultFragment.equals(this.getString(R.string.main_wishlist))) {
 					frag = new WishlistFragment();
-				}
-				else if (defaultFragment.equals(this.getString(R.string.main_timer))) {
+				} else if (defaultFragment.equals(this.getString(R.string.main_timer))) {
 					frag = new RoundTimerFragment();
-				}
-				else if (defaultFragment.equals(this.getString(R.string.main_rules))) {
+				} else if (defaultFragment.equals(this.getString(R.string.main_rules))) {
 					frag = new RulesFragment();
-				}
-				else if (defaultFragment.equals(this.getString(R.string.main_judges_corner))) {
+				} else if (defaultFragment.equals(this.getString(R.string.main_judges_corner))) {
 					frag = new JudgesCornerFragment();
-				}
-				else if (defaultFragment.equals(this.getString(R.string.main_mojhosto))) {
+				} else if (defaultFragment.equals(this.getString(R.string.main_mojhosto))) {
 					frag = new MoJhoStoFragment();
-				}
-				else {
+				} else if (defaultFragment.equals(this.getString(R.string.main_collection))) {
+					frag = new CollectionFragment();
+				} else {
 					frag = new SearchViewFragment();
 				}
 
 				if (action != null) {
 					if (action.equals(ACTION_FULL_SEARCH)) {
 						frag = new SearchViewFragment();
-					}
-					else if (action.equals(ACTION_WIDGET_SEARCH)) {
+					} else if (action.equals(ACTION_WIDGET_SEARCH)) {
 						frag = new SearchWidgetFragment();
-					}
-					else if (action.equals(ACTION_ROUND_TIMER)) {
+					} else if (action.equals(ACTION_ROUND_TIMER)) {
 						frag = new RoundTimerFragment();
 					}
 				}
@@ -339,12 +292,12 @@ public class MainActivity extends SlidingFragmentActivity {
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
 			switch (msg.arg1) {
-				case OPEN:
-					me.showMenu();
-					break;
-				case CLOSE:
-					me.showContent();
-					break;
+			case OPEN:
+				me.showMenu();
+				break;
+			case CLOSE:
+				me.showContent();
+				break;
 			}
 		}
 	};
@@ -384,10 +337,10 @@ public class MainActivity extends SlidingFragmentActivity {
 							msg.arg1 = CLOSE;
 							bounceHandler.sendMessage(msg);
 							runOnUiThread(new Runnable() {
-								
+
 								@Override
 								public void run() {
-									getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_UNSPECIFIED);									
+									getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_UNSPECIFIED);
 								}
 							});
 						}
@@ -401,94 +354,94 @@ public class MainActivity extends SlidingFragmentActivity {
 			@Override
 			public Dialog onCreateDialog(Bundle savedInstanceState) {
 				switch (id) {
-					case DONATEDIALOG: {
-						AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
-						builder.setTitle(R.string.main_donate_dialog_title);
-						builder.setNeutralButton(R.string.dialog_thanks_anyway, new DialogInterface.OnClickListener() {
+				case DONATEDIALOG: {
+					AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+					builder.setTitle(R.string.main_donate_dialog_title);
+					builder.setNeutralButton(R.string.dialog_thanks_anyway, new DialogInterface.OnClickListener() {
 
-							public void onClick(DialogInterface dialog, int id) {
-								dialog.cancel();
-							}
-						});
-
-						LayoutInflater inflater = this.getActivity().getLayoutInflater();
-						View dialoglayout = inflater.inflate(R.layout.about_dialog, (ViewGroup)findViewById(R.id.dialog_layout_root));
-
-						TextView text = (TextView)dialoglayout.findViewById(R.id.aboutfield);
-						text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.main_donate_text)));
-						text.setMovementMethod(LinkMovementMethod.getInstance());
-
-						text.setTextSize(15);
-
-						ImageView paypal = (ImageView)dialoglayout.findViewById(R.id.imageview1);
-						paypal.setImageResource(R.drawable.paypal);
-						paypal.setOnClickListener(new View.OnClickListener() {
-
-							public void onClick(View v) {
-								Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri
-										.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=SZK4TAH2XBZNC&lc=US&item_name=MTG%20Familiar&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted"));
-
-								startActivity(myIntent);
-							}
-						});
-						((ImageView)dialoglayout.findViewById(R.id.imageview2)).setVisibility(View.GONE);
-
-						builder.setView(dialoglayout);
-						return builder.create();
-					}
-					case ABOUTDIALOG: {
-						AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
-
-						// You have to catch the exception because the package stuff is all
-						// run-time
-						if (pInfo != null) {
-							builder.setTitle(getString(R.string.main_about) + " " + getString(R.string.app_name) + " " + pInfo.versionName);
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.cancel();
 						}
-						else {
-							builder.setTitle(getString(R.string.main_about) + " " + getString(R.string.app_name));
+					});
+
+					LayoutInflater inflater = this.getActivity().getLayoutInflater();
+					View dialoglayout = inflater.inflate(R.layout.about_dialog, (ViewGroup) findViewById(R.id.dialog_layout_root));
+
+					TextView text = (TextView) dialoglayout.findViewById(R.id.aboutfield);
+					text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.main_donate_text)));
+					text.setMovementMethod(LinkMovementMethod.getInstance());
+
+					text.setTextSize(15);
+
+					ImageView paypal = (ImageView) dialoglayout.findViewById(R.id.imageview1);
+					paypal.setImageResource(R.drawable.paypal);
+					paypal.setOnClickListener(new View.OnClickListener() {
+
+						public void onClick(View v) {
+							Intent myIntent = new Intent(
+									Intent.ACTION_VIEW,
+									Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=SZK4TAH2XBZNC&lc=US&item_name=MTG%20Familiar&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted"));
+
+							startActivity(myIntent);
 						}
+					});
+					((ImageView) dialoglayout.findViewById(R.id.imageview2)).setVisibility(View.GONE);
 
-						builder.setNeutralButton(R.string.dialog_thanks, new DialogInterface.OnClickListener() {
+					builder.setView(dialoglayout);
+					return builder.create();
+				}
+				case ABOUTDIALOG: {
+					AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
 
-							public void onClick(DialogInterface dialog, int id) {
-								dialog.cancel();
-							}
-						});
-
-						LayoutInflater inflater = this.getActivity().getLayoutInflater();
-						View dialoglayout = inflater.inflate(R.layout.about_dialog, (ViewGroup)findViewById(R.id.dialog_layout_root));
-
-						TextView text = (TextView)dialoglayout.findViewById(R.id.aboutfield);
-						text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.main_about_text)));
-						text.setMovementMethod(LinkMovementMethod.getInstance());
-
-						builder.setView(dialoglayout);
-						return builder.create();
+					// You have to catch the exception because the package stuff
+					// is all
+					// run-time
+					if (pInfo != null) {
+						builder.setTitle(getString(R.string.main_about) + " " + getString(R.string.app_name) + " " + pInfo.versionName);
+					} else {
+						builder.setTitle(getString(R.string.main_about) + " " + getString(R.string.app_name));
 					}
-					case CHANGELOGDIALOG: {
-						AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
 
-						if (pInfo != null) {
-							builder.setTitle(getString(R.string.main_whats_new_in_title) +  " " + pInfo.versionName);
+					builder.setNeutralButton(R.string.dialog_thanks, new DialogInterface.OnClickListener() {
+
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.cancel();
 						}
-						else {
-							builder.setTitle(R.string.main_whats_new_title);
+					});
+
+					LayoutInflater inflater = this.getActivity().getLayoutInflater();
+					View dialoglayout = inflater.inflate(R.layout.about_dialog, (ViewGroup) findViewById(R.id.dialog_layout_root));
+
+					TextView text = (TextView) dialoglayout.findViewById(R.id.aboutfield);
+					text.setText(ImageGetterHelper.jellyBeanHack(getString(R.string.main_about_text)));
+					text.setMovementMethod(LinkMovementMethod.getInstance());
+
+					builder.setView(dialoglayout);
+					return builder.create();
+				}
+				case CHANGELOGDIALOG: {
+					AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+
+					if (pInfo != null) {
+						builder.setTitle(getString(R.string.main_whats_new_in_title) + " " + pInfo.versionName);
+					} else {
+						builder.setTitle(R.string.main_whats_new_title);
+					}
+
+					builder.setNeutralButton(R.string.dialog_enjoy, new DialogInterface.OnClickListener() {
+
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.cancel();
 						}
+					});
 
-						builder.setNeutralButton(R.string.dialog_enjoy, new DialogInterface.OnClickListener() {
-
-							public void onClick(DialogInterface dialog, int id) {
-								dialog.cancel();
-							}
-						});
-
-						builder.setMessage(ImageGetterHelper.jellyBeanHack(getString(R.string.main_whats_new_text)));
-						return builder.create();
-					}
-					default: {
-						savedInstanceState.putInt("id", id);
-						return super.onCreateDialog(savedInstanceState);
-					}
+					builder.setMessage(ImageGetterHelper.jellyBeanHack(getString(R.string.main_whats_new_text)));
+					return builder.create();
+				}
+				default: {
+					savedInstanceState.putInt("id", id);
+					return super.onCreateDialog(savedInstanceState);
+				}
 				}
 			}
 		};
@@ -497,20 +450,18 @@ public class MainActivity extends SlidingFragmentActivity {
 
 	public void hideKeyboard() {
 		try {
-			InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(getCurrentFocus().getApplicationWindowToken(), 0);
-		}
-		catch (NullPointerException e) {
+		} catch (NullPointerException e) {
 			// eat it
 		}
 	}
-	
+
 	public void showKeyboard(View v) {
 		try {
-			InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.showSoftInput(v, 0);
-		}
-		catch (NullPointerException e) {
+		} catch (NullPointerException e) {
 			// eat it
 		}
 	}
@@ -522,17 +473,15 @@ public class MainActivity extends SlidingFragmentActivity {
 			unregisterReceiver(endTimeReceiver);
 			unregisterReceiver(startTimeReceiver);
 			unregisterReceiver(cancelTimeReceiver);
-			
+
 			if (endTime > SystemClock.elapsedRealtime()) {
-				//Timer Active
+				// Timer Active
 			} else {
 				Intent i = new Intent(this, RoundTimerService.class);
 				stopService(i);
 			}
-				
-			
-		}
-		catch (IllegalArgumentException e) {
+
+		} catch (IllegalArgumentException e) {
 			// EAT IT
 		}
 	}
@@ -557,9 +506,9 @@ public class MainActivity extends SlidingFragmentActivity {
 
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			case android.R.id.home:
-				toggle();
-				return true;
+		case android.R.id.home:
+			toggle();
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -572,8 +521,8 @@ public class MainActivity extends SlidingFragmentActivity {
 	}
 
 	/*
-	 * Always add a virtual search key to the menu on the actionbar super.onCreateOptionsMenu should always be called
-	 * from FamiliarActivities
+	 * Always add a virtual search key to the menu on the actionbar
+	 * super.onCreateOptionsMenu should always be called from FamiliarActivities
 	 */
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(R.string.name_search_hint).setIcon(R.drawable.menu_search).setOnMenuItemClickListener(new OnMenuItemClickListener() {
@@ -586,9 +535,9 @@ public class MainActivity extends SlidingFragmentActivity {
 					public void run() {
 						try {
 							new Instrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_SEARCH);
-						}
-						catch (java.lang.SecurityException e) {
-							// apparently this can inject an event into another app if the user switches fast enough
+						} catch (java.lang.SecurityException e) {
+							// apparently this can inject an event into another
+							// app if the user switches fast enough
 						}
 					}
 				}).start();
@@ -615,8 +564,7 @@ public class MainActivity extends SlidingFragmentActivity {
 			if (endTime > SystemClock.elapsedRealtime()) {
 				displayTimeLeft();
 				timerHandler.postDelayed(timerUpdate, 200);
-			}
-			else {
+			} else {
 				stopUpdatingDisplay();
 			}
 		}
@@ -671,11 +619,11 @@ public class MainActivity extends SlidingFragmentActivity {
 
 		if (timeLeftMillis <= 0) {
 			timeLeftStr = "00:00:00";
-		}
-		else {
+		} else {
 			long timeLeftInSecs = (timeLeftMillis / 1000);
 
-			// This is a slight hack to handle the fact that it always rounds down. It
+			// This is a slight hack to handle the fact that it always rounds
+			// down. It
 			// makes the clock look much nicer this way.
 			timeLeftInSecs++;
 
@@ -747,8 +695,7 @@ public class MainActivity extends SlidingFragmentActivity {
 		 * This is for ForceOverflow
 		 */
 		if (DEVICE_VERSION < DEVICE_HONEYCOMB) {
-			if (event.getAction() == KeyEvent.ACTION_UP
-					&& keyCode == KeyEvent.KEYCODE_MENU) {
+			if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_MENU) {
 				openOptionsMenu();
 				return true;
 			}
@@ -761,34 +708,35 @@ public class MainActivity extends SlidingFragmentActivity {
 		if (keyCode == KeyEvent.KEYCODE_SEARCH) {
 			// Send the search key to the leftmost fragment
 			Fragment f = mFragmentManager.findFragmentById(R.id.left_container);
-			if (((FamiliarFragment)f).onInterceptSearchKey() == false) {
+			if (((FamiliarFragment) f).onInterceptSearchKey() == false) {
 				return super.onKeyDown(keyCode, event);
-			}
-			else {
+			} else {
 				return true;
 			}
-		}
-		else if (keyCode == KeyEvent.KEYCODE_BACK) {
-			// If we're not at the root of a hierarchy, the back button should do as it pleases
-			if(getSupportFragmentManager().getBackStackEntryCount() > 0 || !this.isTaskRoot()) {
+		} else if (keyCode == KeyEvent.KEYCODE_BACK) {
+			// If we're not at the root of a hierarchy, the back button should
+			// do as it pleases
+			if (getSupportFragmentManager().getBackStackEntryCount() > 0 || !this.isTaskRoot()) {
 				return super.onKeyDown(keyCode, event);
 			}
-			// Else if were at the root, and the SlidingMenu is closed, it should open the menu
-			else if(!this.getSlidingMenu().isMenuShowing()) {
+			// Else if were at the root, and the SlidingMenu is closed, it
+			// should open the menu
+			else if (!this.getSlidingMenu().isMenuShowing()) {
 				this.getSlidingMenu().showMenu();
 				return true;
 			}
 			// If the SlidingMenu is open, it should close the app
 			else {
-				return super.onKeyDown(keyCode, event);				
+				return super.onKeyDown(keyCode, event);
 			}
 		}
 		return super.onKeyDown(keyCode, event);
 	}
-	
+
 	public PreferencesAdapter getPreferencesAdapter() {
-		// On rotations, this could get called from a fragment's onCreateView before the activity's onCreate. Weird
-		if(this.prefAdapter == null) {
+		// On rotations, this could get called from a fragment's onCreateView
+		// before the activity's onCreate. Weird
+		if (this.prefAdapter == null) {
 			this.prefAdapter = new PreferencesAdapter(this);
 		}
 		return this.prefAdapter;
@@ -797,33 +745,38 @@ public class MainActivity extends SlidingFragmentActivity {
 	public void showDbErrorToast() {
 		try {
 			Toast.makeText(this, getString(R.string.error_database), Toast.LENGTH_LONG).show();
-		} 
-		catch (RuntimeException re) {
+		} catch (RuntimeException re) {
 			// Eat it; this will happen if we try to toast in a non-UI thread.
 			// It can happen when we get an error in autocomplete.
 		}
 	}
-	
+
 	/********************************
-	 *                              *
-	 *    Three Pane Management     *
-	 *                              *
+	 * * Three Pane Management * *
 	 ********************************/
-	
+
 	/**
 	 * 
-	 * @param containerId The resource id of the container view
-	 * @param frag The fragment to be added
-	 * @param tag Optional tag name for the fragment, to later retrieve the fragment with FragmentManager.findFragmentByTag(String)
-	 * @param addToBackStack Add this transaction to the back stack. This means that the transaction will be remembered after it is committed, and will reverse its operation when later popped off the stack.
-	 * @param replace Set this to true to replace the fragment in the container, or false to add the fragment to the container
+	 * @param containerId
+	 *            The resource id of the container view
+	 * @param frag
+	 *            The fragment to be added
+	 * @param tag
+	 *            Optional tag name for the fragment, to later retrieve the
+	 *            fragment with FragmentManager.findFragmentByTag(String)
+	 * @param addToBackStack
+	 *            Add this transaction to the back stack. This means that the
+	 *            transaction will be remembered after it is committed, and will
+	 *            reverse its operation when later popped off the stack.
+	 * @param replace
+	 *            Set this to true to replace the fragment in the container, or
+	 *            false to add the fragment to the container
 	 */
 	private void attachFragment(int containerId, FamiliarFragment frag, String tag, boolean addToBackStack, boolean replace) {
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		if(replace) {
+		if (replace) {
 			ft.replace(containerId, frag, tag);
-		}
-		else {
+		} else {
 			ft.add(containerId, frag, tag);
 		}
 		if (addToBackStack) {
@@ -831,24 +784,42 @@ public class MainActivity extends SlidingFragmentActivity {
 		}
 		ft.commit();
 	}
-	
+
 	/**
-	 * Attach a single fragment. This should be used even on tablets when only one fragment is showing
-	 * @param frag The fragment to attach
-	 * @param tag Optional tag name for the fragment, to later retrieve the fragment with FragmentManager.findFragmentByTag(String)
-	 * @param addToBackStack Add this transaction to the back stack. This means that the transaction will be remembered after it is committed, and will reverse its operation when later popped off the stack.
-	 * @param replace Set this to true to replace the fragment in the container, or false to add the fragment to the container
+	 * Attach a single fragment. This should be used even on tablets when only
+	 * one fragment is showing
+	 * 
+	 * @param frag
+	 *            The fragment to attach
+	 * @param tag
+	 *            Optional tag name for the fragment, to later retrieve the
+	 *            fragment with FragmentManager.findFragmentByTag(String)
+	 * @param addToBackStack
+	 *            Add this transaction to the back stack. This means that the
+	 *            transaction will be remembered after it is committed, and will
+	 *            reverse its operation when later popped off the stack.
+	 * @param replace
+	 *            Set this to true to replace the fragment in the container, or
+	 *            false to add the fragment to the container
 	 */
 	public void attachSingleFragment(FamiliarFragment frag, String tag, boolean addToBackStack, boolean replace) {
 		attachFragment(R.id.left_container, frag, tag, addToBackStack, replace);
 	}
-	
+
 	/**
-	 * Attach a fragment to the leftmost container. It will be added, not replaced.
-	 * This usually isn't called, as attachSingleFragment() does pretty much the same thing
-	 * @param frag The fragment to attach
-	 * @param tag Optional tag name for the fragment, to later retrieve the fragment with FragmentManager.findFragmentByTag(String)
-	 * @param addToBackStack Add this transaction to the back stack. This means that the transaction will be remembered after it is committed, and will reverse its operation when later popped off the stack.
+	 * Attach a fragment to the leftmost container. It will be added, not
+	 * replaced. This usually isn't called, as attachSingleFragment() does
+	 * pretty much the same thing
+	 * 
+	 * @param frag
+	 *            The fragment to attach
+	 * @param tag
+	 *            Optional tag name for the fragment, to later retrieve the
+	 *            fragment with FragmentManager.findFragmentByTag(String)
+	 * @param addToBackStack
+	 *            Add this transaction to the back stack. This means that the
+	 *            transaction will be remembered after it is committed, and will
+	 *            reverse its operation when later popped off the stack.
 	 */
 	public void attachLeftFragment(FamiliarFragment frag, String tag, boolean addToBackStack) {
 		if (!mThreePane) {
@@ -858,10 +829,18 @@ public class MainActivity extends SlidingFragmentActivity {
 	}
 
 	/**
-	 * Attach a fragment to the middle container. It will be added, not replaced.
-	 * @param frag The fragment to attach
-	 * @param tag Optional tag name for the fragment, to later retrieve the fragment with FragmentManager.findFragmentByTag(String)
-	 * @param addToBackStack Add this transaction to the back stack. This means that the transaction will be remembered after it is committed, and will reverse its operation when later popped off the stack.
+	 * Attach a fragment to the middle container. It will be added, not
+	 * replaced.
+	 * 
+	 * @param frag
+	 *            The fragment to attach
+	 * @param tag
+	 *            Optional tag name for the fragment, to later retrieve the
+	 *            fragment with FragmentManager.findFragmentByTag(String)
+	 * @param addToBackStack
+	 *            Add this transaction to the back stack. This means that the
+	 *            transaction will be remembered after it is committed, and will
+	 *            reverse its operation when later popped off the stack.
 	 */
 	public void attachMiddleFragment(FamiliarFragment frag, String tag, boolean addToBackStack) {
 		if (!mThreePane) {
@@ -871,10 +850,18 @@ public class MainActivity extends SlidingFragmentActivity {
 	}
 
 	/**
-	 * Attach a fragment to the rightmost container. It will be added, not replaced.
-	 * @param frag The fragment to attach
-	 * @param tag Optional tag name for the fragment, to later retrieve the fragment with FragmentManager.findFragmentByTag(String)
-	 * @param addToBackStack Add this transaction to the back stack. This means that the transaction will be remembered after it is committed, and will reverse its operation when later popped off the stack.
+	 * Attach a fragment to the rightmost container. It will be added, not
+	 * replaced.
+	 * 
+	 * @param frag
+	 *            The fragment to attach
+	 * @param tag
+	 *            Optional tag name for the fragment, to later retrieve the
+	 *            fragment with FragmentManager.findFragmentByTag(String)
+	 * @param addToBackStack
+	 *            Add this transaction to the back stack. This means that the
+	 *            transaction will be remembered after it is committed, and will
+	 *            reverse its operation when later popped off the stack.
 	 */
 	public void attachRightFragment(FamiliarFragment frag, String tag, boolean addToBackStack) {
 		if (!mThreePane) {
@@ -885,7 +872,9 @@ public class MainActivity extends SlidingFragmentActivity {
 
 	/**
 	 * Send a message to the fragment in the leftmost container
-	 * @param bundle The message
+	 * 
+	 * @param bundle
+	 *            The message
 	 */
 	public void sendMessageToLeftFragment(Bundle bundle) {
 		if (!mThreePane) {
@@ -896,7 +885,9 @@ public class MainActivity extends SlidingFragmentActivity {
 
 	/**
 	 * Send a message to the fragment in the middle container
-	 * @param bundle The message
+	 * 
+	 * @param bundle
+	 *            The message
 	 */
 	public void sendMessageToMiddleFragment(Bundle bundle) {
 		if (!mThreePane) {
@@ -907,7 +898,9 @@ public class MainActivity extends SlidingFragmentActivity {
 
 	/**
 	 * Send a message to the fragment in the rightmost container
-	 * @param bundle The message
+	 * 
+	 * @param bundle
+	 *            The message
 	 */
 	public void sendMessageToRightFragment(Bundle bundle) {
 		if (!mThreePane) {
@@ -915,12 +908,13 @@ public class MainActivity extends SlidingFragmentActivity {
 		}
 		((FamiliarFragment) getSupportFragmentManager().findFragmentById(R.id.right_container)).receiveMessage(bundle);
 	}
-	
+
 	/**
-	 * Show all three panes and dividers. Middle and right panes should be populated after this
+	 * Show all three panes and dividers. Middle and right panes should be
+	 * populated after this
 	 */
 	public void showThreePanes() {
-		if(!mThreePane) {
+		if (!mThreePane) {
 			return;
 		}
 		findViewById(R.id.middle_container).setVisibility(View.VISIBLE);
@@ -929,28 +923,29 @@ public class MainActivity extends SlidingFragmentActivity {
 		findViewById(R.id.secondDivider).setVisibility(View.VISIBLE);
 
 	}
-	
+
 	/**
-	 * Remove the right and middle fragments, if they exist, and set the container and divider visibilities to View.GONE
+	 * Remove the right and middle fragments, if they exist, and set the
+	 * container and divider visibilities to View.GONE
 	 */
 	public void showOnePane() {
-		if(!mThreePane){
+		if (!mThreePane) {
 			return;
 		}
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
 		Fragment middle = getSupportFragmentManager().findFragmentById(R.id.middle_container);
-		if(middle != null) {
+		if (middle != null) {
 			ft.remove(middle);
 		}
-		
+
 		Fragment right = getSupportFragmentManager().findFragmentById(R.id.right_container);
-		if(right != null) {
+		if (right != null) {
 			ft.remove(right);
 		}
 
 		ft.commit();
-		
+
 		findViewById(R.id.middle_container).setVisibility(View.GONE);
 		findViewById(R.id.right_container).setVisibility(View.GONE);
 		findViewById(R.id.firstDivider).setVisibility(View.GONE);

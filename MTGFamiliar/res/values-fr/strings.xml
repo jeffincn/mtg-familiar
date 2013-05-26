@@ -56,6 +56,7 @@
     <string name="main_pages">PAGES</string>
     <string name="main_extras">EXTRAS</string>
     <string name="main_card_search">Chercher Carte</string>
+    <string name="main_collection">Ensemble</string>
     <string name="main_life_counter">Compteur de Vie</string>
     <string name="main_mana_pool">Réserve de Mana</string>
     <string name="main_dice">Dés</string>
@@ -481,4 +482,8 @@
 	<string name="deck_counter_reset">Rétablir</string>
 	<string name="deck_counter_undo">Annuler</string>
 
+	<!-- Collection activity -->
+	<string name="collection_name">Nom</string>
+    <string name="collection_add_card">Ajouter</string>
+    
 </resources>

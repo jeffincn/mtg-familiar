@@ -148,7 +148,7 @@ public class DeckCounterFragment extends FamiliarFragment implements ViewFactory
 		if (updateUi) {
 			StringBuilder history = new StringBuilder();
 			for (int i = 0; i < sequence.size(); i++) {
-				history.append("+" + sequence.get(i) + "   ");
+				history.append(sequence.get(i) + "  ");
 			}
 			deckCountHistory.setText(history.toString());
 			deckCountText.setText("" + deckCount);

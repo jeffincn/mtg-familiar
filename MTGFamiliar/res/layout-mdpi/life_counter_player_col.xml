@@ -73,25 +73,6 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 </TextView>
 
-                <TextView
-                    android:id="@+id/commanderCastText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0"
-                    android:gravity="center"
-                    android:paddingTop="10dp"
-                    android:text="@string/life_counter_commander_cast"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:visibility="gone" />
-
-                <Button
-                    android:id="@+id/commanderCast"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0"
-                    android:text="@string/mana_pool_zero"
-                    android:visibility="gone" />
-
             </LinearLayout>
 
             <LinearLayout

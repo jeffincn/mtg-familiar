@@ -1546,13 +1546,14 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		public void addCommanderCastingView(TextView commandCastText, final Button commanderCast){
 			commanderCastButton = commanderCast;
 			commanderCastText = commandCastText;
-			commanderCastButton.setText(Integer.toString(commanderCasting));
 			
-			if (displayMode == COMMANDER
-				&& getResources().getDisplayMetrics().densityDpi >= DisplayMetrics.DENSITY_MEDIUM) {
-				commanderCastText.setVisibility(View.VISIBLE);
-				commanderCastButton.setVisibility(View.VISIBLE);
+			if (commanderCastButton == null && commanderCastText == null) {
+				return;
 			}
+			commanderCastButton.setText(Integer.toString(commanderCasting));
+
+			commanderCastText.setVisibility(View.VISIBLE);
+			commanderCastButton.setVisibility(View.VISIBLE);
 			
 			commanderCastButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {

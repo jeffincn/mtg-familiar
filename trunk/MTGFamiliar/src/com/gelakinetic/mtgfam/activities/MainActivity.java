@@ -176,7 +176,7 @@ public class MainActivity extends SlidingFragmentActivity {
 
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-		actionBar.setDisplayHomeAsUpEnabled(false);
+		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setHomeButtonEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setIcon(R.drawable.sliding_menu_icon);
@@ -187,6 +187,7 @@ public class MainActivity extends SlidingFragmentActivity {
 		slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
 		slidingMenu.setShadowWidthRes(R.dimen.shadow_width);
 		slidingMenu.setShadowDrawable(R.drawable.sliding_menu_shadow);
+		setSlidingActionBarEnabled(false);
 		setBehindContentView(R.layout.fragment_menu);
 
 		me = this;

@@ -33,6 +33,8 @@
     <string name="update_updating_rules">Updating comprehensive rules…</string>
     <string name="update_added">Added</string>
     <string name="update_added_rules">new comprehensive rules</string>
+    <string name="update_added_mtr">new Magic Tournament Rules</string>
+    <string name="update_added_ipg">new Infraction Procedure Guide</string>
     <string name="update_parse_cards">Parsing %s</string>
     <string name="update_parse_rules">Parsing comprehensive rules</string>
     <string name="error">Error</string>

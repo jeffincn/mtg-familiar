@@ -1,10 +1,13 @@
 package com.gelakinetic.mtgfam.fragments;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -48,16 +51,27 @@ public class IPGFragment extends FamiliarFragment {
 			}
 		});
 		wv.setBackgroundColor(0);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(getResources().openRawResource(R.raw.ipg)));
+		File ipg = new File(Environment.getExternalStorageDirectory(), JudgesCornerFragment.IPG_LOCAL_FILE);
 		StringBuilder html = new StringBuilder();
-		String line;
+		BufferedReader reader = null;
 		try {
+			reader = new BufferedReader(new InputStreamReader(new FileInputStream(ipg)));
+			String line;
 			while ((line = reader.readLine()) != null) {
 				html.append(line);
 			}
-		} catch (IOException e) {
+		} 
+		catch (IOException e) {
 			html.setLength(0);
 			html.append("An error occurred.");
+		}
+		finally {
+			try {
+				if (reader != null) {
+					reader.close();
+				}
+			} catch (IOException e) {
+			}
 		}
 		wv.loadDataWithBaseURL(null, html.toString(), "text/html", "utf-8", null);
 

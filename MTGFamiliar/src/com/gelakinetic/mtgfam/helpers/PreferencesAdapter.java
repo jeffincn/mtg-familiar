@@ -34,6 +34,8 @@ public class PreferencesAdapter {
 	private static final String SPELL_COUNT = "spellCount"; //int, default 0
 	
 	private static final String LAST_RULES_UPDATE = "lastRulesUpdate"; //long, default BuildDate.get(context).getTime()
+	private static final String LAST_MTR_UPDATE = "lastMTRUpdate"; //long, default BuildDate.get(context).getTime()
+	private static final String LAST_IPG_UPDATE = "lastIPGUpdate"; //long, default BuildDate.get(context).getTime()
 	
 	private static final String TTS_SHOW_DIALOG = "ttsShowDialog"; //boolean, default true
 	private static final String AUTO_UPDATE = "autoupdate"; //boolean, default true
@@ -173,6 +175,26 @@ public class PreferencesAdapter {
 	
 	public synchronized void setLastRulesUpdate(long lastRulesUpdate) {
 		this.edit.putLong(LAST_RULES_UPDATE, lastRulesUpdate);
+		this.edit.commit();
+	}
+	
+	//Last MTR update
+	public synchronized long getLastMTRUpdate() {
+		return this.prefs.getLong(LAST_MTR_UPDATE, BuildDate.get(this.context).getTime());
+	}
+	
+	public synchronized void setLastMTRUpdate(long lastMTRUpdate) {
+		this.edit.putLong(LAST_MTR_UPDATE, lastMTRUpdate);
+		this.edit.commit();
+	}
+	
+	//Last IPG update
+	public synchronized long getLastIPGUpdate() {
+		return this.prefs.getLong(LAST_IPG_UPDATE, BuildDate.get(this.context).getTime());
+	}
+	
+	public synchronized void setLastIPGUpdate(long lastIPGUpdate) {
+		this.edit.putLong(LAST_IPG_UPDATE, lastIPGUpdate);
 		this.edit.commit();
 	}
 	

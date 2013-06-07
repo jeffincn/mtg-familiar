@@ -184,19 +184,42 @@ public class DbUpdaterService extends IntentService {
 			mDbHelper.closeTransactional();
 	
 			cancelStatusNotification();
-			showUpdatedNotification(updatedStuff);
 		}
 		catch(FamiliarDbException e) {
 			commitDates = false; // dont commit the dates
 		}
 		
+		boolean mtrUpdated = false;
+		long lastMTRUpdate = mPrefAdapter.getLastMTRUpdate();
+		MTRIPGParser mtrParser = new MTRIPGParser(new Date(lastMTRUpdate));
+		if (mtrParser.performMtrUpdateIfNeeded()) {
+			mtrUpdated = true;
+			updatedStuff.add(getString(R.string.update_added_mtr));
+		}
+		
+		boolean ipgUpdated = false;
+		long lastIPGUpdate = mPrefAdapter.getLastIPGUpdate();
+		MTRIPGParser ipgParser = new MTRIPGParser(new Date(lastIPGUpdate));
+		if (ipgParser.performIpgUpdateIfNeeded()) {
+			ipgUpdated = true;
+			updatedStuff.add(getString(R.string.update_added_ipg));
+		}
+		
 		if(commitDates) {
+			showUpdatedNotification(updatedStuff);
+			
 			parser.commitDates(mPrefAdapter);
 
 			long curTime = new Date().getTime();
 			mPrefAdapter.setLastLegalityUpdate((int)(curTime / 1000));
 			if (newRulesParsed) {
 				mPrefAdapter.setLastRulesUpdate(curTime);
+			}
+			if (mtrUpdated) {
+				mPrefAdapter.setLastMTRUpdate(curTime);
+			}
+			if (ipgUpdated) {
+				mPrefAdapter.setLastIPGUpdate(curTime);
 			}
 		}
 		return;

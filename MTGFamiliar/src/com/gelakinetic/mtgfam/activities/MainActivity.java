@@ -19,8 +19,15 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam.activities;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Date;
+
+import org.apache.commons.io.IOUtils;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -38,6 +45,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -45,6 +53,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -172,6 +181,36 @@ public class MainActivity extends SlidingFragmentActivity {
 			showDialogFragment(CHANGELOGDIALOG);
 			prefAdapter.setLastVersion(pInfo.versionCode);
 			bounceMenu = lastVersion <= 15; //Only bounce if the last version is 1.8.1 or lower (or a fresh install) 
+		}
+		
+		File storage = Environment.getExternalStorageDirectory();
+		File mtr = new File(storage, JudgesCornerFragment.MTR_LOCAL_FILE);
+		File ipg = new File(storage, JudgesCornerFragment.IPG_LOCAL_FILE);
+		if (!mtr.exists()) {
+			try {
+				InputStream in = getResources().openRawResource(R.raw.mtr);
+				FileOutputStream fos = new FileOutputStream(mtr);
+				IOUtils.copy(in, fos);
+			} 
+			catch (FileNotFoundException e) {
+				Log.w("MainActivity", "MTR file could not be copied: " + e.getMessage());
+			}
+			catch (IOException e) {
+				Log.w("MainActivity", "MTR file could not be copied: " + e.getMessage());
+			}
+		}
+		if (!ipg.exists()) {
+			try {
+				InputStream in = getResources().openRawResource(R.raw.ipg);
+				FileOutputStream fos = new FileOutputStream(ipg);
+				IOUtils.copy(in, fos);
+			} 
+			catch (FileNotFoundException e) {
+				Log.w("MainActivity", "IPG file could not be copied: " + e.getMessage());
+			}
+			catch (IOException e) {
+				Log.w("MainActivity", "IPG file could not be copied: " + e.getMessage());
+			}
 		}
 
 		ActionBar actionBar = getSupportActionBar();

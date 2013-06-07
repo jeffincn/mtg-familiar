@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -51,7 +50,7 @@ public class MTRFragment extends FamiliarFragment {
 			}
 		});
 		wv.setBackgroundColor(0);
-		File mtr = new File(Environment.getExternalStorageDirectory(), JudgesCornerFragment.MTR_LOCAL_FILE);
+		File mtr = new File(getActivity().getFilesDir(), JudgesCornerFragment.MTR_LOCAL_FILE);
 		StringBuilder html = new StringBuilder();
 		BufferedReader reader = null;
 		try {

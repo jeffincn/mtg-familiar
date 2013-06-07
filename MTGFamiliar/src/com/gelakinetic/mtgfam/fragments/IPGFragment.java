@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -51,7 +50,7 @@ public class IPGFragment extends FamiliarFragment {
 			}
 		});
 		wv.setBackgroundColor(0);
-		File ipg = new File(Environment.getExternalStorageDirectory(), JudgesCornerFragment.IPG_LOCAL_FILE);
+		File ipg = new File(getActivity().getFilesDir(), JudgesCornerFragment.IPG_LOCAL_FILE);
 		StringBuilder html = new StringBuilder();
 		BufferedReader reader = null;
 		try {

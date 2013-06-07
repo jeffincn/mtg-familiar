@@ -33,6 +33,8 @@
     <string name="update_updating_rules">Mise à jour des règles complètes…</string>
     <string name="update_added">Ajout :</string>
     <string name="update_added_rules">nouvelles règles complètes</string>
+    <string name="update_added_mtr">nouvelles MTR</string>
+    <string name="update_added_ipg">nouveau IPG</string>
     <string name="update_parse_cards">Analyse de %s</string>
     <string name="update_parse_rules">Analyse des règles complètes</string>
     <string name="error">Erreur</string>

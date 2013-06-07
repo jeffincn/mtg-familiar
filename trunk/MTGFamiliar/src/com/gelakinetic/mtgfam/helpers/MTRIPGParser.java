@@ -9,15 +9,14 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
 
-import android.os.Environment;
+import android.content.Context;
 
 import com.gelakinetic.mtgfam.fragments.JudgesCornerFragment;
 
 public class MTRIPGParser {
 
 	private Date lastUpdated;
-//	private Context context;
-//	private ProgressReporter progReport;
+	private Context context;
 
 	private static final String MTR_SOURCE = "https://sites.google.com/site/mtgfamiliar/rules/MagicTournamentRules.html";
 	private static final String IPG_SOURCE = "https://sites.google.com/site/mtgfamiliar/rules/InfractionProcedureGuide.html";
@@ -26,14 +25,9 @@ public class MTRIPGParser {
 		void reportMtrIpgProgress(String... args);
 	}
 	
-//	public MTRIPGParser(Date lastUpdated, Context context, ProgressReporter progReport) {
-//		this.lastUpdated = lastUpdated;
-//		this.context = context;
-//		this.progReport = progReport;
-//	}
-	
-	public MTRIPGParser(Date lastUpdated) {
+	public MTRIPGParser(Date lastUpdated, Context context) {
 		this.lastUpdated = lastUpdated;
+		this.context = context;
 	}
 	
 	public boolean performMtrUpdateIfNeeded() {
@@ -61,8 +55,7 @@ public class MTRIPGParser {
 				}
 				
 				// Write to MTR_LOCAL_FILE
-				File storage = Environment.getExternalStorageDirectory();
-				File output = new File(storage, JudgesCornerFragment.MTR_LOCAL_FILE);
+				File output = new File(context.getFilesDir(), JudgesCornerFragment.MTR_LOCAL_FILE);
 				fos = new FileOutputStream(output);
 				fos.write(sb.toString().getBytes());
 				fos.flush(); // Unnecessary?
@@ -116,8 +109,7 @@ public class MTRIPGParser {
 				}
 				
 				// Write to IPG_LOCAL_FILE
-				File storage = Environment.getExternalStorageDirectory();
-				File output = new File(storage, JudgesCornerFragment.IPG_LOCAL_FILE);
+				File output = new File(context.getFilesDir(), JudgesCornerFragment.IPG_LOCAL_FILE);
 				fos = new FileOutputStream(output);
 				fos.write(sb.toString().getBytes());
 				fos.flush(); // Unnecessary?

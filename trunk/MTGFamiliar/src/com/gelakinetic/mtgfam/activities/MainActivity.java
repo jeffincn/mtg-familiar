@@ -45,7 +45,6 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -183,9 +182,8 @@ public class MainActivity extends SlidingFragmentActivity {
 			bounceMenu = lastVersion <= 15; //Only bounce if the last version is 1.8.1 or lower (or a fresh install) 
 		}
 		
-		File storage = Environment.getExternalStorageDirectory();
-		File mtr = new File(storage, JudgesCornerFragment.MTR_LOCAL_FILE);
-		File ipg = new File(storage, JudgesCornerFragment.IPG_LOCAL_FILE);
+		File mtr = new File(getFilesDir(), JudgesCornerFragment.MTR_LOCAL_FILE);
+		File ipg = new File(getFilesDir(), JudgesCornerFragment.IPG_LOCAL_FILE);
 		if (!mtr.exists()) {
 			try {
 				InputStream in = getResources().openRawResource(R.raw.mtr);

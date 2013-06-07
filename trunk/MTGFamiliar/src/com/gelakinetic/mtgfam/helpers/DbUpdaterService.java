@@ -191,7 +191,7 @@ public class DbUpdaterService extends IntentService {
 		
 		boolean mtrUpdated = false;
 		long lastMTRUpdate = mPrefAdapter.getLastMTRUpdate();
-		MTRIPGParser mtrParser = new MTRIPGParser(new Date(lastMTRUpdate));
+		MTRIPGParser mtrParser = new MTRIPGParser(new Date(lastMTRUpdate), this);
 		if (mtrParser.performMtrUpdateIfNeeded()) {
 			mtrUpdated = true;
 			updatedStuff.add(getString(R.string.update_added_mtr));
@@ -199,7 +199,7 @@ public class DbUpdaterService extends IntentService {
 		
 		boolean ipgUpdated = false;
 		long lastIPGUpdate = mPrefAdapter.getLastIPGUpdate();
-		MTRIPGParser ipgParser = new MTRIPGParser(new Date(lastIPGUpdate));
+		MTRIPGParser ipgParser = new MTRIPGParser(new Date(lastIPGUpdate), this);
 		if (ipgParser.performIpgUpdateIfNeeded()) {
 			ipgUpdated = true;
 			updatedStuff.add(getString(R.string.update_added_ipg));

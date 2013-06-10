@@ -42,11 +42,13 @@ public class IPGFragment extends FamiliarFragment {
 			
 			@Override
 			public void onPageFinished(WebView view, String url) {
-				getActivity().runOnUiThread(new Runnable() {
-					public void run() {
-						prog.setVisibility(View.GONE);
-					}
-				});
+				if (getActivity() != null) {
+					getActivity().runOnUiThread(new Runnable() {
+						public void run() {
+							prog.setVisibility(View.GONE);
+						}
+					});
+				}
 			}
 		});
 		wv.setBackgroundColor(0);

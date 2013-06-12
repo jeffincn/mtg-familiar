@@ -310,7 +310,7 @@ public class MainActivity extends SlidingFragmentActivity {
 			if(mThreePane) {
 				SearchViewFragment svFrag = new SearchViewFragment();
 				svFrag.setArguments(args);
-				attachSingleFragment(svFrag, "left_frag", false, false);
+				attachSingleFragment(svFrag, "left_frag", false, true);
 			}
 			else {
 				ResultListFragment rlFrag = new ResultListFragment();
@@ -956,6 +956,9 @@ public class MainActivity extends SlidingFragmentActivity {
 		findViewById(R.id.firstDivider).setVisibility(View.VISIBLE);
 		findViewById(R.id.secondDivider).setVisibility(View.VISIBLE);
 
+		for( int i=0; i < getFragmentManager().getBackStackEntryCount(); i++) {
+			getFragmentManager().popBackStack();
+		}
 	}
 	
 	/**

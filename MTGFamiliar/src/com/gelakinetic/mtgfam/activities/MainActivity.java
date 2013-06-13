@@ -115,6 +115,13 @@ public class MainActivity extends SlidingFragmentActivity {
 	private Bundle mFragResults;
 	private boolean bounceMenu = false;
 
+	public boolean updatingDisplay;
+	public long endTime;
+	public Handler timerHandler;
+	public boolean timeShowing;
+	public boolean mThreePane;
+	public boolean mIsATablet;
+	
 	/*
 	 * Robospice setup
 	 */
@@ -262,16 +269,22 @@ public class MainActivity extends SlidingFragmentActivity {
 		getSupportFragmentManager().beginTransaction().replace(R.id.frag_menu, new MenuFragment()).commit();
 
 		showOnePane();
-		if (findViewById(R.id.middle_container) != null &&
-				getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+		if (findViewById(R.id.middle_container) != null) {
 			// The detail container view will be present only in the
 			// large-screen layouts (res/values-large and
 			// res/values-sw600dp). If this view is present, then the
 			// activity should be in two-pane mode.
-			mThreePane = true;
+			mIsATablet = true;
+			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+				mThreePane = true;				
+			}
+			else {
+				mThreePane = false;
+			}
 		}
 		else {
 			mThreePane = false;
+			mIsATablet = false;
 			if(findViewById(R.id.middle_container) != null) {
 				findViewById(R.id.middle_container).setVisibility(View.GONE);
 				findViewById(R.id.right_container).setVisibility(View.GONE);
@@ -280,60 +293,60 @@ public class MainActivity extends SlidingFragmentActivity {
 		
 		Intent intent = getIntent();
 
-		if (intent.getAction().equals(Intent.ACTION_VIEW)) {
-			// handles a click on a search suggestion; launches activity to show word
-			Uri u = intent.getData();
-			long id = Long.parseLong(u.getLastPathSegment());
+		if (savedInstanceState == null) {
 
-			// add a fragment
-			Bundle args = new Bundle();
-			args.putBoolean("isSingle", true);
-			args.putLong("id", id);
-			CardViewFragment rlFrag = new CardViewFragment();
-			rlFrag.setArguments(args);
-
-			attachSingleFragment(rlFrag, "left_frag", false, false);
-			showOnePane();
-			hideKeyboard();
-		}
-		else if (intent.getAction().equals(Intent.ACTION_SEARCH)) {
-			boolean consolidate = prefAdapter.getConsolidateSearch();
-			String query = intent.getStringExtra(SearchManager.QUERY);
-			SearchCriteria sc = new SearchCriteria();
-			sc.Name = query;
-			sc.Set_Logic = (consolidate ? CardDbAdapter.FIRSTPRINTING : CardDbAdapter.ALLPRINTINGS);
-
-			// add a fragment
-			Bundle args = new Bundle();
-			args.putBoolean(SearchViewFragment.RANDOM, false);
-			args.putSerializable(SearchViewFragment.CRITERIA, sc);
-			if(mThreePane) {
-				SearchViewFragment svFrag = new SearchViewFragment();
-				svFrag.setArguments(args);
-				attachSingleFragment(svFrag, "left_frag", false, true);
+			if (intent.getAction().equals(Intent.ACTION_VIEW)) {
+				// handles a click on a search suggestion; launches activity to show word
+				Uri u = intent.getData();
+				long id = Long.parseLong(u.getLastPathSegment());
+	
+				// add a fragment
+				Bundle args = new Bundle();
+				args.putBoolean("isSingle", true);
+				args.putLong("id", id);
+				CardViewFragment rlFrag = new CardViewFragment();
+				rlFrag.setArguments(args);
+	
+				attachSingleFragment(rlFrag, "left_frag", false, false);
+				showOnePane();
+				hideKeyboard();
+			}
+			else if (intent.getAction().equals(Intent.ACTION_SEARCH)) {
+				boolean consolidate = prefAdapter.getConsolidateSearch();
+				String query = intent.getStringExtra(SearchManager.QUERY);
+				SearchCriteria sc = new SearchCriteria();
+				sc.Name = query;
+				sc.Set_Logic = (consolidate ? CardDbAdapter.FIRSTPRINTING : CardDbAdapter.ALLPRINTINGS);
+	
+				// add a fragment
+				Bundle args = new Bundle();
+				args.putBoolean(SearchViewFragment.RANDOM, false);
+				args.putSerializable(SearchViewFragment.CRITERIA, sc);
+				if(mIsATablet) {
+					SearchViewFragment svFrag = new SearchViewFragment();
+					svFrag.setArguments(args);
+					attachSingleFragment(svFrag, "left_frag", false, false);
+				}
+				else {
+					ResultListFragment rlFrag = new ResultListFragment();
+					rlFrag.setArguments(args);
+					attachSingleFragment(rlFrag, "left_frag", false, false);
+				}
+				hideKeyboard();
+			}
+			else if (intent.getAction().equals(ACTION_FULL_SEARCH)) {
+				attachSingleFragment(new SearchViewFragment(), "left_frag", false, false);
+				showOnePane();
+			}
+			else if (intent.getAction().equals(ACTION_WIDGET_SEARCH)) {
+				attachSingleFragment(new SearchWidgetFragment(), "left_frag", false, false);
+				showOnePane();
+			}
+			else if (intent.getAction().equals(ACTION_ROUND_TIMER)) {
+				attachSingleFragment(new RoundTimerFragment(), "left_frag", false, false);
+				showOnePane();
 			}
 			else {
-				ResultListFragment rlFrag = new ResultListFragment();
-				rlFrag.setArguments(args);
-				attachSingleFragment(rlFrag, "left_frag", false, false);
-			}
-			hideKeyboard();
-		}
-		else if (intent.getAction().equals(ACTION_FULL_SEARCH)) {
-			attachSingleFragment(new SearchViewFragment(), "left_frag", false, false);
-			showOnePane();
-		}
-		else if (intent.getAction().equals(ACTION_WIDGET_SEARCH)) {
-			attachSingleFragment(new SearchWidgetFragment(), "left_frag", false, false);
-			showOnePane();
-		}
-		else if (intent.getAction().equals(ACTION_ROUND_TIMER)) {
-			attachSingleFragment(new RoundTimerFragment(), "left_frag", false, false);
-			showOnePane();
-		}
-		else {
-			if (savedInstanceState == null) {
-
 				String defaultFragment = prefAdapter.getDefaultFragment();
 
 				FamiliarFragment frag;
@@ -630,10 +643,7 @@ public class MainActivity extends SlidingFragmentActivity {
 	 * Round Timer Display
 	 */
 
-	public boolean updatingDisplay;
-	public long endTime;
-	public Handler timerHandler;
-	public boolean timeShowing;
+
 
 	public Runnable timerUpdate = new Runnable() {
 
@@ -675,7 +685,6 @@ public class MainActivity extends SlidingFragmentActivity {
 			sendBroadcast(i);
 		}
 	};
-	public boolean mThreePane;
 
 	public void startUpdatingDisplay() {
 		updatingDisplay = true;

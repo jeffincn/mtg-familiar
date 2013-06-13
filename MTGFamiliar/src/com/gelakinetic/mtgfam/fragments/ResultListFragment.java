@@ -344,7 +344,12 @@ public class ResultListFragment extends FamiliarFragment {
 			}
 			default: {
 				if (args.getBoolean("isSingle", false)) {
-					getMainActivity().mFragmentManager.popBackStack();
+					if(getMainActivity().mFragmentManager.getBackStackEntryCount() > 0) {
+						getMainActivity().mFragmentManager.popBackStack();
+					}
+					else {
+						this.getMainActivity().finish();
+					}
 				}
 				return;
 			}

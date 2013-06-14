@@ -52,6 +52,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.content.ClipboardManager;
 import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.text.method.LinkMovementMethod;
@@ -1113,8 +1114,8 @@ public class CardViewFragment extends FamiliarFragment {
 			return true;
 		}
 		else {
-			android.content.ClipboardManager clipboard = (android.content.ClipboardManager) this.getMainActivity()
-					.getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+			ClipboardManager clipboard = (ClipboardManager) (this.getMainActivity()
+					.getSystemService(android.content.Context.CLIPBOARD_SERVICE));
 			clipboard.setText(copyText);
 			return true;
 		}

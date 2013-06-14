@@ -3,6 +3,7 @@ package com.gelakinetic.mtgfam.fragments;
 import java.io.File;
 import java.io.IOException;
 
+import android.annotation.SuppressLint;
 import android.app.Instrumentation;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
@@ -140,6 +141,7 @@ public abstract class FamiliarFragment extends SherlockFragment {
 		super.onSaveInstanceState(outState);
 	}
 
+	@SuppressLint("NewApi")
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);

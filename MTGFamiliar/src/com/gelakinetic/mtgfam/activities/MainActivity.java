@@ -154,6 +154,12 @@ public class MainActivity extends SlidingFragmentActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		/* http://stackoverflow.com/questions/13179620/force-overflow-menu-in-actionbarsherlock/13180285
+		 * 
+		 * Open ActionBarSherlock/src/com/actionbarsherlock/internal/view/menu/ActionMenuPresenter.java, go to method reserveOverflow
+		 * Replace the original with:
+		 * public static boolean reserveOverflow(Context context) { return true; }
+		 */
 		if (DEVICE_VERSION >= DEVICE_HONEYCOMB) {
 			try {
 				ViewConfiguration config = ViewConfiguration.get(this);
@@ -965,8 +971,8 @@ public class MainActivity extends SlidingFragmentActivity {
 		findViewById(R.id.firstDivider).setVisibility(View.VISIBLE);
 		findViewById(R.id.secondDivider).setVisibility(View.VISIBLE);
 
-		for( int i=0; i < getFragmentManager().getBackStackEntryCount(); i++) {
-			getFragmentManager().popBackStack();
+		for( int i=0; i < getSupportFragmentManager().getBackStackEntryCount(); i++) {
+			getSupportFragmentManager().popBackStack();
 		}
 	}
 	

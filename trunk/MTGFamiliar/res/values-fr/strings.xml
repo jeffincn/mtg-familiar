@@ -79,8 +79,9 @@
     <string name="main_whats_new_title">Nouveautés</string>
     <string name="main_whats_new_in_title">Nouveautés dans la Version</string>
     <string name="main_whats_new_text">
- 	- Gestion des cartes fusionnées, meilleure gestion des double cartes&lt;br />&lt;br />
- 	- Corrections de bugs
+ 	- Prix pour les cartes premium&lt;br />&lt;br />
+ 	- Espace Arbitre ! Il contient les MTR (Magic Tournament Rules), l\'IPG (Infraction Procedure Guide), et un rapide compteur de deck&lt;br />&lt;br />
+ 	- Recherche de cartes optimisée pour tablette
     </string>
     <string name="main_tts_warning_title">Synthèse vocale (TTS)</string>
     <string name="main_tts_warning_text">Cette appli permet la synthèse vocale parmi ses fonctionnalités, mais il semble que vous ne l\'ayiez pas installée. 

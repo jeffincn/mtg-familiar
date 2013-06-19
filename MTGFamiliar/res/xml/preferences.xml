@@ -43,7 +43,8 @@
 	            android:entries="@array/update_frequency_days"
 	            android:entryValues="@array/update_frequency_days_values"
 	            android:title="@string/pref_update_frequency_title"
-	            android:summary="@string/pref_update_frequency_summary" />
+	            android:summary="@string/pref_update_frequency_summary"
+	            android:defaultValue="3" />
 	        
 	    </PreferenceCategory>
 

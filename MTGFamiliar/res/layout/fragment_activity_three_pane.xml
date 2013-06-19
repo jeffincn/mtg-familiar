@@ -28,12 +28,11 @@ tools:context=".MainActivity"
         android:id="@+id/left_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical" />
+        android:layout_weight="1" />
 
     <View
         android:id="@+id/firstDivider"
-        android:layout_width="1dp"
+       	android:layout_width="1dp"
         android:layout_height="fill_parent"
         android:background="@color/in_fragment_menu_background_color" />
 
@@ -41,8 +40,7 @@ tools:context=".MainActivity"
         android:id="@+id/middle_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical" />
+        android:layout_weight="1" />
 
     <View
         android:id="@+id/secondDivider"
@@ -54,7 +52,6 @@ tools:context=".MainActivity"
         android:id="@+id/right_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical" />
+        android:layout_weight="1" />
 
 </LinearLayout>

@@ -41,9 +41,6 @@ public class JudgesCornerFragment extends FamiliarFragment {
     public static final String TAG_MTR = "MTR";
     public static final String TAG_IPG = "IPG";
     public static final String TAG_COUNTER = "COUNTER";
-	
-	public static final String MTR_LOCAL_FILE = "MTR.html";
-	public static final String IPG_LOCAL_FILE = "IPG.html";
 
 	public JudgesCornerFragment() {
 		/* http://developer.android.com/reference/android/app/Fragment.html

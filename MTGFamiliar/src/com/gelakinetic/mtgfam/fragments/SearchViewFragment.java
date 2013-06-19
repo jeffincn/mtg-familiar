@@ -41,8 +41,8 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.helpers.AutocompleteCursorAdapter;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
-import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 import com.gelakinetic.mtgfam.helpers.InFragmentMenuLoader;
+import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
 
 public class SearchViewFragment extends FamiliarFragment {
 
@@ -413,18 +413,11 @@ public class SearchViewFragment extends FamiliarFragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-		// Extras are ONLY set by the quicksearch
 		Bundle extras = this.getArguments();
 		if(extras != null && extras.containsKey(SearchViewFragment.CRITERIA)) {
-			if(this.isVisible()) {
-				// User has backed to this fragment (but it was never shown, so finish the quicksearch)
-				getMainActivity().finish();
-			}
-			else {
-				SearchCriteria sc = (SearchCriteria) extras.getSerializable(SearchViewFragment.CRITERIA);
-				namefield.setText(sc.Name);
-				doSearch();
-			}
+			SearchCriteria sc = (SearchCriteria) extras.getSerializable(SearchViewFragment.CRITERIA);
+			namefield.setText(sc.Name);
+			doSearch();
 		}
 		else {
 			if(getMainActivity().findViewById(R.id.left_container).getVisibility() != View.GONE) {

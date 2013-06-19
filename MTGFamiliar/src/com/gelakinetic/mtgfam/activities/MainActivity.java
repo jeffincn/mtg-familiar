@@ -19,15 +19,8 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam.activities;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Date;
-
-import org.apache.commons.io.IOUtils;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -52,7 +45,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -115,13 +107,6 @@ public class MainActivity extends SlidingFragmentActivity {
 	private Bundle mFragResults;
 	private boolean bounceMenu = false;
 
-	public boolean updatingDisplay;
-	public long endTime;
-	public Handler timerHandler;
-	public boolean timeShowing;
-	public boolean mThreePane;
-	public boolean mIsATablet;
-	
 	/*
 	 * Robospice setup
 	 */
@@ -154,12 +139,6 @@ public class MainActivity extends SlidingFragmentActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		/* http://stackoverflow.com/questions/13179620/force-overflow-menu-in-actionbarsherlock/13180285
-		 * 
-		 * Open ActionBarSherlock/src/com/actionbarsherlock/internal/view/menu/ActionMenuPresenter.java, go to method reserveOverflow
-		 * Replace the original with:
-		 * public static boolean reserveOverflow(Context context) { return true; }
-		 */
 		if (DEVICE_VERSION >= DEVICE_HONEYCOMB) {
 			try {
 				ViewConfiguration config = ViewConfiguration.get(this);
@@ -194,39 +173,10 @@ public class MainActivity extends SlidingFragmentActivity {
 			prefAdapter.setLastVersion(pInfo.versionCode);
 			bounceMenu = lastVersion <= 15; //Only bounce if the last version is 1.8.1 or lower (or a fresh install) 
 		}
-		
-		File mtr = new File(getFilesDir(), JudgesCornerFragment.MTR_LOCAL_FILE);
-		File ipg = new File(getFilesDir(), JudgesCornerFragment.IPG_LOCAL_FILE);
-		if (!mtr.exists()) {
-			try {
-				InputStream in = getResources().openRawResource(R.raw.mtr);
-				FileOutputStream fos = new FileOutputStream(mtr);
-				IOUtils.copy(in, fos);
-			} 
-			catch (FileNotFoundException e) {
-				Log.w("MainActivity", "MTR file could not be copied: " + e.getMessage());
-			}
-			catch (IOException e) {
-				Log.w("MainActivity", "MTR file could not be copied: " + e.getMessage());
-			}
-		}
-		if (!ipg.exists()) {
-			try {
-				InputStream in = getResources().openRawResource(R.raw.ipg);
-				FileOutputStream fos = new FileOutputStream(ipg);
-				IOUtils.copy(in, fos);
-			} 
-			catch (FileNotFoundException e) {
-				Log.w("MainActivity", "IPG file could not be copied: " + e.getMessage());
-			}
-			catch (IOException e) {
-				Log.w("MainActivity", "IPG file could not be copied: " + e.getMessage());
-			}
-		}
 
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-		actionBar.setDisplayHomeAsUpEnabled(true);
+		actionBar.setDisplayHomeAsUpEnabled(false);
 		actionBar.setHomeButtonEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setIcon(R.drawable.sliding_menu_icon);
@@ -237,7 +187,6 @@ public class MainActivity extends SlidingFragmentActivity {
 		slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
 		slidingMenu.setShadowWidthRes(R.dimen.shadow_width);
 		slidingMenu.setShadowDrawable(R.drawable.sliding_menu_shadow);
-		setSlidingActionBarEnabled(false);
 		setBehindContentView(R.layout.fragment_menu);
 
 		me = this;
@@ -275,22 +224,16 @@ public class MainActivity extends SlidingFragmentActivity {
 		getSupportFragmentManager().beginTransaction().replace(R.id.frag_menu, new MenuFragment()).commit();
 
 		showOnePane();
-		if (findViewById(R.id.middle_container) != null) {
+		if (findViewById(R.id.middle_container) != null &&
+				getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 			// The detail container view will be present only in the
 			// large-screen layouts (res/values-large and
 			// res/values-sw600dp). If this view is present, then the
 			// activity should be in two-pane mode.
-			mIsATablet = true;
-			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-				mThreePane = true;				
-			}
-			else {
-				mThreePane = false;
-			}
+			mThreePane = true;
 		}
 		else {
 			mThreePane = false;
-			mIsATablet = false;
 			if(findViewById(R.id.middle_container) != null) {
 				findViewById(R.id.middle_container).setVisibility(View.GONE);
 				findViewById(R.id.right_container).setVisibility(View.GONE);
@@ -299,60 +242,60 @@ public class MainActivity extends SlidingFragmentActivity {
 		
 		Intent intent = getIntent();
 
-		if (savedInstanceState == null) {
+		if (intent.getAction().equals(Intent.ACTION_VIEW)) {
+			// handles a click on a search suggestion; launches activity to show word
+			Uri u = intent.getData();
+			long id = Long.parseLong(u.getLastPathSegment());
 
-			if (intent.getAction().equals(Intent.ACTION_VIEW)) {
-				// handles a click on a search suggestion; launches activity to show word
-				Uri u = intent.getData();
-				long id = Long.parseLong(u.getLastPathSegment());
-	
-				// add a fragment
-				Bundle args = new Bundle();
-				args.putBoolean("isSingle", true);
-				args.putLong("id", id);
-				CardViewFragment rlFrag = new CardViewFragment();
-				rlFrag.setArguments(args);
-	
-				attachSingleFragment(rlFrag, "left_frag", false, false);
-				showOnePane();
-				hideKeyboard();
-			}
-			else if (intent.getAction().equals(Intent.ACTION_SEARCH)) {
-				boolean consolidate = prefAdapter.getConsolidateSearch();
-				String query = intent.getStringExtra(SearchManager.QUERY);
-				SearchCriteria sc = new SearchCriteria();
-				sc.Name = query;
-				sc.Set_Logic = (consolidate ? CardDbAdapter.FIRSTPRINTING : CardDbAdapter.ALLPRINTINGS);
-	
-				// add a fragment
-				Bundle args = new Bundle();
-				args.putBoolean(SearchViewFragment.RANDOM, false);
-				args.putSerializable(SearchViewFragment.CRITERIA, sc);
-				if(mIsATablet) {
-					SearchViewFragment svFrag = new SearchViewFragment();
-					svFrag.setArguments(args);
-					attachSingleFragment(svFrag, "left_frag", false, false);
-				}
-				else {
-					ResultListFragment rlFrag = new ResultListFragment();
-					rlFrag.setArguments(args);
-					attachSingleFragment(rlFrag, "left_frag", false, false);
-				}
-				hideKeyboard();
-			}
-			else if (intent.getAction().equals(ACTION_FULL_SEARCH)) {
-				attachSingleFragment(new SearchViewFragment(), "left_frag", false, false);
-				showOnePane();
-			}
-			else if (intent.getAction().equals(ACTION_WIDGET_SEARCH)) {
-				attachSingleFragment(new SearchWidgetFragment(), "left_frag", false, false);
-				showOnePane();
-			}
-			else if (intent.getAction().equals(ACTION_ROUND_TIMER)) {
-				attachSingleFragment(new RoundTimerFragment(), "left_frag", false, false);
-				showOnePane();
+			// add a fragment
+			Bundle args = new Bundle();
+			args.putBoolean("isSingle", true);
+			args.putLong("id", id);
+			CardViewFragment rlFrag = new CardViewFragment();
+			rlFrag.setArguments(args);
+
+			attachSingleFragment(rlFrag, "left_frag", false, false);
+			showOnePane();
+			hideKeyboard();
+		}
+		else if (intent.getAction().equals(Intent.ACTION_SEARCH)) {
+			boolean consolidate = prefAdapter.getConsolidateSearch();
+			String query = intent.getStringExtra(SearchManager.QUERY);
+			SearchCriteria sc = new SearchCriteria();
+			sc.Name = query;
+			sc.Set_Logic = (consolidate ? CardDbAdapter.FIRSTPRINTING : CardDbAdapter.ALLPRINTINGS);
+
+			// add a fragment
+			Bundle args = new Bundle();
+			args.putBoolean(SearchViewFragment.RANDOM, false);
+			args.putSerializable(SearchViewFragment.CRITERIA, sc);
+			if(mThreePane) {
+				SearchViewFragment svFrag = new SearchViewFragment();
+				svFrag.setArguments(args);
+				attachSingleFragment(svFrag, "left_frag", false, false);
 			}
 			else {
+				ResultListFragment rlFrag = new ResultListFragment();
+				rlFrag.setArguments(args);
+				attachSingleFragment(rlFrag, "left_frag", false, false);
+			}
+			hideKeyboard();
+		}
+		else if (intent.getAction().equals(ACTION_FULL_SEARCH)) {
+			attachSingleFragment(new SearchViewFragment(), "left_frag", false, false);
+			showOnePane();
+		}
+		else if (intent.getAction().equals(ACTION_WIDGET_SEARCH)) {
+			attachSingleFragment(new SearchWidgetFragment(), "left_frag", false, false);
+			showOnePane();
+		}
+		else if (intent.getAction().equals(ACTION_ROUND_TIMER)) {
+			attachSingleFragment(new RoundTimerFragment(), "left_frag", false, false);
+			showOnePane();
+		}
+		else {
+			if (savedInstanceState == null) {
+
 				String defaultFragment = prefAdapter.getDefaultFragment();
 
 				FamiliarFragment frag;
@@ -649,7 +592,10 @@ public class MainActivity extends SlidingFragmentActivity {
 	 * Round Timer Display
 	 */
 
-
+	public boolean updatingDisplay;
+	public long endTime;
+	public Handler timerHandler;
+	public boolean timeShowing;
 
 	public Runnable timerUpdate = new Runnable() {
 
@@ -691,6 +637,7 @@ public class MainActivity extends SlidingFragmentActivity {
 			sendBroadcast(i);
 		}
 	};
+	public boolean mThreePane;
 
 	public void startUpdatingDisplay() {
 		updatingDisplay = true;
@@ -971,9 +918,6 @@ public class MainActivity extends SlidingFragmentActivity {
 		findViewById(R.id.firstDivider).setVisibility(View.VISIBLE);
 		findViewById(R.id.secondDivider).setVisibility(View.VISIBLE);
 
-		for( int i=0; i < getSupportFragmentManager().getBackStackEntryCount(); i++) {
-			getSupportFragmentManager().popBackStack();
-		}
 	}
 	
 	/**

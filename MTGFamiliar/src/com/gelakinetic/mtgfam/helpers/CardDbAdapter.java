@@ -69,7 +69,7 @@ public class CardDbAdapter {
 	private static final String DATABASE_TABLE_RULES = "rules";
 	private static final String DATABASE_TABLE_GLOSSARY = "glossary";
 
-	public static final int DATABASE_VERSION = 38;
+	public static final int DATABASE_VERSION = 37;
 
 	public static final String KEY_ID = "_id";
 	public static final String KEY_NAME = SearchManager.SUGGEST_COLUMN_TEXT_1; // "name";
@@ -548,18 +548,14 @@ public class CardDbAdapter {
 
 	public Cursor autoComplete(String cardname) throws FamiliarDbException {
 		Cursor mCursor = null;
-		String convertName = null;
-		
-		if (cardname != null){
+
+		if (cardname != null)
 			cardname = cardname.replace(Character.toChars(0xE6)[0], Character.toChars(0xC6)[0]).trim();
-			convertName = cardname.toLowerCase().replace("ae", String.valueOf(Character.toChars(0xC6)[0]));
-		}
 
 		String sql = "SELECT MIN(" + KEY_ID + ") AS " + KEY_ID + ", "
 				+ KEY_NAME + " FROM " + DATABASE_TABLE_CARDS + " WHERE "
-				+ KEY_NAME + " LIKE " + DatabaseUtils.sqlEscapeString(cardname + "%") 
-				+ " OR " + KEY_NAME + " LIKE " + DatabaseUtils.sqlEscapeString(convertName + "%")
-				+ "GROUP BY " + KEY_NAME + " ORDER BY " + KEY_NAME;
+				+ KEY_NAME + " LIKE " + DatabaseUtils.sqlEscapeString(cardname + "%") + " GROUP BY " + KEY_NAME
+				+ " ORDER BY " + KEY_NAME;
 		try {
 			mCursor = mDb.rawQuery(sql, null);
 		} catch (SQLiteException e) {

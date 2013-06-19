@@ -48,8 +48,6 @@
         <item name="android:actionBarStyle">@style/actionbar_solid_ActionBar</item>
         <item name="android:panelBackground">@drawable/menu_hardkey_panel_actionbar</item>
         <item name="android:colorBackground">@color/black</item>
-        <item name="homeAsUpIndicator">@drawable/indicator</item>
-        <item name="android:homeAsUpIndicator">@drawable/indicator</item>
     </style>
 
     <style name="actionbar_solid_ActionBar" parent="@style/Widget.Sherlock.ActionBar.Solid">

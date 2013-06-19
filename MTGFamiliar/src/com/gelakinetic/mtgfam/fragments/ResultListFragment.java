@@ -157,7 +157,12 @@ public class ResultListFragment extends FamiliarFragment {
 			if (this.isAdded()) {
 				if (mCursor == null || mCursor.getCount() == 0) {
 					Toast.makeText(this.getActivity(), getString(R.string.search_toast_no_results), Toast.LENGTH_SHORT).show();
-					getMainActivity().mFragmentManager.popBackStack();
+					if(!getMainActivity().isTaskRoot()) {
+						getMainActivity().finish();
+					}
+					else {
+						getMainActivity().mFragmentManager.popBackStack();
+					}
 					return;
 				}
 				else if (mCursor.getCount() == 1) {

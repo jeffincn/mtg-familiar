@@ -250,6 +250,7 @@
     <string name="gathering_toast_no_gatherings">Aucun Type de Match n\'existe.</string>
     <string name="gathering_toast_no_name">Veuillez saisir un nom pour ce type de match.</string>
     <string name="gathering_empty_field">Les champs ne peuvent pas être vides. Veuillez vérifier tous les champs.</string>
+    <string name="gathering_display_mode_title">Mode Affichage:</string>
 
     <!-- Dice activity -->
     <string name="dice_heads">pile</string>

@@ -250,6 +250,7 @@
     <string name="gathering_toast_no_gatherings">No Gatherings exist.</string>
     <string name="gathering_toast_no_name">Please include a name for the Gathering.</string>
     <string name="gathering_empty_field">Fields cannot be empty. Please check all fields.</string>
+    <string name="gathering_display_mode_title">Display Mode:</string>
 
     <!-- Dice activity -->
     <string name="dice_heads">heads</string>

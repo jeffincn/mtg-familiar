@@ -1,12 +1,12 @@
 package com.gelakinetic.mtgfam.helpers;
 
-import com.gelakinetic.mtgfam.R;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.media.RingtoneManager;
 import android.preference.PreferenceManager;
+
+import com.gelakinetic.mtgfam.R;
 
 /**
  * Brief guide to adding new preferences to this app:
@@ -68,6 +68,7 @@ public class PreferencesAdapter {
 	private static final String LEGALITY_DATE = "date"; //String, default null
 	private static final String LAST_UPDATE = "lastUpdate"; //String, default ""
 	private static final String LAST_TCGNAME_UPDATE = "lastTCGNameUpdate"; //String, default ""
+	private static final String LIFE_TIMER = "lifeTimer"; //String, default "1000"
 	
 	public PreferencesAdapter(Context context) {
 		this.context = context;
@@ -499,6 +500,16 @@ public class PreferencesAdapter {
 	
 	public synchronized void setLastTCGNameUpdate(String lastTCGNameUpdate) {
 		this.edit.putString(LAST_TCGNAME_UPDATE, lastTCGNameUpdate);
+		this.edit.commit();
+	}
+	
+	//Life Counter Timer
+	public synchronized String getLifeTimer() {
+		return this.prefs.getString(LIFE_TIMER, "1000");
+	}
+	
+	public synchronized void setLifeTimer(String milliseconds) {
+		this.edit.putString(LIFE_TIMER, milliseconds);
 		this.edit.commit();
 	}
 }

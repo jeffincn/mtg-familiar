@@ -559,7 +559,7 @@ public class CardDbAdapter {
 				+ KEY_NAME + " FROM " + DATABASE_TABLE_CARDS + " WHERE "
 				+ KEY_NAME + " LIKE " + DatabaseUtils.sqlEscapeString(cardname + "%") 
 				+ " OR " + KEY_NAME + " LIKE " + DatabaseUtils.sqlEscapeString(convertName + "%")
-				+ "GROUP BY " + KEY_NAME + " ORDER BY " + KEY_NAME;
+				+ "GROUP BY " + KEY_NAME + " ORDER BY " + KEY_NAME + " COLLATE UNICODE";
 		try {
 			mCursor = mDb.rawQuery(sql, null);
 		} catch (SQLiteException e) {
@@ -1030,9 +1030,9 @@ public class CardDbAdapter {
 
 			if (consolidate) {
 				sql += " ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE
-						+ ") GROUP BY " + KEY_NAME + " ORDER BY " + KEY_NAME;
+						+ ") GROUP BY " + KEY_NAME + " ORDER BY " + KEY_NAME + " COLLATE UNICODE";
 			} else {
-				sql += " ORDER BY " + DATABASE_TABLE_CARDS + "." + KEY_NAME
+				sql += " ORDER BY " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " COLLATE UNICODE"
 						+ ", " + DATABASE_TABLE_SETS + "." + KEY_DATE
 						+ " DESC)";
 			}
@@ -1077,7 +1077,7 @@ public class CardDbAdapter {
 					+ DATABASE_TABLE_SETS + "." + KEY_CODE + statement;
 
 			sql += " ORDER BY " + DATABASE_TABLE_SETS + "." + KEY_DATE
-					+ ") GROUP BY " + KEY_NAME + " ORDER BY " + KEY_NAME;
+					+ ") GROUP BY " + KEY_NAME + " ORDER BY " + KEY_NAME + " COLLATE UNICODE";
 			mCursor = mDb.rawQuery(sql, null);
 		} catch (SQLiteException e) {
 			throw new FamiliarDbException(e);
@@ -1594,7 +1594,7 @@ public class CardDbAdapter {
 				"SELECT " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " + DATABASE_TABLE_CARDS + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_ID + " AS " + SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID +
 				" FROM " + DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = " + DATABASE_TABLE_CARDS + "." + KEY_SET +
 				" WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " LIKE '" + query.replace("'", "''").replace(Character.toChars(0xE6)[0], Character.toChars(0xC6)[0]).trim() +
-				"%' ORDER BY " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " DESC, " + DATABASE_TABLE_SETS + "." + KEY_DATE + " ASC " +
+				"%' ORDER BY " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " DESC COLLATE UNICODE, " + DATABASE_TABLE_SETS + "." + KEY_DATE + " ASC " +
 				") GROUP BY " + KEY_NAME;
 		return mDb.rawQuery(sql, null);
 	}

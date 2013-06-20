@@ -33,6 +33,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager.LayoutParams;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +41,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
+import com.gelakinetic.mtgfam.helpers.Gathering;
 import com.gelakinetic.mtgfam.helpers.GatheringsIO;
 import com.gelakinetic.mtgfam.helpers.GatheringsPlayerData;
 
@@ -52,6 +54,7 @@ public class GatheringCreateFragment extends FamiliarFragment {
 	private Context						mCtx;
 	private GatheringsIO			gIO;
 	private LinearLayout			mainLayout;
+	private Spinner	displayModeSpinner;
 
 	public GatheringCreateFragment() {
 		/* http://developer.android.com/reference/android/app/Fragment.html
@@ -70,7 +73,8 @@ public class GatheringCreateFragment extends FamiliarFragment {
 		View myFragmentView = inflater.inflate(R.layout.gathering_create_activity, container, false);
 
 		mainLayout = (LinearLayout) myFragmentView.findViewById(R.id.gathering_player_list);
-
+		displayModeSpinner = (Spinner)myFragmentView.findViewById(R.id.gathering_display_mode);
+		
 		mCtx = this.getActivity();
 		gIO = new GatheringsIO(mCtx);
 
@@ -199,7 +203,7 @@ public class GatheringCreateFragment extends FamiliarFragment {
 			players.add(new GatheringsPlayerData(name, life));
 		}
 
-		gIO.writeGatheringXML(players, _gatheringName);
+		gIO.writeGatheringXML(players, _gatheringName, displayModeSpinner.getSelectedItemPosition());
 	}
 
 	private boolean AreAnyFieldsEmpty() {
@@ -223,8 +227,7 @@ public class GatheringCreateFragment extends FamiliarFragment {
 		}
 		return false;
 	}
-	
-	
+
 	private void AddPlayerRowFromData(GatheringsPlayerData _player) {
 		LayoutInflater inf = this.getActivity().getLayoutInflater();
 		View v = inf.inflate(R.layout.gathering_create_player_row, null);
@@ -312,8 +315,10 @@ public class GatheringCreateFragment extends FamiliarFragment {
 				builder.setItems(properNames, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialogInterface, int item) {
 						RemoveAllPlayerRows();
+						Gathering gathering = gIO.ReadGatheringXML(fGatherings[item]);
 
-						ArrayList<GatheringsPlayerData> players = gIO.ReadGatheringXML(fGatherings[item]);
+						displayModeSpinner.setSelection(gathering.getDisplayMode());
+						ArrayList<GatheringsPlayerData> players = gathering.getPlayerList();
 						for (GatheringsPlayerData player : players) {
 							AddPlayerRowFromData(player);
 						}
@@ -330,10 +335,6 @@ public class GatheringCreateFragment extends FamiliarFragment {
 				}
 				
 				showDialog(DIALOG_SET_NAME);
-
-				// Intent i = new Intent(this, NPlayerLifeActivity.class);
-				// finish();
-				// startActivity(i);
 
 				return true;
 			default:

@@ -9,6 +9,7 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -26,8 +27,8 @@ import android.util.Xml;
 public class GatheringsIO {
 	final private static String	FOLDERPATH	= "Gatherings";
 	final private static String	DEFAULTFILE	= "KENNESSAS";
-								//If someone happens to also name their file this without ever reading 
-								//this comment I'll donate my latest mythic rare to them. (Not really.)
+	// If someone happens to also name their file this without ever reading
+	// this comment I'll donate my latest mythic rare to them. (Not really.)
 	Context											ctx;
 
 	public GatheringsIO(Context _ctx) {
@@ -35,8 +36,9 @@ public class GatheringsIO {
 	}
 
 	// returns the default Gathering file name.
-	public ArrayList<GatheringsPlayerData> getDefaultGathering() {
+	public Gathering getDefaultGathering() {
 		ArrayList<GatheringsPlayerData> players = new ArrayList<GatheringsPlayerData>();
+		Gathering gathering;
 
 		File path = new File(ctx.getFilesDir(), FOLDERPATH);
 		File defaultFile = new File(path, DEFAULTFILE + ".xml");
@@ -46,26 +48,26 @@ public class GatheringsIO {
 				throw new FileNotFoundException();
 			}
 
-			players = ReadGatheringXML(defaultFile);
+			gathering = ReadGatheringXML(defaultFile);
 
 		}
 		catch (FileNotFoundException e) {
 			players.add(new GatheringsPlayerData("Player 1", 20));
 			players.add(new GatheringsPlayerData("Player 2", 20));
-			return players;
+			return new Gathering(players, 0);
 		}
 
-		return players;
+		return gathering;
 	}
-	
+
 	public int getNumberOfGatherings() {
 		File path = new File(ctx.getFilesDir(), FOLDERPATH);
 		if (!path.exists()) {
 			return 0;
 		}
-		
+
 		File[] gatheringList = path.listFiles();
-		
+
 		int count = 0;
 		for (int idx = 0; idx < gatheringList.length; idx++) {
 			if (gatheringList[idx].getName().equals(DEFAULTFILE + ".xml")) {
@@ -95,19 +97,20 @@ public class GatheringsIO {
 
 		return returnList;
 	}
-	
-	public void writeGatheringXML(ArrayList<GatheringsPlayerData> _players, String _gatheringName) { 
+
+	public void writeGatheringXML(ArrayList<GatheringsPlayerData> _players, String _gatheringName, int _displayMode) {
 		Date date = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddkkmmss");
-	
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddkkmmss", Locale.ENGLISH);
+
 		String gathering = sdf.format(date);
-	
-		writeGatheringXML(gathering, _players, _gatheringName);
+
+		writeGatheringXML(gathering, _players, _gatheringName, _displayMode);
 	}
-	
-	public void writeGatheringXML(String _fileName, ArrayList<GatheringsPlayerData> _players, String _gatheringName) {
+
+	public void writeGatheringXML(String _fileName, ArrayList<GatheringsPlayerData> _players, String _gatheringName,
+			int _displayMode) {
 		String dataXML = "";
-		
+
 		XmlSerializer serializer = Xml.newSerializer();
 		StringWriter writer = new StringWriter();
 		try {
@@ -119,10 +122,14 @@ public class GatheringsIO {
 			serializer.text(_gatheringName);
 			serializer.endTag("", "name");
 
+			serializer.startTag("", "displaymode");
+			serializer.text(String.valueOf(_displayMode));
+			serializer.endTag("", "displaymode");
+
 			serializer.startTag("", "players");
 
-			for(GatheringsPlayerData player : _players){
-				
+			for (GatheringsPlayerData player : _players) {
+
 				String name = player.getName();
 
 				String life = String.valueOf(player.getStartingLife());
@@ -130,14 +137,14 @@ public class GatheringsIO {
 					life = "0";
 
 				serializer.startTag("", "player");
-				
-					serializer.startTag("", "name");
-					serializer.text(name);
-					serializer.endTag("", "name");
-	
-					serializer.startTag("", "startinglife");
-					serializer.text(String.valueOf(life));
-					serializer.endTag("", "startinglife");
+
+				serializer.startTag("", "name");
+				serializer.text(name);
+				serializer.endTag("", "name");
+
+				serializer.startTag("", "startinglife");
+				serializer.text(String.valueOf(life));
+				serializer.endTag("", "startinglife");
 
 				serializer.endTag("", "player");
 			}
@@ -150,13 +157,13 @@ public class GatheringsIO {
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		try {
 			File path = new File(ctx.getFilesDir(), FOLDERPATH);
 			if (!path.exists())
 				if (path.mkdirs() == false)
 					throw new FileNotFoundException("Folders not made");
-			
+
 			File file = new File(path, _fileName + ".xml");
 
 			BufferedWriter out = new BufferedWriter(new FileWriter(file));
@@ -169,17 +176,16 @@ public class GatheringsIO {
 		catch (IOException e) {
 		}
 	}
-	
 
-	public ArrayList<GatheringsPlayerData> ReadGatheringXML(String _gatheringFile) {
+	public Gathering ReadGatheringXML(String _gatheringFile) {
 		File path = new File(ctx.getFilesDir(), FOLDERPATH);
 		File gathering = new File(path, _gatheringFile);
 
 		return ReadGatheringXML(gathering);
 	}
 
-	public ArrayList<GatheringsPlayerData> ReadGatheringXML(File _gatheringFile) {
-		ArrayList<GatheringsPlayerData> returnList = new ArrayList<GatheringsPlayerData>();
+	public Gathering ReadGatheringXML(File _gatheringFile) {
+		ArrayList<GatheringsPlayerData> playerList = new ArrayList<GatheringsPlayerData>();
 		Document dom = null;
 
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -189,17 +195,17 @@ public class GatheringsIO {
 			dom = db.parse(_gatheringFile);
 		}
 		catch (ParserConfigurationException pce) {
-			return returnList;
+			return new Gathering(playerList, 0);
 		}
 		catch (SAXException se) {
-			return returnList;
+			return new Gathering(playerList, 0);
 		}
 		catch (IOException ioe) {
-			return returnList;
+			return new Gathering(playerList, 0);
 		}
 
 		if (dom == null)
-			return returnList;
+			return new Gathering(playerList, 0);
 
 		Element docEle = dom.getDocumentElement();
 
@@ -225,11 +231,21 @@ public class GatheringsIO {
 				player.setCustomName(customName);
 				player.setStartingLife(startingLife);
 
-				returnList.add(player);
+				playerList.add(player);
 			}
 		}
 
-		return returnList;
+		int displayMode;
+		Element mode = (Element) docEle.getElementsByTagName("displaymode").item(0);
+		if (mode != null) {
+			String sMode = (String) mode.getChildNodes().item(0).getNodeValue();
+			displayMode = Integer.parseInt(sMode);
+		}
+		else {
+			displayMode = 0;
+		}
+
+		return new Gathering(playerList, displayMode);
 	}
 
 	public String ReadGatheringNameFromXML(String _gatheringFile) {
@@ -269,8 +285,8 @@ public class GatheringsIO {
 		// int numOfPlayers = Integer.parseInt(playerList.getAttribute("number"));
 
 		Element name = (Element) docEle.getElementsByTagName("name").item(0);
-		
-		if (name.getChildNodes().item(0) == null){
+
+		if (name.getChildNodes().item(0) == null) {
 			return "";
 		}
 		String gatheringName = name.getChildNodes().item(0).getNodeValue();
@@ -283,10 +299,10 @@ public class GatheringsIO {
 		File gatheringFile = new File(path, fileName);
 		gatheringFile.delete();
 	}
-	
-	public void DeleteGatheringByName(String _name){
-		for(String fileName : getGatheringFileList()){
-			if (_name.equals(ReadGatheringNameFromXML(fileName))){
+
+	public void DeleteGatheringByName(String _name) {
+		for (String fileName : getGatheringFileList()) {
+			if (_name.equals(ReadGatheringNameFromXML(fileName))) {
 				DeleteGathering(fileName);
 			}
 		}

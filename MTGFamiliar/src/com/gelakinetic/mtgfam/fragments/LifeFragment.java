@@ -48,6 +48,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
+import com.gelakinetic.mtgfam.helpers.Gathering;
 import com.gelakinetic.mtgfam.helpers.GatheringsIO;
 import com.gelakinetic.mtgfam.helpers.GatheringsPlayerData;
 import com.slidingmenu.lib.SlidingMenu;
@@ -547,10 +548,13 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 									removePlayer(i);
 								}
 
-								ArrayList<GatheringsPlayerData> players = gIO.ReadGatheringXML(fGatherings[item]);
+								Gathering gathering = gIO.ReadGatheringXML(fGatherings[item]);
+								ArrayList<GatheringsPlayerData> players = gathering.getPlayerList();
 								for (GatheringsPlayerData player : players) {
 									addPlayer(player.getName(), player.getStartingLife(), INITIAL_POISON, null, null, anchor.getActivity(), player.getStartingLife(), null, 0);
 								}
+								displayMode = gathering.getDisplayMode();
+								getMainActivity().getPreferencesAdapter().setDisplayMode(String.valueOf(displayMode));
 
 								restartFragment();
 								return;

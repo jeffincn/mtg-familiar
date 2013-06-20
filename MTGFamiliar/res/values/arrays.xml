@@ -206,4 +206,19 @@
 		<item>ru</item>
 		<item>de</item>
 	</string-array>
+	
+	<string-array name="life_timer_array_entries">
+		<item>@string/pref_1_second</item>
+		<item>@string/pref_2_seconds</item>
+		<item>@string/pref_3_seconds</item>
+		<item>@string/pref_4_seconds</item>
+		<item>@string/pref_5_seconds</item>
+	</string-array>
+	<string-array name="life_timer_array_values">
+		<item>1000</item>
+		<item>2000</item>
+		<item>3000</item>
+		<item>4000</item>
+		<item>5000</item>
+	</string-array>
 </resources>

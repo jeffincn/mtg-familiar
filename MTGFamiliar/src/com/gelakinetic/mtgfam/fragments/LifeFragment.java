@@ -25,7 +25,6 @@ import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.TextToSpeech.OnUtteranceCompletedListener;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -142,7 +141,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 
-		timerStart = 1000;
+		timerStart = Integer.parseInt(getMainActivity().getPreferencesAdapter().getLifeTimer());
 		timerTick = 100;
 		timerValue = 0;
 		timerLock = new Object();

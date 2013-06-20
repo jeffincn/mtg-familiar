@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="left|right"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:orientation="horizontal" >
+
+        <ImageButton android:id="@+id/cardview_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="5dp" android:src="@drawable/wishlist_card_image" android:background="@null"/>
+
+        <TextView
+            android:id="@+id/wishlistRowName"
+            style="@style/text"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="@string/wishlist_name" />
+
+        <TextView
+            android:id="@+id/cardcost"
+            style="@style/text"
+            android:layout_width="wrap_content"
+            android:gravity="right|center_vertical"
+            android:text="@string/ph_cost" 
+            
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/cardtype"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/ph_type"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/cardability"
+        style="@style/text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/ph_ability"
+        android:textSize="18sp" >
+    </TextView>
+
+    <LinearLayout
+        android:id="@+id/linearLayout5"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:orientation="horizontal"
+        android:textAppearance="?android:attr/textAppearanceSmall" >
+
+        <TextView
+            android:id="@+id/cardp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:text="@string/ph_power"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <TextView
+            android:id="@+id/cardslash"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:text="@string/slash"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <TextView
+            android:id="@+id/cardt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:text="@string/ph_toughness"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </LinearLayout>
+
+</LinearLayout>

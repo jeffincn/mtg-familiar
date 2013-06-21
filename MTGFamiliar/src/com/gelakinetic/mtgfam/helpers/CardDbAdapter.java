@@ -1591,7 +1591,7 @@ public class CardDbAdapter {
 	public Cursor getWordMatches(String query, String[] columns)
 			throws FamiliarDbException {
 
-		if(query.length() == 0) {
+		if(query.length() < 2) {
 			return null;
 		}
 		
@@ -1600,7 +1600,7 @@ public class CardDbAdapter {
 				"SELECT " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " + DATABASE_TABLE_CARDS + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_ID + " AS " + SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID +
 				" FROM " + DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = " + DATABASE_TABLE_CARDS + "." + KEY_SET +
 				" WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " LIKE '" + query.replace("'", "''").replace(Character.toChars(0xE6)[0], Character.toChars(0xC6)[0]).trim() +
-				"%' ORDER BY " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " DESC COLLATE UNICODE, " + DATABASE_TABLE_SETS + "." + KEY_DATE + " ASC " +
+				"%' ORDER BY " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " COLLATE UNICODE, " + DATABASE_TABLE_SETS + "." + KEY_DATE + " ASC " +
 				") GROUP BY " + KEY_NAME;
 		return mDb.rawQuery(sql, null);
 	}

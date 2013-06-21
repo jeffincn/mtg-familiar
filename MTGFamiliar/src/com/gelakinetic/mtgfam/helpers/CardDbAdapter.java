@@ -1051,14 +1051,20 @@ public class CardDbAdapter {
 	public Cursor PrefixSearch(String cardname, String[] returnTypes)
 			throws FamiliarDbException {
 		Cursor mCursor = null;
-
-		if (cardname != null)
+		String convertName = null;
+		
+		if (cardname != null) {
 			cardname = cardname.replace(Character.toChars(0xE6)[0], Character.toChars(0xC6)[0]).trim();
+			convertName = cardname.toLowerCase().replace("ae", String.valueOf(Character.toChars(0xC6)[0]));
+		}
 
 		String statement = " WHERE 1=1";
 
 		statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_NAME
-				+ " LIKE " + DatabaseUtils.sqlEscapeString(cardname + "%") + ")";
+				+ " LIKE " + DatabaseUtils.sqlEscapeString(cardname + "%") 
+				+ " OR " + DATABASE_TABLE_CARDS + "." + KEY_NAME
+				+ " LIKE " + DatabaseUtils.sqlEscapeString(convertName + "%") 
+				+ ")";
 
 		try {
 			String sel = null;

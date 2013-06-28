@@ -425,9 +425,8 @@
     <string name="pref_5_days">5 jours</string>
     <string name="pref_1_week">1 semaine</string>
     <string name="pref_2_weeks">2 semaines</string>
-	
 	<string name="pref_life_timer_title">Minuteur</string>
-	<string name="pref_life_timer_summary">TRANSLATE: How long to wait before starting a new entry</string>
+	<string name="pref_life_timer_summary">Délai avant validation du changement de points de vie</string>
 	<string name="pref_1_second">1 seconde</string>
 	<string name="pref_2_seconds">2 secondes</string>
 	<string name="pref_3_seconds">3 secondes</string>

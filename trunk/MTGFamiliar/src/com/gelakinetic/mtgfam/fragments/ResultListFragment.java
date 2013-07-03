@@ -172,6 +172,7 @@ public class ResultListFragment extends FamiliarFragment {
 					startCardViewFrag(id, isRandom, isSingle);
 				}
 				else {
+					Toast.makeText(this.getActivity(), String.format(getString(R.string.search_toast_results), mCursor.getCount()), Toast.LENGTH_LONG).show();
 					isSingle = false;
 				}
 			}

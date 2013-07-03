@@ -140,6 +140,7 @@
     <string name="search_save_defaults">Save Defaults</string>
     <string name="search_load_defaults">Load Defaults</string>
     <string name="search_toast_no_results">No search results found.</string>
+    <string name="search_toast_results">%1$d search results found.</string>
     <string name="search_toast_cannot_save">Could not save search options.</string>
     <string name="search_toast_cannot_load">Could not load search options.</string>
     <string name="search_All_types">All types</string>

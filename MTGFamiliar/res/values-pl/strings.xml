@@ -20,13 +20,13 @@
 <string name="update_updating_rules">Aktualizacja kompleksowych zasad</string>
 <string name="update_added">Dodano</string>
 <string name="update_added_rules">nowe kompleksowe zasady</string>
-<string name="update_added_mtr"></string>
-<string name="update_added_ipg"></string>
+<string name="update_added_mtr">nowe Zasady Turniejowe (MTR)</string>
+<string name="update_added_ipg">nowy Przewodnik Naruszeń Procedurowych (IPG)</string>
 <string name="update_parse_cards">Analizuj %s</string>
 <string name="update_parse_rules">Analizowanie kompleksowych zasad…</string>
 <string name="error">Błąd</string>
 <string name="error_database">Wystąpił błąd bazy danych. Jeśli będzie się to powtarzać, spróbuj wyczyścić dane aplikacji w ustawieniach Androida.</string>
-<string name="error_corruption">Ups! Wygląda na to, że ważna część aplikacji uległa uszkodzeniu i przestała działać. Postaramy się rozgryźć co dokładnie się stało, więc prosimy wyślij nam maila na <a href="mailto:mtg.familiar@gmail.com">mtg.familiar@gmail.com</a> żebymy mogli znaleźć błąd i go naprawić. W międzyczasie, jeśli błąd sam się nie naprawi, spróbuj wyczyścić dane aplikacji w opcjach swojego urządzenia, a jeśli to nie zadziała to przeinstaluj aplkację z Google Play.</string>
+<string name="error_corruption">Ups! Wygląda na to, że ważna część aplikacji uległa uszkodzeniu i przestała działać. Postaramy się rozgryźć co dokładnie się stało, więc prosimy wyślij nam maila na &lt;a href="mailto:mtg.familiar@gmail.com"&gt;mtg.familiar@gmail.com&lt;/a&gt; żebymy mogli znaleźć błąd i go naprawić. W międzyczasie, jeśli błąd sam się nie naprawi, spróbuj wyczyścić dane aplikacji w opcjach swojego urządzenia, a jeśli to nie zadziała to przeinstaluj aplkację z Google Play.</string>
 <string name="error_no_email_client">Wygląda na to, że nie masz zainstalowanego klienta poczty. Skonfiguruj aplikację e-mail.</string>
 <string name="ph_type">Typ</string>
 <string name="ph_cost">Koszt</string>
@@ -123,7 +123,7 @@
 <string name="search_save_defaults">Zapisz jako domyślne</string>
 <string name="search_load_defaults">Wczytaj domyślne</string>
 <string name="search_toast_no_results">Nic nie znaleziono.</string>
-<string name="search_toast_results"></string>
+<string name="search_toast_results">NO TRANSLATION</string>
 <string name="search_toast_cannot_save">Nie można zapisać opcji wyszukiwania.</string>
 <string name="search_toast_cannot_load">Nie można wczytać opcji wyszukiwania.</string>
 <string name="search_All_types">Wszystkie typy</string>
@@ -162,8 +162,8 @@
 <string name="search_Vanguard">Vanguard</string>
 <string name="search_World">World</string>
 <string name="card_view_transform">Transformuj</string>
-<string name="card_view_fuse"></string>
-<string name="card_view_other_half"></string>
+<string name="card_view_fuse">Połącz</string>
+<string name="card_view_other_half">Druga Połowa</string>
 <string name="card_view_left">&lt;</string>
 <string name="card_view_right">&gt;</string>
 <string name="card_view_copy">Kopiuj do schowka</string>
@@ -182,7 +182,7 @@
 <string name="card_view_price_dialog_low">Niska:</string>
 <string name="card_view_price_dialog_medium">Średnia</string>
 <string name="card_view_price_dialog_high">Wysoka</string>
-<string name="card_view_price_dialog_foil"></string>
+<string name="card_view_price_dialog_foil">Średnia foliowana</string>
 <string name="card_view_price_dialog_link">Naciśnij tutaj aby zobaczyć inrofmację o cenie i tendencji</string>
 <string name="card_view_rulings_dialog_title">Zasady karty</string>
 <string name="card_view_no_rulings">Brak zasad dla tej karty</string>
@@ -212,7 +212,7 @@
 <string name="life_counter_Commander">Zwarty</string>
 <string name="life_counter_Compact">Kompaktowy</string>
 <string name="life_counter_Normal">Zwykły</string>
-<string name="life_counter_commander_cast"></string>
+<string name="life_counter_commander_cast">NO TRANSLATION</string>
 <string name="gathering_custom_name">Nazwa</string>
 <string name="gathering_player">Gracz</string>
 <string name="gathering_starting_life">Życie początkowe</string>
@@ -228,7 +228,7 @@
 <string name="gathering_toast_no_gatherings">Nie zapisano żadnych Pojedynków.</string>
 <string name="gathering_toast_no_name">Proszę wpisać nazwę dla Pojedynku.</string>
 <string name="gathering_empty_field">Pola nie mogą pozostać puste. Sprawdź wszystkie pola.</string>
-<string name="gathering_display_mode_title"></string>
+<string name="gathering_display_mode_title">Tryb wyświetlania</string>
 <string name="dice_heads">Orzeł</string>
 <string name="dice_tails">Reszka</string>
 <string name="mana_pool_plus">+</string>
@@ -263,7 +263,7 @@
 <string name="trader_Low">Niskie</string>
 <string name="trader_Average">Średnie</string>
 <string name="trader_High">Wysokie</string>
-<string name="trader_pricing_dialog_title"></string>
+<string name="trader_pricing_dialog_title">Opcje Cen</string>
 <string name="wishlist_name">Nazwa</string>
 <string name="wishlist_add_card">Dodaj</string>
 <string name="wishlist_default_price">0</string>
@@ -275,8 +275,8 @@
 <string name="wishlist_share_include_set">Dołączyć nazwę edycji?</string>
 <string name="wishlist_empty_dialog_title">Wyczyść Listę Życzeń</string>
 <string name="wishlist_empty_dialog_text">Czy na pewno chcesz wyczyścić swoją Listę Życzeń?</string>
-<string name="wishlist_edit_dialog_title_foil"></string>
-<string name="wishlist_edit_dialog_title_end"></string>
+<string name="wishlist_edit_dialog_title_foil">Foliowane</string>
+<string name="wishlist_edit_dialog_title_end">na Liście Życzeń</string>
 <string name="timer_how_long">Podaj czas rundyn(HH:MM)</string>
 <string name="timer_how_long_landscape">Ile trwa runda? (HH:MM)</string>
 <string name="timer_start">Start licznika</string>
@@ -392,19 +392,19 @@
 <string name="pref_5_days">5 dni</string>
 <string name="pref_1_week">1 tydzień</string>
 <string name="pref_2_weeks">2 tygodnie</string>
-<string name="pref_life_timer_title"></string>
-<string name="pref_life_timer_summary"></string>
-<string name="pref_1_second"></string>
-<string name="pref_2_seconds"></string>
-<string name="pref_3_seconds"></string>
-<string name="pref_4_seconds"></string>
-<string name="pref_5_seconds"></string>
+<string name="pref_life_timer_title">Licznik</string>
+<string name="pref_life_timer_summary">Ile czasu ma upłynąć przed wprowadzeniem nowego wpisu</string>
+<string name="pref_1_second">1 sekunda</string>
+<string name="pref_2_seconds">2 sekundy</string>
+<string name="pref_3_seconds">3 sekundy</string>
+<string name="pref_4_seconds">4 sekundy</string>
+<string name="pref_5_seconds">5 sekund</string>
 <string name="main_card_language">en</string>
 <string name="goggles_photo_analysis">Analiza fotografii…</string>
 <string name="goggles_no_card_on_photo">Nie znaleziono żadnej karty odpowiadającej fotografii</string>
 <string name="judges_corner_MTR">MTR</string>
 <string name="judges_corner_IPG">IPG</string>
-<string name="judges_corner_jump_to_top"></string>
+<string name="judges_corner_jump_to_top">Skocz do góry</string>
 <string name="judges_corner_counter">Znacznik</string>
 <string name="deck_counter_1">+1</string>
 <string name="deck_counter_2">+2</string>

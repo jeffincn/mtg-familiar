@@ -91,6 +91,7 @@ public class WishlistHelpers {
 					String number = parts.length < 4 ? null : parts[3];
 					int rarity = parts.length < 5 ? '-' : Integer
 							.parseInt(parts[4]);
+					boolean foil = parts.length < 6 ? false : Boolean.parseBoolean(parts[5]);
 
 					// Build the wishlist, ignoring any cards we are currently
 					// updating
@@ -99,6 +100,8 @@ public class WishlistHelpers {
 								numberOf, number, rarity);
 						if (rarity == '-' || number == null)
 							cd = TradeListHelpers.FetchCardData(cd, mDbHelper);
+						
+						cd.setIsFoil(foil);
 						wishlist.add(cd);
 					}
 				}

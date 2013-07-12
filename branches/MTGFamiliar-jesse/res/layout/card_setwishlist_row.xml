@@ -10,22 +10,42 @@
 	more details. You should have received a copy of the GNU General Public License 
 	along with MTG Familiar. If not, see <http://www.gnu.org/licenses/>.
 -->
+<!--
+  Renders a single row of the card selection dialog. Allows the user to edit a
+  count for a single set+premium value for a single card.
+  -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal" 
-    android:baselineAligned="false">
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <ImageButton
+         android:padding="8dp"
+         android:id="@+id/wishlistDialogMinus"
+         android:layout_height="32dp"
+         android:layout_width="32dp"
+         android:scaleType="fitCenter"
+         android:src="@drawable/minus" />
 
     <EditText
         android:id="@+id/numberInput"
-        android:layout_width="50dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
+        android:padding="0dp"
+        android:minEms="2"
         android:gravity="center"
         android:inputType="number"
         android:maxLength="2"
-        android:selectAllOnFocus="true" >
-    </EditText>
+        android:selectAllOnFocus="true" />
+
+    <ImageButton
+         android:padding="8dp"
+         android:id="@+id/wishlistDialogPlus"
+         android:layout_height="32dp"
+         android:layout_width="32dp"
+         android:scaleType="fitCenter"
+         android:src="@drawable/plus" />
 
     <ImageView
         android:id="@+id/wishlistDialogFoil"
@@ -35,12 +55,11 @@
 
     <TextView
         android:id="@+id/cardset"
-        style="@style/text"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:textSize="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:gravity="left|center_vertical"
-        android:text="@string/search_set" />
+        android:gravity="left|center_vertical" />
 
 </LinearLayout>

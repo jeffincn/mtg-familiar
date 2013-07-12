@@ -14,6 +14,7 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -283,7 +284,6 @@ public class WishlistHelpers {
 
 	public void fillWishlistDialog(ArrayList<CardData> list) throws FamiliarDbException {
 		lCardlist = new ArrayList<CardData>();
-		lCardlist.clear();
 		ArrayList<String> setList = new ArrayList<String>();
 		
 		boolean opened = false;
@@ -359,18 +359,45 @@ public class WishlistHelpers {
 			LayoutInflater inf = ma.getLayoutInflater();
 			View v = inf.inflate(R.layout.card_setwishlist_row, null);
 
-			EditText numberField = (EditText) v.findViewById(R.id.numberInput);
-			ImageView foilField = (ImageView) v.findViewById(R.id.wishlistDialogFoil);
-			TextView setField = (TextView) v.findViewById(R.id.cardset);
-			
-			//Check card list to see if a foil version exist, blank the foil button if so.
-			if (!cd.foil){
+			// Check card list to see if a foil version exist, blank the foil button if so.
+			if (!cd.foil) {
+				ImageView foilField = (ImageView) v.findViewById(R.id.wishlistDialogFoil);
 				foilField.setVisibility(View.GONE);
-			} else {
-				foilField.setVisibility(View.VISIBLE);
 			}
 
-			numberField.setText(cd.numberOf + "");
+			final EditText numberField = (EditText) v.findViewById(R.id.numberInput);
+			numberField.setText(Integer.toString(cd.numberOf));
+
+			// Add listeners for the increment & decrement buttons which do
+			// their thing.
+			View plusButton = v.findViewById(R.id.wishlistDialogPlus);
+			plusButton.setOnClickListener(new View.OnClickListener() {
+				@Override public void onClick(View v) {
+					try {
+						int currValue = Integer.parseInt(numberField.getText().toString());
+						numberField.setText(Integer.toString(currValue + 1));
+					} catch (NumberFormatException nfe) {
+						// Bad input, reset to 0.
+						numberField.setText("0");
+					}
+				}
+			});
+			View minusButton = v.findViewById(R.id.wishlistDialogMinus);
+			minusButton.setOnClickListener(new View.OnClickListener() {
+				@Override public void onClick(View v) {
+					try {
+						int currValue = Integer.parseInt(numberField.getText().toString());
+						if (currValue > 0) {
+							numberField.setText(Integer.toString(currValue - 1));
+						}
+					} catch (NumberFormatException nfe) {
+						// Bad input, reset to 0.
+						numberField.setText("0");
+					}
+				}
+			});
+
+			TextView setField = (TextView) v.findViewById(R.id.cardset);
 			setField.setText(cd.tcgName);
 
 			lvSets.addView(v);

@@ -375,7 +375,10 @@ public class WishlistHelpers {
 				@Override public void onClick(View v) {
 					try {
 						int currValue = Integer.parseInt(numberField.getText().toString());
-						numberField.setText(Integer.toString(currValue + 1));
+						// Text field is limited to two characters, so don't wrap back to 10.
+						if (currValue < 99) {
+							numberField.setText(Integer.toString(currValue + 1));
+						}
 					} catch (NumberFormatException nfe) {
 						// Bad input, reset to 0.
 						numberField.setText("0");

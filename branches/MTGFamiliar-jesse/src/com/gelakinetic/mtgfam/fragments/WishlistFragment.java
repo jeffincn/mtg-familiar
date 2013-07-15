@@ -15,19 +15,20 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.text.Html.ImageGetter;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ExpandableListView;
-import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,16 +55,16 @@ public class WishlistFragment extends FamiliarFragment {
 	private final static int											DIALOG_PRICE_SETTING	= 2;
 	private final static int											DIALOG_CONFIRMATION		= 3;
 	private final static int											DIALOG_SHARE					= 4;
-	private int																		positionForDialog;
+	private int															positionForDialog;
 
-	private AutoCompleteTextView									namefield;
+	private AutoCompleteTextView										namefield;
 
-	private Button																bAdd;
-	private ImageButton															camerabutton;
-	private TextView															tradePrice;
-	private CheckBox												foilButton;
-	private ExpandableListView										expWishlist;
-	private WishlistAdapter												aaExpWishlist;
+	private Button														bAdd;
+	private ImageButton													camerabutton;
+	private TextView													tradePrice;
+	private CheckBox													foilButton;
+	private ListView													cardListView;
+	private WishlistAdapter												cardListAdapter;
 	private ArrayList<String>											cardNames;
 	private ArrayList<ArrayList<String>>					cardSetNames;
 	private static ArrayList<ArrayList<CardData>>	cardSetWishlists;
@@ -108,10 +109,9 @@ public class WishlistFragment extends FamiliarFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
-		View myFragmentView = inflater.inflate(R.layout.wishlist_activity, container, false);
-
 		mTradeListHelper = new TradeListHelpers();
 
+		View myFragmentView = inflater.inflate(R.layout.wishlist_activity, container, false);
 		namefield = (AutoCompleteTextView) myFragmentView.findViewById(R.id.namesearch);
 		namefield.setAdapter(new AutocompleteCursorAdapter(getActivity(), null));
 		setKeyboardFocus(savedInstanceState, namefield, false, 100);
@@ -135,6 +135,7 @@ public class WishlistFragment extends FamiliarFragment {
 			}
 		});
 		
+		// Handler for adding cards to the list.
 		bAdd.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				if (namefield.getText().length() > 0) {
@@ -146,6 +147,7 @@ public class WishlistFragment extends FamiliarFragment {
 
 					
 					boolean foil = foilButton.isChecked();	
+					// TODO: If the card result below is unknown, the app will crash.
 					try {
 						String cardName = namefield.getText().toString();
 						Cursor cards = mDbHelper.fetchCardByName(cardName, new String[]{CardDbAdapter.KEY_SET, CardDbAdapter.KEY_NUMBER, CardDbAdapter.KEY_RARITY});
@@ -168,7 +170,7 @@ public class WishlistFragment extends FamiliarFragment {
 						getMainActivity().getSupportFragmentManager().popBackStack();
 						return;
 					}
-					aaExpWishlist.notifyDataSetChanged();
+					cardListAdapter.notifyDataSetChanged();
 
 					namefield.setText("");
 					numberfield.setText("1");
@@ -180,25 +182,19 @@ public class WishlistFragment extends FamiliarFragment {
 			}
 		});
 
-		expWishlist = (ExpandableListView) myFragmentView.findViewById(R.id.wishlist);
-
-		expWishlist.setGroupIndicator(null);
-		expWishlist.setChildIndicator(null);
-		expWishlist.setDividerHeight(0);
-
-		aaExpWishlist = new WishlistAdapter(getActivity(), expWishlist);
-		expWishlist.setAdapter(aaExpWishlist);
-
-		expWishlist.setOnChildClickListener(new OnChildClickListener() {
-			public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+		cardListView = (ListView) myFragmentView.findViewById(R.id.wishlist);
+		cardListAdapter = new WishlistAdapter(getActivity(), cardSetWishlists);
+		cardListView.setAdapter(cardListAdapter);
+		cardListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 				try {
 					removeDialog();
 				}
 				catch (IllegalArgumentException e) {
+					Log.w("mtgfam", "Error removing dialog:", e);
 				}
-				positionForDialog = groupPosition;
+				positionForDialog = position;
 				showDialog(DIALOG_UPDATE_CARD);
-				return false;
 			}
 		});
 
@@ -266,7 +262,7 @@ public class WishlistFragment extends FamiliarFragment {
 			getMainActivity().getSupportFragmentManager().popBackStack();
 			return;
 		}
-		aaExpWishlist.notifyDataSetChanged();
+		cardListAdapter.notifyDataSetChanged();
 		lWishlist.clear();
 
 		removeDialog();
@@ -369,7 +365,7 @@ public class WishlistFragment extends FamiliarFragment {
 		}
 
 		if (showTotalPrice || showIndividualPrices) {
-			loadPrice(cardToAdd, aaExpWishlist);
+			loadPrice(cardToAdd, cardListAdapter);
 		}
 	}
 
@@ -400,9 +396,9 @@ public class WishlistFragment extends FamiliarFragment {
 				tradePrice.setText(sTotal);
 				tradePrice.setTextColor(color);
 			}
-			aaExpWishlist.notifyDataSetChanged();
-			expWishlist.invalidate();
-			expWishlist.postInvalidate();
+			cardListAdapter.notifyDataSetChanged();
+			cardListView.invalidate();
+			cardListView.postInvalidate();
 		}
 	}
 
@@ -439,19 +435,19 @@ public class WishlistFragment extends FamiliarFragment {
 					if (message.compareTo(card_not_found) == 0) {
 						cardlist.remove(data);
 						i--;
-						aaExpWishlist.notifyDataSetChanged();
+						cardListAdapter.notifyDataSetChanged();
 						Toast.makeText(getActivity(), data.name + ": " + card_not_found, Toast.LENGTH_LONG).show();
 					}
 					else if (message.compareTo(mangled_url) == 0) {
 						cardlist.remove(data);
 						i--;
-						aaExpWishlist.notifyDataSetChanged();
+						cardListAdapter.notifyDataSetChanged();
 						Toast.makeText(getActivity(), data.name + ": " + mangled_url, Toast.LENGTH_LONG).show();
 					}
 					else if (message.compareTo(database_busy) == 0) {
 						cardlist.remove(data);
 						i--;
-						aaExpWishlist.notifyDataSetChanged();
+						cardListAdapter.notifyDataSetChanged();
 						Toast.makeText(getActivity(), data.name + ": " + database_busy, Toast.LENGTH_LONG).show();
 					}
 					else if (message.compareTo(fetch_failed) == 0) {
@@ -463,160 +459,56 @@ public class WishlistFragment extends FamiliarFragment {
 		return totalPrice;
 	}
 
-	class WishlistAdapter extends BaseExpandableListAdapter {
+	class WishlistAdapter extends ArrayAdapter<ArrayList<CardData>> {
+		private final Resources resources;
+		private final ImageGetter imgGetter;
 
-		private Resources		resources;
-		ExpandableListView	_list;
-		private ImageGetter	imgGetter;
-
-		public WishlistAdapter(Context context, ExpandableListView list) {
-			_list = list;
-			resources = context.getResources();
+		public WishlistAdapter(Context context, ArrayList<ArrayList<CardData>> data) {
+			super(context, R.layout.wishlist_row, data);
+			this.resources = context.getResources();
 			this.imgGetter = ImageGetterHelper.GlyphGetter(resources);
 		}
 
-		public Object getChild(int groupPosition, int childPosition) {
-			return null;
-		}
-
-		public long getChildId(int groupPosition, int childPosition) {
-			return 0;
-		}
-
-		public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView,
-				ViewGroup parent) {
-			View v = convertView;
-			CardData data = WishlistFragment.cardSetWishlists.get(groupPosition).get(childPosition);
-
-			if (v == null) {
-				LayoutInflater inf = getActivity().getLayoutInflater();
-				v = inf.inflate(R.layout.wishlist_cardset_row, null);
-			}
-
-			// // empty view for 0-count rows
-			// if (data == null || data.numberOf == 0)
-			// v = new View(getActivity());
-			// else {
-			// LayoutInflater inf = getLayoutInflater();
-			// v = inf.inflate(R.layout.wishlist_cardset_row, null);
-			TextView setField = (TextView) v.findViewById(R.id.wishlistRowSet);
-			TextView priceField = (TextView) v.findViewById(R.id.wishlistRowPrice);
-			ImageView foilField = (ImageView) v.findViewById(R.id.wishlistSetRowFoil);
-
-			
-			if(setField == null || priceField == null) {
-				LayoutInflater inf = getActivity().getLayoutInflater();
-				v = inf.inflate(R.layout.wishlist_cardset_row, null);
-				setField = (TextView) v.findViewById(R.id.wishlistRowSet);
-				priceField = (TextView) v.findViewById(R.id.wishlistRowPrice);
-			}
-
-			setField.setText(data.tcgName);
-			char r = (char) data.rarity;
-			switch (r) {
-				case 'C':
-				case 'c':
-					setField.setTextColor(resources.getColor(R.color.common));
-					break;
-				case 'U':
-				case 'u':
-					setField.setTextColor(resources.getColor(R.color.uncommon));
-					break;
-				case 'R':
-				case 'r':
-					setField.setTextColor(resources.getColor(R.color.rare));
-					break;
-				case 'M':
-				case 'm':
-					setField.setTextColor(resources.getColor(R.color.mythic));
-					break;
-				case 'T':
-				case 't':
-					setField.setTextColor(resources.getColor(R.color.timeshifted));
-					break;
-			}
-			
-			foilField.setVisibility((data.foil ? View.VISIBLE : View.GONE));
-			
-			
-			priceField.setText((showIndividualPrices ? "" : "x") + data.numberOf
-					+ (showIndividualPrices ? ("x" + (data.hasPrice() ? data.getPriceString() : data.message)) : ""));
-			if (data.hasPrice() || !showIndividualPrices) {
-				priceField.setTextColor(resources.getColor(R.color.light_gray));
-			}
-			else {
-				priceField.setTextColor(resources.getColor(R.color.red));
-			}
-			// }
-			return v;
-		}
-
-		public int getChildrenCount(int groupPosition) {
-			return WishlistFragment.cardSetWishlists.get(groupPosition).size();
-		}
-
-		public Object getGroup(int groupPosition) {
-			return null;
-		}
-
-		public int getGroupCount() {
-			return WishlistFragment.cardSetWishlists.size();
-		}
-
-		public long getGroupId(int groupPosition) {
-			return 0;
-		}
-
-		@Override
-		public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+		@Override public View getView(int position, View convertView, ViewGroup parent) {
 			View v = convertView;
 			if (v == null) {
 				LayoutInflater inf = getActivity().getLayoutInflater();
 				v = inf.inflate(R.layout.wishlist_row, null);
 			}
-			CardData data = WishlistFragment.cardSetWishlists.get(groupPosition).get(0);
+			// Use the first set we have for populating the top-level data.
+			CardData data = WishlistFragment.cardSetWishlists.get(position).get(0);
 			if (data != null) {
-				final CardData finalData = data;
-				final int pos = groupPosition;
-				View.OnClickListener onClick = new View.OnClickListener() {
-					public void onClick(View v) {
-						removeDialog();
-						positionForDialog = pos;
-						showDialog(DIALOG_UPDATE_CARD);
-					}
-				};
-
 				TextView nameField = (TextView) v.findViewById(R.id.wishlistRowName);
+				if (nameField == null) {
+					// TODO: This should probably try re-inflating.
+					Log.i("mtgfam", "could not find name field in wishlist view");
+					return v;
+				}
+				nameField.setText(data.name);
+
+				ImageButton cardviewButton = (ImageButton) v.findViewById(R.id.cardview_button);
+				final String cardviewName = data.name;
+				cardviewButton.setOnClickListener(new View.OnClickListener(){
+					@Override
+					public void onClick(View v) {
+						Bundle args = new Bundle();
+						try {
+							args.putLong("id", mDbHelper.fetchIdByName(cardviewName));
+							args.putBoolean(SearchViewFragment.RANDOM, false);
+							args.putBoolean("isSingle", true);
+							CardViewFragment cvFrag = new CardViewFragment();
+							startNewFragment(cvFrag, args);
+						} catch (FamiliarDbException e) {
+							Log.w("mtgfam", "problem loading card view page:", e);
+						}
+					}});
+
 				TextView typeField = (TextView) v.findViewById(R.id.cardtype);
 				TextView costField = (TextView) v.findViewById(R.id.cardcost);
 				TextView abilityField = (TextView) v.findViewById(R.id.cardability);
 				TextView pField = (TextView) v.findViewById(R.id.cardp);
 				TextView slashField = (TextView) v.findViewById(R.id.cardslash);
 				TextView tField = (TextView) v.findViewById(R.id.cardt);
-				ImageButton cardviewButton = (ImageButton) v.findViewById(R.id.cardview_button);
-				
-				if (nameField == null) {
-					return v;
-				}
-
-				cardviewButton.setOnClickListener(new View.OnClickListener(){
-
-					@Override
-					public void onClick(View v) {
-						Bundle args = new Bundle();
-						try {
-							args.putLong("id", mDbHelper.fetchIdByName(finalData.name));
-							args.putBoolean(SearchViewFragment.RANDOM, false);
-							args.putBoolean("isSingle", true);
-							CardViewFragment cvFrag = new CardViewFragment();
-							startNewFragment(cvFrag, args);
-						} catch (FamiliarDbException e) {
-						}
-					}});
-				
-				nameField.setText(data.name);
-				nameField.setOnClickListener(onClick);
-
 				if (!verbose) {
 					typeField.setVisibility(View.GONE);
 					costField.setVisibility(View.GONE);
@@ -646,7 +538,6 @@ public class WishlistFragment extends FamiliarFragment {
 					else {
 						typeField.setVisibility(View.VISIBLE);
 						typeField.setText(type);
-						typeField.setOnClickListener(onClick);
 					}
 					String manaCost = data.cost;
 					if (manaCost == null || manaCost == "") {
@@ -656,7 +547,6 @@ public class WishlistFragment extends FamiliarFragment {
 						costField.setVisibility(View.VISIBLE);
 						manaCost = manaCost.replace("{", "<img src=\"").replace("}", "\"/>");
 						costField.setText(ImageGetterHelper.jellyBeanHack(manaCost, imgGetter, null));
-						costField.setOnClickListener(onClick);
 					}
 					String ability = data.ability;
 					if (ability == null || ability == "") {
@@ -666,7 +556,6 @@ public class WishlistFragment extends FamiliarFragment {
 						abilityField.setVisibility(View.VISIBLE);
 						ability = ability.replace("{", "<img src=\"").replace("}", "\"/>");
 						abilityField.setText(ImageGetterHelper.jellyBeanHack(ability, imgGetter, null));
-						abilityField.setOnClickListener(onClick);
 					}
 					boolean hidePT = true;
 					try {
@@ -740,9 +629,6 @@ public class WishlistFragment extends FamiliarFragment {
 					pField.setVisibility(View.VISIBLE);
 					slashField.setVisibility(View.VISIBLE);
 					tField.setVisibility(View.VISIBLE);
-					pField.setOnClickListener(onClick);
-					slashField.setOnClickListener(onClick);
-					tField.setOnClickListener(onClick);
 
 					if (!hideLoyalty) {
 						pField.setVisibility(View.GONE);
@@ -754,25 +640,75 @@ public class WishlistFragment extends FamiliarFragment {
 						tField.setVisibility(View.GONE);
 					}
 				}
+				// Set focusable programatically to make onItemClick work.
+				cardviewButton.setFocusable(false);
 			}
-			_list.expandGroup(groupPosition); // used to Expand the child list
-			// automatically at the time of
-			// displaying
-			_list.collapseGroup(groupPosition); // used to Expand the child list
-			// automatically at the time of
-			// displaying
-			_list.expandGroup(groupPosition); // used to Expand the child list
-			// automatically at the time of
-			// displaying
+
+			// Re-render the set rows.
+			// TODO: This could cache views for more efficiency.
+			LinearLayout setsView = (LinearLayout) v.findViewById(R.id.wishlist_row_setlist);
+			setsView.removeAllViews();
+			for (CardData setData : WishlistFragment.cardSetWishlists.get(position)) {
+				setsView.addView(getSetView(setData));
+			}
+
 			return v;
 		}
 
-		public boolean hasStableIds() {
-			return false;
-		}
+		/**
+		 * Returns a view of a single set for a card, displaying the set name, quantity, and price. These are appended
+		 * to the main card view.
+		 */
+		private View getSetView(CardData data) {
+			LayoutInflater inf = getActivity().getLayoutInflater();
+			View v = inf.inflate(R.layout.wishlist_cardset_row, null);
 
-		public boolean isChildSelectable(int groupPosition, int childPosition) {
-			return true;
+			// Set & color card name.
+			TextView setField = (TextView) v.findViewById(R.id.wishlistRowSet);
+			setField.setText(data.tcgName);
+			char r = (char) data.rarity;
+			switch (r) {
+				case 'C':
+				case 'c':
+					setField.setTextColor(resources.getColor(R.color.common));
+					break;
+				case 'U':
+				case 'u':
+					setField.setTextColor(resources.getColor(R.color.uncommon));
+					break;
+				case 'R':
+				case 'r':
+					setField.setTextColor(resources.getColor(R.color.rare));
+					break;
+				case 'M':
+				case 'm':
+					setField.setTextColor(resources.getColor(R.color.mythic));
+					break;
+				case 'T':
+				case 't':
+					setField.setTextColor(resources.getColor(R.color.timeshifted));
+					break;
+			}
+			
+			// Show / hide the foil state.
+			ImageView foilField = (ImageView) v.findViewById(R.id.wishlistSetRowFoil);
+			foilField.setVisibility((data.foil ? View.VISIBLE : View.GONE));
+			
+			// Set the quantity (and price if the user has enabled that option).
+			TextView priceField = (TextView) v.findViewById(R.id.wishlistRowPrice);
+			if (showIndividualPrices) {
+				priceField.setText(
+						String.format("%dx%s", data.numberOf, data.hasPrice() ? data.getPriceString() : data.message));
+			} else {
+				priceField.setText(String.format("x%d", data.numberOf));
+			}
+			if (data.hasPrice() || !showIndividualPrices) {
+				priceField.setTextColor(resources.getColor(R.color.light_gray));
+			} else {
+				priceField.setTextColor(resources.getColor(R.color.red));
+			}
+
+			return v;
 		}
 	}
 
@@ -870,7 +806,7 @@ public class WishlistFragment extends FamiliarFragment {
 										if (showTotalPrice || showIndividualPrices) {
 											cd = TradeListHelpers.FetchCardData(cd, mDbHelper);
 											cd.message = ("loading");
-											loadPrice(cd, aaExpWishlist);
+											loadPrice(cd, cardListAdapter);
 										}
 										else
 											cd = TradeListHelpers.FetchCardData(cd, mDbHelper);
@@ -890,7 +826,7 @@ public class WishlistFragment extends FamiliarFragment {
 								cardSetWishlists.remove(positionForDialog);
 								cardNames.remove(positionForDialog);
 							}
-							aaExpWishlist.notifyDataSetChanged();
+							cardListAdapter.notifyDataSetChanged();
 							break;
 						}
 					}
@@ -947,11 +883,11 @@ public class WishlistFragment extends FamiliarFragment {
 													for (CardData data : cardSetWishlists.get(i)) {
 														if (data.numberOf > 0) {
 															data.message = ("loading");
-															loadPrice(data, aaExpWishlist);
+															loadPrice(data, cardListAdapter);
 														}
 													}
 												}
-												aaExpWishlist.notifyDataSetChanged();
+												cardListAdapter.notifyDataSetChanged();
 											}
 
 											// And also update the preference
@@ -991,7 +927,7 @@ public class WishlistFragment extends FamiliarFragment {
 											cardNames.clear();
 											cardSetNames.clear();
 											cardSetWishlists.clear();
-											aaExpWishlist.notifyDataSetChanged();
+											cardListAdapter.notifyDataSetChanged();
 											if (showTotalPrice || showIndividualPrices)
 												UpdateTotalPrices();
 											removeDialog();

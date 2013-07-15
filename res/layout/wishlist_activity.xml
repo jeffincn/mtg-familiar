@@ -60,9 +60,8 @@
         android:text="@string/trader_default_price"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <ExpandableListView
+    <ListView
         android:id="@+id/wishlist"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
-
 </LinearLayout>

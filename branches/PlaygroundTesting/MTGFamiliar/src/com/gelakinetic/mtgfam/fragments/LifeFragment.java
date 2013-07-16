@@ -25,12 +25,14 @@ import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.TextToSpeech.OnUtteranceCompletedListener;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -48,6 +50,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gelakinetic.mtgfam.R;
+import com.gelakinetic.mtgfam.R.id;
 import com.gelakinetic.mtgfam.helpers.GatheringsIO;
 import com.gelakinetic.mtgfam.helpers.GatheringsPlayerData;
 import com.slidingmenu.lib.SlidingMenu;
@@ -69,8 +72,8 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	public static final int									INITIAL_LIFE							= 20;
 	public static final int									INITIAL_LIFE_COMMANDER					= 40;
 	public static final int									INITIAL_POISON						= 0;
-	protected static final int							EVERYTHING								= 0;
-	protected static final int							JUST_TOTALS								= 1;
+	protected static final int								EVERYTHING								= 0;
+	protected static final int								JUST_TOTALS								= 1;
 
 	private int															displayMode;
 	private static final int								normalDisplay							= 0;
@@ -79,12 +82,13 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 	private int															playerWidth;
 	private int															playerHeight;
-	private LinearLayout										mainLayout;
+	private GridView											mainLayout;
 	private LinearLayout										doublePlayer;
 	private GridView											edhGrid;
 	private CommanderTopViewAdapter									commanderPlayersAdapter;
 	private int													visibleEDHPlayer;
 	private int															playersInRow;
+	PlayerViewAdapter playerViews;
 
 	private int															orientation;
 	private boolean													canGetLock;
@@ -124,7 +128,8 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 	private GatheringsIO										gIO;
 	private MenuItem												announceLifeTotals				= null;
-	private FrameLayout											playerScrollView;
+	//private FrameLayout											playerScrollView;
+	private GridView												playerGridView;
 
 	public LifeFragment() {
 		/* http://developer.android.com/reference/android/app/Fragment.html
@@ -207,6 +212,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 		orientation = getResources().getConfiguration().orientation;
 
+		
 		listSizeHeight = -10;
 		listSizeWidth = -10;
 
@@ -258,16 +264,17 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		tts = new TextToSpeech(getActivity(), this);
 		mediaPlayer = MediaPlayer.create(getActivity(), R.raw.over_9000);
 
-		playerScrollView = (FrameLayout) myFragmentView.findViewById(R.id.playerScrollView);
-
-		ViewTreeObserver vto = playerScrollView.getViewTreeObserver();
-		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-
-			@Override
-			public void onGlobalLayout() {
-				anchor.onWindowFocusChanged();
-			}
-		});
+		playerGridView	= (GridView) myFragmentView.findViewById(R.id.playerGridView);
+//		playerScrollView = (FrameLayout) myFragmentView.findViewById(R.id.playerScrollView);
+//
+//		ViewTreeObserver vto = playerScrollView.getViewTreeObserver();
+//		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+//
+//			@Override
+//			public void onGlobalLayout() {
+//				anchor.onWindowFocusChanged();
+//			}
+//		});
 
 		return myFragmentView;
 	}
@@ -310,24 +317,27 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 		removeDialog();
 
-		mainLayout = (LinearLayout) this.getView().findViewById(R.id.playerList);
-		if (displayMode == commanderDisplay){
-			//Really this is just outside the next if for landscape modes, where it will always be ignored
-			//But its a lot easier then wrapping everything with IsPortrait > No > OK ignore commander stuff.
-			commanderPlayersAdapter = new CommanderTopViewAdapter(getActivity());
-			if (orientation == PORTRAIT) {
-				ScrollView parent = (ScrollView) mainLayout.getParent();		
-				mainLayout = (LinearLayout) this.getView().findViewById(R.id.info_layout);		
-				parent.setVisibility(View.GONE);
-				
-				LayoutInflater inflater = (LayoutInflater) this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				LinearLayout edhLayout = (LinearLayout) inflater.inflate(R.layout.life_counter_player_edh_grid, null);
-				edhGrid = (GridView) edhLayout.findViewById(R.id.edh_grid);
-				mainLayout.addView(edhLayout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
-				
-				edhGrid.setAdapter(commanderPlayersAdapter);
-			}
-		}
+		mainLayout = (GridView) this.getView().findViewById(R.id.playerGridView);
+
+		playerViews = new PlayerViewAdapter(getActivity());
+		mainLayout.setAdapter(playerViews);
+//		if (displayMode == commanderDisplay){
+//			//Really this is just outside the next if for landscape modes, where it will always be ignored
+//			//But its a lot easier then wrapping everything with IsPortrait > No > OK ignore commander stuff.
+//			commanderPlayersAdapter = new CommanderTopViewAdapter(getActivity());
+//			if (orientation == PORTRAIT) {
+//				ScrollView parent = (ScrollView) mainLayout.getParent();		
+//				mainLayout = (GridView) this.getView().findViewById(R.id.playerGridView);		
+//				parent.setVisibility(View.GONE);
+//				
+//				LayoutInflater inflater = (LayoutInflater) this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//				LinearLayout edhLayout = (LinearLayout) inflater.inflate(R.layout.life_counter_player_edh_grid, null);
+//				edhGrid = (GridView) edhLayout.findViewById(R.id.edh_grid);
+//				mainLayout.addView(edhLayout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
+//				
+//				edhGrid.setAdapter(commanderPlayersAdapter);
+//			}
+//		}
 		playersInRow = 0;
 
 		if (canGetLock) {
@@ -425,6 +435,21 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		} else {
 			setType(activeType);
 		}
+		
+
+		final View testView = this.getView().findViewById(R.id.info_layout);
+		ViewTreeObserver vto = testView.getViewTreeObserver();
+		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+		  @Override
+		  public void onGlobalLayout() {
+		    Log.d("TEST", "Height = " + testView.getHeight() + " Width = " + testView.getWidth());
+		    listSizeWidth = testView.getWidth();
+		    listSizeHeight = testView.getHeight();
+		    ViewTreeObserver obs = testView.getViewTreeObserver();
+		    obs.removeGlobalOnLayoutListener(this);
+		    playerViews.notifyDataSetChanged();
+		  }
+		});
 	}
 
 	private void restartFragment() {
@@ -439,12 +464,16 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 	public void onWindowFocusChanged() {
 
+		LinearLayout infoLayout = (LinearLayout) this.getView().findViewById(R.id.info_layout);
+		listSizeWidth = infoLayout.getWidth();
+		listSizeHeight = infoLayout.getHeight();
+		
 		if (listSizeWidth != -10) {
 			return;
 		}
 
-		listSizeWidth = playerScrollView.getWidth();
-		listSizeHeight = playerScrollView.getHeight();
+		listSizeWidth = playerGridView.getWidth();
+		listSizeHeight = playerGridView.getHeight();
 
 		if(displayMode == commanderDisplay){
 			try{
@@ -887,7 +916,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			}
 		}
 		else {
-			mainLayout.addView(layout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
+//			mainLayout.addView(layout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
 
 		}
 	}
@@ -918,7 +947,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			updateViews();
 		}
 		else {
-			mainLayout.removeView(players.get(index).layout);
+//			mainLayout.removeView(players.get(index).layout);
 			players.remove(index);
 		}
 	}
@@ -940,6 +969,91 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		}
 
 		restartFragment();
+	}
+	
+	private class PlayerViewAdapter extends BaseAdapter {
+		private Context						context;
+		
+		public PlayerViewAdapter(Context _context){
+			context = _context;
+		}
+		
+		public int getCount() {
+			return players.size();
+		}
+		
+		@Override
+		public Object getItem(int position) {
+			return players.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return players.get(position).hashCode();
+		}
+		
+		public View getView(int position, View convertView, ViewGroup parent) {
+			final int pos = position;
+			View v;
+			LinearLayout wrapperView;
+			TextView name, damage;
+			Button plus1, minus1, plus5, minus5;
+			ListView history;
+			
+			if (convertView == null){
+				LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				v = vi.inflate(R.layout.life_counter_player_row, null);
+				
+
+			} else {
+				v = convertView;
+			}
+			
+			if (listSizeWidth != -10 && listSizeHeight != -10){
+				wrapperView = (LinearLayout)v.findViewById(R.id.nplayer_row);
+				AbsListView.LayoutParams layout = new AbsListView.LayoutParams(listSizeWidth, (listSizeHeight/2)-40);
+				wrapperView.setLayoutParams(layout);
+			}
+			
+			name = (TextView) v.findViewById(R.id.player_name);
+			name.setText(players.get(position).name);
+			
+			damage = (TextView) v.findViewById(R.id.player_readout);
+			damage.setText(Integer.toString(players.get(position).life));
+			
+			history = (ListView) v.findViewById(R.id.player_history);
+			switch(activeType) {
+				case POISON:
+					history.setAdapter(players.get(pos).poisonAdapter);
+					break;
+				case COMMANDER:
+					history.setAdapter(players.get(pos).commanderAdapter);
+					break;
+				case LIFE:
+				default:
+					history.setAdapter(players.get(pos).lifeAdapter);
+			}
+			
+			plus1 = (Button) v.findViewById(R.id.player_plus1);
+			plus1.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					players.get(pos).changeValue(activeType, +1);
+					notifyDataSetChanged();
+				}
+			});
+			
+			minus1 = (Button) v.findViewById(R.id.player_minus1);
+			minus1.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					players.get(pos).changeValue(activeType, -1);
+					notifyDataSetChanged();
+				}
+			});
+			
+			return v;
+		}
 	}
 
 	private class CommanderPlayerAdapter extends BaseAdapter {
@@ -1453,6 +1567,32 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 					}
 					poison = value;
 			}
+		}
+		
+		
+		private void changeValue(int type, int delta) {
+			int value = 0;
+			switch (type) {
+				case LIFE:
+				case COMMANDER:
+					value = life;
+					if (value + delta > CONSTRAINT_LIFE) {
+						delta = CONSTRAINT_LIFE - value;
+					}
+					lifeAdapter.update(delta);
+					break;
+				case POISON:
+					value = poison;
+					if (value + delta < CONSTRAINT_POISON) {
+						delta = CONSTRAINT_POISON - value;
+					}
+					poisonAdapter.update(delta);
+					break;		
+			}
+			synchronized (timerLock) {
+				timerValue = timerStart;
+			}
+			setValue(type, value + delta);
 		}
 
 		private void incrementValue(int type, int delta) {

@@ -18,6 +18,7 @@ You should have received a copy of the GNU General Public License
 along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearLayout1"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -26,24 +27,18 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <LinearLayout
         android:id="@+id/info_layout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         android:orientation="vertical" >
 
-        <ScrollView
-            android:id="@+id/playerScrollView"
-            android:layout_width="fill_parent"
+        <GridView
+            android:id="@+id/playerGridView"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" >
-
-            <LinearLayout
-                android:id="@+id/playerList"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" >
-            </LinearLayout>
-        </ScrollView>
-
+            android:layout_weight="1"
+            android:numColumns="1"
+            tools:listitem="@layout/life_counter_player_row" >
+        </GridView>
     </LinearLayout>
 
     <View
@@ -57,17 +52,17 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
         android:background="#000000"
-        android:gravity="center"
-        android:layout_height="wrap_content" >
+        android:gravity="center" >
 
         <ImageView
             android:id="@+id/poison_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:scaleType="center"
             android:padding="15dp"
+            android:scaleType="center"
             android:src="@drawable/poison_button" />
 
         <ImageView
@@ -75,8 +70,8 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:scaleType="center"
             android:padding="15dp"
+            android:scaleType="center"
             android:src="@drawable/life_button" />
 
         <ImageView
@@ -93,8 +88,8 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:scaleType="center"
             android:padding="15dp"
+            android:scaleType="center"
             android:src="@drawable/blank_button" />
 
         <ImageView
@@ -102,8 +97,8 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:scaleType="center"
             android:padding="15dp"
+            android:scaleType="center"
             android:src="@xml/reset_button_xml" />
     </LinearLayout>
 

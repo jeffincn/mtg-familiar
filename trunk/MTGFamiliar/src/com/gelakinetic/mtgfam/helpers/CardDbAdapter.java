@@ -600,8 +600,9 @@ public class CardDbAdapter {
 		if (cardname != null) {
 			String[] nameParts = cardname.split(" ");
 			for (String s : nameParts) {
-				statement += " AND (" + DATABASE_TABLE_CARDS + "." + KEY_NAME
-						+ " LIKE '%" + s + "%')";
+				statement += " AND (" +
+						DATABASE_TABLE_CARDS + "." + KEY_NAME + " LIKE '%" + s + "%' OR " +
+						DATABASE_TABLE_CARDS + "." + KEY_NAME + " LIKE '%" + s.toLowerCase().replace("ae", String.valueOf(Character.toChars(0xC6)[0])) + "%')";
 			}
 		}
 

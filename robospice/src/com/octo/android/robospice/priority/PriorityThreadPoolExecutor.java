@@ -1,6 +1,5 @@
 package com.octo.android.robospice.priority;
 
-import android.annotation.SuppressLint;
 import java.util.concurrent.Future;
 import java.util.concurrent.RunnableFuture;
 

@@ -17,13 +17,14 @@
 package com.actionbarsherlock.internal.view.menu;
 
 import static com.actionbarsherlock.internal.ResourcesCompat.getResources_getInteger;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.SparseBooleanArray;
@@ -33,6 +34,7 @@ import android.view.View.MeasureSpec;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+
 import com.actionbarsherlock.R;
 import com.actionbarsherlock.internal.view.View_HasStateListenerSupport;
 import com.actionbarsherlock.internal.view.View_OnAttachStateChangeListener;
@@ -118,13 +120,11 @@ public class ActionMenuPresenter extends BaseMenuPresenter
     }
 
     public static boolean reserveOverflow(Context context) {
-    	/*
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB);
-        } else {
-            return !HasPermanentMenuKey.get(context);
-        }
-        */
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+//            return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB);
+//        } else {
+//            return !HasPermanentMenuKey.get(context);
+//        }
     	return true;
     }
 

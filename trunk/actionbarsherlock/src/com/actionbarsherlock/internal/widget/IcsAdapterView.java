@@ -32,7 +32,6 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Adapter;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Gallery;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.Spinner;

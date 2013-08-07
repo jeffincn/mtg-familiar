@@ -128,11 +128,11 @@ public class ActionMenuPresenter extends BaseMenuPresenter
     	return true;
     }
 
-    private static class HasPermanentMenuKey {
-        public static boolean get(Context context) {
-            return ViewConfiguration.get(context).hasPermanentMenuKey();
-        }
-    }
+//    private static class HasPermanentMenuKey {
+//        public static boolean get(Context context) {
+//            return ViewConfiguration.get(context).hasPermanentMenuKey();
+//        }
+//    }
 
     public void onConfigurationChanged(Configuration newConfig) {
         if (!mMaxItemsSet) {

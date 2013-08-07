@@ -136,7 +136,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		 * will occur in some cases during state restore. 
 		 */
 	}
-	
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -147,7 +147,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		timerValue = 0;
 		timerLock = new Object();
 		handler = new Handler();
-		
+
 		runnable = new Runnable() {
 			public void run() {
 				boolean doCommit = false;
@@ -180,14 +180,14 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		};
 		scheduler.scheduleWithFixedDelay(runnable, timerTick, timerTick, TimeUnit.MILLISECONDS);
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		scheduler.shutdown();
 	}
-	
-	
+
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
@@ -240,9 +240,9 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		});
 		commanderButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-                if(displayMode != commanderDisplay) {
-                    return;
-                }
+				if(displayMode != commanderDisplay) {
+					return;
+				}
 				setType(COMMANDER);
 				update();
 				updateViews();
@@ -272,13 +272,13 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 
 		return myFragmentView;
 	}
-	
+
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
-		
+
 		this.getMainActivity().getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-		
+
 		if (tts != null) {
 			tts.shutdown();
 		}
@@ -320,12 +320,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 				ScrollView parent = (ScrollView) mainLayout.getParent();		
 				mainLayout = (LinearLayout) this.getView().findViewById(R.id.info_layout);		
 				parent.setVisibility(View.GONE);
-				
+
 				LayoutInflater inflater = (LayoutInflater) this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 				LinearLayout edhLayout = (LinearLayout) inflater.inflate(R.layout.life_counter_player_edh_grid, null);
 				edhGrid = (GridView) edhLayout.findViewById(R.id.edh_grid);
 				mainLayout.addView(edhLayout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
-				
+
 				edhGrid.setAdapter(commanderPlayersAdapter);
 			}
 		}
@@ -346,71 +346,81 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		else if (players.size() == 0) {
 			numPlayers = 0;
 			String[] playerLines = lifeData.split("\n");
-			for (String line : playerLines) {
-				String[] data = line.split(";");
-				String[] lifehist = data[2].split(",");
-				int[] lhist = new int[lifehist.length];
-				try {
-					for (int i = 0; i < lifehist.length; i++) {
-						lhist[i] = Integer.parseInt(lifehist[i]);
+			try {
+				for (String line : playerLines) {
+					String[] data = line.split(";");
+					String[] lifehist = data[2].split(","); // ArrayIndexOutOfBoundsException??
+					int[] lhist = new int[lifehist.length];
+					try {
+						for (int i = 0; i < lifehist.length; i++) {
+							lhist[i] = Integer.parseInt(lifehist[i]);
+						}
 					}
-				}
-				catch (NumberFormatException e) {
-					lhist = null;
-				}
-
-				int[] phist;
-				try {
-					String[] poisonhist = data[4].split(",");
-					phist = new int[poisonhist.length];
-					for (int i = 0; i < poisonhist.length; i++) {
-						phist[i] = Integer.parseInt(poisonhist[i]);
+					catch (NumberFormatException e) {
+						lhist = null;
 					}
-				}
-				catch (NumberFormatException e) {
-					phist = null;
-				}
-				catch (ArrayIndexOutOfBoundsException e) {
-					phist = null;
-				}
 
-				int lifeDefault = (displayMode != commanderDisplay ? INITIAL_LIFE : INITIAL_LIFE_COMMANDER);
-				try {
-					lifeDefault = Integer.parseInt(data[5]);
-				}
-				catch (Exception e) {
-					lifeDefault = (displayMode != commanderDisplay ? INITIAL_LIFE : INITIAL_LIFE_COMMANDER);
-				}
-
-				int[] cLife;
-				try {
-					String[] commanderLifeString = data[6].split(",");
-					cLife = new int[commanderLifeString.length];
-					for (int idx = 0; idx < commanderLifeString.length; idx++) {
-						cLife[idx] = Integer.parseInt(commanderLifeString[idx]);
+					int[] phist;
+					try {
+						String[] poisonhist = data[4].split(",");
+						phist = new int[poisonhist.length];
+						for (int i = 0; i < poisonhist.length; i++) {
+							phist[i] = Integer.parseInt(poisonhist[i]);
+						}
 					}
-				}
-				catch (NumberFormatException e){
-					cLife = null;
-				}
-				catch (ArrayIndexOutOfBoundsException e) {
-					cLife = null;
-				}
-				
-				int commanderCastings;
-				try {
-					commanderCastings = Integer.parseInt(data[7]);
-				}
-				catch (Exception e){
-					commanderCastings = 0;
-				}
-				
-				
-				addPlayer(data[0], Integer.parseInt(data[1]), Integer.parseInt(data[3]), lhist, phist, getActivity(), lifeDefault, cLife, commanderCastings);
+					catch (NumberFormatException e) {
+						phist = null;
+					}
+					catch (ArrayIndexOutOfBoundsException e) {
+						phist = null;
+					}
 
-				numPlayers++;
+					int lifeDefault = (displayMode != commanderDisplay ? INITIAL_LIFE : INITIAL_LIFE_COMMANDER);
+					try {
+						lifeDefault = Integer.parseInt(data[5]);
+					}
+					catch (Exception e) {
+						lifeDefault = (displayMode != commanderDisplay ? INITIAL_LIFE : INITIAL_LIFE_COMMANDER);
+					}
+
+					int[] cLife;
+					try {
+						String[] commanderLifeString = data[6].split(",");
+						cLife = new int[commanderLifeString.length];
+						for (int idx = 0; idx < commanderLifeString.length; idx++) {
+							cLife[idx] = Integer.parseInt(commanderLifeString[idx]);
+						}
+					}
+					catch (NumberFormatException e){
+						cLife = null;
+					}
+					catch (ArrayIndexOutOfBoundsException e) {
+						cLife = null;
+					}
+
+					int commanderCastings;
+					try {
+						commanderCastings = Integer.parseInt(data[7]);
+					}
+					catch (Exception e){
+						commanderCastings = 0;
+					}
+
+
+					addPlayer(data[0], Integer.parseInt(data[1]), Integer.parseInt(data[3]), lhist, phist, getActivity(), lifeDefault, cLife, commanderCastings);
+
+					numPlayers++;
+				}
+			} catch(ArrayIndexOutOfBoundsException e) {
+				// If something weird happens on 4.3, remove any partially added players and add the defaults
+				int playerNum = players.size();
+				for (int i = playerNum - 1; i >= 0; i--) {
+					removePlayer(i);
+				}
+				addPlayer(null, (displayMode != commanderDisplay ? INITIAL_LIFE : INITIAL_LIFE_COMMANDER), INITIAL_POISON, null, null, getActivity());
+				addPlayer(null, (displayMode != commanderDisplay ? INITIAL_LIFE : INITIAL_LIFE_COMMANDER), INITIAL_POISON, null, null, getActivity());
 			}
-			
+
 			String lastName = players.get(players.size() - 1).name;
 			try {
 				numPlayers = Integer.parseInt("" + lastName.charAt(lastName.length() - 1));
@@ -459,7 +469,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 				return;
 			}
 		}
-		
+
 		if (orientation == LANDSCAPE) {
 			listSizeHeight = LayoutParams.MATCH_PARENT;
 			switch (players.size()) {
@@ -497,7 +507,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 				p.setLayoutSize(listSizeWidth, LayoutParams.MATCH_PARENT);
 			}
 		}
-		
+
 		if(displayMode == commanderDisplay && orientation == PORTRAIT){
 			//In order to fit better on the screen, especially with small screens make the 
 			//commander grid only take a quarter of the screen.
@@ -505,7 +515,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			((LinearLayout)edhGrid.getParent()).setLayoutParams(layoutParams);
 		}
 	}
-	
+
 	protected void showDialog(final int id) {
 		showDialog(id, null);
 	}
@@ -565,23 +575,23 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 					case DIALOG_RESET_CONFIRM: {
 						AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 						builder.setMessage(getString(R.string.life_counter_clear_dialog_text)).setCancelable(true)
-								.setPositiveButton(getString(R.string.dialog_both), new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int id) {
-										removeDialog();
-										ManaPoolFragment.reset(getMainActivity());
-										reset(EVERYTHING);
-									}
-								}).setNeutralButton(getString(R.string.dialog_life), new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int id) {
-										removeDialog();
-										ManaPoolFragment.reset(getMainActivity());
-										reset(JUST_TOTALS);
-									}
-								}).setNegativeButton(getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int id) {
-										dialog.cancel();
-									}
-								});
+						.setPositiveButton(getString(R.string.dialog_both), new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								removeDialog();
+								ManaPoolFragment.reset(getMainActivity());
+								reset(EVERYTHING);
+							}
+						}).setNeutralButton(getString(R.string.dialog_life), new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								removeDialog();
+								ManaPoolFragment.reset(getMainActivity());
+								reset(JUST_TOTALS);
+							}
+						}).setNegativeButton(getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.cancel();
+							}
+						});
 
 						return builder.create();
 					}
@@ -615,7 +625,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 						else {
 							setKeyboardFocus(savedInstanceState, nameInput, false, 100);
 						}
-						
+
 						Dialog dialog = new AlertDialog.Builder(getActivity()).setTitle(R.string.life_counter_edit_name_dialog_title).setView(textEntryView)
 								.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int whichButton) {
@@ -645,28 +655,28 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 						builder.setTitle(R.string.pref_display_mode_title);
 						builder.setSingleChoiceItems(getResources().getStringArray(R.array.display_array_entries), displayMode,
 								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int which) {
-										removeDialog();
-										displayMode = which;
+							public void onClick(DialogInterface dialog, int which) {
+								removeDialog();
+								displayMode = which;
 
-										// And also update the preference
-										getMainActivity().getPreferencesAdapter().setDisplayMode(String.valueOf(displayMode));
+								// And also update the preference
+								getMainActivity().getPreferencesAdapter().setDisplayMode(String.valueOf(displayMode));
 
-										boolean clearPlayers = true;
-										for (Player p : players){
-											if (p.lifeAdapter.count != 0 || p.poisonAdapter.count != 0){
-												clearPlayers = false;
-											}
-										}
-										if (clearPlayers == true){
-											reset(JUST_TOTALS);
-										} else {
-											restartFragment();
-										}
-										
+								boolean clearPlayers = true;
+								for (Player p : players){
+									if (p.lifeAdapter.count != 0 || p.poisonAdapter.count != 0){
+										clearPlayers = false;
 									}
+								}
+								if (clearPlayers == true){
+									reset(JUST_TOTALS);
+								} else {
+									restartFragment();
+								}
 
-								});
+							}
+
+						});
 
 						Dialog dialog = builder.create();
 						return dialog;
@@ -676,7 +686,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 						final int player = args.getInt("player");
 						String commanderName = players.get(fromCommander).name;
 						int commanderDamageCurrent = players.get(player).commanderDamage.get(fromCommander);
-						
+
 						View view = LayoutInflater.from(getActivity()).inflate(R.layout.life_counter_edh_dialog, null);
 						AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
 						builder.setTitle("Damage from " + commanderName + "'s Commander").setView(view);
@@ -684,58 +694,58 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 						cDamage.setAdapter(new HistoryAdapter(this.getActivity(), 0));
 						((HistoryAdapter)(cDamage.getAdapter())).addHistory(new int[] {0}, 0);
 						((HistoryAdapter)(cDamage.getAdapter())).list.get(0).set(0, commanderDamageCurrent);
-						
+
 						Button plusOne = (Button) view.findViewById(R.id.commander_plus1);
 						Button minusOne = (Button) view.findViewById(R.id.commander_minus1);
-						
+
 						plusOne.setOnClickListener(new View.OnClickListener() {
-							
+
 							@Override
 							public void onClick(View v) {
 								int currentDamage = ((HistoryAdapter)(cDamage.getAdapter())).list.get(0).get(0);
 								int currentDelta = ((HistoryAdapter)(cDamage.getAdapter())).list.get(0).get(1);
-								
+
 								currentDamage += 1;
 								currentDelta += 1;
-								
+
 								((HistoryAdapter)(cDamage.getAdapter())).list.get(0).set(0, currentDamage);
 								((HistoryAdapter)(cDamage.getAdapter())).list.get(0).set(1, currentDelta);
-								
+
 								((HistoryAdapter)(cDamage.getAdapter())).notifyDataSetChanged();
 							}
 						});
-						
+
 						minusOne.setOnClickListener(new View.OnClickListener() {
-							
+
 							@Override
 							public void onClick(View v) {
 								int currentDamage = ((HistoryAdapter)(cDamage.getAdapter())).list.get(0).get(0);
 								int currentDelta = ((HistoryAdapter)(cDamage.getAdapter())).list.get(0).get(1);
-								
+
 								if(currentDamage > 0) {
 									currentDamage -= 1;
 									currentDelta -= 1;
-								
-								
+
+
 									((HistoryAdapter)(cDamage.getAdapter())).list.get(0).set(0, currentDamage);
 									((HistoryAdapter)(cDamage.getAdapter())).list.get(0).set(1, currentDelta);
-								
+
 									((HistoryAdapter)(cDamage.getAdapter())).notifyDataSetChanged();
 								}
 							}
 						});
-						
+
 						builder.setNegativeButton(R.string.dialog_cancel, null);
 						builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface arg0, int arg1) {
 								int delta = ((HistoryAdapter)(cDamage.getAdapter())).list.get(0).get(1);
-								
+
 								players.get(player).incrementCommanderValue(fromCommander, delta);
 								players.get(player).commanderAdapter.notifyDataSetChanged();
 							}
 						});
-						
+
 						Dialog dialog = builder.create();
 						return dialog;
 					}
@@ -770,7 +780,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 				break;
 		}
 	}
-	
+
 	private void updateViews() {
 		if (displayMode == commanderDisplay){
 			commanderPlayersAdapter.notifyDataSetChanged();
@@ -787,12 +797,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			case LIFE:
 				lifeButton.setImageResource(R.drawable.life_button_highlighted);
 				poisonButton.setImageResource(R.drawable.poison_button);
-                if (displayMode != commanderDisplay){
-                    commanderButton.setImageResource(R.drawable.blank_button);
-                }
-                else {
-                    commanderButton.setImageResource(R.drawable.commander_button);
-                }
+				if (displayMode != commanderDisplay){
+					commanderButton.setImageResource(R.drawable.blank_button);
+				}
+				else {
+					commanderButton.setImageResource(R.drawable.commander_button);
+				}
 				for (Player p : players) {
 					p.setAdapter(type);
 				}
@@ -800,12 +810,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			case POISON:
 				lifeButton.setImageResource(R.drawable.life_button);
 				poisonButton.setImageResource(R.drawable.poison_button_highlighted);
-                if (displayMode != commanderDisplay){
-                    commanderButton.setImageResource(R.drawable.blank_button);
-                }
-                else {
-                    commanderButton.setImageResource(R.drawable.commander_button);
-                }
+				if (displayMode != commanderDisplay){
+					commanderButton.setImageResource(R.drawable.blank_button);
+				}
+				else {
+					commanderButton.setImageResource(R.drawable.commander_button);
+				}
 				for (Player p : players) {
 					p.setAdapter(type);
 				}
@@ -813,17 +823,17 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			case COMMANDER:
 				lifeButton.setImageResource(R.drawable.life_button);
 				poisonButton.setImageResource(R.drawable.poison_button);
-                if (displayMode != commanderDisplay){
-                    commanderButton.setImageResource(R.drawable.blank_button);
-                }
-                else {
-                    commanderButton.setImageResource(R.drawable.commander_button_highlighted);
-                }
+				if (displayMode != commanderDisplay){
+					commanderButton.setImageResource(R.drawable.blank_button);
+				}
+				else {
+					commanderButton.setImageResource(R.drawable.commander_button_highlighted);
+				}
 				for (Player p : players) {
 					p.setAdapter(type);
 				}
 				break;
-				
+
 		}
 	}
 
@@ -879,12 +889,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			layout.setVisibility(View.GONE);
 			mainLayout.addView(layout, new LinearLayout.LayoutParams(playerWidth, playerHeight));
 			commanderPlayersAdapter.notifyDataSetChanged();
-			
+
 			if (players.size() == 1 || orientation == LANDSCAPE){
 				layout.setVisibility(View.VISIBLE);
 				visibleEDHPlayer = 0;
 			}
-			
+
 			for(int idx = 0; idx < players.size(); idx++){
 				players.get(idx).commanderDamage.add(0);
 				players.get(idx).commanderAdapter.notifyDataSetChanged();
@@ -912,7 +922,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			if (index == visibleEDHPlayer){
 				change_visible_edh_player(-1);
 			}
-			
+
 			mainLayout.removeView((View) players.get(index).layout.getParent().getParent());
 			players.remove(index);
 
@@ -949,12 +959,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 	private class CommanderPlayerAdapter extends BaseAdapter {
 		private Context						context;
 		private Player						owningPlayer;
-		
+
 		public CommanderPlayerAdapter(Context _context, Player _owningPlayer){
 			context = _context;
 			owningPlayer = _owningPlayer;
 		}
-		
+
 		public int getCount() {
 			return players.size();
 		}
@@ -984,11 +994,11 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			}
 			name.setText(players.get(position).name);
 			damage.setText(String.valueOf(owningPlayer.commanderDamage.get(position)));
-			
+
 			final int pos = position;
-			
+
 			v.setOnClickListener(new View.OnClickListener() {
-				
+
 				@Override
 				public void onClick(View v) {
 					Bundle fromBundle = new Bundle();
@@ -998,12 +1008,12 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 				}
 			});
 
-			
+
 			return v;
 		}
 	}
-		
-	
+
+
 	private class CommanderTopViewAdapter extends BaseAdapter {
 		private Context	context;
 
@@ -1039,11 +1049,11 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			}
 			name.setText(players.get(position).name);
 			damage.setText(String.valueOf(players.get(position).life));
-			
+
 			final int pos = position;
-			
+
 			v.setOnClickListener(new View.OnClickListener() {
-				
+
 				@Override
 				public void onClick(View v) {
 					change_visible_edh_player(pos);
@@ -1053,16 +1063,16 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			return v;
 		}
 	}
-	
+
 	private void change_visible_edh_player(int _which){
 		for(Player player : players){
 			player.layout.setVisibility(View.GONE);
 		}
-		
+
 		if (_which == -1){
 			return;
 		}
-		
+
 		players.get(_which).layout.setVisibility(View.VISIBLE);
 		visibleEDHPlayer = _which;
 	}
@@ -1118,7 +1128,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 						addNewVi = false;
 						vi.clear();
 						break; // Short circuit, we have the changing row already no need to
-										// search the rest of the list.
+						// search the rest of the list.
 					}
 				}
 				catch (ArrayIndexOutOfBoundsException e) {
@@ -1146,7 +1156,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 							continue;
 						}
 						break; // Short circuit, we have the life total from the last
-										// committed update.
+						// committed update.
 					}
 				}
 			}
@@ -1317,7 +1327,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			for(int idx = 0; idx < players.size(); idx++){
 				commanderDamage.add(0);
 			}
-			
+
 			commanderCasting = commanderCastings;
 
 			me = this;
@@ -1334,8 +1344,8 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			else {
 				this.poisonAdapter = new HistoryAdapter(context, poison);
 			}
-			
-			
+
+
 			if (comDamage != null) {
 				commanderDamage = new ArrayList<Integer>();
 				for(int idx = 0; idx < comDamage.length; idx++){
@@ -1479,25 +1489,25 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 					break;
 			}
 			setValue(type, value + delta);
-			
+
 			if (displayMode == COMMANDER){
 				commanderPlayersAdapter.notifyDataSetChanged();
 			}
 		}
-		
+
 		private void incrementCommanderValue(int fromCommander, int delta) {
 			int currentDamage = commanderDamage.get(fromCommander);
 			commanderDamage.set(fromCommander, currentDamage + delta);
 			commanderAdapter.notifyDataSetChanged();
-			
+
 			incrementValue(LIFE, -delta);
 			lifeAdapter.commit();
 			poisonAdapter.commit();
 			refreshTextViews();
-			
+
 			commanderPlayersAdapter.notifyDataSetChanged();
 		}
-		
+
 		public void addButtons(Button minus1, Button plus1, Button minus5, Button plus5) {
 			minusButton1 = minus1;
 			plusButton1 = plus1;
@@ -1545,11 +1555,11 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 				}
 			});
 		}
-		
+
 		public void addCommanderCastingView(TextView commandCastText, final Button commanderCast){
 			commanderCastButton = commanderCast;
 			commanderCastText = commandCastText;
-			
+
 			if (commanderCastButton == null && commanderCastText == null) {
 				return;
 			}
@@ -1559,14 +1569,14 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 				commanderCastText.setVisibility(View.VISIBLE);
 				commanderCastButton.setVisibility(View.VISIBLE);
 			}
-			
+
 			commanderCastButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					commanderCasting += 1;
 					commanderCast.setText(Integer.toString(commanderCasting));
 				}
 			});
-			
+
 			commanderCastButton.setOnLongClickListener(new View.OnLongClickListener() {
 				public boolean onLongClick(View v) {
 					commanderCasting = 0;
@@ -1607,7 +1617,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			}
 
 			data += ";" + defaultLife;
-			
+
 			first = true;
 			for (Integer i : commanderDamage) {
 				if (first) {
@@ -1618,9 +1628,9 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 					data += "," + i;
 				}
 			}
-			
+
 			data += ";" + commanderCasting;
-			
+
 			return data + ";\n";
 		}
 
@@ -1631,7 +1641,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			if (defaultLife != -1){
 				initLife = defaultLife;
 			}
-			
+
 			data += initLife + ";";
 			data += ";";
 
@@ -1682,14 +1692,14 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 					sentences.add(new TtsSentence(sentence, null));
 				}
 			}
-			
+
 			speakFromList();
 		}
 		else {
 			Toast.makeText(this.getActivity(), "You do not have text-to-speech installed", Toast.LENGTH_LONG).show();
 		}
 	}
-	
+
 	private void speakFromList() {
 		boolean first = true;
 		if(sentences == null) {
@@ -1699,7 +1709,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			TtsSentence s = sentences.remove(0); //Dequeue the first sentence
 			String sentence = s.getSentence();
 			HashMap<String, String> params = s.getParams();
-			
+
 			if(first) {
 				tts.speak(sentence, TextToSpeech.QUEUE_FLUSH, params);
 				first = false;
@@ -1707,7 +1717,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			else {
 				tts.speak(sentence, TextToSpeech.QUEUE_ADD, params);
 			}
-			
+
 			if(params != null) {
 				break; //Interrupt if we have params; that means we want to shout
 			}
@@ -1762,21 +1772,21 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			if (announceLifeTotals != null) {
 				announceLifeTotals.setVisible(ttsInitialized);
 			}
-	//		tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-	//			public void onStart(String utteranceId) {
-	//				//Do nothing
-	//			}
-	//			
-	//			public void onError(String utteranceId) {
-	//				//Do nothing
-	//			}
-	//			
-	//			public void onDone(String utteranceId) {
-	//				//If the utterance ID is correct, shout that it's OVER NINE THOUSAAAAAAAAND
-	//				mediaPlayer.stop();
-	//				mediaPlayer.start();
-	//			}
-	//		});
+			//		tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+			//			public void onStart(String utteranceId) {
+			//				//Do nothing
+			//			}
+			//			
+			//			public void onError(String utteranceId) {
+			//				//Do nothing
+			//			}
+			//			
+			//			public void onDone(String utteranceId) {
+			//				//If the utterance ID is correct, shout that it's OVER NINE THOUSAAAAAAAAND
+			//				mediaPlayer.stop();
+			//				mediaPlayer.start();
+			//			}
+			//		});
 			if (mediaPlayer != null) {
 				tts.setOnUtteranceCompletedListener(new OnUtteranceCompletedListener() {
 					public void onUtteranceCompleted(String utteranceId) {
@@ -1804,20 +1814,20 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			getMainActivity().showTtsWarningIfShould();
 		}
 	}
-	
+
 	private class TtsSentence {
 		private String sentence;
 		private String id;
-		
+
 		public TtsSentence(String sentence, String id) {
 			this.sentence = sentence;
 			this.id = id;
 		}
-		
+
 		public String getSentence() {
 			return this.sentence;
 		}
-		
+
 		public HashMap<String, String> getParams() {
 			if(this.id == null) {
 				return null;

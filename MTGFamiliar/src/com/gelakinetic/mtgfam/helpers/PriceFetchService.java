@@ -12,72 +12,96 @@ import android.app.Application;
 
 import com.octo.android.robospice.SpiceService;
 import com.octo.android.robospice.persistence.CacheManager;
+import com.octo.android.robospice.persistence.exception.CacheCreationException;
 import com.octo.android.robospice.persistence.exception.CacheLoadingException;
 import com.octo.android.robospice.persistence.exception.CacheSavingException;
 import com.octo.android.robospice.persistence.file.InFileObjectPersister;
 
 public class PriceFetchService extends SpiceService {
 
-    @Override
-    public CacheManager createCacheManager( Application application ) {
-        CacheManager cacheManager = new CacheManager();
+	@Override
+	public CacheManager createCacheManager(Application application) throws CacheCreationException {
+		CacheManager cacheManager = new CacheManager();
 
-        InFileObjectPersister<PriceInfo> priceInfoPersister = new InFileObjectPersister<PriceInfo>(application, PriceInfo.class) {
-			
-            @Override
-            public PriceInfo loadDataFromCache( Object cacheKey, long maxTimeInCacheBeforeExpiry ) throws CacheLoadingException {
-                File file = getCacheFile( cacheKey );
-                if ( file.exists() ) {
-                    long timeInCache = System.currentTimeMillis() - file.lastModified();
-                    if ( maxTimeInCacheBeforeExpiry == 0 || timeInCache <= maxTimeInCacheBeforeExpiry ) {
-                        try {
-                        	return new PriceInfo(fileToBytes(file));
-                        } catch ( FileNotFoundException e ) {
-                            return null;
-                        } catch ( Exception e ) {
-                            throw new CacheLoadingException( e );
-                        }
-                    }
-                }
-                return null;
-            }
+		InFileObjectPersister<PriceInfo> priceInfoPersister = new InFileObjectPersister<PriceInfo>(application,
+				PriceInfo.class) {
 
-            @Override
-            public PriceInfo saveDataToCacheAndReturnData( final PriceInfo data, final Object cacheKey ) throws CacheSavingException {
-                try {
-                    if ( isAsyncSaveEnabled() ) {
+			@Override
+			public PriceInfo loadDataFromCache(Object cacheKey, long maxTimeInCacheBeforeExpiry) throws CacheLoadingException {
+				File file = getCacheFile(cacheKey);
+				if (file.exists()) {
+					long timeInCache = System.currentTimeMillis() - file.lastModified();
+					if (maxTimeInCacheBeforeExpiry == 0 || timeInCache <= maxTimeInCacheBeforeExpiry) {
+						try {
+							return new PriceInfo(fileToBytes(file));
+						}
+						catch (FileNotFoundException e) {
+							return null;
+						}
+						catch (Exception e) {
+							throw new CacheLoadingException(e);
+						}
+					}
+				}
+				return null;
+			}
 
-                        new Thread() {
-                            @Override
-                            public void run() {
-                                try {
-                                	BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(getCacheFile( cacheKey )));
-                                	bos.write(data.toBytes());
-                                	bos.flush();
-                                	bos.close();
-                                } catch ( IOException e ) {
-                                	return;
-                                }
-                            };
-                        }.start();
-                    } else {
-                    	BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(getCacheFile( cacheKey )));
-                    	bos.write(data.toBytes());
-                    	bos.flush();
-                    	bos.close();
-                    }
-                } catch ( Exception e ) {
-                    throw new CacheSavingException( e );
-                }
-                return data;
-            }
+			@Override
+			public PriceInfo saveDataToCacheAndReturnData(final PriceInfo data, final Object cacheKey)
+					throws CacheSavingException {
+				try {
+					if (isAsyncSaveEnabled()) {
+
+						new Thread() {
+							@Override
+							public void run() {
+								try {
+									BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(getCacheFile(cacheKey)));
+									bos.write(data.toBytes());
+									bos.flush();
+									bos.close();
+								}
+								catch (IOException e) {
+									return;
+								}
+							};
+						}.start();
+					}
+					else {
+						BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(getCacheFile(cacheKey)));
+						bos.write(data.toBytes());
+						bos.flush();
+						bos.close();
+					}
+				}
+				catch (Exception e) {
+					throw new CacheSavingException(e);
+				}
+				return data;
+			}
+
+			@Override
+			protected PriceInfo readCacheDataFromFile(File file) throws CacheLoadingException {
+				if (file.exists()) {
+					try {
+						return new PriceInfo(fileToBytes(file));
+					}
+					catch (FileNotFoundException e) {
+						return null;
+					}
+					catch (Exception e) {
+						throw new CacheLoadingException(e);
+					}
+				}
+				return null;
+			}
 		};
-        
-        priceInfoPersister.setAsyncSaveEnabled(true);
-        cacheManager.addPersister(priceInfoPersister);
-        return cacheManager;
-    }
-    
+
+		priceInfoPersister.setAsyncSaveEnabled(true);
+		cacheManager.addPersister(priceInfoPersister);
+		return cacheManager;
+	}
+
 	public byte[] fileToBytes(File file) throws IOException {
 
 		byte[] buffer = new byte[(int) file.length()];
@@ -85,17 +109,28 @@ public class PriceFetchService extends SpiceService {
 		try {
 			ios = new FileInputStream(file);
 			if (ios.read(buffer) == -1) {
-				throw new IOException(
-						"EOF reached while trying to read the whole file");
+				throw new IOException("EOF reached while trying to read the whole file");
 			}
-		} finally {
+		}
+		finally {
 			try {
 				if (ios != null)
 					ios.close();
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 			}
 		}
 
 		return buffer;
 	}
+	
+//	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+//	@Override
+//	public Notification createDefaultNotification() {
+//	    final Notification noti = super.createDefaultNotification();
+//	    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN){
+//	        noti.priority = Notification.PRIORITY_MIN;
+//	    }
+//	    return noti;
+//	}
 }

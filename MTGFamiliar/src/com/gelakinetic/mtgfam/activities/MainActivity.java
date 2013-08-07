@@ -189,7 +189,12 @@ public class MainActivity extends SlidingFragmentActivity {
 		int lastVersion = prefAdapter.getLastVersion();
 		if (pInfo.versionCode != lastVersion) {
 			// Clear the robospice cache on upgrade. This way, no cached values w/o foil prices will exist
-			spiceManager.removeAllDataFromCache();
+			try {
+				spiceManager.removeAllDataFromCache();
+			}
+			catch(NullPointerException e) {
+				// eat it. tasty
+			}
 			showDialogFragment(CHANGELOGDIALOG);
 			prefAdapter.setLastVersion(pInfo.versionCode);
 			bounceMenu = lastVersion <= 15; //Only bounce if the last version is 1.8.1 or lower (or a fresh install) 
@@ -300,98 +305,106 @@ public class MainActivity extends SlidingFragmentActivity {
 		Intent intent = getIntent();
 
 		if (savedInstanceState == null) {
-
-			if (intent.getAction().equals(Intent.ACTION_VIEW)) {
-				// handles a click on a search suggestion; launches activity to show word
-				Uri u = intent.getData();
-				long id = Long.parseLong(u.getLastPathSegment());
-	
-				// add a fragment
-				Bundle args = new Bundle();
-				args.putBoolean("isSingle", true);
-				args.putLong("id", id);
-				CardViewFragment rlFrag = new CardViewFragment();
-				rlFrag.setArguments(args);
-	
-				attachSingleFragment(rlFrag, "left_frag", false, false);
-				showOnePane();
-				hideKeyboard();
-			}
-			else if (intent.getAction().equals(Intent.ACTION_SEARCH)) {
-				boolean consolidate = prefAdapter.getConsolidateSearch();
-				String query = intent.getStringExtra(SearchManager.QUERY);
-				SearchCriteria sc = new SearchCriteria();
-				sc.Name = query;
-				sc.Set_Logic = (consolidate ? CardDbAdapter.FIRSTPRINTING : CardDbAdapter.ALLPRINTINGS);
-	
-				// add a fragment
-				Bundle args = new Bundle();
-				args.putBoolean(SearchViewFragment.RANDOM, false);
-				args.putSerializable(SearchViewFragment.CRITERIA, sc);
-				if(mIsATablet) {
-					SearchViewFragment svFrag = new SearchViewFragment();
-					svFrag.setArguments(args);
-					attachSingleFragment(svFrag, "left_frag", false, false);
-				}
-				else {
-					ResultListFragment rlFrag = new ResultListFragment();
+			try {
+				if (intent.getAction().equals(Intent.ACTION_VIEW)) { //apparently this can NPE on 4.3. because why not. if we catch it, launch the default frag
+					// handles a click on a search suggestion; launches activity to show word
+					Uri u = intent.getData();
+					long id = Long.parseLong(u.getLastPathSegment());
+		
+					// add a fragment
+					Bundle args = new Bundle();
+					args.putBoolean("isSingle", true);
+					args.putLong("id", id);
+					CardViewFragment rlFrag = new CardViewFragment();
 					rlFrag.setArguments(args);
+		
 					attachSingleFragment(rlFrag, "left_frag", false, false);
+					showOnePane();
+					hideKeyboard();
 				}
-				hideKeyboard();
-			}
-			else if (intent.getAction().equals(ACTION_FULL_SEARCH)) {
-				attachSingleFragment(new SearchViewFragment(), "left_frag", false, false);
-				showOnePane();
-			}
-			else if (intent.getAction().equals(ACTION_WIDGET_SEARCH)) {
-				attachSingleFragment(new SearchWidgetFragment(), "left_frag", false, false);
-				showOnePane();
-			}
-			else if (intent.getAction().equals(ACTION_ROUND_TIMER)) {
-				attachSingleFragment(new RoundTimerFragment(), "left_frag", false, false);
-				showOnePane();
-			}
-			else {
-				String defaultFragment = prefAdapter.getDefaultFragment();
-
-				FamiliarFragment frag;
-				if (defaultFragment.equals(this.getString(R.string.main_card_search))) {
-					frag = new SearchViewFragment();
+				else if (intent.getAction().equals(Intent.ACTION_SEARCH)) {
+					boolean consolidate = prefAdapter.getConsolidateSearch();
+					String query = intent.getStringExtra(SearchManager.QUERY);
+					SearchCriteria sc = new SearchCriteria();
+					sc.Name = query;
+					sc.Set_Logic = (consolidate ? CardDbAdapter.FIRSTPRINTING : CardDbAdapter.ALLPRINTINGS);
+		
+					// add a fragment
+					Bundle args = new Bundle();
+					args.putBoolean(SearchViewFragment.RANDOM, false);
+					args.putSerializable(SearchViewFragment.CRITERIA, sc);
+					if(mIsATablet) {
+						SearchViewFragment svFrag = new SearchViewFragment();
+						svFrag.setArguments(args);
+						attachSingleFragment(svFrag, "left_frag", false, false);
+					}
+					else {
+						ResultListFragment rlFrag = new ResultListFragment();
+						rlFrag.setArguments(args);
+						attachSingleFragment(rlFrag, "left_frag", false, false);
+					}
+					hideKeyboard();
 				}
-				else if (defaultFragment.equals(this.getString(R.string.main_life_counter))) {
-					frag = new LifeFragment();
+				else if (intent.getAction().equals(ACTION_FULL_SEARCH)) {
+					attachSingleFragment(new SearchViewFragment(), "left_frag", false, false);
+					showOnePane();
 				}
-				else if (defaultFragment.equals(this.getString(R.string.main_mana_pool))) {
-					frag = new ManaPoolFragment();
+				else if (intent.getAction().equals(ACTION_WIDGET_SEARCH)) {
+					attachSingleFragment(new SearchWidgetFragment(), "left_frag", false, false);
+					showOnePane();
 				}
-				else if (defaultFragment.equals(this.getString(R.string.main_dice))) {
-					frag = new DiceFragment();
-				}
-				else if (defaultFragment.equals(this.getString(R.string.main_trade))) {
-					frag = new TradeFragment();
-				}
-				else if (defaultFragment.equals(this.getString(R.string.main_wishlist))) {
-					frag = new WishlistFragment();
-				}
-				else if (defaultFragment.equals(this.getString(R.string.main_timer))) {
-					frag = new RoundTimerFragment();
-				}
-				else if (defaultFragment.equals(this.getString(R.string.main_rules))) {
-					frag = new RulesFragment();
-				}
-				else if (defaultFragment.equals(this.getString(R.string.main_judges_corner))) {
-					frag = new JudgesCornerFragment();
-				}
-				else if (defaultFragment.equals(this.getString(R.string.main_mojhosto))) {
-					frag = new MoJhoStoFragment();
+				else if (intent.getAction().equals(ACTION_ROUND_TIMER)) {
+					attachSingleFragment(new RoundTimerFragment(), "left_frag", false, false);
+					showOnePane();
 				}
 				else {
-					frag = new SearchViewFragment();
+					launchDefaultFragment();
 				}
-				attachSingleFragment(frag, "left_frag", false, false);
+			}
+			catch(NullPointerException e) {
+				launchDefaultFragment();
 			}
 		}
+	}
+
+	private void launchDefaultFragment() {
+		String defaultFragment = prefAdapter.getDefaultFragment();
+		
+		FamiliarFragment frag;
+		if (defaultFragment.equals(this.getString(R.string.main_card_search))) {
+			frag = new SearchViewFragment();
+		}
+		else if (defaultFragment.equals(this.getString(R.string.main_life_counter))) {
+			frag = new LifeFragment();
+		}
+		else if (defaultFragment.equals(this.getString(R.string.main_mana_pool))) {
+			frag = new ManaPoolFragment();
+		}
+		else if (defaultFragment.equals(this.getString(R.string.main_dice))) {
+			frag = new DiceFragment();
+		}
+		else if (defaultFragment.equals(this.getString(R.string.main_trade))) {
+			frag = new TradeFragment();
+		}
+		else if (defaultFragment.equals(this.getString(R.string.main_wishlist))) {
+			frag = new WishlistFragment();
+		}
+		else if (defaultFragment.equals(this.getString(R.string.main_timer))) {
+			frag = new RoundTimerFragment();
+		}
+		else if (defaultFragment.equals(this.getString(R.string.main_rules))) {
+			frag = new RulesFragment();
+		}
+		else if (defaultFragment.equals(this.getString(R.string.main_judges_corner))) {
+			frag = new JudgesCornerFragment();
+		}
+		else if (defaultFragment.equals(this.getString(R.string.main_mojhosto))) {
+			frag = new MoJhoStoFragment();
+		}
+		else {
+			frag = new SearchViewFragment();
+		}
+		attachSingleFragment(frag, "left_frag", false, false);
 	}
 
 	/*

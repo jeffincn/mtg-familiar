@@ -1601,7 +1601,7 @@ public class CardDbAdapter {
 		
 		String sql =
 				"SELECT * FROM (" + 
-				"SELECT " + DATABASE_TABLE_CARDS + "." + KEY_NAME + ", " + DATABASE_TABLE_CARDS + "." + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_ID + " AS " + SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID +
+				"SELECT " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " AS " + KEY_NAME + ", " + DATABASE_TABLE_CARDS + "." + KEY_ID + " AS " + KEY_ID + ", " + DATABASE_TABLE_CARDS + "." + KEY_ID + " AS " + SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID +
 				" FROM " + DATABASE_TABLE_CARDS + " JOIN " + DATABASE_TABLE_SETS + " ON " + DATABASE_TABLE_SETS + "." + KEY_CODE + " = " + DATABASE_TABLE_CARDS + "." + KEY_SET +
 				" WHERE " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " LIKE '" + query + "%'"
 				+ " OR " + DATABASE_TABLE_CARDS + "." + KEY_NAME + " LIKE '" + convert + "%'" +

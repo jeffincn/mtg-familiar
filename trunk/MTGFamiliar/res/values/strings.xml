@@ -79,9 +79,10 @@
     <string name="main_whats_new_title">What\'s New</string>
     <string name="main_whats_new_in_title">What\'s New in Version</string>
     <string name="main_whats_new_text">
- 	- Prices for foil cards&lt;br />&lt;br />
- 	- Judge\'s Corner! It has the Magic Tournament Rules, Infraction Procedure Guide, and a quick deck counter&lt;br />&lt;br />
- 	- Tablet optimized card search
+ 	- Ae and Æ are now interchangeable for searches&lt;br />&lt;br />
+ 	- Polish translation&lt;br />&lt;br />
+ 	- Oracle text update&lt;br />&lt;br />
+ 	- Bugfixes for Android 4.3
  	</string>
     <string name="main_tts_warning_title">Text-to-Speech</string>
     <string name="main_tts_warning_text">This application has text-to-speech capability for some of its features, but you don\'t seem to have it installed. 

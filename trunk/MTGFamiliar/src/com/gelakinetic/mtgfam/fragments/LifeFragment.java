@@ -16,6 +16,9 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
@@ -27,6 +30,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
@@ -860,7 +864,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 		p.addButtons((Button) layout.findViewById(R.id.player_minus1), (Button) layout.findViewById(R.id.player_plus1),
 				(Button) layout.findViewById(R.id.player_minus5), (Button) layout.findViewById(R.id.player_plus5));
 		p.addOutputViews((TextView) layout.findViewById(R.id.player_name),
-				(TextView) layout.findViewById(R.id.player_readout), (ListView) layout.findViewById(R.id.player_history));
+				(TextView) layout.findViewById(R.id.player_readout), (ListView) layout.findViewById(R.id.player_history), this.getActivity());
 		p.addCommanderCastingView((TextView) layout.findViewById(R.id.commanderCastText), (Button) layout.findViewById(R.id.commanderCast));
 		p.addLayout(layout);
 
@@ -1390,7 +1394,7 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 			((View) history.getParent()).setVisibility(View.GONE);
 		}
 
-		public void addOutputViews(TextView n, TextView l, ListView lv) {
+		public void addOutputViews(TextView n, TextView l, ListView lv, final Context ctx) {
 			TVname = n;
 			TVlife = l;
 			history = lv;
@@ -1437,6 +1441,17 @@ public class LifeFragment extends FamiliarFragment implements OnInitListener {
 					showDialog(DIALOG_SET_PLAYER_NAME);
 				}
 
+			});
+			
+			TVlife.setOnLongClickListener(new OnLongClickListener() {
+				
+				@Override
+				public boolean onLongClick(View v) {
+					Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+					Ringtone r = RingtoneManager.getRingtone(ctx, notification);
+					r.play();
+					return true;
+				}
 			});
 		}
 

@@ -608,6 +608,7 @@ public class CardViewFragment extends FamiliarFragment {
 			String lang = cardLanguage;
 
 			boolean bRetry = true;
+			boolean triedEn = false;
 			
 			while (bRetry){
 				
@@ -615,6 +616,9 @@ public class CardViewFragment extends FamiliarFragment {
 				
 				try {
 	
+					if(lang.equalsIgnoreCase("en")) {
+						triedEn = true;
+					}
 					String picurl;
 					if (setCode.equals("PP2")) {
 						picurl = "http://magiccards.info/extras/plane/planechase-2012-edition/" + cardName + ".jpg";
@@ -651,7 +655,20 @@ public class CardViewFragment extends FamiliarFragment {
 					picurl = picurl.toLowerCase(Locale.ENGLISH);
 	
 					URL u = new URL(picurl);
-					cardPicture = new BitmapDrawable(getMainActivity().getResources(), u.openStream());
+					try {
+						cardPicture = new BitmapDrawable(getMainActivity().getResources(), u.openStream());						
+					}
+					catch (FileNotFoundException e) {
+						if(!triedEn) {
+							// Let the catch block take care of it
+							throw new FileNotFoundException();
+						}
+						else {
+							// Ok, it doesnt exist on Magiccards.info in English. Fall back to Gatherer
+							URL u2 = new URL("http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid="+multiverseId+"&type=card");
+							cardPicture = new BitmapDrawable(getMainActivity().getResources(), u2.openStream());
+						}
+					}
 	
 					int height = 0, width = 0;
 					float scale = 0;
@@ -691,7 +708,7 @@ public class CardViewFragment extends FamiliarFragment {
 				}
 				catch (FileNotFoundException e) {
 					// internet works, image not found
-					if (lang == "en") {
+					if (lang.equalsIgnoreCase("en")) {
 						error = "Image Not Found";
 					} else {
 						// If image doesn't exist in the preferred language, let's retry with "en"

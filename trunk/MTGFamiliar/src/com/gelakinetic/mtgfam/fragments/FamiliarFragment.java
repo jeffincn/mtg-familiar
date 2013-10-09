@@ -1,7 +1,13 @@
 package com.gelakinetic.mtgfam.fragments;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.Instrumentation;
@@ -12,6 +18,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -42,13 +49,12 @@ import com.gelakinetic.mtgfam.R;
 import com.gelakinetic.mtgfam.activities.MainActivity;
 import com.gelakinetic.mtgfam.helpers.CardDbAdapter;
 import com.gelakinetic.mtgfam.helpers.FamiliarDbException;
-import com.gelakinetic.mtgfam.helpers.GoogleGoggles;
 
 public abstract class FamiliarFragment extends SherlockFragment {
 
 	public CardDbAdapter								mDbHelper;
 	protected ProgressDialog progDialog;
-	private GoogleGogglesTask	mGogglesTask;
+	private ImageSearchTask	mImageSearchTask;
 	public static final String	DIALOG_TAG	= "dialog";
 
 	public static final int 	ACTIVITY_CAMERA_GOGGLES		= 1;
@@ -90,7 +96,7 @@ public abstract class FamiliarFragment extends SherlockFragment {
 		progDialog.setIndeterminate(true);
 		progDialog.setCancelable(true);
 
-		if(mGogglesTask != null) {
+		if(mImageSearchTask != null) {
 			progDialog.show();
 		}
 		return super.onCreateView(inflater, container, savedInstanceState);
@@ -231,7 +237,7 @@ public abstract class FamiliarFragment extends SherlockFragment {
 		return this.getFragmentManager();
 	}
 
-	protected void takePictureAndSearchGoogleGogglesIntent() {
+	protected void takePictureAndSearchImageIntent() {
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
 		tmp_img_file = new File (Environment.getExternalStorageDirectory(), TMP_IMG_FILENAME);
@@ -245,8 +251,8 @@ public abstract class FamiliarFragment extends SherlockFragment {
 		case ACTIVITY_CAMERA_GOGGLES:
 			switch (resultCode) {
 			case android.app.Activity.RESULT_OK:
-				mGogglesTask = new GoogleGogglesTask();
-				mGogglesTask.execute(data);
+				mImageSearchTask = new ImageSearchTask();
+				mImageSearchTask.execute(data);
 				return;
 			}
 			return;
@@ -255,9 +261,10 @@ public abstract class FamiliarFragment extends SherlockFragment {
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 
-	public class GoogleGogglesTask extends AsyncTask<Intent, Void, Void> {
+	public class ImageSearchTask extends AsyncTask<Intent, Void, Void> {
 
-		private String	cardName;
+		private long	multiverseId;
+		private String	name;
 
 		@Override
 		protected void onPreExecute() {
@@ -281,22 +288,50 @@ public abstract class FamiliarFragment extends SherlockFragment {
 				BitmapFactory.decodeFile(tmp_img_file.getAbsolutePath(), options);
 
 				// Calculate inSampleSize
-				options.inSampleSize = options.outWidth / 204;
+				options.inSampleSize = options.outWidth / 280;
 
 				// Decode bitmap with inSampleSize set
 				options.inJustDecodeBounds = false;
 				Bitmap mImageBitmap = BitmapFactory.decodeFile(tmp_img_file.getAbsolutePath(), options);
 
-				cardName = "";
-				try {
-					cardName = GoogleGoggles.StartCardSearch(mImageBitmap, getActivity(), mDbHelper);
-				} catch (IOException e) {
-					cardName = null;
+				// Compress to JPG
+				ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
+				mImageBitmap.compress(CompressFormat.JPEG, 75, baos);
+				
+				// Encode with base64
+				byte[] base64image = (com.gelakinetic.mtgfam.helpers.Base64.encodeBytes(baos.toByteArray())).getBytes();
+
+				// POST to the server
+				URL url = new URL("http://93.103.149.115/search/image");
+				HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+				conn.setDoOutput(true);
+				conn.setUseCaches(false);
+				conn.setRequestMethod("POST");
+				OutputStream out = conn.getOutputStream();
+				out.write(base64image);
+				out.close();
+
+				// Read result
+				InputStream in = conn.getInputStream();
+				StringBuffer sb = new StringBuffer();
+				int chr;
+				while ((chr = in.read()) != -1) {
+					sb.append((char) chr);
 				}
+				in.close();
+
+				// Parse the json
+				final JSONObject obj = new JSONObject(sb.toString());
+				multiverseId = obj.getInt("match");
+
+				// Find the name, query the server again if necessary
+				name = mDbHelper.getImageSearchNameFromMultiverseID(multiverseId);
+				
+				// Cleanup
 				mImageBitmap.recycle();
 				tmp_img_file.delete();
 			} catch (Exception e) {
-				cardName = null;
+				multiverseId = -1;
 			}
 			return null;
 		}
@@ -310,8 +345,8 @@ public abstract class FamiliarFragment extends SherlockFragment {
 			catch (IllegalArgumentException e) {
 			}
 
-			if(cardName != null && cardName.length() > 0) {
-				onGoogleGogglesSuccess(cardName);
+			if(multiverseId != -1) {
+				onImageSearchSuccess(multiverseId, name);
 			}
 			else {
 				try {
@@ -323,9 +358,9 @@ public abstract class FamiliarFragment extends SherlockFragment {
 		}
 	}
 
-	protected void onGoogleGogglesSuccess(String cardName) {
-		// this method must be overridden by each class calling takePictureAndSearchGoogleGogglesIntent
-		mGogglesTask = null;
+	protected void onImageSearchSuccess(long multiverseId, String name) {
+		// this method must be overridden by each class calling takePictureAndSearchImageIntent
+		mImageSearchTask = null;
 	}
 	
 	public static void setKeyboardFocus(Bundle savedInstanceState, final EditText primaryTextField, final boolean selectAll, long postTime) {
@@ -342,7 +377,7 @@ public abstract class FamiliarFragment extends SherlockFragment {
 			}, postTime);
 		}
 	}
-		
+	
 	protected void addFragmentMenu() {
 		if(getMainActivity().mThreePane && masterLayout != null && mFragmentMenu != null &&
 				masterLayout.findViewWithTag(mFragmentMenu.getTag()) == null) {

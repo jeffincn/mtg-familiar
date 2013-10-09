@@ -19,11 +19,20 @@ along with MTG Familiar.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.gelakinetic.mtgfam.helpers;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.SearchManager;
 import android.content.ContentValues;
@@ -31,6 +40,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources.NotFoundException;
 import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
 import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -1743,41 +1753,6 @@ public class CardDbAdapter {
 			throw new FamiliarDbException(e);
 		}
 	}
-
-	/*
-	 * Returns true if a card with this exact name exists in the database
-	 */
-	public boolean isValidCardName(String goggleResult) throws FamiliarDbException {
-		goggleResult = goggleResult.replace("'", "''"); // Sanitization
-		String sql = "SELECT " + KEY_ID + " FROM " + DATABASE_TABLE_CARDS + " WHERE " + KEY_NAME + " = '" + goggleResult + "'";
-		try {
-			Cursor mCursor = mDb.rawQuery(sql, null);
-			if(mCursor.getCount() > 0) {
-				return true;
-			}
-		} catch (SQLiteException e) {
-			throw new FamiliarDbException(e);
-		} catch (IllegalStateException e) {
-			throw new FamiliarDbException(e);
-		}
-		return false;
-	}
-
-	public boolean isPartOfACardName(String word) throws FamiliarDbException {
-		word = word.replace("'", "''"); // Sanitization
-		String sql = "SELECT " + KEY_ID + " FROM " + DATABASE_TABLE_CARDS + " WHERE " + KEY_NAME + " LIKE '%" + word + "%'";
-		try {
-			Cursor mCursor = mDb.rawQuery(sql, null);
-			if(mCursor.getCount() > 0) {
-				return true;
-			}
-		} catch (SQLiteException e) {
-			throw new FamiliarDbException(e);
-		} catch (IllegalStateException e) {
-			throw new FamiliarDbException(e);
-		}
-		return false;
-	}
 	
     public static String removeAccentMarks(String s) {
         return s.replace(Character.toChars(0xC0)[0]+"", "A")
@@ -1879,5 +1854,48 @@ public class CardDbAdapter {
 			}
 		}
 		return NOPE;
+	}
+	
+	public String getImageSearchNameFromMultiverseID(long multiverseID) throws FamiliarDbException {
+				
+		Cursor mCursor = null;
+		String statement = "SELECT " + KEY_NAME + " from "
+				+ DATABASE_TABLE_CARDS + " WHERE " + KEY_MULTIVERSEID + " = "
+				+ multiverseID;
+
+		try {
+			mCursor = mDb.rawQuery(statement, null);
+			
+			if(mCursor.getCount() > 0) {
+				mCursor.moveToFirst();
+				String name = mCursor.getString(mCursor.getColumnIndex(KEY_NAME));
+				mCursor.close();
+				return name;
+			}
+			else {
+				URL url = new URL("http://93.103.149.115/card/" + multiverseID);
+				InputStream is = url.openStream();
+				BufferedReader br = new BufferedReader(new InputStreamReader(new BufferedInputStream(is)));
+	
+				String json = "", line;
+				while ((line = br.readLine()) != null) {
+					json += line;
+				}
+				JSONObject jo = new JSONObject(json);
+				return jo.getString("name");
+			}			
+		} catch (SQLiteException e) {
+			throw new FamiliarDbException(e);
+		} catch (IllegalStateException e) {
+			throw new FamiliarDbException(e);
+		} catch (CursorIndexOutOfBoundsException e) {
+			throw new FamiliarDbException(e);
+		} catch (MalformedURLException e) {
+			throw new FamiliarDbException(e);
+		} catch (IOException e) {
+			throw new FamiliarDbException(e);
+		} catch (JSONException e) {
+			throw new FamiliarDbException(e);
+		}
 	}
 }

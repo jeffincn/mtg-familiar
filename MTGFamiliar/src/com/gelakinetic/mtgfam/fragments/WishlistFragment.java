@@ -101,7 +101,7 @@ public class WishlistFragment extends FamiliarFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// This is necessary to keep the goggles task running through rotation
+		// This is necessary to keep the image search task running through rotation
 		this.setRetainInstance(true);
 	}
 	
@@ -131,7 +131,7 @@ public class WishlistFragment extends FamiliarFragment {
 
 		camerabutton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				takePictureAndSearchGoogleGogglesIntent();
+				takePictureAndSearchImageIntent();
 			}
 		});
 		
@@ -206,13 +206,12 @@ public class WishlistFragment extends FamiliarFragment {
 	}
 
 	@Override
-    protected void onGoogleGogglesSuccess(String cardName) {
-    	// this method must be overridden by each class calling takePictureAndSearchGoogleGogglesIntent
-		super.onGoogleGogglesSuccess(cardName);
-		namefield.setText(cardName);
-		bAdd.performClick();
+    protected void onImageSearchSuccess(long multiverseId, String name) {
+    	// this method must be overridden by each class calling takePictureAndSearchImageIntent
+		super.onImageSearchSuccess(multiverseId, name);
+		namefield.setText(name);
 	}
-
+	
 	@Override
 	public void onPause() {
 		super.onPause();

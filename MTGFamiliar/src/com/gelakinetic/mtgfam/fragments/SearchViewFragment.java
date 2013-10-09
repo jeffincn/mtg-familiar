@@ -132,7 +132,7 @@ public class SearchViewFragment extends FamiliarFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		// This is necessary to persist the goggles task through rotation
+		// This is necessary to persist the image search task through rotation
 		this.setRetainInstance(true);
 
 		Cursor setCursor;
@@ -185,7 +185,148 @@ public class SearchViewFragment extends FamiliarFragment {
 		}
 
 		selectedFormat = -1;
+		/*
+		int cardsPerColor = 58;
+		cubeStats("Wubrgl", cardsPerColor);
+		cubeStats("wUbrgl", cardsPerColor);
+		cubeStats("wuBrgl", cardsPerColor);
+		cubeStats("wubRgl", cardsPerColor);
+		cubeStats("wubrGl", cardsPerColor);
+		*/
 	}
+/*
+	public static final int CREATURE = 0;
+	public static final int INSTAINT = 1;
+	public static final int SORCERY = 2;
+	public static final int ENCHANT = 3;
+	public static final int ARTIFACT = 4;
+	public static final int LAND = 5;
+	String[] typeStrings = {"CRE", "INS", "SOR", "ENC", "ART", "LND"};
+	
+	private void cubeStats(String string, int numCards) {
+		String[] returnTypes = new String[] { CardDbAdapter.KEY_ID, CardDbAdapter.KEY_NAME, CardDbAdapter.KEY_SET,
+				CardDbAdapter.KEY_RARITY, CardDbAdapter.KEY_MANACOST, CardDbAdapter.KEY_TYPE, CardDbAdapter.KEY_ABILITY,
+				CardDbAdapter.KEY_POWER, CardDbAdapter.KEY_TOUGHNESS, CardDbAdapter.KEY_LOYALTY , CardDbAdapter.KEY_NUMBER, CardDbAdapter.KEY_CMC };
+
+		try {
+			// Type Analysis
+			SearchCriteria criteria = new SearchCriteria();
+			criteria.Color= string;
+			criteria.Color_Logic = 2;
+			criteria.Format = "Modern";
+			Cursor mCursor = mDbHelper.Search(criteria.Name, criteria.Text, criteria.Type, criteria.Color, criteria.Color_Logic,
+					criteria.Set, criteria.Pow_Choice, criteria.Pow_Logic, criteria.Tou_Choice, criteria.Tou_Logic, criteria.Cmc,
+					criteria.Cmc_Logic, criteria.Format, criteria.Rarity, criteria.Flavor, criteria.Artist, criteria.Type_Logic,
+					criteria.Text_Logic, criteria.Set_Logic, true, returnTypes, true);
+			mCursor.moveToFirst();
+			
+			float types[] = {0,0,0,0,0,0};
+			while(!mCursor.isAfterLast()) {
+				String type = mCursor.getString(mCursor.getColumnIndex(CardDbAdapter.KEY_TYPE));
+				char rarity = (char)mCursor.getInt(mCursor.getColumnIndex(CardDbAdapter.KEY_RARITY));
+				switch(rarity) {
+					case 'C':
+						addToTypes(types, type, 10.89);
+						break;
+					case 'U':
+						addToTypes(types, type, 5);
+						break;
+					case 'R':
+						addToTypes(types, type, 1.65);
+						break;
+					case 'M':
+						addToTypes(types, type, 0.83);
+						break;
+					case 'T':
+						addToTypes(types, type, 0.83);
+						break;
+					default:
+						break;
+				}
+				mCursor.moveToNext();
+			}
+			float weightedSum = 0;
+			for(int i=0; i < types.length; i++) {
+				weightedSum += types[i];
+			}
+
+			for(int i = 0; i < types.length; i++) {
+				Log.v(string, typeStrings[i]+ ": "+Math.round(100*(numCards*types[i]/weightedSum))/100.0f);
+			}
+			int numCreatures = Math.round(numCards*types[0]/weightedSum);
+			
+			// Creature CMC Analysis
+			criteria = new SearchCriteria();
+			criteria.Color= string;
+			criteria.Color_Logic = 2;
+			criteria.Type= "Creature - ";
+			criteria.Format = "Modern";
+			mCursor = mDbHelper.Search(criteria.Name, criteria.Text, criteria.Type, criteria.Color, criteria.Color_Logic,
+					criteria.Set, criteria.Pow_Choice, criteria.Pow_Logic, criteria.Tou_Choice, criteria.Tou_Logic, criteria.Cmc,
+					criteria.Cmc_Logic, criteria.Format, criteria.Rarity, criteria.Flavor, criteria.Artist, criteria.Type_Logic,
+					criteria.Text_Logic, criteria.Set_Logic, true, returnTypes, true);
+			float cmcs[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+			while(!mCursor.isAfterLast()) {
+				int cmc = mCursor.getInt(mCursor.getColumnIndex(CardDbAdapter.KEY_CMC));
+				char rarity = (char)mCursor.getInt(mCursor.getColumnIndex(CardDbAdapter.KEY_RARITY));
+				switch(rarity) {
+					case 'C':
+						cmcs[cmc] += 10.89;
+						break;
+					case 'U':
+						cmcs[cmc] += 5;
+						break;
+					case 'R':
+						cmcs[cmc] += 1.65;
+						break;
+					case 'M':
+						cmcs[cmc] += 0.83;
+						break;
+					case 'T':
+						cmcs[cmc] += 0.83;
+						break;
+					default:
+						break;
+				}
+				mCursor.moveToNext();
+			}
+			
+			weightedSum = 0;
+			for(int i=0; i < cmcs.length; i++) {
+				weightedSum += cmcs[i];
+			}
+
+			for(int i = 0; i < cmcs.length; i++) {
+				Log.v(string, "{" + i + "}: "+Math.round(100*(numCreatures*cmcs[i]/weightedSum))/100.0f);
+			}
+		} catch (FamiliarDbException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void addToTypes(float[] types, String type, double d) {
+		// TODO Auto-generated method stub
+		if(type.toLowerCase().contains("creature")) {
+			types[CREATURE] += d;
+		}
+		else if(type.toLowerCase().contains("instant")) {
+			types[INSTAINT] += d;			
+		}
+		else if(type.toLowerCase().contains("sorcery")) {
+			types[SORCERY] += d;			
+		}
+		else if(type.toLowerCase().contains("land")) {
+			types[LAND] += d;			
+		}
+		else if(type.toLowerCase().contains("artifact")) {
+			types[ARTIFACT] += d;			
+		}
+		else if(type.toLowerCase().contains("enchant")) {
+			types[ENCHANT] += d;			
+		}
+	}
+*/
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -401,7 +542,7 @@ public class SearchViewFragment extends FamiliarFragment {
 
 		camerabutton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				takePictureAndSearchGoogleGogglesIntent();
+				takePictureAndSearchImageIntent();
 			}
 		});
 		
@@ -434,10 +575,10 @@ public class SearchViewFragment extends FamiliarFragment {
 	}
 	
 	@Override
-  protected void onGoogleGogglesSuccess(String cardName) {
-	// this method must be overridden by each class calling takePictureAndSearchGoogleGogglesIntent
-		super.onGoogleGogglesSuccess(cardName);
-		namefield.setText(cardName);
+  protected void onImageSearchSuccess(long multiverseId, String name) {
+	// this method must be overridden by each class calling takePictureAndSearchImageIntent
+		super.onImageSearchSuccess(multiverseId, name);
+		namefield.setText(name);
 		doSearch();
 	}
     

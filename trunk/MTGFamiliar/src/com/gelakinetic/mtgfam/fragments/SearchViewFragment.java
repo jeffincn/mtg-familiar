@@ -545,6 +545,7 @@ public class SearchViewFragment extends FamiliarFragment {
 				takePictureAndSearchImageIntent();
 			}
 		});
+		camerabutton.setVisibility(View.GONE);
 		
 		checkDialogButtonColors();
 

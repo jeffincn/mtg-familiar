@@ -134,7 +134,8 @@ public class WishlistFragment extends FamiliarFragment {
 				takePictureAndSearchImageIntent();
 			}
 		});
-		
+		camerabutton.setVisibility(View.GONE);
+
 		bAdd.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				if (namefield.getText().length() > 0) {

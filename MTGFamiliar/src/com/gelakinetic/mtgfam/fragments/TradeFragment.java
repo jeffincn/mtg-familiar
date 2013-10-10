@@ -157,6 +157,7 @@ public class TradeFragment extends FamiliarFragment {
 				takePictureAndSearchImageIntent();
 			}
 		});
+		camerabutton.setVisibility(View.GONE);
 		
 		bAddTradeLeft.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {

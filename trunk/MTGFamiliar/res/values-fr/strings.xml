@@ -79,10 +79,8 @@
     <string name="main_whats_new_title">Nouveautés</string>
     <string name="main_whats_new_in_title">Nouveautés dans la Version</string>
     <string name="main_whats_new_text">
- 	- Ae et Æ sont désormais interchangeables dans les recherches&lt;br />&lt;br />
-	- Traduction en Polonais&lt;br />&lt;br />
-	- Mise à jour des textes liés à Oracle&lt;br />&lt;br />
-	- Corrections de bugs pour Android 4.3
+ 	- Recherche par photo retirée (Google n\'en assure plus le support)&lt;br />&lt;br />
+ 	- Corrections de bugs mineurs
     </string>
     <string name="main_tts_warning_title">Synthèse vocale (TTS)</string>
     <string name="main_tts_warning_text">Cette appli permet la synthèse vocale parmi ses fonctionnalités, mais il semble que vous ne l\'ayiez pas installée. 

@@ -31,6 +31,7 @@ public class TranslationSpreadsheetMaker {
 		ArrayList<String> langTags = new ArrayList<String>();
 
 		if (args.length != 1) {
+			System.out.println("Please supply a path to the res/ directory, or a csv");
 			return;
 		}
 
@@ -64,19 +65,44 @@ public class TranslationSpreadsheetMaker {
 					}
 				}
 
+				boolean pluralsHaveStarted = false;
+				int pluralsWritten = 0;
 				// Read in the CSV row by row, and write the XML files as it goes along
 				String[] nextLine;
 				while ((nextLine = csvr.readNext()) != null) {
 					for (int i = 0; i < outputFiles.size(); i++) {
 						// Make sure ampersands, <>, and ' are all happy
-						String line = nextLine[i + 1].replace("&", "&amp;");
-						line = line.replace("\\'", "'");
-						line = line.replace("'", "\\'");
-						line = line.replace("<", "&lt;").replace(">", "&gt;");
-						if (line.length() == 0) {
-							line = "NO TRANSLATION";
+						if(nextLine[0].contains("__plurals__")) {
+							String key = nextLine[0].split("&&")[1];
+							String quantity = nextLine[0].split("&&")[2];
+
+							if(!pluralsHaveStarted) {
+								outputFiles.get(i).write("<plurals name=\"" + key + "\">\n");
+								if(i == outputFiles.size() - 1) {
+									pluralsHaveStarted = true;
+								}
+							}
+							
+							String line = formatLine(nextLine[i + 1]);
+							
+							outputFiles.get(i).write("<item quantity=\"" + quantity + "\">" + line +"</item>\n");
+							
+							if(i == 0) {
+								pluralsWritten++;
+							}
+							
+							if(pluralsWritten == 4){
+								outputFiles.get(i).write("</plurals>\n");
+								if(i == outputFiles.size()-1) {
+									pluralsWritten = 0;
+									pluralsHaveStarted = false;
+								}
+							}
 						}
-						outputFiles.get(i).write("<string name=\"" + nextLine[0] + "\">" + line + "</string>\n");
+						else {
+							String line = formatLine(nextLine[i + 1]);
+							outputFiles.get(i).write("<string name=\"" + nextLine[0] + "\">" + line + "</string>\n");
+						}
 					}
 				}
 
@@ -171,11 +197,33 @@ public class TranslationSpreadsheetMaker {
 					bw.write("\n");
 				}
 				bw.close();
+				System.out.println("Spreadsheet written to " + (new File("fout.csv")).getAbsolutePath());
 			}
 			catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private static String formatLine(String string) {
+		string = string.replace("&", "&amp;");
+		
+		string = string.replace("\\'", "'"); // clear forward slashes
+		string = string.replace("'", "\\'"); // add forward slashes
+
+		string = string.replace("\"\"\"", "\\\"");
+		string = string.replace("\"\"", "\"");
+
+		string = string.replace("\\\"", "\"");
+		string = string.replace("\"", "\\\"");
+
+		string = string.replace("<", "&lt;").replace(">", "&gt;"); // format html tags
+		string = string.replaceAll("\u00a0", "&#160;");
+		if (string.length() == 0) {
+			string = "NO TRANSLATION";
+		}
+		
+		return string;
 	}
 
 	private static Document parseXmlFile(InputSource is) {
@@ -217,6 +265,17 @@ public class TranslationSpreadsheetMaker {
 				}
 				catch (NullPointerException e) {
 					System.out.println(e + " " + el.getAttribute("name"));
+				}
+			}
+		}
+		
+		nl = docEle.getElementsByTagName("plurals");
+		if (nl != null && nl.getLength() > 0) {
+			for (int i = 0; i < nl.getLength(); i++) {
+				String pluralName = ((Element)nl.item(i)).getAttribute("name");
+				NodeList nls = ((Element)nl.item(i)).getElementsByTagName("item");
+				for(int j = 0; j < nls.getLength(); j++) {
+					translationMap.put("__plurals__&&" + pluralName + "&&" + ((Element)nls.item(j)).getAttribute("quantity"), ((Element)nls.item(j)).getFirstChild().getNodeValue());
 				}
 			}
 		}

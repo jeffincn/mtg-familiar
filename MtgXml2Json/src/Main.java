@@ -122,6 +122,7 @@ public class Main implements ActionListener {
 		openButton = new JButton("Select the XML File");
 		convertButton = new JButton("Barf the JSON");
 		fileChooser = new JFileChooser(new File("./"));
+		fileChooser.setFileFilter(new XmlFilter());
 		chooserLabel = new JLabel("");
 		statusLabel = new JLabel("");
 

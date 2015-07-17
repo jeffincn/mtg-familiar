@@ -1,0 +1,1 @@
+We've moved to github: https://github.com/AEFeinstein/mtg-familiar
